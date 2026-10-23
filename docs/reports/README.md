@@ -23,6 +23,11 @@ status: measured        # measured | decided | stale | superseded
 | date | report | verdict in one line | status |
 |---|---|---|---|
 | 2026-10-24 | [The name, picked by a persona jury](2026-10-24-the-name-picked-by-a-persona-jury.md) | PersonaJury, 8 of 8 forced picks over seven other names | decided |
+| 2026-10-24 | [v0.2 measured: panels, the draw and overrides](2026-10-24-v0-2-measured.md) | 292 tests green after a review that found 6 Important findings, all fixed; the ceiling of 12 is still a guess | measured |
+| 2026-10-24 | [v0.3 measured: the jury graph, waves and usage](2026-10-24-v0-3-measured.md) | 332 tests green; the graph is byte-identical and goes red when one score moves; 3 Important findings fixed | measured |
+| 2026-10-24 | [v0.4 measured: the apply check](2026-10-24-v0-4-measured.md) | 409 tests green; the review found 5 Critical cases where apply-check said apply, all fixed; the .mcpb bundle is unverified | measured |
+| 2026-10-24 | [v0.5 measured: summary, calibration, CSV cells, CI](2026-10-24-v0-5-measured.md) | 471 tests green; the CI gate now judges every subject and fails closed; the Action has not run on GitHub | measured |
+| 2026-10-24 | [How to show a jury's answer](2026-10-24-display-jury.md) | sentences first, numbers for checking, no bars: bars got 0 of 8 picks, numbers and sentences tied 4 to 4 by reader | decided |
 
-No report exists yet. The first is expected from the held-out check: a jury run on the fixture site compared with the
+The held-out check is still to be reported: a jury run on the fixture site compared with the
 answer key in `fixtures/README.md` (see `../testing.md`).

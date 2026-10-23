@@ -87,6 +87,7 @@ pass that never happened. The orchestrator's rulings, built in lane `final-fixes
 Would change: the maintainer's answer on the "same point" key (R12/B3), which stays provisional.
 
 ## D9 — schema v3, the seeded draw, a stake per panel term, `brief --rule` (2026-10-24, the maintainer's call on the design author's read)
+*Built in v0.2: [plan](plans/2026-10-24-v0-2-panels-and-the-draw.md), [measured](reports/2026-10-24-v0-2-measured.md).*
 The persona-structure read (kept privately by the maintainer) found that a rule already carries `panel`, `lenses`, `spend` and
 `detail`, but `brief` did not read it, the panel resolved in persona-id order (the same bystanders on every subject) and
 every stake was typed by hand. v0.2 builds option A1:
@@ -113,6 +114,7 @@ Would change: a saturation run (brief 12, count new findings per added persona) 
 rotate bystanders between rounds, which would break `delta` and so needs its own decision.
 
 ## D10 — seat ceilings 12 and 1000, and the agent's overrides with a reason (2026-10-24, the maintainer)
+*Built in v0.2: [plan](plans/2026-10-24-v0-2-panels-and-the-draw.md), [measured](reports/2026-10-24-v0-2-measured.md).*
 The maintainer, 2026-10-24: "allow llm to override the persona count, type, etc on top of us for flexibility … if they want
 to run 1000 maximum also can right? in a crazy sense". Built as:
 - **Two ceilings** (`domain/model.rs`): `SEAT_CEILING = 12` and `SEAT_HARD_MAX = 1000`. A panel (`panel add`) or a brief
@@ -147,6 +149,7 @@ Fix round 1 (review of 2026-10-24, the maintainer's rulings):
   yet confirmed that reading of the amendment.
 
 ## D11 — the jury graph: one deterministic SVG, and its layout rule (2026-10-24, the maintainer asked for it by name)
+*Built in v0.3: [plan](plans/2026-10-24-v0-3-the-jury-graph.md), [measured](reports/2026-10-24-v0-3-measured.md).*
 The name promises a graph and v0.2 drew none. v0.3 adds `personajury graph RUN... --svg [--out F]` and the MCP tool
 `personajury_graph` (the tool count goes from 5 to 6; it answers the SVG text in `data.svg` and writes no file).
 - **One static picture, no simulation.** The layout is integer arithmetic over ordered containers (`domain/graphlayout.rs`,
@@ -176,6 +179,7 @@ Fix round 1 (review of 2026-10-24): above 30 personas the strata sit side by sid
 wants its own lane (more than two lenses already stack in two lanes).
 
 ## D12 — waves, reported usage, the allowed anchors, a reason for any large brief (2026-10-24)
+*Built in v0.3: [plan](plans/2026-10-24-v0-3-the-jury-graph.md), [measured](reports/2026-10-24-v0-3-measured.md).*
 - **Waves.** Every brief answers `waves`: its persona ids in brief order, cut into waves of `--wave N` seats (default 30;
   one wave up to 12 seats; `--wave 0` is `invalid_arguments`). The engine runs nothing, so the throttle is advice the skill
   gives: run a wave, ingest it, then the next. A 100-seat brief answers 30/30/30/10.
@@ -198,6 +202,7 @@ Would change: a measured wave size (the 30 is the mirror of a rate limit, not a 
 usage, which leaves `reported` null.
 
 ## D13 — the split rule and `apply-check`, the verdict an agent obeys (2026-10-24, the maintainer: "decide automatically")
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what counts as a split).
 - **A split** is a (lens, dimension, about) cell on which two strata's `anchor_met` ranges `[min, max]` do not overlap. Ranges
   that touch at an endpoint overlap: no split. Pure code in `domain/apply.rs`. `matrix` answers `splits` beside `strata`
@@ -240,6 +245,7 @@ Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what count
 Would change: a measured false-escalation rate; the calibration lane (v0.5), which can turn `apply` into `escalate`.
 
 ## D14 — `lens generate` (2026-10-24)
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 `personajury lens generate --from PATH [--dimensions N]` (default 4, at most 12) writes `.personajury/generate/lens-<hash>.md`
 the way `persona generate` writes its brief, with the same material hash and the same record in `material`. Two steps for the
 agent: list what the material says good looks like (not part of the lens file), then draft a lens in the exact TOML shape, with
@@ -249,6 +255,7 @@ investor pitch, financial model: four dimensions each, anchors in words, generic
 test checks that `lens add` accepts them.
 
 ## D15 — a model per panel term (2026-10-24)
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 A term may close with `@model`: `3 builder=primary@claude-sonnet-5-5, 2 approver=secondary@other-model`. The model is letters,
 digits and `. _ : / -`, else `invalid_query`. `brief --model` stays the default and the run's `model`. Each brief records its model
 (`BriefRef.model`, in `run.briefs_json`; a run made before v0.4 reads as the run's model). **A run whose panel terms name a model
@@ -257,6 +264,7 @@ recorded fixture hashes did not change. `matrix` answers `models` per stratum an
 informational reason `single_model` when every juror used one model.
 
 ## D16 — packaging: the `.mcpb` bundle, `mcp.json`, registry packages (2026-10-24)
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 No engine change. `packaging/mcpb/manifest.json` (manifest 0.4, `server.type` `binary`, `mcp_config.command`
 `${__dirname}/bin/personajury`, args `["--root", "${user_config.root}", "mcp"]`, a required `directory` setting) and
 `scripts/build-mcpb.sh <platform> <binary>` (zip of the manifest for that platform and the binary; prints the sha256; no network).
@@ -271,6 +279,7 @@ Unverified against Claude Desktop until the maintainer installs a bundle by hand
 is files (`docs/usage.md`).
 
 ## D17 — effort: one word for how much a jury may spend (2026-10-24, the maintainer: "keep it simple")
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 `effort = "low" | "medium" | "high" | "max"` in `personajury.toml`, `brief --effort` per run (recorded), and an optional
 `budget_tokens`. The rule says what a change needs; effort says what you will spend; the run gets the smaller.
 | effort | seats | lenses |
@@ -299,6 +308,7 @@ is files (`docs/usage.md`).
   A store of any other version is refused as before.
 
 ## D18 — independence: a word on the run (2026-10-24)
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 Where no subagents exist (Claude Desktop, a chat window, Copilot) one context plays every juror, and the engine cannot see it. So it is
 a declaration: `brief --independence independent|sequential` (default `independent`; MCP `independence`), stored as `run.independence`.
 The brief files are byte-identical either way. The answer echoes it and, for `sequential`, adds `sequence` (the brief paths in panel
@@ -309,6 +319,7 @@ brief) and never `apply`; `escalate` and `human` take precedence. `docs/publishi
 `independent` from one window is a false record.
 
 ## D19 — experts and a human verdict (2026-10-24)
+*Built in v0.4: [plan](plans/2026-10-24-v0-4-the-apply-check.md), [measured](reports/2026-10-24-v0-4-measured.md).*
 Expertise is a property of a persona or of a lens, never a stratum. A persona file may carry `credential` (words, at most 500
 characters, else `credential_too_long`; shown in the brief, `persona list` and the matrix as `(C)`; the key is left out of an older
 persona's profile and hash). A lens's `standard` is shown in every brief and in a `standard: <lens> — ...` header line of the matrix.
@@ -321,6 +332,7 @@ that decision is the only way a human verdict is overruled, and `decide` takes i
 the agent, the foreman or anyone is refused, `human_decision_required`; the MCP has no `decide`). `calibrate` (v0.5) will compare human batches with persona batches.
 
 ## D20 — calibration (2026-10-24)
+*Built in v0.5: [plan](plans/2026-10-24-v0-5-summary-calibration-ci.md), [measured](reports/2026-10-24-v0-5-measured.md).*
 `personajury calibrate <jury-run> <human-run> [--out F]`. The human run is an ordinary run whose batches were entered with `--by-human`
 (`not_human_run` otherwise) on the same subject and lens version. For each stratum, the cells (lens, dimension, about) are ranked by the
 stratum's median (the lower middle), high first, ties sharing a rank (1, 1, 3); `within_one_rank` per cell. **`calibrated` is true iff every
@@ -331,12 +343,14 @@ and `human` still take precedence). The roadmap said "escalate"; this is `advise
 not send the change up a quorum). A file for another subject, or not a calibration, is `invalid_arguments`. Pure code in `domain/calibrate.rs`.
 
 ## D21 — CSV cell locators (2026-10-24)
+*Built in v0.5: [plan](plans/2026-10-24-v0-5-summary-calibration-ci.md), [measured](reports/2026-10-24-v0-5-measured.md).*
 `<label>#R<row>C<col>` on a text attachment whose label ends `.csv`, 1-based, the header is row 1, canonical digits only. Rows are records
 (RFC 4180, `domain/csv.rs`: quoted fields, doubled quotes, CRLF, line breaks in quotes; no crate), so a quoted newline does not add a row.
 The column must exist in that record (ragged rows are allowed). Out of range or non-canonical: `citation_unresolved`. `R` followed by a
 letter stays an anchor; `#L<n>` keeps working.
 
 ## D22 — the GitHub Action (2026-10-24)
+*Built in v0.5: [plan](plans/2026-10-24-v0-5-summary-calibration-ci.md), [measured](reports/2026-10-24-v0-5-measured.md).*
 `action.yml` (composite) installs the released binary through `scripts/install.sh` (checksum verified), then `scripts/action-run.sh` takes
 `git diff base...HEAD`, runs `should-run`, and with `store` runs `check` and `apply-check --latest`. Outputs `quorum`, `spend`, `effort`,
 `answer`, `check`. The job fails on a failing `check` always, and on an answer or a `human` quorum named in `fail-on` (default `human`).
@@ -352,11 +366,13 @@ needs no run ids. The script needs `jq`. Tested against a local binary in `tests
   `calibration_mismatch`. CSV: lowercase and `RC1` locators are refused; a quote in the middle of an unquoted field is literal.
 
 ## D23 — the Claude Agent SDK recipe (2026-10-24)
+*Built in v0.5: [plan](plans/2026-10-24-v0-5-summary-calibration-ci.md), [measured](reports/2026-10-24-v0-5-measured.md).*
 Docs and one example, no runner of our own. `docs/agent-sdk.md`, `examples/agent-sdk/run_jury.py` (Python; the SDK's names are marked "check
 the SDK version"). One `query()` session per brief; private folders; a coordinator session ingests through `personajury mcp`. The test only
 checks the example compiles and holds no key or environment read.
 
 ## D24 — the answer display (2026-10-24, the maintainer, with a display jury of 8 mixed personas)
+*Built in v0.5: [plan](plans/2026-10-24-v0-5-summary-calibration-ci.md), [measured](reports/2026-10-24-v0-5-measured.md). Display jury: [report](reports/2026-10-24-display-jury.md).*
 `personajury summary RUN... [--html F] [--md F] [--save] [--width N]`, MCP `personajury_summary`. The jury preferred sentences (the non-technical
 readers) and numbers (the technical readers) over bars, which got 0 of 8 picks: so **no bars anywhere**. Layout: 2 to 5 plain sentences (the
 apply-check answer in words, who won with counts per stratum, the weakest dimension, the change "15 → 6", up to three quoted blockers with
@@ -375,6 +391,7 @@ is binding only where wired (Action, hook, own gate). Golden: `fixtures/run/summ
   quoted blockers rotate across jurors, primary first, one per juror before anyone's second.
 
 ## D25 — the name: PersonaJury, renamed from JuryGraph before the first release (2026-10-24, the maintainer, "let the persona jury decide")
+*Report: [the name, picked by a persona jury](reports/2026-10-24-the-name-picked-by-a-persona-jury.md).*
 The working name did not say what the tool does (a persona jury scored it 2 of 5 on *understood* in every stratum) and a persona jury
 picked PersonaJury 8 of 8 (`docs/reports/2026-10-24-the-name-picked-by-a-persona-jury.md`). Nothing was ever released, so the rename is
 complete and carries no shim: the crate, package and binary `personajury`, the config file `personajury.toml`, the store directory

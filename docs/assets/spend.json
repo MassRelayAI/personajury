@@ -1,0 +1,44 @@
+{
+ "title": "What a jury costs the agent: brief bytes by spend and detail",
+ "command": "jurygraph brief --subject lantern-site --panel fixture --lens critical --stake <seven stakes> --spend N --detail compact|full --model claude-sonnet-5-5, on the workspace fixtures/run/setup.sh builds; the bytes of every brief of the run, summed",
+ "tokens_per_brief": 15000,
+ "caption": "Two knobs: how many, and how much each carries. The token figure is the project toml’s own estimate, not a measurement.",
+ "rows": [
+  {
+   "spend": 1,
+   "detail": "compact",
+   "briefs": 1,
+   "bytes": 5116
+  },
+  {
+   "spend": 1,
+   "detail": "full",
+   "briefs": 1,
+   "bytes": 7879
+  },
+  {
+   "spend": 3,
+   "detail": "compact",
+   "briefs": 3,
+   "bytes": 15212
+  },
+  {
+   "spend": 3,
+   "detail": "full",
+   "briefs": 3,
+   "bytes": 23501
+  },
+  {
+   "spend": 7,
+   "detail": "compact",
+   "briefs": 7,
+   "bytes": 34934
+  },
+  {
+   "spend": 7,
+   "detail": "full",
+   "briefs": 7,
+   "bytes": 54275
+  }
+ ]
+}

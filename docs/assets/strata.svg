@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 556" width="1050" role="img" aria-labelledby="t d">
+<title id="t">The same question, asked of three strata: compare:clarity</title><desc id="d">The compare:clarity dimension, one dot per persona on a 1 to 5 scale. primary (4 personas): Lantern Notes median 2, range 2 to 2; cmp:acme-pricing median 4, range 4 to 5. secondary (2 personas): Lantern Notes median 1, range 1 to 2; cmp:acme-pricing median 4, range 4 to 5. bystander (1 persona): Lantern Notes median 2, range 2 to 2; cmp:acme-pricing median 4, range 4 to 4. Pooling every persona into one mean gives 1.9, a number the engine refuses to print.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="554" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+<text x="30" y="40" font-size="18" font-weight="700">The same question, asked of three strata</text>
+<text x="30" y="62" font-size="13" fill="#57606a">One dot per persona, <tspan font-family="monospace" fill="#0550ae">compare:clarity</tspan>, 1 to 5. Bar: median. Line: lowest to highest.</text>
+<text x="1020" y="40" font-size="16" text-anchor="end" fill="#57606a" text-decoration="line-through">all strata: 1.9</text>
+<text x="1020" y="62" font-size="13" text-anchor="end" fill="#cf222e">the engine refuses this row</text>
+<rect x="30" y="92" width="316" height="418" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="46" y="108" width="87" height="26" rx="13" fill="#ddf4ff" stroke="#57606a" stroke-width="1"/>
+<text x="58" y="126" font-size="14" font-weight="700">primary</text>
+<text x="46" y="154" font-size="12" fill="#57606a">would use it · 4 personas</text>
+<text x="46" y="192" font-size="12" font-weight="700">Lantern Notes</text>
+<line x1="64" y1="238" x2="312" y2="238" stroke="#d0d7de" stroke-width="1"/>
+<line x1="126" y1="204" x2="126" y2="264" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="126" cy="216" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="126" cy="228" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="126" cy="240" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="126" cy="252" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<text x="46" y="282" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">2</tspan> · range 2 to 2</text>
+<text x="46" y="312" font-size="12" font-weight="700">cmp:acme-pricing</text>
+<line x1="64" y1="358" x2="312" y2="358" stroke="#d0d7de" stroke-width="1"/>
+<line x1="250" y1="354" x2="312" y2="354" stroke="#57606a" stroke-width="1.5"/>
+<line x1="250" y1="348" x2="250" y2="360" stroke="#57606a" stroke-width="1.5"/>
+<line x1="312" y1="348" x2="312" y2="360" stroke="#57606a" stroke-width="1.5"/>
+<line x1="250" y1="324" x2="250" y2="384" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="250" cy="342" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="250" cy="354" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="250" cy="366" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="312" cy="354" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<text x="46" y="402" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">4</tspan> · range 4 to 5</text>
+<line x1="64" y1="430" x2="312" y2="430" stroke="#57606a" stroke-width="1.2"/>
+<line x1="64" y1="430" x2="64" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="64" y="450" font-size="12" text-anchor="middle" fill="#57606a">1</text>
+<line x1="126" y1="430" x2="126" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="126" y="450" font-size="12" text-anchor="middle" fill="#57606a">2</text>
+<line x1="188" y1="430" x2="188" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="188" y="450" font-size="12" text-anchor="middle" fill="#57606a">3</text>
+<line x1="250" y1="430" x2="250" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="250" y="450" font-size="12" text-anchor="middle" fill="#57606a">4</text>
+<line x1="312" y1="430" x2="312" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="312" y="450" font-size="12" text-anchor="middle" fill="#57606a">5</text>
+<line x1="46" y1="472" x2="330" y2="472" stroke="#d0d7de" stroke-width="1"/>
+<text x="46" y="496" font-size="13">The comparator leads by <tspan font-weight="700">2</tspan>: median 4 to 2</text>
+<rect x="377" y="92" width="316" height="418" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="393" y="108" width="105" height="26" rx="13" fill="#fff8c5" stroke="#57606a" stroke-width="1"/>
+<text x="405" y="126" font-size="14" font-weight="700">secondary</text>
+<text x="393" y="154" font-size="12" fill="#57606a">buys, approves or supports it · 2 personas</text>
+<text x="393" y="192" font-size="12" font-weight="700">Lantern Notes</text>
+<line x1="411" y1="238" x2="659" y2="238" stroke="#d0d7de" stroke-width="1"/>
+<line x1="411" y1="234" x2="473" y2="234" stroke="#57606a" stroke-width="1.5"/>
+<line x1="411" y1="228" x2="411" y2="240" stroke="#57606a" stroke-width="1.5"/>
+<line x1="473" y1="228" x2="473" y2="240" stroke="#57606a" stroke-width="1.5"/>
+<line x1="411" y1="204" x2="411" y2="264" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="473" cy="234" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="411" cy="234" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<text x="393" y="282" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">1</tspan> · range 1 to 2</text>
+<text x="393" y="312" font-size="12" font-weight="700">cmp:acme-pricing</text>
+<line x1="411" y1="358" x2="659" y2="358" stroke="#d0d7de" stroke-width="1"/>
+<line x1="597" y1="354" x2="659" y2="354" stroke="#57606a" stroke-width="1.5"/>
+<line x1="597" y1="348" x2="597" y2="360" stroke="#57606a" stroke-width="1.5"/>
+<line x1="659" y1="348" x2="659" y2="360" stroke="#57606a" stroke-width="1.5"/>
+<line x1="597" y1="324" x2="597" y2="384" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="597" cy="354" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<circle cx="659" cy="354" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<text x="393" y="402" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">4</tspan> · range 4 to 5</text>
+<line x1="411" y1="430" x2="659" y2="430" stroke="#57606a" stroke-width="1.2"/>
+<line x1="411" y1="430" x2="411" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="411" y="450" font-size="12" text-anchor="middle" fill="#57606a">1</text>
+<line x1="473" y1="430" x2="473" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="473" y="450" font-size="12" text-anchor="middle" fill="#57606a">2</text>
+<line x1="535" y1="430" x2="535" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="535" y="450" font-size="12" text-anchor="middle" fill="#57606a">3</text>
+<line x1="597" y1="430" x2="597" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="597" y="450" font-size="12" text-anchor="middle" fill="#57606a">4</text>
+<line x1="659" y1="430" x2="659" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="659" y="450" font-size="12" text-anchor="middle" fill="#57606a">5</text>
+<line x1="393" y1="472" x2="677" y2="472" stroke="#d0d7de" stroke-width="1"/>
+<text x="393" y="496" font-size="13">The comparator leads by <tspan font-weight="700">3</tspan>: median 4 to 1</text>
+<rect x="724" y="92" width="316" height="418" rx="8" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="740" y="108" width="105" height="26" rx="13" fill="#dafbe1" stroke="#57606a" stroke-width="1"/>
+<text x="752" y="126" font-size="14" font-weight="700">bystander</text>
+<text x="740" y="154" font-size="12" fill="#57606a">passes by · 1 persona</text>
+<text x="740" y="192" font-size="12" font-weight="700">Lantern Notes</text>
+<line x1="758" y1="238" x2="1006" y2="238" stroke="#d0d7de" stroke-width="1"/>
+<line x1="820" y1="204" x2="820" y2="264" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="820" cy="234" r="5.5" fill="#0969da" stroke="#ffffff" stroke-width="1.5"/>
+<text x="740" y="282" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">2</tspan> · range 2 to 2</text>
+<text x="740" y="312" font-size="12" font-weight="700">cmp:acme-pricing</text>
+<line x1="758" y1="358" x2="1006" y2="358" stroke="#d0d7de" stroke-width="1"/>
+<line x1="944" y1="324" x2="944" y2="384" stroke="#1f2328" stroke-width="3" stroke-linecap="round"/>
+<circle cx="944" cy="354" r="5.5" fill="#bf8700" stroke="#ffffff" stroke-width="1.5"/>
+<text x="740" y="402" font-size="12" fill="#57606a">median <tspan font-weight="700" fill="#1f2328">4</tspan> · range 4 to 4</text>
+<line x1="758" y1="430" x2="1006" y2="430" stroke="#57606a" stroke-width="1.2"/>
+<line x1="758" y1="430" x2="758" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="758" y="450" font-size="12" text-anchor="middle" fill="#57606a">1</text>
+<line x1="820" y1="430" x2="820" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="820" y="450" font-size="12" text-anchor="middle" fill="#57606a">2</text>
+<line x1="882" y1="430" x2="882" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="882" y="450" font-size="12" text-anchor="middle" fill="#57606a">3</text>
+<line x1="944" y1="430" x2="944" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="944" y="450" font-size="12" text-anchor="middle" fill="#57606a">4</text>
+<line x1="1006" y1="430" x2="1006" y2="435" stroke="#57606a" stroke-width="1.2"/><text x="1006" y="450" font-size="12" text-anchor="middle" fill="#57606a">5</text>
+<line x1="740" y1="472" x2="1024" y2="472" stroke="#d0d7de" stroke-width="1"/>
+<text x="740" y="496" font-size="13">The comparator leads by <tspan font-weight="700">2</tspan>: median 4 to 2</text>
+<g font-size="12" fill="#57606a"><circle cx="720" cy="534" r="5.5" fill="#0969da"/><text x="732" y="538">Lantern Notes</text><circle cx="860" cy="534" r="5.5" fill="#bf8700"/><text x="872" y="538">cmp:acme-pricing</text></g>
+<text x="30" y="538" font-size="12" fill="#57606a">Fixture run, 7 personas, report 2026-10-23-v0-1-measured. A fixture we wrote, not a benchmark.</text>
+</g>
+</svg>

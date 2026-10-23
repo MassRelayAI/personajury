@@ -22,6 +22,10 @@ jobs:
         run: cargo test -p jurygraph
       - name: Clippy
         run: cargo clippy -p jurygraph --tests -- -D warnings
+      - name: README illustration script tests
+        run: node --test scripts/test/*.test.mjs
+      - name: README illustrations are current
+        run: node scripts/readme-assets.mjs --check
       - name: server.json version equals Cargo.toml
         run: |
           v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="jurygraph") | .version')

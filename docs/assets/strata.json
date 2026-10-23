@@ -1,0 +1,87 @@
+{
+ "title": "The same question, asked of three strata",
+ "dimension": "compare:clarity",
+ "subject": "Lantern Notes",
+ "comparator": "cmp:acme-pricing",
+ "pooled_mean": 1.9,
+ "strata": [
+  {
+   "stake": "primary",
+   "personas": [
+    "builder-ana",
+    "builder-mei",
+    "builder-ravi",
+    "newcomer-sofia"
+   ],
+   "subject": {
+    "scores": {
+     "builder-ana": 2,
+     "builder-mei": 2,
+     "builder-ravi": 2,
+     "newcomer-sofia": 2
+    },
+    "median": 2,
+    "min": 2,
+    "max": 2
+   },
+   "comparator": {
+    "scores": {
+     "builder-ana": 4,
+     "builder-mei": 4,
+     "builder-ravi": 4,
+     "newcomer-sofia": 5
+    },
+    "median": 4,
+    "min": 4,
+    "max": 5
+   }
+  },
+  {
+   "stake": "secondary",
+   "personas": [
+    "company-george",
+    "company-hanna"
+   ],
+   "subject": {
+    "scores": {
+     "company-george": 2,
+     "company-hanna": 1
+    },
+    "median": 1,
+    "min": 1,
+    "max": 2
+   },
+   "comparator": {
+    "scores": {
+     "company-george": 4,
+     "company-hanna": 5
+    },
+    "median": 4,
+    "min": 4,
+    "max": 5
+   }
+  },
+  {
+   "stake": "bystander",
+   "personas": [
+    "investor-claire"
+   ],
+   "subject": {
+    "scores": {
+     "investor-claire": 2
+    },
+    "median": 2,
+    "min": 2,
+    "max": 2
+   },
+   "comparator": {
+    "scores": {
+     "investor-claire": 4
+    },
+    "median": 4,
+    "min": 4,
+    "max": 4
+   }
+  }
+ ]
+}

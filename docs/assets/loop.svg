@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 400" width="1050" role="img" aria-labelledby="t d">
+<title id="t">The JuryGraph loop</title><desc id="d">Inside the engine: should-run, brief, verdict, matrix per stratum, decide, delta. Outside the engine, drawn dashed: your subagents, your model, your bill. The brief goes out to the subagents, a verdict comes back, and a verdict without a citation is returned as refused. The engine stores, composes, checks and refuses; no model is called.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#57606a"/></marker><marker id="r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#cf222e"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="398" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+<rect x="24" y="40" width="1002" height="196" rx="12" fill="#f6f8fa" stroke="#57606a" stroke-width="1.4"/>
+<text x="42" y="66" font-size="13" font-weight="700">the engine</text>
+<text x="124" y="66" font-size="12" fill="#57606a">one binary, SQLite, no model call</text>
+<rect x="50" y="96" width="140" height="100" rx="8" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="64" y="120" font-size="13" fill="#57606a">1</text>
+<text x="64" y="144" font-size="17" font-weight="700" font-family="monospace">should-run</text>
+<text x="64" y="164" font-size="12">does this change</text>
+<text x="64" y="180" font-size="12">need a jury?</text>
+<line x1="192" y1="146" x2="208" y2="146" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="210" y="96" width="140" height="100" rx="8" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="224" y="120" font-size="13" fill="#57606a">2</text>
+<text x="224" y="144" font-size="17" font-weight="700" font-family="monospace">brief</text>
+<text x="224" y="164" font-size="12">one file per</text>
+<text x="224" y="180" font-size="12">persona, hashed</text>
+<line x1="352" y1="146" x2="368" y2="146" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="370" y="96" width="140" height="100" rx="8" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="384" y="120" font-size="13" fill="#57606a">3</text>
+<text x="384" y="144" font-size="17" font-weight="700" font-family="monospace">verdict</text>
+<text x="384" y="164" font-size="12">ingest, cite-check,</text>
+<text x="384" y="180" font-size="12">refuse</text>
+<line x1="512" y1="146" x2="528" y2="146" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="530" y="96" width="140" height="100" rx="8" fill="#dafbe1" stroke="#57606a" stroke-width="1.2"/>
+<text x="544" y="120" font-size="13" fill="#57606a">4</text>
+<text x="544" y="144" font-size="17" font-weight="700" font-family="monospace">matrix</text>
+<text x="544" y="164" font-size="12">scores per</text>
+<text x="544" y="180" font-size="12">stratum</text>
+<line x1="672" y1="146" x2="688" y2="146" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="690" y="96" width="140" height="100" rx="8" fill="#fff8c5" stroke="#57606a" stroke-width="1.2"/>
+<text x="704" y="120" font-size="13" fill="#57606a">5</text>
+<text x="704" y="144" font-size="17" font-weight="700" font-family="monospace">decide</text>
+<text x="704" y="164" font-size="12">a person: fixed,</text>
+<text x="704" y="180" font-size="12">dismissed, row</text>
+<line x1="832" y1="146" x2="848" y2="146" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<rect x="850" y="96" width="140" height="100" rx="8" fill="#dafbe1" stroke="#57606a" stroke-width="1.2"/>
+<text x="864" y="120" font-size="13" fill="#57606a">6</text>
+<text x="864" y="144" font-size="17" font-weight="700" font-family="monospace">delta</text>
+<text x="864" y="164" font-size="12">what moved</text>
+<text x="864" y="180" font-size="12">between runs</text>
+<path d="M920.0 94 V80 H280.0 V92" fill="none" stroke="#57606a" stroke-width="1.2" stroke-dasharray="2 4" marker-end="url(#a)"/>
+<text x="600.0" y="72" font-size="12" text-anchor="middle" fill="#57606a" stroke="#f6f8fa" stroke-width="4" paint-order="stroke">next round, after the fixes</text>
+<rect x="190" y="292" width="340" height="76" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="360.0" y="322" font-size="17" font-weight="700" text-anchor="middle">your subagents</text>
+<text x="360.0" y="344" font-size="13" text-anchor="middle" fill="#57606a">your model, your bill</text>
+<line x1="250.0" y1="196" x2="250.0" y2="290" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="240.0" y="262" font-size="12" text-anchor="end">brief files</text>
+<line x1="405.0" y1="292" x2="405.0" y2="198" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+<text x="395.0" y="262" font-size="12" text-anchor="end">verdict JSON</text>
+<line x1="465.0" y1="198" x2="465.0" y2="290" stroke="#cf222e" stroke-width="1.5" marker-end="url(#r)"/>
+<text x="477.0" y="258" font-size="12" font-weight="700" fill="#cf222e">refused: no citation</text>
+<text x="477.0" y="274" font-size="12" fill="#57606a">the persona answers again</text>
+<text x="525" y="392" font-size="13" text-anchor="middle" fill="#57606a">The engine stores, composes, checks and refuses. No model is called.</text>
+</g></svg>

@@ -1,0 +1,407 @@
+{
+ "title": "The fixture jury, every score",
+ "subject": "Lantern Notes",
+ "cols": [
+  {
+   "lens": "critical",
+   "dimension": "works",
+   "about": null,
+   "label": "works"
+  },
+  {
+   "lens": "critical",
+   "dimension": "blocks",
+   "about": null,
+   "label": "blocks"
+  },
+  {
+   "lens": "critical",
+   "dimension": "missing",
+   "about": null,
+   "label": "missing"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": null,
+   "label": "subject"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": "cmp:acme-pricing",
+   "label": "cmp:acme-pricing"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": "home.png",
+   "label": "home.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": "home.walk.json",
+   "label": "home.walk.json"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": "pricing.png",
+   "label": "pricing.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "clarity",
+   "about": "pricing.walk.json",
+   "label": "pricing.walk.json"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": null,
+   "label": "subject"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": "cmp:acme-pricing",
+   "label": "cmp:acme-pricing"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": "home.png",
+   "label": "home.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": "home.walk.json",
+   "label": "home.walk.json"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": "pricing.png",
+   "label": "pricing.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "price",
+   "about": "pricing.walk.json",
+   "label": "pricing.walk.json"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": null,
+   "label": "subject"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": "cmp:acme-pricing",
+   "label": "cmp:acme-pricing"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": "home.png",
+   "label": "home.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": "home.walk.json",
+   "label": "home.walk.json"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": "pricing.png",
+   "label": "pricing.png"
+  },
+  {
+   "lens": "compare",
+   "dimension": "trust",
+   "about": "pricing.walk.json",
+   "label": "pricing.walk.json"
+  }
+ ],
+ "strata": [
+  {
+   "stake": "primary",
+   "rows": [
+    {
+     "persona": "builder-ana",
+     "scores": [
+      2,
+      2,
+      2,
+      2,
+      4,
+      1,
+      1,
+      3,
+      3,
+      2,
+      5,
+      1,
+      1,
+      2,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2
+     ],
+     "blockers": 7
+    },
+    {
+     "persona": "builder-mei",
+     "scores": [
+      3,
+      2,
+      3,
+      2,
+      4,
+      2,
+      2,
+      4,
+      4,
+      3,
+      5,
+      2,
+      2,
+      3,
+      3,
+      2,
+      4,
+      2,
+      3,
+      3,
+      3
+     ],
+     "blockers": 2
+    },
+    {
+     "persona": "builder-ravi",
+     "scores": [
+      2,
+      2,
+      2,
+      2,
+      4,
+      2,
+      3,
+      3,
+      3,
+      2,
+      4,
+      2,
+      2,
+      3,
+      3,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2
+     ],
+     "blockers": 2
+    },
+    {
+     "persona": "newcomer-sofia",
+     "scores": [
+      2,
+      1,
+      3,
+      2,
+      5,
+      2,
+      2,
+      4,
+      4,
+      2,
+      5,
+      1,
+      1,
+      3,
+      3,
+      2,
+      4,
+      2,
+      2,
+      2,
+      2
+     ],
+     "blockers": 4
+    }
+   ],
+   "median": [
+    2,
+    2,
+    2,
+    2,
+    4,
+    2,
+    2,
+    3,
+    3,
+    2,
+    5,
+    1,
+    1,
+    3,
+    3,
+    2,
+    3,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  {
+   "stake": "secondary",
+   "rows": [
+    {
+     "persona": "company-george",
+     "scores": [
+      2,
+      2,
+      2,
+      2,
+      4,
+      2,
+      2,
+      2,
+      2,
+      2,
+      5,
+      1,
+      1,
+      3,
+      3,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2
+     ],
+     "blockers": 2
+    },
+    {
+     "persona": "company-hanna",
+     "scores": [
+      2,
+      2,
+      2,
+      1,
+      5,
+      1,
+      1,
+      3,
+      3,
+      2,
+      5,
+      1,
+      1,
+      2,
+      2,
+      2,
+      3,
+      2,
+      2,
+      2,
+      2
+     ],
+     "blockers": 5
+    }
+   ],
+   "median": [
+    2,
+    2,
+    2,
+    1,
+    4,
+    1,
+    1,
+    2,
+    2,
+    2,
+    5,
+    1,
+    1,
+    2,
+    2,
+    2,
+    3,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  {
+   "stake": "bystander",
+   "rows": [
+    {
+     "persona": "investor-claire",
+     "scores": [
+      2,
+      2,
+      2,
+      2,
+      4,
+      2,
+      2,
+      3,
+      3,
+      2,
+      5,
+      1,
+      1,
+      3,
+      3,
+      2,
+      4,
+      2,
+      2,
+      3,
+      3
+     ],
+     "blockers": 4
+    }
+   ],
+   "median": [
+    2,
+    2,
+    2,
+    2,
+    4,
+    2,
+    2,
+    3,
+    3,
+    2,
+    5,
+    1,
+    1,
+    3,
+    3,
+    2,
+    4,
+    2,
+    2,
+    3,
+    3
+   ]
+  }
+ ]
+}

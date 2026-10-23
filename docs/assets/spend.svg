@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 474" width="1050" role="img" aria-labelledby="t d">
+<title id="t">What a jury costs the agent: brief bytes by spend and detail</title><desc id="d">Brief bytes for the critical lens on the fixture workspace: spend 1, compact 5,116 bytes and full 7,879 bytes, the project's estimate 15,000 tokens; spend 3, compact 15,212 bytes and full 23,501 bytes, the project's estimate 45,000 tokens; spend 7, compact 34,934 bytes and full 54,275 bytes, the project's estimate 105,000 tokens. Two knobs: how many, and how much each carries. The token figure is the project toml’s own estimate, not a measurement.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="472" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+<text x="30" y="40" font-size="18" font-weight="700">What a jury costs the agent: brief bytes by spend and detail</text>
+<rect x="30" y="58" width="14" height="14" rx="3" fill="#ddf4ff" stroke="#57606a" stroke-width="1"/><text x="52" y="70" font-size="13">detail <tspan font-family="monospace" fill="#0550ae">compact</tspan>: attachments by path and hash</text>
+<rect x="390" y="58" width="14" height="14" rx="3" fill="#fff8c5" stroke="#57606a" stroke-width="1"/><text x="412" y="70" font-size="13">detail <tspan font-family="monospace" fill="#0550ae">full</tspan>: text attachments inline</text>
+<text x="1020" y="94" font-size="12" text-anchor="end" fill="#57606a">the toml's own estimate</text>
+<text x="30" y="136" font-size="16" font-weight="700">spend 1</text>
+<text x="30" y="156" font-size="12" fill="#57606a">1 brief</text>
+<text x="170" y="131" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">compact</text>
+<rect x="180" y="112" width="43" height="28" rx="4" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="233" y="131" font-size="14" font-weight="700">5,116 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="170" y="167" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">full</text>
+<rect x="180" y="148" width="67" height="28" rx="4" fill="#fff8c5" stroke="#57606a" stroke-width="1.2"/>
+<text x="257" y="167" font-size="14" font-weight="700">7,879 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="1020" y="152" font-size="18" font-weight="700" text-anchor="end">≈ 15,000 tokens</text>
+<line x1="30" y1="190" x2="1020" y2="190" stroke="#eaeef2" stroke-width="1"/>
+<text x="30" y="228" font-size="16" font-weight="700">spend 3</text>
+<text x="30" y="248" font-size="12" fill="#57606a">3 briefs</text>
+<text x="170" y="223" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">compact</text>
+<rect x="180" y="204" width="129" height="28" rx="4" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="319" y="223" font-size="14" font-weight="700">15,212 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="170" y="259" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">full</text>
+<rect x="180" y="240" width="199" height="28" rx="4" fill="#fff8c5" stroke="#57606a" stroke-width="1.2"/>
+<text x="389" y="259" font-size="14" font-weight="700">23,501 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="1020" y="244" font-size="18" font-weight="700" text-anchor="end">≈ 45,000 tokens</text>
+<line x1="30" y1="282" x2="1020" y2="282" stroke="#eaeef2" stroke-width="1"/>
+<text x="30" y="320" font-size="16" font-weight="700">spend 7</text>
+<text x="30" y="340" font-size="12" fill="#57606a">7 briefs</text>
+<text x="170" y="315" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">compact</text>
+<rect x="180" y="296" width="296" height="28" rx="4" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="486" y="315" font-size="14" font-weight="700">34,934 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="170" y="351" font-size="12" text-anchor="end" font-family="monospace" fill="#0550ae">full</text>
+<rect x="180" y="332" width="460" height="28" rx="4" fill="#fff8c5" stroke="#57606a" stroke-width="1.2"/>
+<text x="650" y="351" font-size="14" font-weight="700">54,275 <tspan font-size="12" font-weight="400" fill="#57606a">bytes</tspan></text>
+<text x="1020" y="336" font-size="18" font-weight="700" text-anchor="end">≈ 105,000 tokens</text>
+
+<line x1="180" y1="104" x2="180" y2="370" stroke="#57606a" stroke-width="1.2"/>
+<text x="525" y="402" font-size="14" font-weight="700" text-anchor="middle">Two knobs: how many, and how much each carries.</text>
+<text x="525" y="424" font-size="12" text-anchor="middle" fill="#57606a">Bytes are measured on the fixture (critical lens, linear scale). The token figure is 15,000 per brief from fixtures/jurygraph.toml, an estimate.</text>
+</g>
+</svg>

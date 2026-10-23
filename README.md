@@ -1,18 +1,41 @@
 <!-- adapted from comparegraph README.md (shape only) -->
 # JuryGraph
 
-**A persona jury as an engine.** It stores personas, panels, lenses and subjects, composes the briefs, ingests the
-verdicts your agent's subagents write, refuses a verdict without evidence, and reports scores per stratum. The engine
-never calls a model.
+**A persona jury as an engine: your agent runs the personas, the engine keeps the jury honest.** Already installed? `jurygraph doctor`
+
+[![ci](https://github.com/massrelay-ai/jurygraph/actions/workflows/ci.yml/badge.svg)](https://github.com/massrelay-ai/jurygraph/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/massrelay-ai/jurygraph?include_prereleases)](https://github.com/massrelay-ai/jurygraph/releases)
+[![licence](https://img.shields.io/badge/licence-Apache--2.0-blue)](LICENSE)
+![MCP tools](https://img.shields.io/badge/MCP%20tools-5-blue)
+![Rust](https://img.shields.io/badge/Rust-1.98-orange)
+![local](https://img.shields.io/badge/100%25%20local-no%20model%20calls-brightgreen)
+![platforms](https://img.shields.io/badge/platforms-linux%20%7C%20macOS%20%7C%20windows-lightgrey)
+![agents](https://img.shields.io/badge/agents-Claude%20Code%20%7C%20Codex%20%7C%20any%20MCP%20client-lightgrey)
+
+It stores personas, panels, lenses and subjects, composes the briefs, ingests the verdicts your agent's subagents write,
+refuses a verdict without evidence, and reports scores per stratum. The engine never calls a model.
+
+<p align="center"><img src="docs/assets/loop.svg" alt="The loop: should-run, brief, verdict, matrix per stratum, decide, delta run inside the engine; your subagents, your model and your bill sit outside it, take the briefs, and return verdicts, and a verdict with no citation is sent back as refused." width="100%"></p>
+
+The engine stores, composes, checks and refuses. Your agent (Claude Code, Codex, any MCP client) runs the personas with
+its own subagents and its own bill: `brief`, then its subagents, then `verdict`. No API key, no network call at verdict
+time. Apache-2.0. Rust, one binary, SQLite at `.jurygraph/store.db`. Status: v0.1, no benchmarks published yet.
 
 **Three evidence classes.** Every verdict line carries one:
 - `seen`: the persona looked at an attachment of this run, and cites it (an ARIA node, a screenshot, a diff line).
 - `told`: text the brief itself supplied.
 - `recalled`: the model's memory, shown as such. A comparison with no comparator snapshot can only be `recalled`.
 
+## Why JuryGraph
+Three laws: the engine never calls a model, a verdict line has evidence or is labelled, and strata are never averaged.
+
 **The strata rule.** A persona's stake in a subject is `primary` (would use it), `secondary` (buys, approves or supports it)
 or `bystander` (passes by). Scores are reported per stratum, side by side, and never averaged across them; the engine
 refuses the table that does.
+
+<p align="center"><img src="docs/assets/strata.svg" alt="The same question, compare:clarity, asked of three strata: the comparator leads Lantern Notes in every stratum, median 4 to 2 for primary, 4 to 1 for secondary and 4 to 2 for bystander; the secondary stratum is the harshest, and pooling every persona into one number (1.9) is the row the engine refuses." width="100%"></p>
+
+The picture is the recorded fixture run (`fixtures/run/matrix.json`, [report](docs/reports/2026-10-23-v0-1-measured.md)).
 
 The engine never calls a model. Your agent (Claude Code, Codex, any MCP client) runs the personas with its own subagents
 and its own bill: `brief`, then its subagents, then `verdict`. No API key, no network call at verdict time.
@@ -68,6 +91,14 @@ how much each brief carries: `compact` lists attachments by path and hash, `full
 lines, a diff, a document) up to 64 KiB each. Every brief reports its byte size. Two knobs, how many and how much each.
 `persona generate --from <material>` writes a brief that asks your agent to write the personas; see `skills/writing-a-persona`.
 
+<p align="center"><img src="docs/assets/spend.svg" alt="Brief bytes on the fixture for the critical lens: spend 1 is 5,116 bytes compact and 7,879 full; spend 3 is 15,212 and 23,501; spend 7 is 34,934 and 54,275; the toml's own estimate is 15,000 tokens per brief." width="100%"></p>
+
+Measured with `scripts/readme-assets-data.sh` (the command is recorded in [`docs/assets/spend.json`](docs/assets/spend.json)); the token figure is the project toml's estimate, not a measurement.
+
+<p align="center"><img src="docs/assets/refusal.svg" alt="Two verdict lines: evidence seen with an empty citations list is refused with the code seen_without_citation; evidence recalled is accepted and labelled recalled." width="100%"></p>
+
+Coming in v0.2: a seeded panel draw, a 12-seat default ceiling, and agent overrides that carry a reason.
+
 ## The four lenses
 Dimension sets with anchors in words (what a 1, a 3 and a 5 look like), shipped as data in `lenses/`.
 
@@ -95,6 +126,12 @@ Each refusal is a test that was seen failing first.
 - a panel query that resolves to fewer personas than `--spend`;
 - a `jurygraph.toml` that puts a `human` class (money, permission, deploy, secret, licence, public-claim, brand) under a
   persona quorum.
+
+## How good is it
+One fixture run: a seven-persona jury over three strata read the Lantern Notes site and found all four planted defects. Verdicts: 14 accepted, 0 refused. Findings: 26, with one false positive. This is a fixture we wrote, not a benchmark. The report is
+[`docs/reports/2026-10-23-v0-1-measured.md`](docs/reports/2026-10-23-v0-1-measured.md); every score is below.
+
+<p align="center"><img src="docs/assets/matrix.svg" alt="The fixture jury, every score: seven personas in three strata (four primary, two secondary, one bystander) across 21 columns of lens, dimension and option, each cell a score from 1 to 5, with a median row per stratum and a blockers count per persona; no row spans strata." width="100%"></p>
 
 ## Not every change needs a jury
 `jurygraph.toml` holds trigger rules as data (`fixtures/jurygraph.toml` is an example). `should-run` classifies a diff:

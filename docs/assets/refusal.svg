@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 388" width="1050" role="img" aria-labelledby="t d">
+<title id="t">Evidence or it is labelled</title><desc id="d">Two verdict lines side by side. A line with evidence seen and an empty citations list is refused with the code seen_without_citation. A line with evidence recalled is accepted and labelled recalled. Evidence or it is labelled.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="386" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+<text x="525" y="38" font-size="13" text-anchor="middle" fill="#57606a">Two verdict lines from a persona. The engine reads the evidence class before the score.</text>
+<rect x="30" y="64" width="470" height="250" rx="10" fill="#ffffff" stroke="#cf222e" stroke-width="1.8"/>
+<rect x="30" y="64" width="470" height="40" rx="10" fill="#ffebe9"/><rect x="30" y="90" width="470" height="14" fill="#ffebe9"/>
+<text x="50" y="90" font-size="14" font-weight="700">A line claiming to have looked</text>
+<rect x="50" y="122" width="430" height="104" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="64" y="148" font-size="13" font-family="monospace" xml:space="preserve">{ "dimension": "clarity",</text>
+<text x="64" y="170" font-size="13" font-family="monospace" xml:space="preserve">  "score": 2,</text>
+<text x="64" y="192" font-size="13" font-family="monospace" xml:space="preserve">  "evidence": "seen",</text>
+<text x="64" y="214" font-size="13" font-family="monospace" xml:space="preserve">  "citations": [] }</text>
+<rect x="50" y="244" width="304" height="30" rx="15" fill="#ffebe9" stroke="#cf222e" stroke-width="1.2"/>
+<text x="64" y="264" font-size="14" font-weight="700" font-family="monospace">refused: seen_without_citation</text>
+<text x="50" y="296" font-size="12" fill="#57606a">Nothing was cited, so nothing is stored. The persona answers again.</text>
+<rect x="550" y="64" width="470" height="250" rx="10" fill="#ffffff" stroke="#1a7f37" stroke-width="1.8"/>
+<rect x="550" y="64" width="470" height="40" rx="10" fill="#dafbe1"/><rect x="550" y="90" width="470" height="14" fill="#dafbe1"/>
+<text x="570" y="90" font-size="14" font-weight="700">A line from memory</text>
+<rect x="570" y="122" width="430" height="104" rx="6" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="584" y="148" font-size="13" font-family="monospace" xml:space="preserve">{ "dimension": "clarity",</text>
+<text x="584" y="170" font-size="13" font-family="monospace" xml:space="preserve">  "score": 2,</text>
+<text x="584" y="192" font-size="13" font-family="monospace" xml:space="preserve">  "evidence": "recalled",</text>
+<text x="584" y="214" font-size="13" font-family="monospace" xml:space="preserve">  "citations": [] }</text>
+<rect x="570" y="244" width="276" height="30" rx="15" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
+<text x="584" y="264" font-size="14" font-weight="700" font-family="monospace">accepted, labelled recalled</text>
+<text x="570" y="296" font-size="12" fill="#57606a">Stored and shown as memory, never as something seen.</text>
+<text x="525" y="356" font-size="16" font-weight="700" text-anchor="middle">Evidence, or it is labelled.</text>
+</g></svg>

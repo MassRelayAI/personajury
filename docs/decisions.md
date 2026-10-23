@@ -401,3 +401,9 @@ Old stores and old `JURYGRAPH_*` variables are not read. The verb `graph` stays,
 with the title "PersonaJury · <subject>". The brief text carries the product name, so the recorded brief hashes in
 `fixtures/run/briefs.json` and the pinned compare-brief hash in `tests/authoring.rs` were regenerated (and the golden `fixtures/run/summary.md`, which lists them); the recorded verdicts, matrix
 and picks are byte-identical. The version of every manifest is 0.5.0, and the CHANGELOG is one `[0.5.0] - unreleased` entry.
+
+## D26 — Zlib joins the licence allow list (2026-10-24, maintainer-approved policy fix)
+The first CI run on GitHub failed `cargo deny check licenses`: `foldhash` 0.2.0, pulled in by `serde_json` through
+`indexmap` and `hashbrown`, is licensed Zlib, which `deny.toml` did not list. Zlib is permissive and OSI approved, and is
+compatible with Apache-2.0. Instead of: replacing serde_json's features (D7 needs `preserve_order` and
+`arbitrary_precision`). Seen red locally with `cargo deny --all-features check` before the change, green after.

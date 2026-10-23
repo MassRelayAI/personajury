@@ -9,6 +9,7 @@ allow = [
   "Apache-2.0", # the project's own licence; most of the tree is dual MIT OR Apache-2.0
   "MIT",        # clap, serde, rusqlite, toml, globset
   "Unlicense",  # globset and its regex helpers are dual Unlicense OR MIT
+  "Zlib",        # foldhash (via serde_json's indexmap and hashbrown): permissive, OSI approved
   "Unicode-3.0", # unicode-ident (MIT OR Apache-2.0 AND Unicode-3.0): the Unicode data files
 ]
 

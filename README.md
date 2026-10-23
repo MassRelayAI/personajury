@@ -1,5 +1,5 @@
 <!-- adapted from comparegraph README.md (shape only) -->
-<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (hero alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size) -->
+<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (hero alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size); docs/decisions.md D13 to D24 (apply-check, effort seats 3, 7, 12; 0 of 8 for bars); fixtures/run/summary.txt (the summary excerpt); docs/usage.md and docs/ci.md (results, display, Desktop, the Action); docs/playbooks/README-section.md (the gallery block); fixtures/lenses/*.toml (dimension counts) -->
 
 <p align="center">
   <picture>
@@ -36,6 +36,17 @@
 
 ---
 
+## What people use it for
+
+<p align="center"><img src="docs/assets/use-cases.svg" alt="Six things a jury helps with: a marketing site without the AI slop; docs a newcomer can follow, where a real docs jury cut critical blockers from 15 to 6; a logo picked by its audience, where 7 of 7 personas picked the same mark; a deck a CFO reads to the end; a change checked before merge; and any field, with your own lens and your own personas." width="100%"></p>
+
+- **A marketing site, without the AI slop.** Personas from each audience read every page and flag vague, generic copy before your customers see it ([playbook](docs/playbooks/marketing-site.md)).
+- **Docs a newcomer can follow.** A real jury on a sibling project's README cut the blockers it found from 15 to 6 in two rounds ([playbook](docs/playbooks/docs-and-readme.md)).
+- **A logo picked by its audience.** Our own logo was chosen by a forced pick: 7 of 7 personas picked the same mark in round 2 ([playbook](docs/playbooks/pick-a-name-or-logo.md)).
+- **A deck a CFO reads to the end.** A client, a CFO and a skimming board member read your slides and say where they got lost ([playbook](docs/playbooks/deck-or-pitch.md)).
+- **A change checked before merge.** Rules say which changes need a jury, so a typo goes by tests and a new pricing page goes before personas ([playbook](docs/playbooks/a-change-in-a-pull-request.md)).
+- **Any field: your lens, your personas.** Write what good looks like in plain words, and a jury can judge any files against it ([all playbooks](docs/playbooks/README.md)).
+
 ## Get started
 
 One binary, SQLite at `.personajury/store.db`, no API key. Linux, macOS and Windows.
@@ -46,6 +57,8 @@ curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scrip
 personajury setup --apply   # registers the MCP server with your agents (without --apply: a plan)
 personajury doctor          # the store, the counts, each agent's registration
 ```
+
+v0.5.0 is not released yet, so the install script, the `.mcpb` bundles and the Action have nothing to download. Until the first release, build from source.
 
 In Claude Code, `/plugin install personajury --marketplace massrelay-ai/personajury` adds the skills and the MCP server.
 
@@ -84,11 +97,11 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 
 <p align="center"><img src="docs/assets/loop.svg" alt="The loop: should-run, brief, verdict, matrix per stratum, decide, delta run inside the engine; your subagents, your model and your bill sit outside it, take the briefs, and return verdicts, and a verdict with no citation is sent back as refused." width="100%"></p>
 
-`should-run` says whether a change needs a jury. `brief` writes one hashed brief per persona. Your agent's subagents answer, and `verdict` ingests or refuses each answer. `matrix` reports per stratum. `decide` closes each finding as `fixed`, `dismissed` (with a why) or `row` (an issue). `delta` says whether the next round landed.
+`should-run` says whether a change needs a jury. `brief` writes one hashed brief per persona. Your agent's subagents answer, and `verdict` ingests or refuses each answer. `matrix` reports per stratum. `decide` closes each finding as `fixed`, `dismissed` (with a why) or `row` (an issue). `delta` says whether the next round landed. `apply-check` says, last, whether the agent may apply the fixes.
 
 - **Rules pick the panel per audience.** `brief --rule CLASS` takes the panel, lenses, spend and detail from `personajury.toml`, one run per lens.
 - **A seeded draw.** When a pool holds more personas than seats, the seats are drawn from the subject's name, so round 2 meets the same jurors and `delta` can land.
-- **Agent overrides carry a reason.** The agent may change a rule's panel, spend, lens or detail, but each change needs `--reason`, and `matrix` shows it. A brief seats 12 by default, up to 1000 with `--allow-large`.
+- **Agent overrides carry a reason.** The agent may change a rule's panel, spend, lens or detail, but each change needs `--reason`, and `matrix` shows it. A brief seats at most 12 without a reason, up to 1000 with `--allow-large`.
 - **Waves.** Every brief lists its jurors in waves of 30 (`--wave N`). The agent runs a wave, ingests it, then the next.
 - **Reported usage beside the estimate.** A verdict may carry the tokens the agent spent. `matrix` and `doctor` show that sum, labelled "reported by the agent", beside the estimate. The engine measures no token.
 - **`graph --svg`.** The jury as one deterministic picture, the hero above. Over several runs, each finding shows its life.
@@ -99,6 +112,63 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 <p align="center"><img src="docs/assets/spend.svg" alt="Brief bytes on the fixture for the critical lens: spend 1 is 5,116 bytes compact and 7,879 full; spend 3 is 15,212 and 23,501; spend 7 is 34,934 and 54,275; the toml's own estimate is 15,000 tokens per brief." width="100%"></p>
 
 Measured by `scripts/readme-assets-data.sh` ([`docs/assets/spend.json`](docs/assets/spend.json)); the token figure is the project's own estimate, not a measurement.
+
+### The last word: `apply-check`
+
+`personajury apply-check RUN...` answers one of four words, with its reasons as data. The agent runs it last and obeys it. It applies nothing itself.
+
+- **`apply`**: the agent may apply the fixes.
+- **`advise`**: something is unknown, missing or lowered. The findings still help; the agent does not apply them on its own.
+- **`escalate`**: a primary blocker, a split between strata, a finding with no decision, or a delta that did not land. Run the next quorum up.
+- **`human`**: money, permission, deploy, secret, licence, public claim or brand. A person decides.
+
+`apply` needs every condition proven: every seat answered, a known quorum, the run under its rule and not cut down, independent jurors, a current subject, the delta landed, `check` clean. A guess must never pass a change, so anything unproven advises ([D13](docs/decisions.md)).
+
+### Cost, independence, experts
+
+- **Effort.** One word sets what a jury may spend: `effort = "low|medium|high|max"` in `personajury.toml`, or `brief --effort`. Under a rule, `low` seats 3 with one lens, `medium` (the default) at most 7, `high` at most 12. Every cap keeps one seat per stratum.
+- **`budget_tokens`.** An optional cap on the estimate. The brief trims lenses, then seats, to fit, and records each cut. A cheap jury on a `high` quorum only advises.
+- **Independence.** A run is `independent` (one context per brief) or `sequential` (one context reads every brief, as in Claude Desktop or a chat window). Sequential runs only advise.
+- **Experts and human verdicts.** A persona may carry a `credential`, and a lens a named `standard`. A real person's verdict goes in with `verdict --by-human "<name, credential>"`. It stands beside the jury, never in a median, and a blocker it raises escalates until a person closes it. An agent cannot enter one.
+- **A model per panel term.** `3 builder=primary@claude-sonnet-5-5` names the model in those seats' briefs. `matrix` shows which models answered.
+- **`lens generate`.** `lens generate --from handbook.md` writes a brief that asks your agent to draft a lens from your own standard. `lens add` checks the draft.
+- **`calibrate`.** `calibrate JURY_RUN HUMAN_RUN` compares the jury's rank order with real people's, per stratum. Given that file, `apply-check --calibration` advises when a primary cell is off by more than one rank.
+
+### Reading the answer: `summary`
+
+`personajury summary RUN...` writes sentences first, then the numbers for checking, then what to do next. There are no bars: a display jury of eight gave bars 0 picks ([D24](docs/decisions.md)). The fixture run, from [`fixtures/run/summary.txt`](fixtures/run/summary.txt):
+
+```text
+PersonaJury summary: lantern-site, runs 1 2 (critical, compare)
+
+The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree
+on 2 scores, and 26 findings have no decision yet.
+Even without that, the jury could only advise: no rule was given.
+...
+Numbers, for checking (medians primary·secondary·bystander; - = nobody):
+                   works  blocks  missing  clarity  price  trust
+cmp:acme-pricing   -      -       -        4·4·4    5·5·5  3·3·4
+pricing.png        -      -       -        3·2·3    3·2·3  2·2·3
+pricing.walk.json  -      -       -        3·2·3    3·2·3  2·2·3
+lantern-site       2·2·2  2·2·2   2·2·2    2·1·2    2·2·2  2·2·2
+...
+Next: run the high quorum with these reasons in hand before applying anything.
+```
+
+`--md` and `--html` write the same summary as a file. The MCP tool is `personajury_summary`.
+
+### In CI and in your own code
+
+- **The GitHub Action** ([`action.yml`](action.yml), [`docs/ci.md`](docs/ci.md)) classifies a pull request with `should-run`. With a committed store it also runs `check` and `apply-check`. It calls no model and needs no secret. By default `human`, `escalate` or an engine error fails the job. Unverified on GitHub: it is tested against a local binary, and no release exists for it to install.
+- **The Claude Agent SDK recipe** ([`docs/agent-sdk.md`](docs/agent-sdk.md)) runs one SDK session per brief, so each juror has its own context. A coordinator ingests the verdicts through `personajury mcp`. A test checks only that the example compiles; running it needs your own key.
+
+## Where results live
+
+The store, `.personajury/store.db`, is the record. It is append-only, and it does not belong in git unless CI reads it. Reports are views of the store. They are written only when you ask (`summary --md` or `--html`), or into the `report_dir` named in `personajury.toml` by `summary --save`. With no `report_dir`, nothing is written ([`docs/usage.md`](docs/usage.md#where-results-live)).
+
+## Display is free, the verdict is not
+
+Any agent may restyle what the engine returns, with two rules: never pool strata, and never write a number the data lacks. `apply-check` is different. It is a verdict, and it binds only where you wire it: the Action, a Claude Code hook, a git hook or your own gate. The recipes are in [`docs/usage.md`](docs/usage.md#display-is-free-the-verdict-is-not).
 
 ## Proven on real work
 
@@ -132,8 +202,11 @@ Anything people read or look at, as long as you can attach it as files. The jury
 | Business plans and policy briefs | the document and its charts | who must act on it / who approves it / a reader from the public | `critical` |
 | Pricing | the pricing page as walk and screenshot; rivals' pages as comparators | who pays / who approves the spend / someone shopping around | `compare`, with a forced pick |
 | Logos and design | one board per candidate: small and large, light and dark | the users / the approvers / a passer-by | your own lens with a forced pick, as the [logo jury](docs/reports/2026-10-24-logo-jury.md) did |
+| Technical decisions (the trade-offs, not correctness) | one text file per option: a README excerpt, a usage snippet, the licence, the release cadence | the maintainer and an SRE / a security reviewer and a new hire / a finance approver | [`tradeoffs`](fixtures/lenses/tradeoffs.toml), with a forced pick |
 
-The three sector lenses ship as data in `fixtures/lenses/`, not seeded: `personajury lens add --file fixtures/lenses/investor-pitch.toml`. Each has four dimensions with anchors in words at 1, 3 and 5.
+The three sector lenses and `tradeoffs` ship as data in `fixtures/lenses/`, not seeded: `personajury lens add --file fixtures/lenses/investor-pitch.toml`. Each sector lens has four dimensions and `tradeoffs` has five, with anchors in words at 1, 3 and 5.
+
+Worked stories: [choose between technical options](docs/playbooks/a-technical-decision.md), [your own juror, a devil's advocate, real people](docs/playbooks/your-own-jurors.md), and [all playbooks](docs/playbooks/README.md).
 
 **What a jury must not judge:**
 - **Correctness.** Tests do that. A financial-model jury reads the model; it never checks the arithmetic.
@@ -153,6 +226,7 @@ A lens is a set of dimensions with anchors in words: what a 1, a 3 and a 5 look 
 | `consulting-deck` | storyline, action-titles, evidence, the-ask | `fixtures/lenses/` |
 | `investor-pitch` | problem, why-now, proof, the-ask | `fixtures/lenses/` |
 | `financial-model` | assumptions-visible, sensitivities, risks-stated, a-lender-would-sign | `fixtures/lenses/` |
+| `tradeoffs` | fit, risk, cost-to-change, operability, learning-curve; the persona also picks one option | `fixtures/lenses/` |
 | `site` | six criteria on a 1 to 10 scale, for the held-out check | `fixtures/lenses/` |
 
 Add your own with `personajury lens add --file my-lens.toml`; `personajury lens list` shows them.
@@ -167,6 +241,7 @@ Each refusal is a test that was seen failing first. The codes are in [`docs/trou
 - a verdict for a run whose subject changed since the brief, or from a persona with no stake in the run;
 - a `pick` without a reason;
 - a rule override, or a brief above 12 seats, without a reason;
+- a decision on a finding a person raised, unless a person makes it;
 - reported usage in any shape but two non-negative token counts;
 - a `personajury.toml` that puts a human class under a persona quorum.
 
@@ -177,11 +252,11 @@ Each refusal is a test that was seen failing first. The codes are in [`docs/trou
 | quorum | who decides |
 |---|---|
 | `none` | tests and an adversarial read: internals, migrations, tests |
-| `low` | three personas, one lens; applies itself with no primary blocker and no split |
+| `low` | three personas, one lens; the agent applies the fixes only when `apply-check` says `apply` |
 | `high` | the full panel, all lenses; a foreman proposes the fixes |
 | `human` | a person; the jury only advises |
 
-The human classes are money, permission, deploy, secret, licence, public-claim and brand. A split or any primary blocker escalates one level; today the agent applies that rule (`skills/running-a-jury`).
+The human classes are money, permission, deploy, secret, licence, public-claim and brand. A split or any primary blocker escalates one level; `apply-check` computes that.
 
 **What a citation proves.** That the persona was given the attachment and named a node that exists in it. Not that it looked, read well or is realistic. Colour and layout reach the jury only through screenshots, and image regions are not checked. A published matrix means something only with its subject, panel, lens and brief hashes beside it ([`docs/publishing-results.md`](docs/publishing-results.md)).
 
@@ -189,9 +264,14 @@ The human classes are money, permission, deploy, secret, licence, public-claim a
 
 `personajury setup` registers the MCP server with Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes, Windsurf, Antigravity, Kiro, GitHub Copilot, Copilot CLI and Qwen Code; any other MCP client can run `personajury mcp`. The CLI does everything the tools do. Release builds: Linux x64 and arm64, macOS arm64 and x64, Windows x64. Two skills, [`running-a-jury`](skills/running-a-jury) and [`writing-a-persona`](skills/writing-a-persona), teach your agent the loop.
 
+- **Claude Desktop:** drop the `.mcpb` bundle for your platform on the app. Desktop has no subagents, so brief with `--independence sequential`; those runs advise and never apply. Unverified: no maintainer has installed a bundle by hand yet.
+- **A chat window:** no server, files only. Paste one brief per chat and save the verdict JSON it answers ([`docs/usage.md`](docs/usage.md#where-it-runs)).
+- **CI:** the GitHub Action ([`docs/ci.md`](docs/ci.md)). Unverified on GitHub until the first release.
+- **Your own code:** the Claude Agent SDK recipe ([`docs/agent-sdk.md`](docs/agent-sdk.md)).
+
 ## Docs
 
-[Quickstart](docs/quickstart.md) · [Usage](docs/usage.md) · [Commands](docs/commands.md) · [MCP tools](docs/mcp-tools.md) · [Lenses](docs/lenses.md) · [FAQ](docs/faq.md) · [Troubleshooting](docs/troubleshooting.md) · [Decisions](docs/decisions.md) · [Reports](docs/reports/README.md) · [Changelog](CHANGELOG.md) · [All docs](docs/README.md)
+[Quickstart](docs/quickstart.md) · [Usage](docs/usage.md) · [Commands](docs/commands.md) · [MCP tools](docs/mcp-tools.md) · [Lenses](docs/lenses.md) · [Playbooks](docs/playbooks/README.md) · [CI](docs/ci.md) · [Agent SDK](docs/agent-sdk.md) · [FAQ](docs/faq.md) · [Troubleshooting](docs/troubleshooting.md) · [Decisions](docs/decisions.md) · [Reports](docs/reports/README.md) · [Changelog](CHANGELOG.md) · [All docs](docs/README.md)
 
 ## Contributing
 

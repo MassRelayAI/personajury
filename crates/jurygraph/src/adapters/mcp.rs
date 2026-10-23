@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Six tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Seven tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -47,6 +47,8 @@ pub fn tools() -> Vec<Value> {
                     "allow_large": {"type":"boolean","description":"allow more than 12 seats (the most is 1000)"},
                     "reason": {"type":"string","description":"why this brief departs from its rule, or runs above 12 seats; recorded on the run"},
                     "by": {"type":"string","description":"who departed from the rule; default agent"},
+                    "effort": {"type":"string","enum":["low","medium","high","max"],"description":"how much this run may spend, over jurygraph.toml's effort (default medium under a rule): low is 3 seats and the rule's first lens, medium up to 7, high up to 12, max the rule's panel (above 12 needs allow_large and reason). A cheap jury on a risky change advises, never applies. Recorded on the run."},
+                    "independence": {"type":"string","enum":["independent","sequential"],"description":"independent (default): one context per brief. sequential: one context will read all the briefs; the run is labelled so and apply-check never answers apply for it"},
                     "wave": {"type":"integer","minimum":1,"description":"seats per wave in the answer's waves (default 30): run one wave, ingest it, then the next"} }),
                 &["subject", "model"],
             ),
@@ -85,6 +87,15 @@ pub fn tools() -> Vec<Value> {
                 json!({ "a": {"type":"integer","minimum":1,"description":"the earlier run id"},
                         "b": {"type":"integer","minimum":1,"description":"the later run id"} }),
                 &["a", "b"],
+            ),
+        ),
+        tool(
+            "jurygraph_apply_check",
+            "The verdict to obey last, over the runs of one subject: apply, escalate, human or advise, with the reasons as data (human_class; escalate: primary_blocker, split, check_failed, delta_not_landed, human_blocker; advise: incomplete_jury, quorum_unknown, rule_below_sources, overridden_down, effort_below_quorum, independence_sequential, stale_run, delta_unavailable). apply only when every condition is proven: anything unknown, missing or lowered answers advise or worse. human: the change falls under a human class (named by rule, or found in the subject's recorded sources): a person decides, the jury only advises. escalate: run the next quorum up (next_quorum: low to high, high to human). advise: the jury was incomplete, cheap, overridden down, stale or weak; it may advise but never apply. apply: nothing stands in the way. It applies nothing itself and reads only.",
+            schema(
+                json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids of one subject; the latest run of each lens is judged, earlier ones are the rounds before it"},
+                        "rule": {"type":"string","description":"the rule class of jurygraph.toml this change falls under: its quorum is the current level"} }),
+                &["runs"],
             ),
         ),
         tool(
@@ -204,11 +215,14 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             "reason",
             "by",
             "wave",
+            "effort",
+            "independence",
         ],
         "jurygraph_verdict" => &["run", "verdict"],
         "jurygraph_matrix" => &["runs", "table", "history", "detail"],
         "jurygraph_delta" => &["a", "b"],
         "jurygraph_graph" => &["runs"],
+        "jurygraph_apply_check" => &["runs", "rule"],
         "jurygraph_should_run" => &["diff", "paths", "config", "subject"],
         _ => return Err(format!("unknown tool {name}")),
     };
@@ -248,6 +262,8 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             allow_large: bool_arg(a, "allow_large")?,
             reason: str_arg(a, "reason")?,
             by: str_arg(a, "by")?,
+            effort: str_arg(a, "effort")?,
+            independence: str_arg(a, "independence")?,
             wave: match a.get("wave") {
                 None | Some(Value::Null) => None,
                 Some(v) => match v.as_u64() {
@@ -263,6 +279,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                     run,
                     file: None,
                     json: Some(v.to_string()),
+                    by_human: None,
                 },
                 None | Some(Value::Null) => return Err("missing required argument verdict".into()),
                 Some(_) => return Err("verdict must be an object".into()),
@@ -282,6 +299,10 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             runs: runs_arg(a)?,
             svg: true,
             out: None,
+        },
+        "jurygraph_apply_check" => Cmd::ApplyCheck {
+            runs: runs_arg(a)?,
+            rule: str_arg(a, "rule")?,
         },
         "jurygraph_delta" => Cmd::Delta {
             a: id_arg(a, "a")?,

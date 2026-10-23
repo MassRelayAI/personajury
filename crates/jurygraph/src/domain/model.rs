@@ -118,6 +118,68 @@ impl Detail {
     }
 }
 
+/// How much a jury may spend (D17): the words people know from their agent's effort setting.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Effort {
+    Low,
+    Medium,
+    High,
+    Max,
+}
+impl Effort {
+    pub fn parse(s: &str) -> Option<Effort> {
+        match s {
+            "low" => Some(Effort::Low),
+            "medium" => Some(Effort::Medium),
+            "high" => Some(Effort::High),
+            "max" => Some(Effort::Max),
+            _ => None,
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            Effort::Low => "low",
+            Effort::Medium => "medium",
+            Effort::High => "high",
+            Effort::Max => "max",
+        }
+    }
+    /// The most seats a brief of this effort takes of the rule's panel; none for `max` (the ceilings of D10 apply).
+    pub fn seat_cap(self) -> Option<usize> {
+        match self {
+            Effort::Low => Some(3),
+            Effort::Medium => Some(7),
+            Effort::High => Some(12),
+            Effort::Max => None,
+        }
+    }
+}
+
+/// Whether the jurors of a run were separate contexts or one context that read every brief (D18).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Independence {
+    #[default]
+    Independent,
+    Sequential,
+}
+impl Independence {
+    pub fn parse(s: &str) -> Option<Independence> {
+        match s {
+            "independent" => Some(Independence::Independent),
+            "sequential" => Some(Independence::Sequential),
+            _ => None,
+        }
+    }
+    pub fn name(self) -> &'static str {
+        match self {
+            Independence::Independent => "independent",
+            Independence::Sequential => "sequential",
+        }
+    }
+}
+
 /// `hand`, or `generated-from:<material sha256>` in the store.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Origin {
@@ -154,7 +216,12 @@ pub struct PersonaFile {
     pub never_reads: String,
     pub decides_by: String,
     pub stake_rules: String,
+    /// who this person is as an expert, in words (D19): shown, never checked; the tag `expert` is a convention
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub credential: Option<String>,
 }
+/// The longest credential a persona file may carry: a line, not a biography (D19).
+pub const CREDENTIAL_MAX: usize = 500;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Persona {
@@ -338,6 +405,8 @@ pub struct BriefRef {
     pub path: String,
     pub hash: String,
     pub bytes: usize,
+    /// the model this brief is to be run on (D15): the term's, else the run's `--model`
+    pub model: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -365,15 +434,27 @@ pub struct RunRow {
     pub draw_seed: Option<String>,
     /// `{rule, fields:{name:{rule,given}}, reason, by}` when the caller departed from a rule (schema v3, D10)
     pub override_json: Option<serde_json::Value>,
+    /// the effort word the run was planned under (schema v4, D17); none for a run made with no rule and no effort
+    pub effort: Option<String>,
+    /// what effort or the budget cut from the plan: `[{what, from, to, why}]` (schema v4, D17)
+    pub trimmed: Vec<serde_json::Value>,
+    /// `independent` (one context per brief) or `sequential` (one context read every brief), schema v4, D18
+    pub independence: String,
+    /// the rule class the run was briefed under (`brief --rule`), schema v4, D13; none for a run with no rule
+    pub rule: Option<String>,
+    /// the run's effective quorum at brief time, `low | high`: the higher of its rule's and its sources' (D13)
+    pub quorum: Option<String>,
 }
 
 /// One term of a panel query: "5 builders" → { count: 5, tag: "builders", stake: None };
-/// "3 builder=primary" carries the stake the audience gives those seats.
+/// "3 builder=primary" carries the stake the audience gives those seats, and "3 builder=primary@model" the model.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Term {
     pub count: usize,
     pub tag: String,
     pub stake: Option<Stake>,
+    /// the model these seats run on (D15): `3 builder=primary@claude-sonnet-5-5`
+    pub model: Option<String>,
 }
 
 // ---- the verdict file the agent writes (ingested by `jurygraph verdict`) ----
@@ -702,6 +783,12 @@ pub struct TriggerRule {
 pub struct TriggerConfig {
     #[serde(default)]
     pub tokens_per_brief: Option<u64>,
+    /// how much a jury may spend (D17); `medium` when a rule is named and this is silent
+    #[serde(default)]
+    pub effort: Option<Effort>,
+    /// a hard cap on a brief's estimated tokens (D17): the run is fitted under it or refused as `over_budget`
+    #[serde(default)]
+    pub budget_tokens: Option<u64>,
     #[serde(rename = "rule", default)]
     pub rules: Vec<TriggerRule>,
 }

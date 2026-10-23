@@ -11,6 +11,8 @@ pub struct Resolved {
     pub ids: Vec<String>,
     /// the stake the panel's own term gives each id (parallel to `ids`); none for a term written without one
     pub stakes: Vec<Option<Stake>>,
+    /// the model the panel's own term gives each id (parallel to `ids`, D15)
+    pub models: Vec<Option<String>>,
     pub hash: String,
     pub terms: Vec<(Term, usize)>,
     /// the seed the draw used; none when there was no subject to draw for
@@ -60,10 +62,12 @@ pub fn draw_query(query: &str, personas: &[Persona], seed: Option<[u8; 8]>) -> R
     let per_term = query::draw_terms(&terms, personas, seed);
     let mut ids = Vec::new();
     let mut stakes = Vec::new();
+    let mut models = Vec::new();
     for (t, got) in terms.iter().zip(&per_term) {
         for id in got {
             ids.push(id.clone());
             stakes.push(t.stake);
+            models.push(t.model.clone());
         }
     }
     let hash = panel_hash(query, &ids);
@@ -71,6 +75,7 @@ pub fn draw_query(query: &str, personas: &[Persona], seed: Option<[u8; 8]>) -> R
         query: query.to_string(),
         ids,
         stakes,
+        models,
         hash,
         terms: terms
             .into_iter()

@@ -1,5 +1,6 @@
 //! adapted from comparegraph crates/comparegraph/src/application/mod.rs (AppError, codes)
 //! Workflows, one module per verb. Each returns the envelope's `data` as a serde_json::Value.
+pub mod apply_check;
 pub mod brief;
 pub mod check;
 pub mod decide;

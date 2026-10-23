@@ -11,6 +11,7 @@
   "license": "Apache-2.0",
   "keywords": ["persona-jury", "design-review", "rubric", "evidence", "mcp", "skills"],
   "skills": "./skills/",
+  "mcpServers": "./mcp.json",
   "interface": {
     "displayName": "JuryGraph",
     "shortDescription": "A persona jury as an engine: evidence on every line, scores per stratum",

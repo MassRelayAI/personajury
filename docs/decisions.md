@@ -196,3 +196,126 @@ wants its own lane (more than two lenses already stack in two lanes).
 - `--comparator` takes a comma list as `--lens` does, and still repeats; an empty element is `invalid_arguments`.
 Would change: a measured wave size (the 30 is the mirror of a rate limit, not a measurement); an agent that cannot report
 usage, which leaves `reported` null.
+
+## D13 — the split rule and `apply-check`, the verdict an agent obeys (2026-10-24, the maintainer: "decide automatically")
+Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what counts as a split).
+- **A split** is a (lens, dimension, about) cell on which two strata's `anchor_met` ranges `[min, max]` do not overlap. Ranges
+  that touch at an endpoint overlap: no split. Pure code in `domain/apply.rs`. `matrix` answers `splits` beside `strata`
+  (`{lens, dimension, about, strata: [{stake, min, max}, {stake, min, max}]}`, one per disagreeing pair); it is a sibling key,
+  never a field of a stratum or a cell, so `Matrix` still has no field that spans strata and the recorded fixture matrix and
+  table are unchanged.
+- **`jurygraph apply-check RUN... [--rule CLASS]`** (named `apply-check`, `verdict-of` reads badly) and the MCP tool
+  `jurygraph_apply_check` (seven tools) answer `apply | escalate | human | advise` with the reasons as data. The latest given
+  run of each lens is judged; earlier given runs are the rounds before it, and the previous round of the same subject and lens
+  is found in the store.
+- **The principle (the maintainer's ruling, 2026-10-24, after the v0.4 review): `apply` only when every condition is proven;
+  anything unknown, missing or lowered answers `advise` (or worse), never `apply`.** The full rule:
+  - **The quorum** is the higher of the quorum recorded on the judged runs, the `--rule` named to apply-check, and the highest
+    `low`/`high` among the rules the subject's recorded sources fall under (what `should-run --subject` gives). `brief --rule`
+    stores the run's rule class and its effective quorum (the higher of the rule's and the sources') as `run.rule_class` and
+    `run.quorum` (schema v4, the same idempotent migration as D17/D18), so dropping `--rule` later never lowers it. `quorum_source`
+    names where the highest came from (`sources`, `run`, `rule`). With none of the three the quorum is unknown: `quorum: null`,
+    `quorum_unknown`, `advise`.
+  - `human`: the rule named with `--rule` is a human class (or quorum `human`), or the subject's recorded source paths fall under one.
+  - `escalate` (the answer names `next_quorum`, low to high, high to human):
+    `primary_blocker`: a blocker in the primary stratum of any judged run, each run read with its own stakes (a persona primary
+    in one lens run and secondary in another is primary where it was; no stakes map is shared across runs);
+    `split`: two strata disagree on a cell within one run; `check_failed`: a finding of any run of this subject has no decision
+    or a fix that did not land (not only the runs given); `delta_not_landed`; `human_blocker`: a blocker raised by a
+    `--by-human` batch no decision has closed.
+  - `advise`: `incomplete_jury` (a briefed seat of any given run has no accepted verdict; a human row does not fill a seat;
+    `missing` lists the seats per run); `quorum_unknown`; `rule_below_sources` (the `--rule` named here, or the run's recorded
+    rule, has a lower quorum than the sources'; at `brief` such a rule is an override, field `quorum`, that needs `--reason`);
+    `overridden_down` (the run's recorded override lowers `spend` below the rule's, drops a rule lens, or sets `detail` below
+    it; or replaces the rule's panel, stakes or draw, which is not proven equal; or the run's effort is below the toml's
+    `effort`, `medium` when unset; or the run was briefed with no rule while a rule holds the subject); `effort_below_quorum`
+    (D17); `independence_sequential` (D18); `stale_run` (the subject moved since the run, or a later run of the same subject and
+    lens supersedes it); `delta_unavailable` (a previous round of the same subject and lens exists but the delta cannot be
+    computed: another lens version, or cells the previous round does not have).
+  - Raising seats, lenses, effort or detail above the rule is fine. `apply`: none of the above. `single_model` is informational.
+  - Precedence: `human`, then `escalate`, then `advise`, then `apply`. Every condition is a row of `tests/apply_check_table.rs`,
+    each seen red; the review's twelve probes are `tests/v04_review_probes.rs`.
+- It applies nothing itself and writes nothing. The skill: the agent runs it last and obeys it. The recorded fixture run answers
+  `escalate` (it has primary blockers); a test pins that.
+Would change: a measured false-escalation rate; the calibration lane (v0.5), which can turn `apply` into `escalate`.
+
+## D14 — `lens generate` (2026-10-24)
+`jurygraph lens generate --from PATH [--dimensions N]` (default 4, at most 12) writes `.jurygraph/generate/lens-<hash>.md`
+the way `persona generate` writes its brief, with the same material hash and the same record in `material`. Two steps for the
+agent: list what the material says good looks like (not part of the lens file), then draft a lens in the exact TOML shape, with
+the anchors in words at 1, 3 and 5 and `standard = "material:<hash>"`. The brief's example is a valid lens (a test adds it with
+`lens add`). The engine calls no model; `lens add` validates. The three sector lenses in `fixtures/lenses/` (consulting deck,
+investor pitch, financial model: four dimensions each, anchors in words, generic) are loaded with `lens add`, never seeded, and a
+test checks that `lens add` accepts them.
+
+## D15 — a model per panel term (2026-10-24)
+A term may close with `@model`: `3 builder=primary@claude-sonnet-5-5, 2 approver=secondary@other-model`. The model is letters,
+digits and `. _ : / -`, else `invalid_query`. `brief --model` stays the default and the run's `model`. Each brief records its model
+(`BriefRef.model`, in `run.briefs_json`; a run made before v0.4 reads as the run's model). **A run whose panel terms name a model
+states, in every one of its briefs, `Run this brief on the model <m>`; a run with no term model has the briefs it always had**, so the
+recorded fixture hashes did not change. `matrix` answers `models` per stratum and `models_distinct`; `apply-check` adds the
+informational reason `single_model` when every juror used one model.
+
+## D16 — packaging: the `.mcpb` bundle, `mcp.json`, registry packages (2026-10-24)
+No engine change. `packaging/mcpb/manifest.json` (manifest 0.4, `server.type` `binary`, `mcp_config.command`
+`${__dirname}/bin/jurygraph`, args `["--root", "${user_config.root}", "mcp"]`, a required `directory` setting) and
+`scripts/build-mcpb.sh <platform> <binary>` (zip of the manifest for that platform and the binary; prints the sha256; no network).
+`release.yml` builds four bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64), validates them with a pinned
+`@anthropic-ai/mcpb` (the one place the build touches the network), and gains `publish-registry` ported from CompareGraph's
+(`mcp-publisher` pinned and checksum-verified, `login github-oidc`, `publish`) after the bundles' hashes are written into
+`server.json`'s `packages`. `mcp.json` at the root (never `.mcp.json`, which Claude Code would load in a clone) is referenced by
+the Codex (`"./mcp.json"`) and Cursor (`"mcp.json"`) manifests; `gemini-extension.json` carries `mcpServers` (the key is unverified
+on a local reference). `tests/manifests.rs`: one name, one version (Cargo.toml's), one command across all of them, the `.mcpb`
+args run against the binary, the script run on a stand-in binary. `tests/guards.rs` gains a no-listener scan (`bind(`, `listen(`).
+Unverified against Claude Desktop until the maintainer installs a bundle by hand. A hosted connector is never built: the chat route
+is files (`docs/usage.md`).
+
+## D17 — effort: one word for how much a jury may spend (2026-10-24, the maintainer: "keep it simple")
+`effort = "low" | "medium" | "high" | "max"` in `jurygraph.toml`, `brief --effort` per run (recorded), and an optional
+`budget_tokens`. The rule says what a change needs; effort says what you will spend; the run gets the smaller.
+| effort | seats | lenses |
+|---|---|---|
+| low | 3: one per stratum present, primary first, then the next in draw order | the rule's first |
+| medium | the rule's, at most 7: one per stratum present first, then primary first, in draw order | the rule's |
+| high | the rule's, at most 12, the same way | the rule's |
+| max | the rule's (above 12 needs `--allow-large` and `--reason`, as ever) | the rule's |
+- **When it applies.** A brief under `--rule`, or with `--effort`, or with `effort` set in the toml is planned; the default under a rule
+  is `medium`. A brief with none of them is as in v0.3 (nothing is recorded). An explicit `--spend` is the caller's own choice and is
+  not cut by effort; an explicit `--lens` list is not cut to its first. **Consequence for existing projects:** a rule with more than
+  7 seats is now cut to 7 by default; set `effort = "high"` (12) or `"max"` to keep the v0.3 behaviour. One existing test uses
+  `--effort high` for this reason.
+- **`budget_tokens`** fits the run under briefs × `tokens_per_brief`: lenses after the first go first, then seats from the end of the draw
+  order, never the last seat of a stratum; if one seat per stratum and one lens do not fit, `over_budget` with data
+  `{needed, budget, minimum_plan}` and nothing written. Every cut is recorded (`trimmed: [{what, from, to, why}]`), answered by
+  `brief`, kept in the run and shown by `matrix` (JSON `effort`, `trimmed`; a header line `effort: low, trimmed: ...`, left out for the
+  default `medium` with nothing cut).
+- **A cap never drops a stratum** (ruling after the v0.4 review): every effort cap keeps one seat per stratum the panel has,
+  then fills primary first (then secondary, then bystander) in draw order, so a split stays possible. `low` was already so.
+- **A cheap jury advises.** On a `high` quorum, effort `low` or any cut makes `apply-check` answer `advise`
+  (`effort_below_quorum`), never `apply`.
+- `doctor` shows `effort {configured, default}` and `usage_7d`, the tokens reported over the last 7 days.
+- **Schema v4** (`store/schema.sql`): `run.effort`, `run.trimmed_json`, `run.independence` (D18), `run.rule_class` and `run.quorum` (D13). A v3 store, or a v4 store made before the last two, gains them on open by an
+  idempotent `ALTER TABLE ... ADD COLUMN` and its `schema_version` becomes 4; every old run reads as `independent`, no effort.
+  A store of any other version is refused as before.
+
+## D18 — independence: a word on the run (2026-10-24)
+Where no subagents exist (Claude Desktop, a chat window, Copilot) one context plays every juror, and the engine cannot see it. So it is
+a declaration: `brief --independence independent|sequential` (default `independent`; MCP `independence`), stored as `run.independence`.
+The brief files are byte-identical either way. The answer echoes it and, for `sequential`, adds `sequence` (the brief paths in panel
+order) and "one context will read all of these; the run is labelled sequential". `matrix` answers `independence`
+(`independent | sequential | mixed`) and opens a table with `independence: sequential` when any run is; `delta` answers
+`independence {a, b}`; `apply-check` answers `advise` (`independence_sequential`, remedy: re-run the same quorum with one context per
+brief) and never `apply`; `escalate` and `human` take precedence. `docs/publishing-results.md` lists it beside the hashes. Claiming
+`independent` from one window is a false record.
+
+## D19 — experts and a human verdict (2026-10-24)
+Expertise is a property of a persona or of a lens, never a stratum. A persona file may carry `credential` (words, at most 500
+characters, else `credential_too_long`; shown in the brief, `persona list` and the matrix as `(C)`; the key is left out of an older
+persona's profile and hash). A lens's `standard` is shown in every brief and in a `standard: <lens> — ...` header line of the matrix.
+`verdict --by-human "<name, credential>"` ingests a person's batch under the same refusals; the file's `persona` is the seat whose
+stratum the person speaks in; rows are stored as `human:<name>:<seat>` and who entered them in the new append-only table
+`human_batch`. They stand beside the jury's rows (matrix JSON `human`, an `H` block under the table), never in a persona's cell, never
+in a median, never in a split. The MCP verdict tool has no `by_human`: an agent never enters a person's verdict. A blocker raised by a
+human batch makes `apply-check` answer `escalate` (`human_blocker`) whatever the stratum, until a recorded `decide` closes the finding;
+that decision is the only way a human verdict is overruled, and `decide` takes it only with `--by-human "<name>"` (a `--by` of
+the agent, the foreman or anyone is refused, `human_decision_required`; the MCP has no `decide`). `calibrate` (v0.5) will compare human batches with persona batches.

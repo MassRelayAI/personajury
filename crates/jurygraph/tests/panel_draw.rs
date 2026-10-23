@@ -293,7 +293,8 @@ fn a_rule_gives_the_panel_lenses_spend_and_detail_one_run_per_lens() {
     let ws = tempfile::tempdir().unwrap();
     let w = ws.path();
     world(w);
-    let d = ok(brief(w, &["--rule", "public-surface"]));
+    // v0.4 (D17): the default effort (medium) would cut the rule's 8 seats to 7; high leaves them
+    let d = ok(brief(w, &["--rule", "public-surface", "--effort", "high"]));
     assert_eq!(d["rule"], "public-surface");
     let runs = d["runs"].as_array().unwrap();
     let lenses: Vec<&str> = runs.iter().map(|r| r["lens"]["name"].as_str().unwrap()).collect();
@@ -446,7 +447,7 @@ fn a_brief_above_twelve_seats_under_a_rule_needs_a_reason() {
     ok(jg(w, &["panel", "add", "wide", "--query", "14 reader=bystander", "--allow-large"]));
     std::fs::write(
         w.join("jurygraph.toml"),
-        "[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"low\"\npanel = \"wide\"\nlenses = [\"recall\"]\n",
+        "effort = \"max\"\n[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"low\"\npanel = \"wide\"\nlenses = [\"recall\"]\n",
     )
     .unwrap();
     let r = ok(brief(w, &["--rule", "crowd"]));
@@ -684,7 +685,7 @@ fn i4_a_rule_with_spend_zero_caps_the_full_panel_at_twelve() {
     ));
     std::fs::write(
         w.join("jurygraph.toml"),
-        "[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"high\"\npanel = \"big\"\nlenses = [\"recall\"]\nspend = 0\n",
+        "effort = \"max\"\n[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"high\"\npanel = \"big\"\nlenses = [\"recall\"]\nspend = 0\n",
     )
     .unwrap();
     let d = ok(brief(w, &["--rule", "crowd"]));

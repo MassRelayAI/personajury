@@ -89,6 +89,16 @@ pub enum Refusal {
     HumanPathUnderPersonaQuorum { class: String, path: String },
     #[error("usage: {0}; give {{\"input_tokens\": <integer >= 0>, \"output_tokens\": <integer >= 0>}} or leave it out")]
     InvalidUsage(String),
+    #[error("the brief needs {needed} tokens at the least (one seat per stratum, one lens) and budget_tokens is {budget}")]
+    OverBudget {
+        needed: u64,
+        budget: u64,
+        minimum_plan: serde_json::Value,
+    },
+    #[error("finding {finding} was raised by a human batch: only a person decides it; give --by-human \"<name>\"")]
+    HumanDecisionRequired { finding: String },
+    #[error("the credential is {len} characters; keep it a line of at most {max}")]
+    CredentialTooLong { len: usize, max: usize },
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -129,6 +139,9 @@ impl Refusal {
             Refusal::PanelTermEmpty { .. } => "panel_term_empty",
             Refusal::OverrideWithoutReason { .. } => "override_without_reason",
             Refusal::HumanPathUnderPersonaQuorum { .. } => "human_class_under_persona_quorum",
+            Refusal::OverBudget { .. } => "over_budget",
+            Refusal::CredentialTooLong { .. } => "credential_too_long",
+            Refusal::HumanDecisionRequired { .. } => "human_decision_required",
             Refusal::InvalidUsage(_) => "invalid_usage",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
@@ -147,6 +160,9 @@ impl Refusal {
             Refusal::HumanPathUnderPersonaQuorum { class, path } => {
                 Some(serde_json::json!({"class": class, "path": path}))
             }
+            Refusal::OverBudget { needed, budget, minimum_plan } => Some(
+                serde_json::json!({"needed": needed, "budget": budget, "minimum_plan": minimum_plan}),
+            ),
             _ => None,
         }
     }

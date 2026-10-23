@@ -17,7 +17,9 @@ and must be labelled as such:
 2. the **model** as declared with `--model`, marked **unverified**: the engine never calls a model and cannot check what ran;
 3. the **subject** and the hash of its attachments;
 4. the **panel**, **lens** (with its version) and **brief** hashes;
-5. the **per-stratum table**: primary, secondary and bystander side by side, with every score, median, min and max, from
+5. the **independence** of the run (`independence:` in the matrix header, `independent` or `sequential`): a sequential run was
+   judged by one context that read every brief, and it is weaker evidence than one context per brief;
+6. the **per-stratum table**: primary, secondary and bystander side by side, with every score, median, min and max, from
    `jurygraph matrix RUN --table`.
 
 **Do not publish an average across strata.** The engine refuses to produce one (`strata_average_refused`); do not compute one

@@ -56,8 +56,19 @@ pub fn report(root: &Path, bin: Option<&str>) -> Result<Value> {
             super::brief::DEFAULT_TOKENS_PER_BRIEF
         }
     };
+    // the effort the toml sets (D17) and what the agent reported spending over the last 7 days
+    let configured = std::fs::read_to_string(root.join("jurygraph.toml"))
+        .ok()
+        .and_then(|t| crate::domain::trigger::parse_config(&t).ok())
+        .and_then(|c| c.effort)
+        .map(|e| e.name());
+    let usage_7d = match store.reported_usage_since(&crate::store::iso_days_ago(7))? {
+        Some((i, o, n)) => json!({"input_tokens": i, "output_tokens": o, "verdicts": n, "by": "reported by the agent"}),
+        None => json!({"input_tokens": 0, "output_tokens": 0, "verdicts": 0, "by": "reported by the agent"}),
+    };
     Ok(json!({
         "store": store.path(), "schema_version": store.schema_version()?, "counts": counts(&store)?,
+        "effort": {"configured": configured, "default": "medium"}, "usage_7d": usage_7d,
         "usage": super::verdict::usage_summary_with(&store, &[], per)?,
         "clients": clients, "engine": engine, "limitation_items": limitations,
     }))

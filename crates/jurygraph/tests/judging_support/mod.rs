@@ -140,11 +140,17 @@ impl Ws {
                     path: format!("briefs/{p}.md"),
                     hash: "bh".into(),
                     bytes: 10,
+                    model: "m".into(),
                 })
                 .collect(),
             created_at: "2026-10-23T00:00:00Z".into(),
             draw_seed: None,
             override_json: None,
+            effort: None,
+            trimmed: vec![],
+            independence: "independent".into(),
+            rule: None,
+            quorum: None,
         };
         self.store.insert_run(&r).unwrap()
     }

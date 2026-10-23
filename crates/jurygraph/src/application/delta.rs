@@ -30,5 +30,6 @@ pub fn show(root: &Path, a: i64, b: i64) -> Result<Value> {
     out["subject"] = json!(rb.subject_name);
     out["lens"] = json!(rb.lens_name);
     out["step"] = json!(step);
+    out["independence"] = json!({"a": ra.independence, "b": rb.independence});
     Ok(out)
 }

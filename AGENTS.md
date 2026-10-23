@@ -11,7 +11,7 @@ crates/jurygraph/src/
   domain/       the standard: types, hashes, panel query, citations, the refusals, matrix, delta, trigger rules - pure, no I/O
   store/        SQLite at <root>/.jurygraph/store.db; verdicts, picks and decisions append-only (triggers)
   application/  one module per verb: persona, panel, lens, subject, brief, verdict, matrix, pick, delta, check, decide,
-                should-run, setup, doctor
+                should-run, apply-check, setup, doctor
   adapters/     cli (clap, one-shot), mcp (stdio), the envelope - thin
 lenses/   the four shipped lenses as data      skills/  the agent's method      fixtures/  the fixture site and its recorded run
 docs/     plans, decisions, reports, quickstart

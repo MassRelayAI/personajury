@@ -37,8 +37,14 @@ at least one line for every dimension of the lens; scoring the same dimension tw
 refused (`duplicate_dimension`, `missing_dimension`). The table of codes is in [`troubleshooting.md`](troubleshooting.md).
 
 ## Cost knobs
-Two: how many personas (`--spend N`, the first N of the panel by stake, then the lens choice) and how much each brief carries
-(`--detail compact|full`, also settable as `detail` in a `jurygraph.toml` rule). Every brief reports its byte size. The engine does not estimate tokens.
+Three: how many personas (`--spend N`, the first N of the panel by stake, then the lens choice), how much each brief carries
+(`--detail compact|full`, also settable as `detail` in a `jurygraph.toml` rule) and the one word that bounds both,
+`effort = "low" | "medium" | "high" | "max"` (`brief --effort`; an optional `budget_tokens` caps the estimate). Every brief
+reports its byte size and an `estimate {briefs, tokens}`; `doctor` shows the tokens your agent reported over the last 7 days.
+
+## The last step: apply-check
+`jurygraph apply-check RUN...` answers `apply`, `escalate`, `human` or `advise`, with the reasons. Run it last and obey it; it applies
+nothing itself. A jury that cannot apply (a cheap one, or one context playing every juror) can still advise.
 
 ## Does this change need a jury
 `jurygraph should-run --diff change.diff --config jurygraph.toml` returns `none`, `low`, `high` or `human` and a spend, from
@@ -54,3 +60,49 @@ The five-minute example in the README uses only files in `fixtures/`.
 ## What it cannot do
 It checks that a citation names something the run holds; it does not check image regions or whether a persona really read
 it. Colour and layout reach the jury only through screenshots.
+
+## Where it runs
+- **Claude Code, Codex, Cursor, Gemini CLI and the rest:** `jurygraph setup --apply`, or the plugin of your harness. Where the
+  harness has subagents, one per brief is a strong jury.
+- **Claude Desktop:** drop the `.mcpb` bundle for your platform (from the release page) on the app and pick the project folder
+  that holds `.jurygraph/`. Desktop has no subagents, so one context plays every juror: brief with `--independence sequential`.
+  Those runs advise and never apply. This route is unverified against Claude Desktop until a maintainer installs one by hand.
+  Build a bundle yourself with `scripts/build-mcpb.sh <platform> <binary>`.
+- **The chat route (claude.ai, ChatGPT, any chat window):** no server, files only. Run `jurygraph brief` in a terminal, paste one
+  brief file per chat (one chat per brief keeps the jurors independent), have the chat answer with the verdict JSON, save it and run
+  `jurygraph verdict --run N --file v.json`. Many briefs in one chat is `--independence sequential`.
+- **CI and SDKs:** the JSON envelope over the CLI and MCP is the API; there is no stable Rust API and no runner in the tree. A
+  composite GitHub Action and a Claude Agent SDK recipe are planned (`roadmap.md`).
+
+## Personas from a use-case table
+A table of jobs and triggers answers what the persona brief's first step asks for (roles, sectors, objections). The example
+`fixtures/material/usecases.csv` has twelve invented rows for Lantern Notes:
+```
+jurygraph persona generate --from fixtures/material/usecases.csv --count 5
+```
+The engine hashes the file it is given and filters nothing: cut the rows you want into a file first. A sensitivity column
+(`data_sensitivity`, `clearance_note`) is material for your personas and for your own `jurygraph.toml`, where the paths of sensitive
+surfaces belong under the human classes; the engine never learns a sector.
+
+## The dial: what you decide, what needs a reason, what a person decides
+The default is the fast one. You move freely inside the rule and the effort; to leave the rule you give a reason that is
+recorded; four things stay with a person.
+
+| choice | you decide (no reason) | needs a recorded reason (`--reason`, `--by`) | a person only |
+|---|---|---|---|
+| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject` and `--comparator` are yours | `--panel`, `--query` or `--stake` that differ from the rule | |
+| persona count | the rule's seats, trimmed by effort | `--spend` above the rule; 13 to 1000 seats with `--allow-large` | above 1000 seats: nobody |
+| lens choice | any of the rule's lenses; the first under effort `low` | `--lens` that the rule does not name | |
+| dimensions and anchors | `lens generate` drafts them, you accept with `lens add` | editing a shipped lens's anchors (a new version) | an anchor set claimed as a named standard carries the expert's name in `standard` |
+| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence` | `--detail` and `--draw` under a rule | |
+| effort and tokens | effort at or below the toml's; `budget_tokens` trims | `--effort` above the toml's | |
+| quorum | you never set it; the rule's paths do; `--rule` names the rule (recorded on the run with its quorum) | a bigger jury than the rule asks; a rule below the sources' quorum (then `apply-check` advises, `rule_below_sources`) | lowering a quorum is a toml edit, a person's commit; a human class under a persona quorum is refused whoever edits |
+| findings | the foreman decides `fixed`, `dismissed` or `row` with `--by foreman` | a `dismissed` needs `--why` | a finding raised by a human batch is decided by a person (`decide --by-human`; a plain --by is refused, `human_decision_required`) |
+| apply | `apply-check` answers `apply` only when every condition is proven: every briefed seat answered, a known quorum, the run under its rule and not overridden down, effort within the quorum, independent, current, the delta computed and landed, no primary blocker or split in any run, `check` clean for the subject, no open human blocker | | `human` classes: the jury advises, a person applies |
+| human verdicts | | | only a person enters one (`--by-human`) |
+
+**The four hard stops:** the human classes; seats above 1000; a verdict edited to pass; a human-raised finding, or a human verdict
+entered by an agent. Everything else is yours, with a reason where the rule said otherwise, and `apply-check` turns a weak, cheap,
+incomplete, stale or overridden-down run into `advise` instead of refusing it: anything unknown, missing or lowered advises, never
+applies. Raising seats, lenses, effort or detail above the rule is fine. A jury that cannot apply can still advise, which is how a
+small subscription still gets a jury.

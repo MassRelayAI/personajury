@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/tests/mcp.rs
-//! The MCP server: protocol, six tools, and the envelope passed through unchanged. Verb behaviour is not tested here.
+//! The MCP server: protocol, seven tools, and the envelope passed through unchanged. Verb behaviour is not tested here.
 use serde_json::{json, Value};
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
@@ -48,7 +48,7 @@ fn tools_list() -> Vec<Value> {
 }
 
 #[test]
-fn initialize_and_list_six_tools() {
+fn initialize_and_list_seven_tools() {
     let ws = tempfile::tempdir().unwrap();
     let (ok, out) = session(
         ws.path(),
@@ -73,6 +73,7 @@ fn initialize_and_list_six_tools() {
     assert_eq!(
         names,
         [
+            "jurygraph_apply_check",
             "jurygraph_brief",
             "jurygraph_delta",
             "jurygraph_graph",
@@ -274,4 +275,20 @@ fn bad_stakes_detail_and_runs_are_invalid_arguments() {
         assert_eq!(o["result"]["isError"], true, "{o}");
         assert_eq!(tool_env(o)["error"]["code"], "invalid_arguments", "{o}");
     }
+}
+
+#[test]
+fn apply_check_over_mcp_answers_the_same_envelope() {
+    let ws = tempfile::tempdir().unwrap();
+    let (ok, out) = session(
+        ws.path(),
+        &[call(1, "jurygraph_apply_check", json!({"runs": [1]})), call(2, "jurygraph_apply_check", json!({}))],
+    );
+    assert!(ok);
+    // no store yet: the verb's own refusal, as an envelope with isError
+    let env: Value = serde_json::from_str(out[0]["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    assert_eq!(env["verb"], "apply-check", "{env}");
+    assert_eq!(out[0]["result"]["isError"], true);
+    let env: Value = serde_json::from_str(out[1]["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    assert_eq!(env["error"]["code"], "invalid_arguments", "{env}");
 }

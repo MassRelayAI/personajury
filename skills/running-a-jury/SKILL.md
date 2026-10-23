@@ -42,6 +42,17 @@ personas, primary then secondary then bystander. `--detail full` inlines text at
 query that resolves to fewer personas than `--spend` is refused, and so is a term that resolves to nobody
 (`panel_term_empty`). A citation into a text file (`README.md#L153`) must name a line the file has.
 
+### How much to spend, and who the jurors are
+`effort` is one word, set in `jurygraph.toml` or per run with `--effort low|medium|high|max` (medium under a rule): `low` runs 3
+seats (one per stratum) and the rule's first lens, `medium` up to 7 seats, `high` up to 12, `max` the whole panel. A
+`budget_tokens` in the toml fits the run under a cap (`trimmed` in the answer lists every cut) or refuses it as `over_budget`.
+The rule says what the change needs, effort says what you will spend; the run gets the smaller, and `apply-check` will say
+`advise` for a cheap jury on a risky change.
+A panel term can pin a model (`3 builder=primary@claude-sonnet-5-5`); `--model` is the default. Two models make a less
+correlated jury; `apply-check` notes `single_model` when there was only one.
+**If you cannot dispatch one subagent per brief, brief with `--independence sequential`.** A sequential run advises; it never
+applies. Claiming `independent` from one window is a false record.
+
 ### Large juries: run in waves
 Every brief answers `waves`, the persona ids in groups of 30 (`--wave N` changes it; up to 12 seats it is one wave). **Run
 one wave at a time:** give its personas to subagents, ingest their verdicts, and only then start the next wave. A jury of a
@@ -122,17 +133,56 @@ jurygraph delta A B
 A fix claimed in prose without a delta did not land as far as the engine can tell. A run whose subject changed since the
 brief is refused until it is briefed again.
 
-## The quorum, and escalation (guidance you apply; the engine does not)
+## The quorum
 | quorum | who decides | applies itself when |
 |---|---|---|
 | `none` | tests and the adversarial read | always, no jury |
-| `low` | 3 personas, one lens | no primary-stratum blocker and no split |
-| `high` | full panel, all lenses, an Opus foreman proposes fixes | the same rule |
+| `low` | 3 personas, one lens | `apply-check` answers `apply` |
+| `high` | full panel, all lenses, an Opus foreman proposes fixes | the same |
 | `human` | a person; the jury only advises | never: money, permission, deploy, secret, licence, public-claim, brand |
 
-A split (strata disagree) or any primary blocker escalates one level: low to high to human. Count blockers and agreement;
-do not add scores.
+## 7. Apply-check, last
+```
+jurygraph apply-check <run>... [--rule <class>]
+```
+Run it last and obey it. It answers `apply | escalate | human | advise` and the reasons as data; it applies nothing itself.
+| answer | what you do |
+|---|---|
+| `apply` | every condition is proven: every briefed seat answered, a known quorum, the run under its rule and not overridden down, independent, current, the last round compared and landed, no primary blocker, no split, `check` clean for the subject |
+| `escalate` | run the next quorum up (`next_quorum`: low to high, high to human), with the reasons in hand: `primary_blocker`, `split`, `check_failed`, `delta_not_landed`, `human_blocker` |
+| `advise` | something is unknown, missing or lowered: `incomplete_jury` (ingest every seat), `quorum_unknown` (brief under a rule), `rule_below_sources`, `overridden_down`, `effort_below_quorum`, `independence_sequential`, `stale_run` (brief again), `delta_unavailable`: use it as advice, re-run for more |
+| `human` | the change falls under a human class (money, permission, deploy, secret, licence, public-claim, brand): the jury advises, a person decides |
 
-**What the engine does not do yet:** it does not compute a split, and it does not apply the quorum rule for you. `matrix`
-shows the strata; you read them and decide whether they disagree. It also cannot see colour or layout in a walk: a claim
-about contrast or look must cite the screenshot.
+A split is two strata whose `anchor_met` ranges on a cell do not overlap (touching ranges overlap); `matrix` lists them as
+`splits`. Count blockers and agreement; never add scores across strata.
+
+## Experts
+A persona may carry a `credential` (shown in its brief and badged `(C)` in the matrix); a lens's `standard` names the source of its
+anchors. A real expert's word is `verdict --run N --file v.json --by-human "Dr Rao, ward nurse"`: the same refusals, a seat of the
+run to speak from, and the rows stand beside the jury's, never in a cell. Only a person enters one; you never do. A blocker in it
+makes `apply-check` escalate until a person closes the finding with `decide --by-human "<name>"`; you cannot.
+
+## The dial: what you decide, what needs a reason, what a person decides
+The default is the fast one. You move freely inside the rule and the effort; to leave the rule you give a reason that is
+recorded; four things stay with a person.
+
+| choice | you decide (no reason) | needs a recorded reason (`--reason`, `--by`) | a person only |
+|---|---|---|---|
+| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject` and `--comparator` are yours | `--panel`, `--query` or `--stake` that differ from the rule | |
+| persona count | the rule's seats, trimmed by effort | `--spend` above the rule; 13 to 1000 seats with `--allow-large` | above 1000 seats: nobody |
+| lens choice | any of the rule's lenses; the first under effort `low` | `--lens` that the rule does not name | |
+| dimensions and anchors | `lens generate` drafts them, you accept with `lens add` | editing a shipped lens's anchors (a new version) | an anchor set claimed as a named standard carries the expert's name in `standard` |
+| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence` | `--detail` and `--draw` under a rule | |
+| effort and tokens | effort at or below the toml's; `budget_tokens` trims | `--effort` above the toml's | |
+| quorum | you never set it; the rule's paths do; `--rule` names the rule (recorded on the run with its quorum) | a bigger jury than the rule asks; a rule below the sources' quorum (then `apply-check` advises, `rule_below_sources`) | lowering a quorum is a toml edit, a person's commit; a human class under a persona quorum is refused whoever edits |
+| findings | the foreman decides `fixed`, `dismissed` or `row` with `--by foreman` | a `dismissed` needs `--why` | a finding raised by a human batch is decided by a person (`decide --by-human`; a plain --by is refused, `human_decision_required`) |
+| apply | `apply-check` answers `apply` only when every condition is proven: every briefed seat answered, a known quorum, the run under its rule and not overridden down, effort within the quorum, independent, current, the delta computed and landed, no primary blocker or split in any run, `check` clean for the subject, no open human blocker | | `human` classes: the jury advises, a person applies |
+| human verdicts | | | only a person enters one (`--by-human`) |
+
+**The four hard stops:** the human classes; seats above 1000; a verdict edited to pass; a human-raised finding, or a human verdict
+entered by an agent. Everything else is yours, with a reason where the rule said otherwise, and `apply-check` turns a weak, cheap,
+incomplete, stale or overridden-down run into `advise` instead of refusing it: anything unknown, missing or lowered advises, never
+applies. Raising seats, lenses, effort or detail above the rule is fine. A jury that cannot apply can still advise, which is how a
+small subscription still gets a jury.
+
+It also cannot see colour or layout in a walk: a claim about contrast or look must cite the screenshot.

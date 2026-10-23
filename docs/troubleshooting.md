@@ -25,6 +25,7 @@ Read `error.code` in the envelope (`--pretty`). Codes are the contract in the pl
 | `bottom_score_without_blocker` | a score at the bottom of the scale names no blocker | name the blocker, or score higher |
 | `bad_anchor` | `anchor_met` is not an anchor of the lens at or below the score | pick one of the lens's anchors; the brief lists them (`anchor_met: one of 1, 3, 5, at or below your score`) |
 | `invalid_usage` | a verdict's `usage` is not `{input_tokens, output_tokens}` of non-negative integers | fix the numbers or leave `usage` out |
+| `human_decision_required` | `decide` on a finding a human batch (`verdict --by-human`) raised, without `--by-human` | a person decides it: `decide <finding> ... --by-human "<name>"`; the agent and the foreman never do |
 | `invalid_query`, `invalid_config` | a panel query or a `jurygraph.toml` is malformed | fix the text; the message says where |
 | `check_failed` | `check` found findings with no decision (exit 1); `data.unresolved` lists them, a fixed finding raised again is listed with `fix_not_landed`; `fixed_unverified` lists fixes no later run of that lens and persona has judged | `jurygraph decide` each; run the next round |
 

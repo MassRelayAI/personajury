@@ -90,6 +90,11 @@ pub const LEGEND: &str = "scores: r = recalled, t = told, unmarked = seen";
 /// legend. Columns are the union of `lens:dimension[@about]` across strata in first-seen order; `—` marks no score.
 /// A persona's score is suffixed `r` when recalled and `t` when told (I4: §2.2 "shown as such"); a median never is.
 pub fn render_table(m: &Matrix) -> String {
+    render_table_with(m, &BTreeMap::new())
+}
+
+/// `render_table`, a persona with a credential (D19) marked ` (C)` in its row: the badge stays inside its stratum.
+pub fn render_table_with(m: &Matrix, credentials: &BTreeMap<String, String>) -> String {
     type Col = (String, String, Option<String>);
     let mut cols: Vec<Col> = Vec::new();
     for s in &m.strata {
@@ -118,7 +123,8 @@ pub fn render_table(m: &Matrix) -> String {
         };
         if s.cells.iter().any(|c| !c.scores.is_empty()) {
             for p in &s.personas {
-                out.push_str(&format!("| {} | {} |", s.stake.name(), p));
+                let badge = if credentials.contains_key(p) { " (C)" } else { "" };
+                out.push_str(&format!("| {} | {}{} |", s.stake.name(), p, badge));
                 for col in &cols {
                     match cell(col).and_then(|c| c.scores.get(p).map(|v| (v, c.classes.get(p)))) {
                         Some((v, e)) => {

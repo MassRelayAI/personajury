@@ -34,6 +34,10 @@ pub struct BriefArgs {
     pub by: Option<String>,
     /// seats per wave in the `waves` answer (D12); default 30
     pub wave: Option<usize>,
+    /// how much this run may spend, over the toml's (D17); recorded on the run
+    pub effort: Option<Effort>,
+    /// whether the jurors are separate contexts (D18)
+    pub independence: Independence,
 }
 
 /// Seats per wave when the caller does not say (D12).
@@ -157,6 +161,7 @@ fn compose_text(
     cmps: &[Cmp],
     options: &[String],
     detail: Detail,
+    run_on: Option<&str>,
 ) -> Result<String> {
     let mut t = String::new();
     t.push_str("jurygraph-brief 1\n\n");
@@ -173,6 +178,7 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
     if let Ok(Value::Object(m)) = serde_json::from_str::<Value>(&persona.profile_json) {
         for (k, label) in [
             ("role", "Role"),
+            ("credential", "Credential"),
             ("context", "Context"),
             ("daily_tasks", "Daily tasks"),
             ("fears", "Fears"),
@@ -190,6 +196,10 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
         stake_meaning(stake),
         persona.stake_rules
     ));
+    // D15: a run whose panel terms name models says, in every brief, which one this brief is for
+    if let Some(m) = run_on {
+        t.push_str(&format!("## Model\n\nRun this brief on the model `{m}`.\n\n"));
+    }
     t.push_str(&format!(
         "## Lens: {} (version {})\n\nScores are integers from {} to {}.\n\n",
         lens.name, lens.version, lens.scale[0], lens.scale[1]
@@ -417,12 +427,20 @@ struct Shared<'a> {
     panel_name: &'a str,
     resolved: &'a super::panel::Resolved,
     stakes: &'a BTreeMap<String, Stake>,
+    /// the model of each persona whose panel term names one (D15)
+    models: &'a BTreeMap<String, String>,
     selected: &'a [String],
     model: &'a str,
     detail: Detail,
     seed_hex: &'a str,
     override_json: Option<&'a Value>,
     wave: usize,
+    effort: Option<Effort>,
+    trimmed: &'a [Value],
+    independence: Independence,
+    /// the rule class and the effective quorum (the higher of the rule's and the sources'), recorded on the run (D13)
+    rule: Option<&'a str>,
+    quorum: Option<&'static str>,
 }
 
 /// Compose and write the briefs of one lens and create its run.
@@ -457,6 +475,11 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         created_at: now_iso(),
         draw_seed: Some(sh.seed_hex.to_string()),
         override_json: sh.override_json.cloned(),
+        effort: sh.effort.map(|e| e.name().to_string()),
+        trimmed: sh.trimmed.to_vec(),
+        independence: sh.independence.name().to_string(),
+        rule: sh.rule.map(str::to_string),
+        quorum: sh.quorum.map(str::to_string),
     };
     // compose every brief first (the text names no run), so nothing can fail between the run row and its files
     let mut texts = Vec::new();
@@ -465,10 +488,13 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
             .persona(id)?
             .ok_or_else(|| AppError::NotFound(format!("no persona {id}")))?;
         let stake = sh.stakes[id];
+        let model = sh.models.get(id).cloned().unwrap_or_else(|| sh.model.to_string());
+        // every brief of a run with a model in its terms states its own; a run with none is as it always was
+        let run_on = (!sh.models.is_empty()).then_some(model.as_str());
         let text = compose_text(
-            root, &persona, stake, lens, sh.subject, sh.cmps, &options, sh.detail,
+            root, &persona, stake, lens, sh.subject, sh.cmps, &options, sh.detail, run_on,
         )?;
-        texts.push((id.clone(), persona.version, stake, text));
+        texts.push((id.clone(), persona.version, stake, text, model));
     }
     let run_id = store.insert_run(&run)?;
     let dir_rel = format!(".jurygraph/runs/{run_id}");
@@ -477,7 +503,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
     let written = (|| -> Result<Vec<BriefRef>> {
         std::fs::create_dir_all(&dir).map_err(|e| AppError::Io(dir.clone(), e))?;
         let mut refs = Vec::new();
-        for (id, version, stake, text) in &texts {
+        for (id, version, stake, text, model) in &texts {
             let rel = format!("{dir_rel}/{id}--{}.md", lens.name);
             let path = root.join(&rel);
             std::fs::write(&path, text.as_bytes()).map_err(|e| AppError::Io(path.clone(), e))?;
@@ -488,6 +514,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
                 path: rel,
                 hash: sha256_hex(text.as_bytes()),
                 bytes: text.len(),
+                model: model.clone(),
             });
         }
         store.set_run_briefs(run_id, &refs)?;
@@ -504,9 +531,9 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
     let bytes_total: usize = refs.iter().map(|r| r.bytes).sum();
     let briefs: Vec<Value> = refs
         .iter()
-        .map(|r| json!({"persona": r.persona, "stake": r.stake.name(), "path": r.path, "hash": r.hash, "bytes": r.bytes}))
+        .map(|r| json!({"persona": r.persona, "stake": r.stake.name(), "path": r.path, "hash": r.hash, "bytes": r.bytes, "model": r.model}))
         .collect();
-    Ok(json!({
+    let mut out = json!({
         "run": run_id,
         "subject": {"name": sh.subject.name, "version": sh.subject.version, "hash": sh.subject.hash},
         "lens": {"name": lens.name, "version": lens.version},
@@ -527,7 +554,41 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         "waves": sh.selected.chunks(sh.wave).map(|c| c.to_vec()).collect::<Vec<_>>(),
         "briefs": briefs,
         "bytes_total": bytes_total,
-    }))
+    });
+    // D18: one context will read every brief; the run says so, in the order the panel sits
+    if sh.independence == Independence::Sequential {
+        out["sequence"] = json!(refs.iter().map(|r| r.path.clone()).collect::<Vec<_>>());
+        out["note"] = json!("one context will read all of these; the run is labelled sequential");
+    }
+    Ok(out)
+}
+
+/// An effort's seat cap (D17): one seat per stratum present first (primary first), then the next in the selection's
+/// order (primary, then secondary, then bystander, draw order within each) up to `cap`; kept in brief order. A cap never
+/// drops a whole stratum.
+fn capped_seats(selected: &[String], stakes: &BTreeMap<String, Stake>, cap: usize) -> Vec<String> {
+    let mut keep = std::collections::BTreeSet::new();
+    let mut seen = std::collections::BTreeSet::new();
+    for (i, id) in selected.iter().enumerate() {
+        if seen.insert(stakes[id]) {
+            keep.insert(i);
+        }
+    }
+    let mut i = 0;
+    while keep.len() < cap && i < selected.len() {
+        keep.insert(i);
+        i += 1;
+    }
+    selected.iter().enumerate().filter(|(i, _)| keep.contains(i)).map(|(_, id)| id.clone()).collect()
+}
+
+pub(crate) fn quorum_word(q: Quorum) -> &'static str {
+    match q {
+        Quorum::None => "none",
+        Quorum::Low => "low",
+        Quorum::High => "high",
+        Quorum::Human => "human",
+    }
 }
 
 fn detail_name(d: Detail) -> &'static str {
@@ -577,6 +638,21 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         .as_ref()
         .and_then(|c| c.tokens_per_brief)
         .unwrap_or(DEFAULT_TOKENS_PER_BRIEF);
+    // the highest jury quorum the subject's recorded sources fall under (D13): a rule below it is an override
+    let mut sources_quorum: Option<Quorum> = None;
+    if let (None, Some(cfg)) = (&a.rule, &cfg) {
+        let paths: Vec<String> = subject
+            .attachments
+            .iter()
+            .map(|x| super::persona::display_path(root, Path::new(&x.source_path)))
+            .collect();
+        sources_quorum = trigger::classify(cfg, &paths)
+            .hits
+            .iter()
+            .map(|h| h.quorum)
+            .filter(|q| matches!(q, Quorum::Low | Quorum::High))
+            .max();
+    }
     let rule: Option<&TriggerRule> = match (&a.rule, &cfg) {
         (Some(class), Some(cfg)) => {
             let r = cfg.rules.iter().find(|r| r.class == *class).ok_or_else(|| {
@@ -604,6 +680,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
                 .map(|x| super::persona::display_path(root, Path::new(&x.source_path)))
                 .collect();
             for hit in trigger::classify(cfg, &paths).hits {
+                if matches!(hit.quorum, Quorum::Low | Quorum::High) {
+                    sources_quorum = sources_quorum.max(Some(hit.quorum));
+                }
                 if hit.quorum == Quorum::Human
                     || HUMAN_CLASSES.contains(&trigger::normalise_class(&hit.class).as_str())
                 {
@@ -787,9 +866,79 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
     }
     let mut ordered: Vec<&String> = resolved.ids.iter().collect();
     ordered.sort_by_key(|id| stakes[*id]); // stable: panel order within a stake
-    let selected: Vec<String> = ordered.into_iter().take(spend).cloned().collect();
+    let mut selected: Vec<String> = ordered.into_iter().take(spend).cloned().collect();
     for id in &selected {
         super::slug("persona id", id)?;
+    }
+
+    // D17: the rule says what a change needs, effort says what you will spend; the run gets the smaller. Only a run
+    // under a rule, an effort the caller or the toml named, or a budget is planned; any other brief is as in v0.3.
+    let effort: Option<Effort> = a
+        .effort
+        .or(cfg.as_ref().and_then(|c| c.effort))
+        .or(rule.map(|_| Effort::Medium));
+    let budget = cfg.as_ref().and_then(|c| c.budget_tokens);
+    let mut trimmed: Vec<Value> = Vec::new();
+    if let Some(e) = effort {
+        let why = format!("effort {}", e.name());
+        // a lens list the caller wrote is the caller's; the rule's list is cut to its first under `low`
+        if e == Effort::Low && lenses_from_rule && lenses.len() > 1 {
+            let from: Vec<String> = lenses.iter().map(|l| l.name.clone()).collect();
+            lenses.truncate(1);
+            trimmed.push(json!({"what": "lenses", "from": from, "to": [lenses[0].name], "why": why}));
+        }
+        // an explicit --spend is the caller's own choice (and a recorded override where it differs from the rule)
+        if a.spend.is_none() {
+            let kept = match e.seat_cap() {
+                Some(c) if selected.len() > c => capped_seats(&selected, &stakes, c),
+                _ => selected.clone(),
+            };
+            if kept.len() < selected.len() {
+                trimmed.push(json!({"what": "seats", "from": selected.len(), "to": kept.len(), "why": why}));
+                selected = kept;
+            }
+        }
+    }
+    if let Some(b) = budget {
+        let per = tokens_per_brief;
+        let fits = |seats: usize, lens: usize| {
+            (seats as u64).checked_mul(lens as u64).and_then(|n| n.checked_mul(per)).is_some_and(|t| t <= b)
+        };
+        let strata = selected.iter().map(|id| stakes[id]).collect::<std::collections::BTreeSet<_>>().len();
+        let floor = (strata as u64).saturating_mul(per);
+        if floor > b {
+            return Err(Refusal::OverBudget {
+                needed: floor,
+                budget: b,
+                minimum_plan: json!({"seats": strata, "lenses": 1, "briefs": strata, "tokens": floor}),
+            }
+            .into());
+        }
+        let why = format!("budget_tokens {b}");
+        // lenses after the first go first, then seats in reverse draw order, never the last of a stratum
+        if lenses.len() > 1 && !fits(selected.len(), lenses.len()) {
+            let from: Vec<String> = lenses.iter().map(|l| l.name.clone()).collect();
+            while lenses.len() > 1 && !fits(selected.len(), lenses.len()) {
+                lenses.pop();
+            }
+            let to: Vec<String> = lenses.iter().map(|l| l.name.clone()).collect();
+            trimmed.push(json!({"what": "lenses", "from": from, "to": to, "why": why}));
+        }
+        if !fits(selected.len(), lenses.len()) {
+            let from = selected.len();
+            while !fits(selected.len(), lenses.len()) {
+                let drop = (0..selected.len()).rev().find(|i| {
+                    selected.iter().filter(|o| stakes[*o] == stakes[&selected[*i]]).count() > 1
+                });
+                match drop {
+                    Some(i) => {
+                        selected.remove(i);
+                    }
+                    None => break,
+                }
+            }
+            trimmed.push(json!({"what": "seats", "from": from, "to": selected.len(), "why": why}));
+        }
     }
     // D10: 12 seats a brief unless the caller says so; never more than 1000
     super::panel::check_seats(selected.len(), a.allow_large)?;
@@ -875,6 +1024,13 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
                     json!({"rule": SEAT_CEILING, "given": selected.len()}),
                 );
             }
+            // a rule whose quorum is below the one the sources fall under lowers the jury: an override (D13)
+            if let Some(sq) = sources_quorum.filter(|sq| *sq > r.quorum) {
+                fields.insert(
+                    "quorum".into(),
+                    json!({"sources": quorum_word(sq), "given": quorum_word(r.quorum)}),
+                );
+            }
             if fields.is_empty() {
                 None
             } else {
@@ -907,18 +1063,33 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         })?;
     let tokens = briefs as u64 * tokens_per_brief;
     let seed_hex = super::panel::hex_seed(seed);
+    // the models panel terms name, by persona (D15); empty when no term does
+    let models: BTreeMap<String, String> = resolved
+        .ids
+        .iter()
+        .zip(&resolved.models)
+        .filter_map(|(id, m)| m.clone().map(|m| (id.clone(), m)))
+        .filter(|(id, _)| selected.contains(id))
+        .collect();
+    let quorum = rule.map(|r| r.quorum).max(sources_quorum).filter(|q| matches!(q, Quorum::Low | Quorum::High));
     let sh = Shared {
         subject: &subject,
         cmps: &cmps,
         panel_name: &panel_name,
         resolved: &resolved,
         stakes: &stakes,
+        models: &models,
         selected: &selected,
         model: &a.model,
         detail,
         seed_hex: &seed_hex,
         override_json: override_json.as_ref(),
         wave: a.wave.unwrap_or(DEFAULT_WAVE),
+        effort,
+        trimmed: &trimmed,
+        independence: a.independence,
+        rule: rule.map(|r| r.class.as_str()),
+        quorum: quorum.map(quorum_word),
     };
     let mut runs = Vec::new();
     for lens in &lenses {
@@ -936,6 +1107,16 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         out["capped"] = json!(true);
     }
     out["draw"] = json!({"seed": seed_hex});
+    if let Some(e) = effort {
+        out["effort"] = json!(e.name());
+        out["trimmed"] = json!(trimmed);
+    } else if !trimmed.is_empty() {
+        out["trimmed"] = json!(trimmed);
+    }
+    if let Some(b) = budget {
+        out["budget_tokens"] = json!(b);
+    }
+    out["independence"] = json!(a.independence.name());
     if large {
         out["large"] = json!(true);
     }

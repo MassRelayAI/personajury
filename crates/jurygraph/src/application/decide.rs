@@ -1,7 +1,8 @@
-//! decide: a person's word on a finding — fixed | dismissed <why> | row <id> (plan Task 5, D4)
+//! decide: a person's word on a finding — fixed | dismissed <why> | row <id> (plan Task 5, D4). A finding a human batch
+//! raised is decided only with `--by-human` (D19).
 use super::verdict::open;
 use super::{AppError, Result};
-use crate::domain::DecisionRow;
+use crate::domain::{DecisionRow, Refusal};
 use crate::store::now_iso;
 use serde_json::{json, Value};
 use std::path::Path;
@@ -16,18 +17,24 @@ pub fn record(
     outcome: &str,
     why: Option<&str>,
     row: Option<&str>,
-    by: &str,
+    by: Option<&str>,
+    by_human: Option<&str>,
 ) -> Result<Value> {
     if !matches!(outcome, "fixed" | "dismissed" | "row") {
         return Err(AppError::InvalidArguments(format!(
             "outcome {outcome:?} is not one of fixed, dismissed, row"
         )));
     }
-    if present(Some(by)).is_none() {
+    if by.is_some() && by_human.is_some() {
         return Err(AppError::InvalidArguments(
-            "a decision needs --by <who decided>".into(),
+            "give --by or --by-human, not both".into(),
         ));
     }
+    let Some(by) = present(by_human).or(present(by)) else {
+        return Err(AppError::InvalidArguments(
+            "a decision needs --by <who decided> (or --by-human <name> for a person)".into(),
+        ));
+    };
     if outcome == "dismissed" && present(why).is_none() {
         return Err(AppError::InvalidArguments(
             "dismissed needs --why <the reason>".into(),
@@ -39,8 +46,15 @@ pub fn record(
         ));
     }
     let store = open(root)?;
-    if store.finding(finding)?.is_none() {
+    let Some(f) = store.finding(finding)? else {
         return Err(AppError::NotFound(format!("no finding {finding}")));
+    };
+    // a human-raised blocker is overruled only by a person's recorded word, never by the agent or the foreman
+    if super::verdict::is_human(&f.persona) && present(by_human).is_none() {
+        return Err(Refusal::HumanDecisionRequired {
+            finding: finding.to_string(),
+        }
+        .into());
     }
     let id = store.insert_decision(&DecisionRow {
         id: 0,

@@ -64,7 +64,7 @@ fn doctor_counts() {
         .as_str()
         .unwrap()
         .ends_with(".jurygraph/store.db"));
-    assert_eq!(d["schema_version"], 3);
+    assert_eq!(d["schema_version"], 4);
     let c = &d["counts"];
     assert_eq!(
         (

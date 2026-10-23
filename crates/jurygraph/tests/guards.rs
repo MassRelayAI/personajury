@@ -147,3 +147,38 @@ fn std_network_scanner_catches_a_planted_socket() {
     );
     assert!(std_network_uses("let x = 1;").is_empty());
 }
+
+/// A `bind(` or `listen(` call: the engine is a one-shot CLI and a stdio server, it never accepts a connection.
+fn listener_calls(src: &str) -> Vec<String> {
+    src.lines()
+        .enumerate()
+        .filter(|(_, l)| {
+            let code = l.split("//").next().unwrap_or("");
+            code.contains("bind(") || code.contains("listen(")
+        })
+        .map(|(n, l)| format!("line {}: {}", n + 1, l.trim()))
+        .collect()
+}
+
+#[test]
+fn no_listener_in_src() {
+    let mut files = Vec::new();
+    rs_files(&Path::new(env!("CARGO_MANIFEST_DIR")).join("src"), &mut files);
+    assert!(files.len() > 10, "walked src/: {} files", files.len());
+    let mut bad = Vec::new();
+    for f in files {
+        for hit in listener_calls(&std::fs::read_to_string(&f).unwrap()) {
+            bad.push(format!("{}: {hit}", f.display()));
+        }
+    }
+    assert!(bad.is_empty(), "{bad:#?}");
+}
+
+#[test]
+fn listener_scanner_catches_a_planted_bind() {
+    assert_eq!(listener_calls("let l = TcpListener::bind(\"127.0.0.1:0\");").len(), 1);
+    assert_eq!(listener_calls("sock.listen(16);").len(), 1);
+    // prose after a line comment is not code
+    assert!(listener_calls("let x = 1; // never bind( a port").is_empty());
+    assert!(listener_calls("let x = 1;").is_empty());
+}

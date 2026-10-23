@@ -27,8 +27,20 @@ pub fn parse(q: &str) -> Result<Vec<Term>, Refusal> {
             if count == 0 {
                 return Err(bad());
             }
-            let (tag_raw, stake) = match parts[1].split_once('=') {
+            // `@model` closes the term (D15): letters, digits and `. _ : / -`, nothing else
+            let (spec, model) = match parts[1].split_once('@') {
                 None => (parts[1], None),
+                Some((spec, m)) => {
+                    let ok = !m.is_empty()
+                        && m.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | ':' | '/' | '-'));
+                    if !ok {
+                        return Err(bad());
+                    }
+                    (spec, Some(m.to_string()))
+                }
+            };
+            let (tag_raw, stake) = match spec.split_once('=') {
+                None => (spec, None),
                 Some((t, s)) => {
                     let stake = Stake::parse(&s.to_lowercase()).ok_or_else(bad)?;
                     (t, Some(stake))
@@ -41,7 +53,7 @@ pub fn parse(q: &str) -> Result<Vec<Term>, Refusal> {
             if tag == "other" {
                 tag = "others".into();
             }
-            Ok(Term { count, tag, stake })
+            Ok(Term { count, tag, stake, model })
         })
         .collect()
 }
@@ -89,9 +101,12 @@ pub fn draw_terms(terms: &[Term], personas: &[Persona], seed: Option<[u8; 8]>) -
 pub fn normalise(terms: &[Term]) -> String {
     terms
         .iter()
-        .map(|t| match t.stake {
-            Some(s) => format!("{} {}={}", t.count, t.tag, s.name()),
-            None => format!("{} {}", t.count, t.tag),
+        .map(|t| {
+            let at = t.model.as_ref().map(|m| format!("@{m}")).unwrap_or_default();
+            match t.stake {
+                Some(s) => format!("{} {}={}{at}", t.count, t.tag, s.name()),
+                None => format!("{} {}{at}", t.count, t.tag),
+            }
         })
         .collect::<Vec<_>>()
         .join(", ")
@@ -135,20 +150,35 @@ mod tests {
                 Term {
                     count: 5,
                     tag: "companies".into(),
-                    stake: None
+                    stake: None,
+                    model: None
                 },
                 Term {
                     count: 2,
                     tag: "builders".into(),
-                    stake: None
+                    stake: None,
+                    model: None
                 },
                 Term {
                     count: 1,
                     tag: "others".into(),
-                    stake: None
+                    stake: None,
+                    model: None
                 }
             ]
         );
+    }
+    #[test]
+    fn a_term_may_close_with_a_model() {
+        let t = parse("3 builder=primary@claude-sonnet-5-5, 1 visitor@m.2:x/y, 2 others").unwrap();
+        assert_eq!(t[0].model.as_deref(), Some("claude-sonnet-5-5"));
+        assert_eq!(t[0].stake, Some(Stake::Primary));
+        assert_eq!((t[1].model.as_deref(), t[1].stake), (Some("m.2:x/y"), None));
+        assert_eq!(t[2].model, None);
+        assert_eq!(normalise(&t), "3 builder=primary@claude-sonnet-5-5, 1 visitor@m.2:x/y, 2 others");
+        for q in ["1 a@", "1 a=primary@", "1 a@b@c", "1 a@b c", "1 a@b,", "1 a@ö"] {
+            assert!(parse(q).is_err(), "{q:?}");
+        }
     }
     #[test]
     fn parse_refuses_bad_terms() {

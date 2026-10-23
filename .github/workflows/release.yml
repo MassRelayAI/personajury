@@ -50,8 +50,48 @@ jobs:
           path: dist/*
           if-no-files-found: error
 
-  release:
+  # D16: four Claude Desktop bundles (one platform's binary each), validated here and nowhere else (the only network use)
+  bundle:
     needs: build
+    runs-on: ubuntu-latest
+    env:
+      # pin: set to the @anthropic-ai/mcpb version you verified (unverified in the tree: it was written without network)
+      MCPB_CLI_VERSION: '2.1.2'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: bins
+          pattern: bin-*
+          merge-multiple: true
+      - name: The binaries are the built ones (checksums verified)
+        working-directory: bins
+        run: |
+          cat jurygraph-*.sha256 > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - name: Build the four bundles
+        run: |
+          for p in linux-x64 darwin-arm64 darwin-x64 win32-x64; do
+            bin="bins/jurygraph-$p"; [ "$p" = win32-x64 ] && bin="bins/jurygraph-$p.exe"
+            scripts/build-mcpb.sh "$p" "$bin" dist
+          done
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '22'
+      - name: Validate each bundle's manifest (pinned CLI)
+        run: |
+          for b in dist/*.mcpb; do
+            d=$(mktemp -d); unzip -q "$b" manifest.json -d "$d"
+            npx --yes "@anthropic-ai/mcpb@${MCPB_CLI_VERSION}" validate "$d/manifest.json"
+          done
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mcpb-bundles
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    needs: [build, bundle]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -61,7 +101,7 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: dist
-          pattern: bin-*
+          pattern: '{bin,mcpb}-*'
           merge-multiple: true
       - name: SHA256SUMS
         working-directory: dist
@@ -78,3 +118,43 @@ jobs:
           subject-path: |
             dist/jurygraph-*
             dist/SHA256SUMS
+
+  # D16: the MCP registry entry, after the bundles are released and their hashes are known
+  publish-registry:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # the registry authenticates this repository's owner through GitHub OIDC
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: bundles
+          name: mcpb-bundles
+      - name: mcp-publisher (pinned, checksum verified)
+        env:
+          MCP_PUBLISHER_VERSION: v1.8.1
+          MCP_PUBLISHER_SHA256: a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc
+        run: |
+          archive=mcp-publisher_linux_amd64.tar.gz
+          curl -fsSLo "$archive" "https://github.com/modelcontextprotocol/registry/releases/download/$MCP_PUBLISHER_VERSION/$archive"
+          echo "$MCP_PUBLISHER_SHA256  $archive" | sha256sum --check --strict
+          tar xzf "$archive" mcp-publisher && chmod +x mcp-publisher
+      - name: server.json version must equal the tag (bump it in the tagged commit; exit 4)
+        run: |
+          v=$(jq -r .version server.json)
+          [ "$v" = "${GITHUB_REF_NAME#v}" ] || { echo "server.json $v != tag ${GITHUB_REF_NAME#v}"; exit 4; }
+      - name: Put the released bundles' hashes in server.json
+        run: |
+          for p in linux-x64 darwin-arm64 darwin-x64 win32-x64; do
+            sha=$(cut -d' ' -f1 "bundles/jurygraph-$p.mcpb.sha256")
+            jq --arg p "$p" --arg sha "$sha" '(.packages[] | select(.identifier | endswith("jurygraph-" + $p + ".mcpb")) | .fileSha256) = $sha' server.json > server.tmp
+            mv server.tmp server.json
+          done
+          ! grep -q '"fileSha256": "0000000000000000000000000000000000000000000000000000000000000000"' server.json
+      - name: Validate, authenticate, publish
+        run: |
+          ./mcp-publisher validate
+          ./mcp-publisher login github-oidc
+          ./mcp-publisher publish

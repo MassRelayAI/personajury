@@ -2,7 +2,7 @@
 //! The CLI: thin. Every verb parses, calls one application function and prints one envelope.
 use crate::adapters::envelope::Envelope;
 use crate::application::{self as app, AppError};
-use crate::domain::{Detail, Stake, SubjectKind};
+use crate::domain::{Detail, Effort, Independence, Stake, SubjectKind};
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
@@ -97,6 +97,12 @@ pub enum Cmd {
         /// seats per wave in the answer's `waves` (default 30): run one wave, ingest it, then the next
         #[arg(long)]
         wave: Option<usize>,
+        /// how much this run may spend: low | medium | high | max (default: the toml's, else medium under a rule); recorded
+        #[arg(long)]
+        effort: Option<String>,
+        /// independent (one context per brief, the default) or sequential (one context reads every brief)
+        #[arg(long)]
+        independence: Option<String>,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
@@ -106,6 +112,10 @@ pub enum Cmd {
         file: Option<PathBuf>,
         #[arg(long)]
         json: Option<String>,
+        /// a person entered this verdict: "<name>, <credential>". The file's persona is the seat whose stratum the
+        /// person speaks in; the rows stand beside the jury's, never in its cells. Only a person enters one.
+        #[arg(long)]
+        by_human: Option<String>,
     },
     /// Scores per stratum for one or more runs; never averaged across strata
     Matrix {
@@ -142,6 +152,14 @@ pub enum Cmd {
         #[arg(long)]
         history: bool,
     },
+    /// The verdict to obey last: apply | escalate | human | advise, with the reasons as data; applies nothing itself
+    ApplyCheck {
+        #[arg(required = true)]
+        runs: Vec<i64>,
+        /// the rule class of jurygraph.toml this change falls under (its quorum is the current level)
+        #[arg(long)]
+        rule: Option<String>,
+    },
     /// A person's word on a finding: fixed, dismissed (with --why) or row (with --row)
     Decide {
         finding: String,
@@ -150,8 +168,12 @@ pub enum Cmd {
         why: Option<String>,
         #[arg(long)]
         row: Option<String>,
+        /// who decided (the foreman, an agent, a person)
         #[arg(long)]
-        by: String,
+        by: Option<String>,
+        /// a person's name: required to decide a finding a human batch raised (D19)
+        #[arg(long)]
+        by_human: Option<String>,
     },
     /// Classify a diff against jurygraph.toml: none | low | high | human, and the spend
     ShouldRun {
@@ -235,6 +257,15 @@ pub enum LensCmd {
         #[arg(long)]
         file: PathBuf,
     },
+    /// Write the brief that asks an agent to draft a lens from a standard, a handbook or examples (no model is called)
+    Generate {
+        /// a file or a folder of the material the lens is drawn from
+        #[arg(long)]
+        from: PathBuf,
+        /// how many dimensions the lens has (1 to 12)
+        #[arg(long, default_value_t = 4)]
+        dimensions: usize,
+    },
     List,
 }
 #[derive(Subcommand, Debug)]
@@ -257,6 +288,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
         Cmd::Panel { what: PanelCmd::Resolve { .. } } => "panel resolve",
         Cmd::Lens { what: LensCmd::Add { .. } } => "lens add",
+        Cmd::Lens { what: LensCmd::Generate { .. } } => "lens generate",
         Cmd::Lens { what: LensCmd::List } => "lens list",
         Cmd::Subject { .. } => "subject add",
         Cmd::Comparator { .. } => "comparator add",
@@ -267,6 +299,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Pick { .. } => "pick",
         Cmd::Delta { .. } => "delta",
         Cmd::Check { .. } => "check",
+        Cmd::ApplyCheck { .. } => "apply-check",
         Cmd::Decide { .. } => "decide",
         Cmd::ShouldRun { .. } => "should-run",
         Cmd::Setup { .. } => "setup",
@@ -277,6 +310,13 @@ pub fn verb(cmd: &Cmd) -> &'static str {
 
 fn detail(s: &str) -> app::Result<Detail> {
     Detail::parse(s).ok_or_else(|| AppError::InvalidArguments(format!("unknown detail {s} (compact|full)")))
+}
+fn parse_effort(s: &str) -> app::Result<Effort> {
+    Effort::parse(s).ok_or_else(|| AppError::InvalidArguments(format!("unknown effort {s} (low|medium|high|max)")))
+}
+fn parse_independence(s: &str) -> app::Result<Independence> {
+    Independence::parse(s)
+        .ok_or_else(|| AppError::InvalidArguments(format!("unknown independence {s} (independent|sequential)")))
 }
 fn kind(s: &str) -> app::Result<SubjectKind> {
     SubjectKind::parse(s).ok_or_else(|| {
@@ -317,6 +357,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         },
         Cmd::Lens { what } => match what {
             LensCmd::Add { file } => app::lens::add(root, file),
+            LensCmd::Generate { from, dimensions } => app::lens::generate(root, from, *dimensions),
             LensCmd::List => app::lens::list(root),
         },
         Cmd::Subject { what: SubjectCmd::Add { name, kind: k, attach } } => {
@@ -326,7 +367,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             app::subject::add(root, name, kind(k)?, attach, true)
         }
         Cmd::Brief {
-            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave,
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence,
         } => app::brief::compose(
             root,
             &app::brief::BriefArgs {
@@ -345,15 +386,17 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 reason: reason.clone(),
                 by: by.clone(),
                 wave: *wave,
+                effort: effort.as_deref().map(parse_effort).transpose()?,
+                independence: independence.as_deref().map(parse_independence).transpose()?.unwrap_or_default(),
             },
         ),
-        Cmd::Verdict { run, file, json } => {
+        Cmd::Verdict { run, file, json, by_human } => {
             let input = match (file, json) {
                 (Some(f), None) => app::read_text(f)?,
                 (None, Some(j)) => j.clone(),
                 _ => return Err(AppError::InvalidArguments("give the verdict as --file <path> or --json <text>".into())),
             };
-            app::verdict::ingest(root, *run, &input)
+            app::verdict::ingest_by(root, *run, &input, by_human.as_deref())
         }
         Cmd::Matrix { runs, across_strata, history, table, detail: d } => {
             app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?)
@@ -362,9 +405,16 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Pick { run } => app::pick::show(root, *run),
         Cmd::Delta { a, b } => app::delta::show(root, *a, *b),
         Cmd::Check { history } => app::check::run(root, *history),
-        Cmd::Decide { finding, outcome, why, row, by } => {
-            app::decide::record(root, finding, outcome, why.as_deref(), row.as_deref(), by)
-        }
+        Cmd::ApplyCheck { runs, rule } => app::apply_check::run(root, runs, rule.as_deref()),
+        Cmd::Decide { finding, outcome, why, row, by, by_human } => app::decide::record(
+            root,
+            finding,
+            outcome,
+            why.as_deref(),
+            row.as_deref(),
+            by.as_deref(),
+            by_human.as_deref(),
+        ),
         Cmd::ShouldRun { diff, paths, config, subject } => {
             app::should_run::classify(root, diff.as_deref(), paths, config.as_deref(), subject.as_deref())
         }

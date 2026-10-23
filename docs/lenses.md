@@ -65,3 +65,10 @@ Open a feature request with the file, the question it asks that the four above d
 good from bad (`GOVERNANCE.md`). A contributed lens has anchors in words at every anchor score, a public and citable
 `standard` if it measures against one, and a new version on every anchor change. A lens that only renames a shipped dimension
 is declined.
+
+## Drafting a lens from material
+`jurygraph lens generate --from PATH [--dimensions N]` writes the brief that asks your agent to draft a lens from a standard, a
+handbook or examples, with `standard = "material:<hash>"`; `lens add` validates what it writes. Three generic examples ship as
+fixture data: `fixtures/lenses/consulting-deck.toml`, `investor-pitch.toml` and `financial-model.toml` (four dimensions each).
+A lens's `standard` is shown in every brief and in the matrix header; an anchor set claimed as a named standard should carry the
+expert's name there.

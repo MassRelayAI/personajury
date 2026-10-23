@@ -7,6 +7,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-24
+Everything below this heading ships together as 0.4.0; the manifests still read 0.1.0 until the release commit bumps them
+(`docs/dev/release.md`).
+
+### Added (v0.4, D13 to D19)
+- `jurygraph apply-check RUN... [--rule CLASS]` and the MCP tool `jurygraph_apply_check` (seven tools): `apply | escalate | human |
+  advise` with the reasons as data (D13). `matrix` answers `splits`, the cells on which two strata's `anchor_met` ranges do not overlap.
+- `jurygraph lens generate --from PATH [--dimensions N]`: the brief that asks an agent to draft a lens from a standard (D14).
+  Three example lenses ship as fixture data (consulting deck, investor pitch, financial model).
+- A model per panel term (`3 builder=primary@claude-sonnet-5-5`), stated in every brief of that run; `matrix` answers `models` and
+  `models_distinct` (D15).
+- `.mcpb` bundles for Claude Desktop (`packaging/mcpb`, `scripts/build-mcpb.sh`), `mcp.json` for Codex and Cursor, `mcpServers` in the
+  Gemini extension, `packages` in `server.json`, a `publish-registry` release job, `tests/manifests.rs` and a no-listener guard (D16).
+- Effort: `effort = "low|medium|high|max"` in `jurygraph.toml` and `brief --effort`, `budget_tokens`, `over_budget`, `trimmed`; `doctor`
+  shows the effort and the tokens reported over 7 days (D17).
+- `brief --independence independent|sequential`, shown by `matrix`, `delta` and `apply-check` (D18).
+- Experts: a persona `credential`, a lens `standard` in the matrix header, `verdict --by-human "<name, credential>"` (D19).
+- `fixtures/material/usecases.csv`: twelve invented rows for Lantern Notes, the public example for `persona generate`.
+
+### Changed (v0.4)
+- **Store schema v4** (D17, D18, D19): a v3 store upgrades in place on open.
+- `apply-check` answers `apply` only when every condition is proven (D13 as ruled after the v0.4 review): new reasons
+  `incomplete_jury`, `quorum_unknown`, `rule_below_sources`, `overridden_down`, `stale_run`, `delta_unavailable` (advise);
+  `check_failing` is renamed `check_failed` and now covers every run of the subject; blockers and splits are read per run. The
+  quorum is the highest of the run's recorded quorum (`run.rule_class`, `run.quorum`, schema v4), the `--rule` named and the sources';
+  with none it is unknown (`quorum: null`), never an assumed `low`.
+- `brief --rule` whose quorum is below the sources' is an override (`quorum`) that needs `--reason`. The medium and high seat caps
+  keep one seat per stratum before filling primary first (D17).
+- `decide` on a finding a human batch raised needs `--by-human "<name>"` (`human_decision_required`); `--by` is now optional when
+  `--by-human` is given (D19).
+- Under a rule, `brief` is planned by effort (default `medium`: at most 7 seats). Set `effort = "high"` or `"max"` for more.
+
+### Deferred (to v0.5)
+- Calibration (`calibrate`), CSV cell locators, the GitHub Action, the Agent SDK recipe, the marketplace listings.
+
 ### Added (v0.3, D11 and D12)
 - `jurygraph graph RUN... --svg [--out F]` and the MCP tool `jurygraph_graph`: the jury as one deterministic SVG (personas
   in three stratum columns, the dimensions they scored with a median badge per stratum, the findings coloured by decision;

@@ -40,6 +40,11 @@ fn run_row() -> RunRow {
         created_at: "2026-10-23T00:00:00Z".into(),
         draw_seed: None,
         override_json: None,
+        effort: None,
+        trimmed: vec![],
+        independence: "independent".into(),
+        rule: None,
+        quorum: None,
     }
 }
 
@@ -114,8 +119,8 @@ fn subject(name: &str, hash: &str) -> Subject {
 fn open_creates_store_and_schema_version() {
     let (d, s) = tmp();
     assert!(d.path().join(".jurygraph/store.db").exists());
-    assert_eq!(s.schema_version().unwrap(), 3);
-    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 3);
+    assert_eq!(s.schema_version().unwrap(), 4);
+    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 4);
     assert!(Store::open_existing(d.path()).is_ok());
 }
 
@@ -275,6 +280,7 @@ fn material_panel_and_run_round_trip() {
         path: "x".into(),
         hash: "h".into(),
         bytes: 9,
+        model: "m".into(),
     };
     s.set_run_briefs(id, std::slice::from_ref(&brief)).unwrap();
     let r = s.run(id).unwrap().unwrap();

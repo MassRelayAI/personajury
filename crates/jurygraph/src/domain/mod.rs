@@ -1,4 +1,5 @@
 //! The standard: personas, lenses, subjects, verdicts and the refusals. Pure, no I/O.
+pub mod apply;
 pub mod citation;
 pub mod delta;
 pub mod graphlayout;

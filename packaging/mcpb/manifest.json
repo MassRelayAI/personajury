@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/mcpb/main/schemas/mcpb-manifest-v0.4.schema.json",
+  "manifest_version": "0.4",
+  "name": "jurygraph",
+  "display_name": "JuryGraph",
+  "version": "0.1.0",
+  "description": "A persona jury as an engine: briefs, verdicts refused without evidence, scores per stratum. Local; never calls a model.",
+  "long_description": "JuryGraph writes the briefs, refuses any verdict without evidence and reports scores per stratum, never averaged. It calls no model and no network: the app you chat in runs the personas. Claude Desktop has no subagents, so one context plays every juror; runs made here are labelled sequential, and `jurygraph_apply_check` answers advise for them, never apply. Pick the project folder that holds (or will hold) `.jurygraph/`.",
+  "author": { "name": "Nicholas Andrea Sujitno", "email": "support@massrelay.ai" },
+  "homepage": "https://github.com/massrelay-ai/jurygraph",
+  "repository": { "type": "git", "url": "https://github.com/massrelay-ai/jurygraph" },
+  "license": "Apache-2.0",
+  "keywords": ["persona-jury", "design-review", "rubric", "evidence", "mcp"],
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/jurygraph",
+    "mcp_config": {
+      "command": "${__dirname}/bin/jurygraph",
+      "args": ["--root", "${user_config.root}", "mcp"]
+    }
+  },
+  "user_config": {
+    "root": {
+      "type": "directory",
+      "title": "Project folder",
+      "description": "The project folder that holds .jurygraph/ (the store, the briefs, the verdicts). Desktop's working directory is not your project, so pick it here.",
+      "required": true
+    }
+  },
+  "tools": [
+    { "name": "jurygraph_brief", "description": "Write one deterministic, hashed brief per persona and create the run" },
+    { "name": "jurygraph_verdict", "description": "Ingest one persona's verdict; refused without evidence" },
+    { "name": "jurygraph_matrix", "description": "Scores per stratum, never averaged" },
+    { "name": "jurygraph_graph", "description": "The jury as one static SVG" },
+    { "name": "jurygraph_delta", "description": "What moved between two rounds" },
+    { "name": "jurygraph_should_run", "description": "Whether a change needs a jury, from rules you write" },
+    { "name": "jurygraph_apply_check", "description": "apply, escalate, human or advise, with the reasons" }
+  ],
+  "compatibility": { "platforms": ["PLATFORM"] }
+}

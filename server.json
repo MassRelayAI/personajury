@@ -8,5 +8,39 @@
     "url": "https://github.com/massrelay-ai/jurygraph",
     "source": "github"
   },
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurygraph/releases/download/v0.1.0/jurygraph-linux-x64.mcpb",
+      "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transport": {
+        "type": "stdio"
+      }
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurygraph/releases/download/v0.1.0/jurygraph-darwin-arm64.mcpb",
+      "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transport": {
+        "type": "stdio"
+      }
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurygraph/releases/download/v0.1.0/jurygraph-darwin-x64.mcpb",
+      "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transport": {
+        "type": "stdio"
+      }
+    },
+    {
+      "registryType": "mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurygraph/releases/download/v0.1.0/jurygraph-win32-x64.mcpb",
+      "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
 }

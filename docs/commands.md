@@ -13,17 +13,19 @@ the version.
 | `panel add` | `NAME` `--query Q` `[--allow-large]` | save a query over persona tags with a stake per term, e.g. `"3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 1 others=bystander"`; more than 12 seats is refused (`panel_too_large`) unless `--allow-large`, and more than 1000 always |
 | `panel resolve` | `NAME` `[--subject S]` | the personas the query resolves to now; with `--subject` the seats a draw gives that subject (`draw.seed`), without it the first by id (`draw: "none (no subject)"`) |
 | `lens add` | `--file F` | add a lens (TOML) |
+| `lens generate` | `--from PATH` `[--dimensions N]` (default 4, at most 12) | write the brief that asks your agent to draft a lens from a standard, a handbook or examples (see below) |
 | `lens list` | | list lenses; four ship (a 1 to 10 `site` lens is fixture data: `lens add --file fixtures/lenses/site.toml`) |
 | `subject add` | `NAME` `--kind K` `--attach FILE...` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu` or `prices` |
 | `comparator add` | same as `subject add` | a comparator, stored the same way and flagged |
-| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed` |
-| `verdict` | `--run N` and `--file F` or `--json J` | ingest one persona's verdict; refused without evidence; may carry `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed) |
+| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--effort low\|medium\|high\|max]` `[--independence independent\|sequential]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed` |
+| `verdict` | `--run N` and `--file F` or `--json J` `[--by-human "NAME, CREDENTIAL"]` | ingest one persona's verdict, or with `--by-human` a person's (see Experts); refused without evidence; may carry `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed) |
 | `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` | scores per stratum, and `usage {reported, estimate}`; `--across-strata` exists only so the refusal is explicit |
 | `graph` | `RUN...` `--svg` `[--out F]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
 | `delta` | `A B` | what moved between two runs on the same subject and lens |
+| `apply-check` | `RUN...` `[--rule CLASS]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
 | `check` | `[--history]` | stale runs (source changed or a newer subject version), `fixed_unverified`, and findings with no decision from any batch or fixed and raised again (`fix_not_landed`); exits 1 with `check_failed` listing `unresolved`; `--history` adds `decisions` and `lives`, each finding's life across the runs (`raised`, `raised_again`, `fixed`, `unjudged`, `absent`) |
-| `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`) |
+| `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` or `--by-human NAME` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`); a finding a human batch raised needs `--by-human` (`human_decision_required`) |
 | `should-run` | `[--diff F]` `[--paths a,b]` `[--subject S]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend; `--subject` classifies the subject's recorded source paths (a page added by hand has no diff); `warnings` names a rule's panel or lens the store lacks |
 | `setup` | `[--client C]` `[--scope S]` `[--apply]` `[--force]` `[--bin B]` `[--no-rules]` `[--no-hook]` | register the MCP server; a plan unless `--apply` |
 | `doctor` | `[--bin B]` `[--brief]` | the store, counts and registrations; `--brief` is two plain lines for a hook |
@@ -85,3 +87,65 @@ A panel or a brief seats at most 12 unless `--allow-large` (on `panel add` and o
 A verdict line may carry `about` (an attachment label of the subject or `cmp:<name>`). `jurygraph.toml` rules may set
 `detail = "compact" | "full"`. Citations in a verdict are `<label>[#locator]` or `cmp:<name>/<label>[#locator]`; `#L<n>` on a diff or a UTF-8 text attachment (a `.md`) must name a line the file has (`citation_unresolved`). The refusals and their error codes are in
 the plan's "The refusals" table and in [`troubleshooting.md`](troubleshooting.md).
+
+### `apply-check`
+`jurygraph apply-check RUN... [--rule CLASS]` answers `answer` (`apply | escalate | human | advise`), `runs` (the runs judged: the
+latest given run of each lens), `quorum` (`low`, `high`, or `null` when unknown) and `quorum_source` (`run`, `rule`, `sources` or
+`unknown`), `next_quorum` when it escalates (low to high, high to human) and `reasons`, each `{code, effect, ...}`. **`apply` only
+when every condition is proven; anything unknown, missing or lowered answers `advise` (or worse), never `apply`.** The quorum is the
+highest of the quorum recorded on the judged runs (`brief --rule` stores the rule class and its effective quorum), the `--rule`
+named here, and the rules the subject's recorded sources fall under.
+
+| code | effect | when |
+|---|---|---|
+| `human_class` | human | the rule named with `--rule` is a human class (or quorum `human`), or the subject's recorded sources fall under one |
+| `primary_blocker` | escalate | a blocker in the primary stratum of any judged run, with that run's own stakes |
+| `split` | escalate | within one judged run, two strata's `anchor_met` ranges on a cell do not overlap (touching ranges overlap) |
+| `check_failed` | escalate | a finding of any run of this subject has no decision, or a fix did not land |
+| `delta_not_landed` | escalate | the delta against the previous round of the same subject and lens did not land |
+| `human_blocker` | escalate | a person's batch (`--by-human`) raised a blocker no `decide --by-human` has closed, in any stratum |
+| `incomplete_jury` | advise | a briefed seat of a given run has no accepted verdict; `missing` lists them per run |
+| `quorum_unknown` | advise | no rule recorded on the run, none named, and no rule holds the subject's sources |
+| `rule_below_sources` | advise | the `--rule` named here, or the run's recorded rule, has a lower quorum than the sources' |
+| `overridden_down` | advise | the run's recorded override lowers seats (`spend`), lenses or detail below its rule, or replaced its panel, stakes or draw; its effort is below the toml's (`medium` when unset); or it was briefed with no rule while a rule holds the subject |
+| `effort_below_quorum` | advise | the quorum is `high` and the run's effort was `low`, or anything was cut by effort or the budget |
+| `independence_sequential` | advise | one context read every brief |
+| `stale_run` | advise | the subject moved since the run, or a later run of the same subject and lens supersedes it |
+| `delta_unavailable` | advise | a previous round exists but the delta cannot be computed: another lens version, or cells it does not have |
+| `single_model` | info | one model judged every seat; changes no answer |
+
+Raising seats, lenses, effort or detail above the rule is fine. `human` beats `escalate` beats `advise` beats `apply`. It reads the
+store and `jurygraph.toml`; it writes nothing. The MCP tool `jurygraph_apply_check` takes `runs` and `rule`. The full rule and the
+table test that pins every condition: D13, `tests/apply_check_table.rs`.
+
+### Effort
+`effort = "low" | "medium" | "high" | "max"` in `jurygraph.toml`, `brief --effort` over it (recorded on the run), and an optional
+`budget_tokens` (a cap on briefs × `tokens_per_brief`). The rule says what a change needs, effort what you will spend; the run gets
+the smaller: `low` 3 seats (one per stratum, primary first) and the rule's first lens, `medium` the rule's seats up to 7, `high` up to 12,
+`max` all of them (above 12 still needs `--allow-large` and `--reason`). Applied to a brief with `--rule`, `--effort` or an `effort` in
+the toml; medium is the default under a rule. An explicit `--spend` or `--lens` is not cut. A budget drops lenses after the first, then
+seats from the end of the draw order, never the last seat of a stratum, else `over_budget` (`data {needed, budget, minimum_plan}`).
+Every cut is answered as `trimmed: [{what, from, to, why}]`, recorded on the run and shown by `matrix`. See D17.
+
+### Independence
+`brief --independence sequential` declares that one context will read every brief (no subagents: Claude Desktop, a chat window).
+The answer adds `sequence` and a sentence; `matrix`, `delta` and `apply-check` carry the word; a sequential run advises and never
+applies. The briefs are byte-identical either way. See D18.
+
+### A model per term
+A panel term may close with `@model`: `3 builder=primary@claude-sonnet-5-5, 2 approver=secondary@other-model`. `--model` is the
+default. A run whose terms name a model states the model in every brief of the run; `matrix` answers `models` per stratum and
+`models_distinct`. See D15.
+
+### `lens generate`
+`jurygraph lens generate --from PATH [--dimensions N]` hashes the material (a file, or a folder in path order), writes
+`.jurygraph/generate/lens-<hash>.md` and records the material. The brief asks the agent for two things: what the material says good
+looks like (a list, not part of the lens), then one lens file of N dimensions in the exact TOML shape, anchors in words at 1, 3 and 5,
+`standard = "material:<hash>"`. Then `lens add --file` validates it. The engine calls no model. See D14.
+
+### Experts
+A persona file may carry `credential` (words, at most 500 characters: `credential_too_long`); the tag `expert` is a convention, not a
+stratum. A lens's `standard` is shown in every brief and in the matrix header. `verdict --by-human "NAME, CREDENTIAL"` ingests a
+person's batch with the same refusals: the file's `persona` is the seat whose stratum the person speaks in. The rows stand beside the
+jury's (matrix JSON `human`, an `H` block under the table), never in a cell, a median or a split. Only a person enters one: the MCP
+verdict tool has no such argument. A blocker in it escalates `apply-check` until a recorded `decide --by-human` closes the finding. See D19.

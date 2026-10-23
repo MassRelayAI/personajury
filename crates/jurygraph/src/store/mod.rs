@@ -7,7 +7,16 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 const SCHEMA: &str = include_str!("schema.sql");
-pub const SCHEMA_VERSION: i64 = 3;
+pub const SCHEMA_VERSION: i64 = 4;
+/// The columns schema v4 added to `run`; a v3 store (or an early v4 one) gains them on open (idempotent
+/// `ALTER TABLE`, D17, D18, D13: the rule class a run was briefed under and its effective quorum).
+const V4_RUN_COLUMNS: [(&str, &str); 5] = [
+    ("effort", "TEXT"),
+    ("trimmed_json", "TEXT"),
+    ("independence", "TEXT NOT NULL DEFAULT 'independent'"),
+    ("rule_class", "TEXT"),
+    ("quorum", "TEXT"),
+];
 pub const DIR: &str = ".jurygraph";
 pub const DB: &str = "store.db";
 
@@ -43,11 +52,20 @@ pub enum StoreError {
 pub type Result<T> = std::result::Result<T, StoreError>;
 
 pub fn now_iso() -> String {
-    // seconds since epoch rendered as an RFC 3339 UTC string without a chrono dependency
-    let secs = std::time::SystemTime::now()
+    iso_from_secs(now_secs())
+}
+fn now_secs() -> u64 {
+    std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .map(|d| d.as_secs())
-        .unwrap_or(0);
+        .unwrap_or(0)
+}
+/// The timestamp `days` days before now, in `now_iso`'s form (they compare as text).
+pub fn iso_days_ago(days: u64) -> String {
+    iso_from_secs(now_secs().saturating_sub(days.saturating_mul(86_400)))
+}
+fn iso_from_secs(secs: u64) -> String {
+    // seconds since epoch rendered as an RFC 3339 UTC string without a chrono dependency
     let (days, rem) = (secs / 86_400, secs % 86_400);
     let (h, m, s) = (rem / 3600, (rem % 3600) / 60, rem % 60);
     // civil-from-days (Howard Hinnant), valid for the years we care about
@@ -62,6 +80,20 @@ pub fn now_iso() -> String {
     let mo = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = if mo <= 2 { y + 1 } else { y };
     format!("{y:04}-{mo:02}-{d:02}T{h:02}:{m:02}:{s:02}Z")
+}
+
+/// Add the v4 columns a v3 `run` table lacks. Idempotent: a column already there is left alone.
+fn upgrade_v3(conn: &Connection) -> rusqlite::Result<()> {
+    let have: Vec<String> = conn
+        .prepare("SELECT name FROM pragma_table_info('run')")?
+        .query_map([], |r| r.get::<_, String>(0))?
+        .collect::<std::result::Result<Vec<_>, _>>()?;
+    for (col, decl) in V4_RUN_COLUMNS {
+        if !have.iter().any(|h| h == col) {
+            conn.execute(&format!("ALTER TABLE run ADD COLUMN {col} {decl}"), [])?;
+        }
+    }
+    Ok(())
 }
 
 fn bad(what: &str, e: impl std::fmt::Display) -> StoreError {
@@ -96,10 +128,12 @@ fn brief_from_value(v: &serde_json::Value) -> Result<BriefRef> {
         path: s("path")?,
         hash: s("hash")?,
         bytes: v["bytes"].as_u64().ok_or_else(|| bad("brief", "bytes"))? as usize,
+        // a run made before v0.4 recorded none: `row_to_run` fills in the run's own model
+        model: v["model"].as_str().unwrap_or("").to_string(),
     })
 }
 
-const RUN_COLS: &str = "id, subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json";
+const RUN_COLS: &str = "id, subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json, effort, trimmed_json, independence, rule_class, quorum";
 fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
     let text = |i: usize| r.get::<_, String>(i);
     let conv = |what: &'static str, e: StoreError| {
@@ -120,11 +154,17 @@ fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
     }
     let briefs_raw: Vec<serde_json::Value> =
         json_vec("run briefs", &text(13)?).map_err(|e| conv("briefs", e))?;
-    let briefs = briefs_raw
+    let run_model: String = r.get(8)?;
+    let mut briefs = briefs_raw
         .iter()
         .map(brief_from_value)
         .collect::<Result<Vec<_>>>()
         .map_err(|e| conv("briefs", e))?;
+    for b in &mut briefs {
+        if b.model.is_empty() {
+            b.model = run_model.clone();
+        }
+    }
     Ok(RunRow {
         id: r.get(0)?,
         subject_name: r.get(1)?,
@@ -146,6 +186,14 @@ fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
             None => None,
             Some(t) => Some(json_vec("run override", &t).map_err(|e| conv("override", e))?),
         },
+        effort: r.get(17)?,
+        trimmed: match r.get::<_, Option<String>>(18)? {
+            None => vec![],
+            Some(t) => json_vec("run trimmed", &t).map_err(|e| conv("trimmed", e))?,
+        },
+        independence: r.get(19)?,
+        rule: r.get(20)?,
+        quorum: r.get(21)?,
     })
 }
 
@@ -241,7 +289,8 @@ impl Store {
             let v: Option<String> = conn
                 .query_row("SELECT value FROM meta WHERE key = 'schema_version'", [], |r| r.get(0))
                 .optional()?;
-            if let Some(v) = v.filter(|v| v.parse::<i64>().ok() != Some(SCHEMA_VERSION)) {
+            // a v3 store is upgraded below; anything else is another binary's
+            if let Some(v) = v.filter(|v| !matches!(v.parse::<i64>().ok(), Some(3) | Some(4))) {
                 return Err(StoreError::Schema(format!(
                     "{} has schema_version {v}, this binary needs {SCHEMA_VERSION}",
                     path.display()
@@ -253,6 +302,7 @@ impl Store {
         )
         .map_err(open_err)?;
         conn.execute_batch(SCHEMA).map_err(open_err)?;
+        upgrade_v3(&conn).map_err(open_err)?;
         let existing: Option<String> = conn
             .query_row(
                 "SELECT value FROM meta WHERE key = 'schema_version'",
@@ -268,6 +318,12 @@ impl Store {
                 )?;
             }
             Some(Ok(v)) if v == SCHEMA_VERSION => {}
+            Some(Ok(3)) => {
+                conn.execute(
+                    "UPDATE meta SET value = ?1 WHERE key = 'schema_version'",
+                    params![SCHEMA_VERSION.to_string()],
+                )?;
+            }
             Some(other) => {
                 return Err(StoreError::Schema(format!(
                     "{} has schema_version {}, this binary needs {SCHEMA_VERSION}",
@@ -596,7 +652,7 @@ impl Store {
     // ---- runs ----
     pub fn insert_run(&self, r: &RunRow) -> Result<i64> {
         self.conn.execute(
-            "INSERT INTO run(subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16)",
+            "INSERT INTO run(subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json, effort, trimmed_json, independence, rule_class, quorum) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16,?17,?18,?19,?20,?21)",
             params![
                 r.subject_name,
                 r.subject_version,
@@ -613,7 +669,12 @@ impl Store {
                 to_json(&r.briefs),
                 r.created_at,
                 r.draw_seed,
-                r.override_json.as_ref().map(to_json)
+                r.override_json.as_ref().map(to_json),
+                r.effort,
+                (!r.trimmed.is_empty()).then(|| to_json(&r.trimmed)),
+                r.independence,
+                r.rule,
+                r.quorum
             ],
         )?;
         Ok(self.conn.last_insert_rowid())
@@ -668,6 +729,18 @@ impl Store {
         subject_name: &str,
         v: &ValidVerdict,
     ) -> Result<()> {
+        self.insert_verdict_by(run_id, batch, persona_version, subject_name, v, None)
+    }
+    /// `insert_verdict`, and when a person entered the batch, who (D19), in the same transaction.
+    pub fn insert_verdict_by(
+        &self,
+        run_id: i64,
+        batch: i64,
+        persona_version: i64,
+        subject_name: &str,
+        v: &ValidVerdict,
+        by_human: Option<&str>,
+    ) -> Result<()> {
         let tx = self.conn.unchecked_transaction()?;
         let now = now_iso();
         for l in &v.lines {
@@ -689,6 +762,12 @@ impl Store {
                     l.line.note,
                     now
                 ],
+            )?;
+        }
+        if let Some(by) = by_human {
+            tx.execute(
+                "INSERT INTO human_batch(run_id, batch, persona_id, by_human, created_at) VALUES (?1,?2,?3,?4,?5)",
+                params![run_id, batch, v.persona, by, now],
             )?;
         }
         if let Some(p) = &v.pick {
@@ -772,6 +851,32 @@ impl Store {
                 output = output.saturating_add(o.max(0) as u64);
                 n += 1;
             }
+        }
+        Ok((n > 0).then_some((input, output, n)))
+    }
+    /// Who entered each human batch of a run (D19): persona id (`human:<name>:<seat>`) to the name and credential given.
+    /// A later batch of the same id names who entered it.
+    pub fn human_batches(&self, run_id: i64) -> Result<BTreeMap<String, String>> {
+        let mut st = self
+            .conn
+            .prepare("SELECT persona_id, by_human FROM human_batch WHERE run_id = ?1 ORDER BY id")?;
+        let rows = st
+            .query_map(params![run_id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        Ok(rows.into_iter().collect())
+    }
+    /// The tokens reported by verdicts stored at or after `since` (an `iso_days_ago` text): (input, output, verdicts).
+    pub fn reported_usage_since(&self, since: &str) -> Result<Option<(u64, u64, u64)>> {
+        let (mut input, mut output, mut n) = (0u64, 0u64, 0u64);
+        let mut st = self
+            .conn
+            .prepare("SELECT input_tokens, output_tokens FROM usage WHERE created_at >= ?1")?;
+        let rows = st.query_map(params![since], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, i64>(1)?)))?;
+        for row in rows {
+            let (i, o) = row?;
+            input = input.saturating_add(i.max(0) as u64);
+            output = output.saturating_add(o.max(0) as u64);
+            n += 1;
         }
         Ok((n > 0).then_some((input, output, n)))
     }

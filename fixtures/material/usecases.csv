@@ -1,0 +1,13 @@
+role,job,trigger,data_sensitivity,clearance_note
+team lead,keep the weekly planning notes where the whole team can find them,every Monday before standup,low,none
+new hire,find out how the team does things without asking twenty questions,first week on the job,low,none
+freelance designer,share meeting notes with a client without sharing the whole notebook,end of a client call,medium,notes shared with a client must not include other clients' pages
+operations manager,keep a checklist for opening and closing the shop,start and end of each shift,low,none
+bookkeeper,attach receipts to the notes of the month they belong to,when a receipt arrives by email,money,receipts and bank details stay inside the finance notebook
+teacher,plan lessons with a co-teacher and keep the plan next to the class notes,Sunday evening,personal,pupils are named only by first name and initial
+clinic receptionist,leave handover notes for the next shift,end of the afternoon shift,personal health,no patient names in a shared notebook; a first name and a room number only
+hiring manager,collect interview notes from three interviewers in one place,after each interview,personal,interview notes are visible to the hiring group only
+volunteer coordinator,publish the rota and let volunteers swap shifts,Thursday for the next week,low,none
+researcher,keep reading notes with their sources and quote them in a draft,while reading a paper,low,none
+shop owner,write down supplier prices and compare them month to month,when a supplier changes a price,money,price lists are not shared outside the owners
+community moderator,record the reasons for a ban so the next moderator can see them,after removing a member,identity,member names and contact details are visible to moderators only

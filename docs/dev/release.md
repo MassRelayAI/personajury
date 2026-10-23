@@ -6,7 +6,9 @@ Maintainers only. A release is a tag; the workflow in `.github/workflows/release
 ## Before the tag
 
 1. The version is `[workspace.package] version` in `Cargo.toml`; `Cargo.lock` (the `jurygraph` entry), `server.json`,
-   `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` repeat it. CI checks `server.json`. Bump them in the
+   `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`,
+   `gemini-extension.json`, `packaging/mcpb/manifest.json` and the release URLs in `server.json`'s `packages` repeat it
+   (`tests/manifests.rs` fails when one disagrees). CI checks `server.json`. Bump them in the
    commit that will be tagged; the build jobs exit 4 when the tag disagrees with `Cargo.toml`.
 2. Date the section in `CHANGELOG.md` (`## [x.y.z] - YYYY-MM-DD`) and leave an empty `## [Unreleased]` above it.
 3. `cargo test -p jurygraph` and `cargo clippy -p jurygraph --tests -- -D warnings` green; the `ci` workflow green on
@@ -24,11 +26,15 @@ git push origin vX.Y.Z
 - `build`: five jobs, one per platform (linux-x64, linux-arm64, darwin-arm64, darwin-x64, win32-x64), each on a runner of
   that platform. Each checks the version, builds with `--locked`, strips the Linux binaries, and uploads the binary with
   its `.sha256`.
-- `release`: downloads the five binaries, writes `SHA256SUMS`, checks it, publishes a GitHub release with the binaries,
+- `release`: downloads the five binaries and the four bundles, writes `SHA256SUMS`, checks it, publishes a GitHub release with the binaries,
   the sums and generated notes, and signs a build-provenance attestation over them.
 
-There is no npm package and no MCP Registry publish job in v0.1; `server.json` is kept in step so a registry entry can be
-added later. The install script (`scripts/install.sh`) reads `releases/latest/download/`, so it serves the new version as
+- `bundle`: builds the four `.mcpb` bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64) from the built binaries and validates
+  them with a pinned `@anthropic-ai/mcpb` (`MCPB_CLI_VERSION` in the workflow: verify the pin before the first tag).
+- `publish-registry`: after `release`, writes the bundles' sha256 into `server.json` and publishes it with a pinned,
+  checksum-verified `mcp-publisher` over GitHub OIDC.
+
+There is no npm package. The install script (`scripts/install.sh`) reads `releases/latest/download/`, so it serves the new version as
 soon as the release exists.
 
 ## Attestations

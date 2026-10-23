@@ -35,12 +35,12 @@ git push origin vX.Y.Z
 - `build`: five jobs, one per platform (linux-x64, linux-arm64, darwin-arm64, darwin-x64, win32-x64), each on a runner of
   that platform. Each checks the version, builds with `--locked`, strips the Linux binaries, and uploads the binary with
   its `.sha256`.
-- `release`: downloads the five binaries and the four bundles, writes `SHA256SUMS`, checks it, publishes a GitHub release with the binaries,
+- `release`: downloads the five binaries, writes `SHA256SUMS`, checks it, publishes a GitHub release with the binaries,
   the sums and generated notes, and signs a build-provenance attestation over them.
 
-- `bundle`: builds the four `.mcpb` bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64) from the built binaries and validates
+- `bundle` (opt-in: runs only when the repository variable `ENABLE_MCPB` is `true`): builds the four `.mcpb` bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64) from the built binaries and validates
   them with a pinned `@anthropic-ai/mcpb` (`MCPB_CLI_VERSION` in the workflow: verify the pin before the first tag).
-- `publish-registry`: after `release`, writes the bundles' sha256 into `server.json` and publishes it with a pinned,
+- `publish-registry` (opt-in: `ENABLE_REGISTRY` and `ENABLE_MCPB` both `true`): after `release` and `bundle`, writes the bundles' sha256 into `server.json` and publishes it with a pinned,
   checksum-verified `mcp-publisher` over GitHub OIDC.
 
 There is no npm package. The install script (`scripts/install.sh`) reads `releases/latest/download/`, so it serves the new version as

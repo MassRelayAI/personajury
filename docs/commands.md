@@ -22,6 +22,8 @@ the version.
 | `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` | scores per stratum, and `usage {reported, estimate}`; `--across-strata` exists only so the refusal is explicit |
 | `graph` | `RUN...` `--svg` `[--out F]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
+| `summary` | `RUN...` `[--md F]` `[--html F]` `[--save]` `[--width N]` | the answer for a person: plain sentences, a numbers table "for checking" (medians primary·secondary·bystander), then Next; no pooled number; `--save` writes into `report_dir` |
+| `calibrate` | `JURY_RUN HUMAN_RUN` `[--out F]` | the jury's rank order per stratum beside a human run's (`verdict --by-human` batches); `calibrated` when every primary cell is within one rank |
 | `delta` | `A B` | what moved between two runs on the same subject and lens |
 | `apply-check` | `RUN...` or `--latest [--subject S]`, `[--rule CLASS]` `[--calibration F]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
 | `check` | `[--history]` | stale runs (source changed or a newer subject version), `fixed_unverified`, and findings with no decision from any batch or fixed and raised again (`fix_not_landed`); exits 1 with `check_failed` listing `unresolved`; `--history` adds `decisions` and `lives`, each finding's life across the runs (`raised`, `raised_again`, `fixed`, `unjudged`, `absent`) |

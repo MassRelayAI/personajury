@@ -114,8 +114,8 @@ it. Colour and layout reach the jury only through screenshots.
 - **The chat route (claude.ai, ChatGPT, any chat window):** no server, files only. Run `personajury brief` in a terminal, paste one
   brief file per chat (one chat per brief keeps the jurors independent), have the chat answer with the verdict JSON, save it and run
   `personajury verdict --run N --file v.json`. Many briefs in one chat is `--independence sequential`.
-- **CI and SDKs:** the JSON envelope over the CLI and MCP is the API; there is no stable Rust API and no runner in the tree. A
-  composite GitHub Action and a Claude Agent SDK recipe are planned (`roadmap.md`).
+- **CI and SDKs:** the JSON envelope over the CLI and MCP is the API; there is no stable Rust API and no runner in the tree. The
+  composite GitHub Action is `action.yml` (see `ci.md`); the Claude Agent SDK recipe is `agent-sdk.md`.
 
 ## Personas from a use-case table
 A table of jobs and triggers answers what the persona brief's first step asks for (roles, sectors, objections). The example

@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 560" width="1050" role="img" aria-labelledby="t d">
+<title id="t">What people use a jury for</title><desc id="d">Six tiles. A marketing site without the AI slop: a page whose gradient hero is struck through, watched by three personas. Docs a newcomer can follow: in a real two-round jury on CompareGraph's docs, critical blockers went from 15 to 6. A logo picked by its audience: in the second round, 7 of 7 personas picked candidate C. A deck a CFO reads to the end: every slide title says what the slide proves. A change checked before merge: only the changes that need a jury get one. Any field: your lens, your personas, with the scores written in words.</desc>
+<defs>
+<linearGradient id="slop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c297ff"/><stop offset="0.5" stop-color="#ff8ac9"/><stop offset="1" stop-color="#ffc27a"/></linearGradient>
+</defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="558" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+
+<!-- 1 marketing site -->
+<rect x="24" y="24" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="40" y="40" width="292" height="130" rx="8" fill="#ddf4ff"/>
+<rect x="66" y="54" width="160" height="104" rx="5" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="66" y="54" width="160" height="12" rx="5" fill="#d0d7de"/>
+<rect x="76" y="74" width="140" height="44" rx="4" fill="url(#slop)"/>
+<text x="146" y="101" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff">Unleash synergy</text>
+<line x1="72" y1="122" x2="220" y2="70" stroke="#cf222e" stroke-width="3" stroke-linecap="round"/>
+<rect x="76" y="128" width="100" height="6" rx="3" fill="#1f2328"/>
+<rect x="76" y="140" width="40" height="10" rx="3" fill="#0550ae"/>
+<g stroke="#ffffff" stroke-width="1.5"><circle cx="262" cy="84" r="11" fill="#0969da"/><circle cx="290" cy="104" r="11" fill="#bf8700"/><circle cx="262" cy="124" r="11" fill="#1a7f37"/></g>
+<text x="40" y="206" font-size="17" font-weight="700">A marketing site, without the AI slop</text>
+<text x="40" y="232" font-size="14" fill="#57606a">Personas from each audience read every</text>
+<text x="40" y="252" font-size="14" fill="#57606a">page before your customers do.</text>
+
+<!-- 2 docs -->
+<rect x="363" y="24" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="379" y="40" width="292" height="130" rx="8" fill="#dafbe1"/>
+<rect x="400" y="52" width="96" height="108" rx="5" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="410" y="64" width="56" height="7" rx="3" fill="#1f2328"/>
+<rect x="410" y="80" width="74" height="4" rx="2" fill="#d0d7de"/><rect x="410" y="90" width="66" height="4" rx="2" fill="#d0d7de"/>
+<rect x="410" y="104" width="74" height="22" rx="3" fill="#f6f8fa" stroke="#d0d7de"/>
+<text x="414" y="119" font-size="9" font-family="monospace" fill="#0550ae">$ git clone</text>
+<rect x="410" y="134" width="60" height="4" rx="2" fill="#d0d7de"/><rect x="410" y="144" width="70" height="4" rx="2" fill="#d0d7de"/>
+<text x="590" y="94" font-size="13" text-anchor="middle" fill="#57606a">blockers</text>
+<text x="590" y="128" font-size="30" text-anchor="middle" fill="#57606a">15 → <tspan font-weight="700" fill="#1f2328">6</tspan></text>
+<text x="590" y="150" font-size="12" text-anchor="middle" fill="#57606a">round 1 → round 2</text>
+<text x="379" y="206" font-size="17" font-weight="700">Docs a newcomer can follow</text>
+<text x="379" y="232" font-size="14" fill="#57606a">A real docs jury: critical blockers</text>
+<text x="379" y="252" font-size="14" fill="#57606a">fell from 15 to 6 in two rounds.</text>
+
+<!-- 3 logo -->
+<rect x="702" y="24" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="718" y="40" width="292" height="130" rx="8" fill="#fff8c5"/>
+<g stroke="#57606a" stroke-width="1.2">
+<rect x="736" y="70" width="52" height="52" rx="8" fill="#ffffff"/>
+<rect x="800" y="70" width="52" height="52" rx="8" fill="#ffffff"/>
+<rect x="864" y="66" width="60" height="60" rx="9" fill="#ffffff" stroke="#0550ae" stroke-width="3"/>
+<rect x="936" y="70" width="52" height="52" rx="8" fill="#ffffff"/>
+</g>
+<g fill="#0550ae"><circle cx="762" cy="96" r="5"/><circle cx="762" cy="80" r="3"/><circle cx="776" cy="88" r="3"/><circle cx="776" cy="104" r="3"/><circle cx="762" cy="112" r="3"/><circle cx="748" cy="104" r="3"/><circle cx="748" cy="88" r="3"/></g>
+<g fill="#0550ae"><circle cx="814" cy="84" r="3"/><circle cx="814" cy="96" r="3"/><circle cx="814" cy="108" r="3"/><circle cx="826" cy="90" r="3"/><circle cx="826" cy="102" r="3"/><circle cx="838" cy="96" r="3"/></g>
+<path d="M878 98 L890 110 L910 82" stroke="#0550ae" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="878" cy="98" r="3.5" fill="#0550ae"/><circle cx="890" cy="110" r="3.5" fill="#0550ae"/><circle cx="910" cy="82" r="5" fill="#fff8c5" stroke="#0550ae" stroke-width="2"/>
+<path d="M972 80 V104 Q972 114 962 114 Q952 114 952 106" stroke="#0550ae" stroke-width="3" fill="none" stroke-linecap="round"/>
+<g font-size="12" text-anchor="middle" fill="#57606a"><text x="762" y="140">A</text><text x="826" y="140">B</text><text x="894" y="144" font-weight="700" fill="#1f2328">C ✓</text><text x="962" y="140">D</text></g>
+<text x="718" y="206" font-size="17" font-weight="700">A logo picked by its audience</text>
+<text x="718" y="232" font-size="14" fill="#57606a">A forced pick, round 2:</text>
+<text x="718" y="252" font-size="14" fill="#57606a">7 of 7 personas picked C.</text>
+
+<!-- 4 deck -->
+<rect x="24" y="290" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="40" y="306" width="292" height="130" rx="8" fill="#fff8c5"/>
+<rect x="84" y="324" width="130" height="80" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="74" y="332" width="130" height="80" rx="4" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="64" y="340" width="130" height="80" rx="4" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="74" y="350" width="104" height="7" rx="3" fill="#1f2328"/>
+<rect x="74" y="362" width="80" height="7" rx="3" fill="#1f2328"/>
+<rect x="80" y="394" width="12" height="16" fill="#0550ae"/><rect x="98" y="386" width="12" height="24" fill="#0550ae"/><rect x="116" y="378" width="12" height="32" fill="#0550ae"/>
+<circle cx="264" cy="362" r="18" fill="#bf8700" stroke="#ffffff" stroke-width="2"/>
+<text x="264" y="367" font-size="12" font-weight="700" text-anchor="middle" fill="#ffffff">CFO</text>
+<g stroke="#ffffff" stroke-width="1.5"><circle cx="240" cy="396" r="7" fill="#0969da"/><circle cx="288" cy="396" r="7" fill="#1a7f37"/></g>
+<text x="264" y="420" font-size="12" text-anchor="middle" fill="#57606a">reads to the end</text>
+<text x="40" y="472" font-size="17" font-weight="700">A deck a CFO reads to the end</text>
+<text x="40" y="498" font-size="14" fill="#57606a">A client, a CFO and a skimming board</text>
+<text x="40" y="518" font-size="14" fill="#57606a">member judge the slides, one by one.</text>
+
+<!-- 5 change before merge -->
+<rect x="363" y="290" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="379" y="306" width="292" height="130" rx="8" fill="#ddf4ff"/>
+<rect x="398" y="320" width="170" height="100" rx="5" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<g font-family="monospace" font-size="11">
+<rect x="399" y="334" width="168" height="16" fill="#ffebe9"/><text x="406" y="346" fill="#cf222e">- Orchestrate synergies</text>
+<rect x="399" y="352" width="168" height="16" fill="#dafbe1"/><text x="406" y="364" fill="#1a7f37">+ A notebook for teams</text>
+<text x="406" y="384" fill="#57606a">  site/index.html</text>
+<text x="406" y="404" fill="#57606a">  pricing.html</text>
+</g>
+<rect x="586" y="338" width="68" height="26" rx="13" fill="#fff8c5" stroke="#57606a" stroke-width="1"/>
+<text x="620" y="356" font-size="13" font-weight="700" text-anchor="middle">jury?</text>
+<line x1="620" y1="366" x2="620" y2="384" stroke="#57606a" stroke-width="1.3"/>
+<circle cx="620" cy="400" r="14" fill="#1a7f37"/>
+<path d="M613 400 l5 5 l9 -11" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="379" y="472" font-size="17" font-weight="700">A change checked before merge</text>
+<text x="379" y="498" font-size="14" fill="#57606a">Only changes that need a jury get one;</text>
+<text x="379" y="518" font-size="14" fill="#57606a">the rest go by tests alone.</text>
+
+<!-- 6 any field -->
+<rect x="702" y="290" width="324" height="250" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<rect x="718" y="306" width="292" height="130" rx="8" fill="#dafbe1"/>
+<rect x="738" y="320" width="176" height="100" rx="5" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<g font-size="11">
+<text x="748" y="340" font-weight="700">your lens</text>
+<text x="748" y="360" fill="#57606a"><tspan font-weight="700" fill="#1f2328">1</tspan>  I cannot tell what …</text>
+<text x="748" y="380" fill="#57606a"><tspan font-weight="700" fill="#1f2328">3</tspan>  I follow, but …</text>
+<text x="748" y="400" fill="#57606a"><tspan font-weight="700" fill="#1f2328">5</tspan>  I could retell it …</text>
+</g>
+<g stroke="#ffffff" stroke-width="1.5"><circle cx="944" cy="342" r="10" fill="#0969da"/><circle cx="970" cy="342" r="10" fill="#0969da"/><circle cx="944" cy="370" r="10" fill="#bf8700"/><circle cx="970" cy="370" r="10" fill="#bf8700"/><circle cx="957" cy="398" r="10" fill="#1a7f37"/></g>
+<text x="718" y="472" font-size="17" font-weight="700">Any field: your lens, your personas</text>
+<text x="718" y="498" font-size="14" fill="#57606a">Write what good looks like in words;</text>
+<text x="718" y="518" font-size="14" fill="#57606a">a jury judges any files against it.</text>
+</g>
+</svg>

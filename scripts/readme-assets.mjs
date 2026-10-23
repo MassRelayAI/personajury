@@ -1,6 +1,8 @@
 // adapted from comparegraph scripts/readme-assets.mjs
-// Renders docs/assets/{strata,spend,matrix}.svg from the JSON of the same name. Deterministic, no dependencies.
-// loop.svg and refusal.svg are hand-drawn: committed, edited by hand, never generated (--check only requires them to exist).
+// Renders docs/assets/{strata,spend,matrix,rounds}.svg from the JSON of the same name. Deterministic, no dependencies.
+// rounds.json is copied by hand from CompareGraph's public readme-jury report (its link is in the JSON); the render refuses
+// it when the per-stratum blockers do not sum to the totals or a median leaves the scale.
+// loop, refusal, playbook-site and use-cases are hand-drawn: committed, edited by hand, never generated (--check only requires them to exist).
 // strata.json and matrix.json are derived from fixtures/run/matrix.json and fixtures/run/verdicts/ (--derive, or a plain run).
 // spend.json is measured by scripts/readme-assets-data.sh (it runs the binary).
 // node scripts/readme-assets.mjs            derive the two JSON files, then write the three SVGs
@@ -312,10 +314,106 @@ export function renderMatrix(d) {
   return o + close;
 }
 
+// ---------------------------------------------------------------- rounds
+
+// A real two-round jury (CompareGraph's docs), copied from its public report. Before and after per stratum, never pooled.
+export function checkRounds(d) {
+  const sum = (xs) => xs.reduce((a, b) => a + b, 0);
+  const c = d.blockers.critical;
+  const errs = [];
+  if (sum(c.round1) !== c.total1) errs.push(`critical round1 strata sum ${sum(c.round1)} is not total1 ${c.total1}`);
+  if (sum(c.round2) !== c.total2) errs.push(`critical round2 strata sum ${sum(c.round2)} is not total2 ${c.total2}`);
+  const [lo, hi] = d.scale;
+  for (const l of d.lenses) for (const r of l.rows) for (const v of [...r.round1, ...r.round2]) {
+    if (!Number.isInteger(v) || v < lo || v > hi) errs.push(`${l.lens}:${r.dimension} has ${v}, outside ${lo} to ${hi}`);
+  }
+  for (const l of d.lenses) for (const r of l.rows) {
+    if (r.round1.length !== d.strata.length || r.round2.length !== d.strata.length) errs.push(`${l.lens}:${r.dimension} needs one median per stratum`);
+  }
+  if (!/^https:\/\/github\.com\//.test(d.source)) errs.push('source must link the public report');
+  return errs;
+}
+
+export function renderRounds(d) {
+  const errs = checkRounds(d);
+  if (errs.length) throw new Error(errs.join('; '));
+  const W = 1050;
+  const pw = 316, gap = 31, left = 30, top = 112, rowH = 34, headH = 30;
+  const nRows = d.lenses.reduce((a, l) => a + l.rows.length, 0);
+  const rowsH = nRows * rowH + d.lenses.length * headH;
+  const ph = 82 + rowsH + 48 + 62;
+  const H = top + ph + 52;
+  const [lo, hi] = d.scale;
+  const R1 = '#8c959f', R2 = '#0969da';
+  const desc = `${d.subject}, judged by seven composite personas, then fixed and judged again. Medians per stratum on a ${lo} to ${hi} scale, round 1 then round 2. ` +
+    d.strata.map((s, i) => `${s.stake} (${s.personas} persona${s.personas > 1 ? 's' : ''}): ` +
+      d.lenses.map((l) => l.rows.map((r) => `${l.lens} ${r.dimension} ${r.round1[i]} to ${r.round2[i]}`).join(', ')).join(', ') +
+      `; critical blockers ${d.blockers.critical.round1[i]} to ${d.blockers.critical.round2[i]}`).join('. ') +
+    `. Critical blockers in all: ${d.blockers.critical.total1} to ${d.blockers.critical.total2}; compare blockers ${d.blockers.compare.total1} to ${d.blockers.compare.total2}. Source: ${d.source}`;
+  let o = open(W, H, `${d.title}: ${d.subject}`, desc);
+  o += `<text x="30" y="40" font-size="18" font-weight="700">${esc(d.title)}</text>
+<text x="30" y="62" font-size="13" fill="${MUTED}">${esc(d.subject)}, median per stratum, ${lo} to ${hi}. Each stratum on its own; never one number for all.</text>
+<circle cx="36" cy="84" r="6" fill="#ffffff" stroke="${R1}" stroke-width="2"/><text x="48" y="88" font-size="13">round 1</text>
+<circle cx="126" cy="84" r="6" fill="${R2}" stroke="#ffffff" stroke-width="1.5"/><text x="138" y="88" font-size="13">round 2, after the fixes</text>
+<text x="${W - 30}" y="40" font-size="16" font-weight="700" text-anchor="end">critical blockers ${d.blockers.critical.total1} → ${d.blockers.critical.total2}</text>
+<text x="${W - 30}" y="62" font-size="13" text-anchor="end" fill="${MUTED}">compare blockers ${d.blockers.compare.total1} → ${d.blockers.compare.total2}</text>
+`;
+  d.strata.forEach((s, i) => {
+    const px = left + i * (pw + gap);
+    const ax0 = px + 104, ax1 = px + pw - 70;
+    const xs = (v) => Math.round((ax0 + ((v - lo) / (hi - lo)) * (ax1 - ax0)) * 10) / 10;
+    o += `<rect x="${px}" y="${top}" width="${pw}" height="${ph}" rx="8" fill="#ffffff" stroke="${LINE}" stroke-width="1.2"/>
+<rect x="${px + 16}" y="${top + 16}" width="${s.stake.length * 9 + 24}" height="26" rx="13" fill="${STAKE[s.stake].fill}" stroke="${MUTED}" stroke-width="1"/>
+<text x="${px + 28}" y="${top + 34}" font-size="14" font-weight="700">${esc(s.stake)}</text>
+<text x="${px + 16}" y="${top + 62}" font-size="12" fill="${MUTED}">${esc(STAKE[s.stake].who)} · ${s.personas} persona${s.personas > 1 ? 's' : ''}</text>
+`;
+    let y = top + 82;
+    for (const l of d.lenses) {
+      o += `<text x="${px + 16}" y="${y + 20}" font-size="12" font-weight="700" ${MONO} fill="${BLUE}">${esc(l.lens)}</text>
+<line x1="${px + 16 + l.lens.length * 8 + 8}" y1="${y + 16}" x2="${px + pw - 16}" y2="${y + 16}" stroke="#eaeef2" stroke-width="1"/>
+`;
+      y += headH;
+      for (const r of l.rows) {
+        const a = r.round1[i], b = r.round2[i];
+        const cy = y + rowH / 2;
+        o += `<text x="${px + 16}" y="${cy + 4}" font-size="13">${esc(r.dimension)}</text>
+<line x1="${ax0}" y1="${cy}" x2="${ax1}" y2="${cy}" stroke="${LINE}" stroke-width="1"/>
+`;
+        for (let v = lo; v <= hi; v++) o += `<line x1="${xs(v)}" y1="${cy - 3}" x2="${xs(v)}" y2="${cy + 3}" stroke="${LINE}" stroke-width="1"/>
+`;
+        if (b !== a) {
+          const dir = b > a ? 1 : -1;
+          o += `<line x1="${xs(a) + dir * 7}" y1="${cy}" x2="${xs(b) - dir * 9}" y2="${cy}" stroke="${R2}" stroke-width="2" marker-end="url(#ra)"/>
+`;
+        }
+        o += `<circle cx="${xs(a)}" cy="${cy}" r="6" fill="#ffffff" stroke="${R1}" stroke-width="2"/>
+<circle cx="${xs(b)}" cy="${cy}" r="${b === a ? 4 : 6}" fill="${R2}" stroke="#ffffff" stroke-width="1.5"/>
+<text x="${px + pw - 16}" y="${cy + 4}" font-size="13" text-anchor="end" fill="${MUTED}">${a} → <tspan font-weight="700" fill="${b > a ? INK : MUTED}">${b}</tspan></text>
+`;
+        y += rowH;
+      }
+    }
+    o += `<line x1="${ax0}" y1="${y + 6}" x2="${ax1}" y2="${y + 6}" stroke="${MUTED}" stroke-width="1.2"/>
+`;
+    for (let v = lo; v <= hi; v++) o += `<line x1="${xs(v)}" y1="${y + 6}" x2="${xs(v)}" y2="${y + 11}" stroke="${MUTED}" stroke-width="1.2"/><text x="${xs(v)}" y="${y + 26}" font-size="12" text-anchor="middle" fill="${MUTED}">${v}</text>
+`;
+    const by = top + ph - 62;
+    const b1 = d.blockers.critical.round1[i], b2 = d.blockers.critical.round2[i];
+    o += `<line x1="${px + 16}" y1="${by}" x2="${px + pw - 16}" y2="${by}" stroke="${LINE}" stroke-width="1"/>
+<text x="${px + 16}" y="${by + 26}" font-size="13">critical blockers</text>
+<text x="${px + pw - 16}" y="${by + 28}" font-size="20" text-anchor="end" fill="${MUTED}">${b1} → <tspan font-weight="700" fill="${b2 < b1 ? INK : '#cf222e'}">${b2}</tspan></text>
+<text x="${px + 16}" y="${by + 46}" font-size="12" fill="${MUTED}">points a persona said would stop them</text>
+`;
+  });
+  o += `<text x="30" y="${H - 20}" font-size="12" fill="${MUTED}">Source: CompareGraph's public report 2026-10-24-readme-jury, copied into docs/assets/rounds.json. Seven composites are not a survey.</text>
+`;
+  return o.replace('<g ', `<defs><marker id="ra" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="${R2}"/></marker></defs>\n<g `) + close;
+}
+
 // ---------------------------------------------------------------- run
 
-const HAND = ['loop', 'refusal'];
-const assets = { strata: renderStrata, spend: renderSpend, matrix: renderMatrix };
+const HAND = ['loop', 'refusal', 'playbook-site', 'use-cases'];
+const assets = { strata: renderStrata, spend: renderSpend, matrix: renderMatrix, rounds: renderRounds };
 const check = args.includes('--check');
 const custom = args.includes('--in') || args.includes('--out');
 const names = args.includes('--asset') ? [opt('--asset')] : custom ? ['spend'] : Object.keys(assets);
@@ -341,7 +439,9 @@ for (const name of names) {
   if (!assets[name]) { console.error(`unknown asset ${name}`); process.exit(2); }
   const inPath = opt('--in', path.join(root, `docs/assets/${name}.json`));
   const outPath = opt('--out', path.join(root, `docs/assets/${name}.svg`));
-  const svg = assets[name](JSON.parse(readFileSync(inPath, 'utf8')));
+  let svg;
+  try { svg = assets[name](JSON.parse(readFileSync(inPath, 'utf8'))); }
+  catch (e) { console.error(`${inPath} refused: ${e.message}`); bad = true; continue; }
   if (check) {
     const have = existsSync(outPath) ? readFileSync(outPath, 'utf8') : '';
     if (have !== svg) { console.error(`${outPath} differs from the render of ${inPath}; run node scripts/readme-assets.mjs`); bad = true; }

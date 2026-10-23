@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1050 470" width="1050" role="img" aria-labelledby="t d">
+<title id="t">One round of a marketing-site jury</title><desc id="d">A loop in five steps. Screenshots of every page, desktop and phone, plus a walk of the page. Personas grouped by audience: people, companies and others. Scores read per group, side by side, never one number for everyone. The owner's five rules filter the findings: analyse first, do not churn what people like, apply only what is true today, hand some findings to a person, and treat a risk to how the product is placed as seriously as a wording problem. What passes becomes fixes, the site is rebuilt, and the next round starts with new screenshots.</desc>
+<defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#57606a"/></marker></defs>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1048" height="468" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1f2328">
+<text x="30" y="40" font-size="18" font-weight="700">One round of a marketing-site jury</text>
+<text x="30" y="62" font-size="13" fill="#57606a">Pictures in, opinions per group, a person's rules in the middle, fixes out. Then again.</text>
+
+<!-- loop back -->
+<path d="M935 112 V92 H120 V108" fill="none" stroke="#57606a" stroke-width="1.3" stroke-dasharray="3 4" marker-end="url(#a)"/>
+<text x="528" y="96" font-size="12" text-anchor="middle" fill="#57606a" stroke="#ffffff" stroke-width="5" paint-order="stroke">next round: rebuild, new screenshots</text>
+
+<!-- 1 screenshots -->
+<rect x="30" y="112" width="180" height="190" rx="10" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="46" y="136" font-size="13" fill="#57606a">1</text>
+<rect x="50" y="150" width="84" height="62" rx="4" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="50" y="150" width="84" height="10" rx="4" fill="#d0d7de"/>
+<rect x="58" y="168" width="50" height="6" rx="3" fill="#1f2328"/>
+<rect x="58" y="180" width="66" height="4" rx="2" fill="#d0d7de"/>
+<rect x="58" y="196" width="26" height="9" rx="3" fill="#0550ae"/>
+<rect x="146" y="150" width="34" height="62" rx="5" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="152" y="162" width="22" height="5" rx="2" fill="#1f2328"/>
+<rect x="152" y="172" width="22" height="3" rx="1.5" fill="#d0d7de"/>
+<rect x="152" y="196" width="14" height="7" rx="2" fill="#0550ae"/>
+<path d="M188 160 h10 M193 160 v40 M193 176 h8 M193 190 h8" stroke="#57606a" stroke-width="1.2" fill="none"/>
+<text x="46" y="246" font-size="16" font-weight="700">Screenshots</text>
+<text x="46" y="266" font-size="12">each page, desktop</text>
+<text x="46" y="282" font-size="12">and phone, plus a walk</text>
+<line x1="212" y1="207" x2="226" y2="207" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+
+<!-- 2 personas -->
+<rect x="230" y="112" width="190" height="190" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<text x="246" y="136" font-size="13" fill="#57606a">2</text>
+<g stroke="#ffffff" stroke-width="1.5">
+<circle cx="262" cy="170" r="8" fill="#0969da"/><circle cx="282" cy="170" r="8" fill="#0969da"/><circle cx="272" cy="188" r="8" fill="#0969da"/>
+<circle cx="322" cy="170" r="8" fill="#bf8700"/><circle cx="342" cy="170" r="8" fill="#bf8700"/><circle cx="332" cy="188" r="8" fill="#bf8700"/>
+<circle cx="382" cy="170" r="8" fill="#1a7f37"/><circle cx="392" cy="188" r="8" fill="#1a7f37"/>
+</g>
+<text x="272" y="216" font-size="11" text-anchor="middle" fill="#57606a">people</text>
+<text x="332" y="216" font-size="11" text-anchor="middle" fill="#57606a">companies</text>
+<text x="388" y="216" font-size="11" text-anchor="middle" fill="#57606a">others</text>
+<text x="246" y="246" font-size="16" font-weight="700">Personas</text>
+<text x="246" y="266" font-size="12">grouped by audience;</text>
+<text x="246" y="282" font-size="12">each page sets the stakes</text>
+<line x1="422" y1="207" x2="436" y2="207" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+
+<!-- 3 scores per group -->
+<rect x="440" y="112" width="180" height="190" rx="10" fill="#dafbe1" stroke="#57606a" stroke-width="1.2"/>
+<text x="456" y="136" font-size="13" fill="#57606a">3</text>
+<line x1="462" y1="214" x2="598" y2="214" stroke="#57606a" stroke-width="1.2"/>
+<rect x="472" y="170" width="22" height="44" rx="3" fill="#0969da"/>
+<rect x="516" y="190" width="22" height="24" rx="3" fill="#bf8700"/>
+<rect x="560" y="160" width="22" height="54" rx="3" fill="#1a7f37"/>
+<line x1="466" y1="150" x2="594" y2="150" stroke="#cf222e" stroke-width="1.2" stroke-dasharray="3 3"/>
+<text x="530" y="146" font-size="11" text-anchor="middle" fill="#cf222e">no pooled score</text>
+<text x="456" y="246" font-size="16" font-weight="700">Scores per group</text>
+<text x="456" y="266" font-size="12">side by side, and the</text>
+<text x="456" y="282" font-size="12">weakest one is next</text>
+<line x1="622" y1="207" x2="636" y2="207" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+
+<!-- 4 owner's rules: a filter -->
+<rect x="640" y="112" width="190" height="190" rx="10" fill="#fff8c5" stroke="#57606a" stroke-width="1.2"/>
+<text x="656" y="136" font-size="13" fill="#57606a">4</text>
+<path d="M680 150 H790 L748 188 V212 L722 222 V188 Z" fill="#ffffff" stroke="#57606a" stroke-width="1.3" stroke-linejoin="round"/>
+<circle cx="700" cy="140" r="3.5" fill="#57606a"/><circle cx="720" cy="134" r="3.5" fill="#57606a"/><circle cx="742" cy="141" r="3.5" fill="#57606a"/><circle cx="764" cy="135" r="3.5" fill="#57606a"/><circle cx="780" cy="142" r="3.5" fill="#57606a"/>
+<text x="735" y="176" font-size="13" font-weight="700" text-anchor="middle">1–5</text>
+<text x="656" y="246" font-size="16" font-weight="700">The owner's rules</text>
+<text x="656" y="266" font-size="12">a person decides what</text>
+<text x="656" y="282" font-size="12">gets through, and why</text>
+<line x1="832" y1="207" x2="846" y2="207" stroke="#57606a" stroke-width="1.5" marker-end="url(#a)"/>
+
+<!-- 5 fixes -->
+<rect x="850" y="112" width="170" height="190" rx="10" fill="#ddf4ff" stroke="#57606a" stroke-width="1.2"/>
+<text x="866" y="136" font-size="13" fill="#57606a">5</text>
+<rect x="874" y="150" width="84" height="62" rx="4" fill="#ffffff" stroke="#57606a" stroke-width="1.2"/>
+<rect x="874" y="150" width="84" height="10" rx="4" fill="#d0d7de"/>
+<rect x="882" y="168" width="60" height="6" rx="3" fill="#1f2328"/>
+<rect x="882" y="180" width="54" height="4" rx="2" fill="#d0d7de"/>
+<rect x="882" y="196" width="26" height="9" rx="3" fill="#1f2328"/>
+<circle cx="972" cy="200" r="15" fill="#1a7f37"/>
+<path d="M964 200 l6 6 l10 -12" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="866" y="246" font-size="16" font-weight="700">Fixes</text>
+<text x="866" y="266" font-size="12">then check they</text>
+<text x="866" y="282" font-size="12">landed next round</text>
+
+<!-- the five rules -->
+<rect x="30" y="326" width="990" height="118" rx="10" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="48" y="352" font-size="13" font-weight="700">The owner's five rules, in step 4</text>
+<g font-size="13">
+<text x="48" y="380"><tspan font-weight="700">1</tspan>  Read the whole jury first. One grumpy persona is not a reason.</text>
+<text x="48" y="404"><tspan font-weight="700">2</tspan>  If people already like it, leave it alone.</text>
+<text x="48" y="428"><tspan font-weight="700">3</tspan>  Fix only what is true today. Never promise a feature to please a juror.</text>
+<text x="560" y="380"><tspan font-weight="700">4</tspan>  Prices, names, legal pages: those go to a person.</text>
+<text x="560" y="404"><tspan font-weight="700">5</tspan>  A jury spots risky positioning, not only clumsy words.</text>
+<text x="560" y="428" fill="#57606a">Each decision is written down with its reason.</text>
+</g>
+</g>
+</svg>

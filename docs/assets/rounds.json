@@ -1,0 +1,35 @@
+{
+ "title": "A real docs jury, round 1 and round 2",
+ "subject": "CompareGraph's README and docs",
+ "source": "https://github.com/massrelay-ai/comparegraph/blob/main/docs/reports/2026-10-24-readme-jury.md",
+ "note": "Copied by hand from the report's tables (medians per stratum, primary / secondary / bystander) and its verdict line (blockers). Seven composite personas, JuryGraph v0.2.",
+ "scale": [1, 5],
+ "strata": [
+  { "stake": "primary", "personas": 4 },
+  { "stake": "secondary", "personas": 2 },
+  { "stake": "bystander", "personas": 1 }
+ ],
+ "lenses": [
+  {
+   "lens": "docs",
+   "rows": [
+    { "dimension": "find-it", "round1": [3, 3, 2], "round2": [4, 4, 4] },
+    { "dimension": "run-it", "round1": [3, 3, 2], "round2": [3, 4, 3] },
+    { "dimension": "trust-it", "round1": [4, 3, 3], "round2": [4, 4, 4] },
+    { "dimension": "next", "round1": [3, 3, 3], "round2": [4, 4, 4] }
+   ]
+  },
+  {
+   "lens": "compare",
+   "rows": [
+    { "dimension": "clarity", "round1": [2, 3, 1], "round2": [4, 3, 4] },
+    { "dimension": "price", "round1": [3, 3, 3], "round2": [4, 4, 4] },
+    { "dimension": "trust", "round1": [4, 3, 2], "round2": [4, 3, 2] }
+   ]
+  }
+ ],
+ "blockers": {
+  "critical": { "round1": [8, 6, 1], "round2": [3, 3, 0], "total1": 15, "total2": 6 },
+  "compare": { "total1": 6, "total2": 0 }
+ }
+}

@@ -53,6 +53,8 @@ jobs:
   # D16: four Claude Desktop bundles (one platform's binary each), validated here and nowhere else (the only network use)
   bundle:
     needs: build
+    # opt-in until the mcpb CLI pin is verified (docs/dev/release.md): set the repository variable ENABLE_MCPB=true
+    if: ${{ vars.ENABLE_MCPB == 'true' }}
     runs-on: ubuntu-latest
     env:
       # pin: set to the @anthropic-ai/mcpb version you verified (unverified in the tree: it was written without network)
@@ -91,7 +93,7 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: [build, bundle]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -101,7 +103,7 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: dist
-          pattern: '{bin,mcpb}-*'
+          pattern: 'bin-*'
           merge-multiple: true
       - name: SHA256SUMS
         working-directory: dist
@@ -121,7 +123,9 @@ jobs:
 
   # D16: the MCP registry entry, after the bundles are released and their hashes are known
   publish-registry:
-    needs: release
+    needs: [release, bundle]
+    # opt-in: publishing to the public MCP registry is a separate decision; set ENABLE_REGISTRY=true (and ENABLE_MCPB)
+    if: ${{ vars.ENABLE_REGISTRY == 'true' && vars.ENABLE_MCPB == 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

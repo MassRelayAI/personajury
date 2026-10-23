@@ -1,0 +1,29 @@
+# The investor-pitch lens: would a reader take the next meeting. Anchors in words, 1 / 3 / 5. It judges the pitch as
+# read, not the business: the jury is no due diligence. Fixture data, not seeded: load it with
+# `jurygraph lens add --file fixtures/lenses/investor-pitch.toml`. Attach the deck as files (a PDF, one PNG per slide).
+name = "investor-pitch"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "problem"
+title = "The problem is real and someone has it"
+anchors = { "1" = "I cannot say whose problem this is or why they would pay to solve it", "3" = "I see the problem and who has it, but not how much it costs them today", "5" = "I can name who has the problem, what it costs them and how they cope with it today" }
+
+[[dimension]]
+id = "why-now"
+title = "Why now, and not five years ago"
+anchors = { "1" = "nothing says why this works now; it could have been pitched at any time", "3" = "a reason is given (a new technology, a rule, a shift), but it is asserted, not shown", "5" = "the change that makes this possible now is named, dated and shown with a fact I can check" }
+
+[[dimension]]
+id = "proof"
+title = "Something already shows it works"
+anchors = { "1" = "only plans and promises; no user, no number, no result", "3" = "some proof (users, revenue, a pilot), but without a base, a period or a trend", "5" = "proof I could check: named numbers with their period and trend, or users I could call" }
+
+[[dimension]]
+id = "the-ask"
+title = "I know what they want and what it buys"
+anchors = { "1" = "I cannot tell how much they raise, on what terms, or what the money is for", "3" = "the amount is there, but not what it buys or which milestone it reaches", "5" = "the amount, what it pays for and the milestone it reaches by a date are all on one slide" }

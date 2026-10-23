@@ -1,0 +1,29 @@
+# The consulting-deck lens: does a deck carry a client from the question to a decision. Anchors in words, 1 / 3 / 5.
+# Fixture data, not seeded: load it with `jurygraph lens add --file fixtures/lenses/consulting-deck.toml`. Attach the
+# deck as files (a PDF export, one PNG per slide, the speaker notes); the jury reads the slides, it does not check the data.
+name = "consulting-deck"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "storyline"
+title = "The slides tell one story"
+anchors = { "1" = "I cannot say what the deck argues; the slides are a pile of facts in no order", "3" = "I can follow the argument, but a slide is out of place or a step is missing", "5" = "reading only the titles in order, I can retell the argument and its conclusion" }
+
+[[dimension]]
+id = "action-titles"
+title = "Each title says what the slide proves"
+anchors = { "1" = "the titles are topics (\"Market\", \"Costs\"); I must read the body to learn the point", "3" = "most titles state a point, but some are topics or claim more than the slide shows", "5" = "every title is a full sentence that the slide below it proves" }
+
+[[dimension]]
+id = "evidence"
+title = "The claims rest on something I can check"
+anchors = { "1" = "the numbers have no source, no date and no base; I would not repeat them to my boss", "3" = "the key numbers have a source, but some charts lack a base, a unit or a date", "5" = "every number names its source, its date and its base, and the charts show what the titles say" }
+
+[[dimension]]
+id = "the-ask"
+title = "I know what I am asked to decide"
+anchors = { "1" = "I finish the deck and do not know what decision, money or next step it wants from me", "3" = "there is an ask, but it is vague, buried, or without an owner or a date", "5" = "the ask is one clear decision with its cost, its owner and its date, and the deck has earned it" }

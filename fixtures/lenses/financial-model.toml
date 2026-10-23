@@ -1,0 +1,31 @@
+# The financial-model lens: can a reader follow and trust the model. Anchors in words, 1 / 3 / 5.
+# It judges readability and credibility, never arithmetic: a jury does not check that the formulas are right, and a
+# score here is no audit. Test the numbers with formulas and a person who signs for them.
+# Fixture data, not seeded: load it with `jurygraph lens add --file fixtures/lenses/financial-model.toml`. Attach the
+# model as files (a CSV or PDF export per sheet, a screenshot of the summary).
+name = "financial-model"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "assumptions-visible"
+title = "I can see every assumption"
+anchors = { "1" = "the drivers are buried in formulas or hard-coded; I cannot list what the model assumes", "3" = "the main assumptions are on one sheet, but some are hidden in cells or unlabelled", "5" = "every assumption is in one place, labelled, with its unit and its source" }
+
+[[dimension]]
+id = "sensitivities"
+title = "I see what moves the result"
+anchors = { "1" = "one case only; I cannot tell what happens if a key assumption is wrong", "3" = "a downside case exists, but it moves one input or it is hard to find", "5" = "the inputs that matter most are flexed, and I see how far each moves the result" }
+
+[[dimension]]
+id = "risks-stated"
+title = "The risks are named, not hidden"
+anchors = { "1" = "no risk is named; the model reads as if nothing can go wrong", "3" = "some risks are listed, but not tied to the numbers they would move", "5" = "each main risk is named and tied to the assumption and the case it would change" }
+
+[[dimension]]
+id = "a-lender-would-sign"
+title = "A lender would put their name to it"
+anchors = { "1" = "a lender would send it back unread: it is unclear, inconsistent or too good to be true", "3" = "a lender would read on, but would come back with questions before deciding", "5" = "a lender could follow it, check it and take it to a credit committee as it stands" }

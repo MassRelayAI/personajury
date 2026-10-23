@@ -1,0 +1,30 @@
+# adapted from comparegraph deny.toml
+# cargo-deny policy: licences, advisories, bans and sources for the dependency tree (CI job `deny`).
+[graph]
+all-features = true
+
+[licenses]
+confidence-threshold = 0.8
+allow = [
+  "Apache-2.0", # the project's own licence; most of the tree is dual MIT OR Apache-2.0
+  "MIT",        # clap, serde, rusqlite, toml, globset
+  "Unlicense",  # globset and its regex helpers are dual Unlicense OR MIT
+  "Unicode-3.0", # unicode-ident (MIT OR Apache-2.0 AND Unicode-3.0): the Unicode data files
+]
+
+[advisories]
+version = 2
+yanked = "warn"
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+# the engine never calls a model or the network (report §2.5): no HTTP client may enter the tree
+deny = [
+  { name = "reqwest" }, { name = "hyper" }, { name = "ureq" }, { name = "curl" }, { name = "isahc" }, { name = "surf" },
+]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]

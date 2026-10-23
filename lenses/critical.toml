@@ -1,0 +1,22 @@
+# The critical lens (report §2.4): does it work, what blocks me, what is missing. Anchors in words, 1 / 3 / 5.
+name = "critical"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "works"
+title = "It does the job I came for"
+anchors = { "1" = "I cannot do what I came for; the path breaks or does not exist", "3" = "I get it done, with a detour, a guess or a second try", "5" = "I get it done on the first try, and I can say which element took me there" }
+
+[[dimension]]
+id = "blocks"
+title = "Nothing stops me"
+anchors = { "1" = "something stops me outright: an error, a dead end, a missing step, a wall I cannot pass", "3" = "something slows me or makes me doubt, but I pass it", "5" = "nothing on my path stops or slows me" }
+
+[[dimension]]
+id = "missing"
+title = "What I need is there"
+anchors = { "1" = "what I need most is absent: a price, a proof, an action, an answer", "3" = "it is there, but I had to hunt for it or it is half there", "5" = "everything I would look for is there, where I would look for it" }

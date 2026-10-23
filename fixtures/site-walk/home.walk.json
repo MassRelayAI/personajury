@@ -1,0 +1,39 @@
+{
+  "url": "http://lantern.example/index.html",
+  "viewport": [1280, 800],
+  "nodes": [
+    { "id": "banner", "role": "banner", "name": "", "children": [
+      { "id": "brand", "role": "link", "name": "Lantern Notes (index.html)" },
+      { "id": "nav", "role": "navigation", "name": "Main", "children": [
+        { "id": "nav-home", "role": "link", "name": "Home (index.html)" },
+        { "id": "nav-pricing", "role": "link", "name": "Pricing (pricing.html)" },
+        { "id": "nav-signin", "role": "link", "name": "Sign in (https://app.lantern.example/signin)" }
+      ] }
+    ] },
+    { "id": "main", "role": "main", "name": "", "children": [
+      { "id": "hero", "role": "region", "name": "", "children": [
+        { "id": "h1", "role": "heading", "name": "Orchestrate asynchronous knowledge synergies across your team's cognitive workflows" },
+        { "id": "hero-text", "role": "paragraph", "name": "A best-in-class, AI-native collaborative substrate that operationalizes tacit insight at scale." },
+        { "id": "btn-start", "role": "link", "name": "Get started (pricing.html)" },
+        { "id": "btn-how", "role": "link", "name": "See how it works (#features)" }
+      ] },
+      { "id": "features", "role": "region", "name": "Features", "children": [
+        { "id": "feat-1", "role": "article", "name": "", "children": [
+          { "id": "feat-1-h", "role": "heading", "name": "One notebook for the team" },
+          { "id": "feat-1-t", "role": "paragraph", "name": "Everyone writes in the same pages. Edits show up as they happen, with a name beside each change." }
+        ] },
+        { "id": "feat-2", "role": "article", "name": "", "children": [
+          { "id": "feat-2-h", "role": "heading", "name": "Find it again" },
+          { "id": "feat-2-t", "role": "paragraph", "name": "Search looks inside every page and every comment, and puts the newest match first." }
+        ] },
+        { "id": "feat-3", "role": "article", "name": "", "children": [
+          { "id": "feat-3-h", "role": "heading", "name": "Keep a trail" },
+          { "id": "feat-3-t", "role": "paragraph", "name": "Every page keeps its history. Bring back last Tuesday's version with one click." }
+        ] }
+      ] }
+    ] },
+    { "id": "footer", "role": "contentinfo", "name": "", "children": [
+      { "id": "footer-text", "role": "paragraph", "name": "Lantern Notes is a made-up product used to test JuryGraph. Nothing here can be bought." }
+    ] }
+  ]
+}

@@ -1,0 +1,18 @@
+# The recall lens (report §2.4): a first impression from general memory, cheap, and explicitly `recalled` —
+# a line under this lens can carry no other evidence class.
+name = "recall"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["recalled"]
+standard = ""
+
+[[dimension]]
+id = "first-read"
+title = "What I think it is, in ten seconds"
+anchors = { "1" = "I cannot say what it is or who it is for", "3" = "I can say roughly what it is, but not why I would choose it", "5" = "I can say what it is, who it is for and why in one sentence" }
+
+[[dimension]]
+id = "would-return"
+title = "Would I come back"
+anchors = { "1" = "no; nothing here is for me", "3" = "maybe, if I remember it when the need comes", "5" = "yes; I would bookmark it or tell someone now" }

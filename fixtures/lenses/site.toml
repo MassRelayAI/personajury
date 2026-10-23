@@ -1,0 +1,40 @@
+# The site lens of the held-out detector (D6, Fable read B1): the six criteria of a hand-scored jury table the maintainer keeps privately on a 1–10 scale, anchors in
+# words at 1, 4, 7, 10 (step 3), so six dimensions can be ranked. Fixture data: not seeded into stores; the detector's
+# run loads it with `jurygraph lens add --file fixtures/lenses/site.toml`.
+name = "site"
+version = 1
+scale = [1, 10]
+asks_pick = false
+compares = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "craft"
+title = "Aesthetics and craft"
+anchors = { "1" = "it looks broken or thrown together; I notice the mistakes before the product", "4" = "it looks like a template; nothing is wrong and nothing is cared for", "7" = "it looks finished and consistent; spacing, type and images agree with each other", "10" = "every detail looks chosen; I would show it to someone as an example of good work" }
+
+[[dimension]]
+id = "clarity-5s"
+title = "Clarity in five seconds"
+anchors = { "1" = "after five seconds I cannot say what this is or who it is for", "4" = "after five seconds I can guess what it is, but I am not sure", "7" = "after five seconds I can say what it is and who it is for", "10" = "after five seconds I can say what it is, who it is for and why I would pick it" }
+
+[[dimension]]
+id = "next-action"
+title = "I find the next action"
+anchors = { "1" = "I do not know what to do next, or the obvious button goes nowhere", "4" = "I find a next step after looking around, and I am not sure it is the right one", "7" = "the next step for someone like me is visible and works", "10" = "the next step for someone like me is the first thing I see, and it takes me where I expected" }
+
+[[dimension]]
+id = "pricing"
+title = "Upsell and pricing clarity"
+anchors = { "1" = "I cannot find what it costs, or a price is hidden behind a contact form", "4" = "I find the prices but cannot tell which plan is mine or what the next plan adds", "7" = "I can tell which plan is mine, what it costs and what paying more would add", "10" = "I know what I would pay today and later, and the reason to move up a plan is plain" }
+
+[[dimension]]
+id = "distinct"
+title = "Brand distinctiveness"
+anchors = { "1" = "with the name covered I could not tell it from any other product of its kind", "4" = "one element is its own; the rest could belong to anyone", "7" = "the words and the look are recognisably its own", "10" = "I would recognise it from a single screenshot with the name covered" }
+
+[[dimension]]
+id = "phone"
+title = "Phone layout"
+anchors = { "1" = "on a phone it is unusable: text cut off, sideways scrolling, buttons too small to tap", "4" = "on a phone it works, with zooming, scrolling sideways or a missed tap", "7" = "on a phone everything reads and taps without effort", "10" = "on a phone it feels made for the phone first" }

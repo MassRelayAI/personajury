@@ -1,0 +1,16 @@
+JuryGraph
+Copyright 2026 Nicholas Andrea Sujitno
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Adapted files
+-------------
+Files adapted from CompareGraph (our own Apache-2.0 sibling, same author): the repository files, the plugin manifests, the
+CLI/envelope/store scaffolding and parts of the documentation structure. Text files carry an "adapted from comparegraph"
+note on their first line; the rest are listed in docs/THIRD_PARTY_NOTICES.md.
+
+Structure ideas from superpowers 7.0.0 (MIT, Copyright (c) 2025 Jesse Vincent): the issue-template set, the pull request
+provenance table, the Codex, Cursor and Gemini manifests and the testing document. The text is our own; the files are listed
+in docs/THIRD_PARTY_NOTICES.md.
+
+Governance files of goose, A2A, keycloak, openllmetry and openlineage (Apache-2.0) were read for structure only.

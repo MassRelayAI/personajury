@@ -1,0 +1,240 @@
+{
+  "persona": "builder-mei",
+  "lines": [
+    {
+      "dimension": "clarity",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme tells me what it is in one line and Lantern's hero makes me squint."
+    },
+    {
+      "dimension": "price",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Lantern shows $0 and $24 but Team is Contact us, Acme shows every price in a table."
+    },
+    {
+      "dimension": "trust",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Pale Get started button and a footer saying nothing can be bought; I would pick Acme first."
+    },
+    {
+      "dimension": "clarity",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Plain headline, one table."
+    },
+    {
+      "dimension": "price",
+      "about": "cmp:acme-pricing",
+      "score": 5,
+      "anchor_met": 5,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Every plan has a price and a button."
+    },
+    {
+      "dimension": "trust",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Dark readable buttons, looks professional."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Buzzword hero, weak main button."
+    },
+    {
+      "dimension": "price",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Buzzword hero, weak main button."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Buzzword hero, weak main button."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#btn-start",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Heading is jargon, no price on the page."
+    },
+    {
+      "dimension": "price",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#btn-start",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Heading is jargon, no price on the page."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#btn-start",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Heading is jargon, no price on the page."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.png",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Clear cards, Team price missing."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Clear cards, Team price missing."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Clear cards, Team price missing."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.walk.json",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#btn-signup",
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Structured, but Contact us and a # link."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#btn-signup",
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Structured, but Contact us and a # link."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#btn-signup",
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Structured, but Contact us and a # link."
+    }
+  ],
+  "pick": {
+    "choice": "cmp:acme-pricing",
+    "reason": "Its prices and dark buttons are readable at a glance and I would show it to a client."
+  }
+}

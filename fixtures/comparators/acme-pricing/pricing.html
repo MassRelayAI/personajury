@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pricing - Acme Pads</title>
+  <style>
+    body { margin: 0; font: 16px/1.5 Helvetica, Arial, sans-serif; color: #12222e; background: #f4f8fa; }
+    header { padding: 18px 48px; background: #12222e; color: #fff; font-weight: bold; font-size: 20px; }
+    main { max-width: 1040px; margin: 0 auto; padding: 48px; }
+    h1 { font-size: 36px; margin: 0 0 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 28px; background: #fff; }
+    th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid #d5e0e6; }
+    th { background: #e6eff3; }
+    .p { font-size: 28px; font-weight: bold; }
+    a.go { display: inline-block; padding: 10px 18px; background: #0b5ea8; color: #fff; text-decoration: none; border-radius: 4px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>Acme Pads</header>
+  <main>
+    <h1>Simple pricing, billed monthly</h1>
+    <p>Shared notes for small teams. Cancel any time.</p>
+    <table>
+      <caption class="sr" style="text-align:left;padding:8px 0">Plans and prices</caption>
+      <thead>
+        <tr><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">Includes</th><th scope="col"><span style="position:absolute;left:-9999px">Action</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Free</th><td class="p">$0</td><td>1 person, 20 pages</td><td><a class="go" href="/signup?plan=free">Start free</a></td></tr>
+        <tr><th scope="row">Team</th><td class="p">$12 per person / month</td><td>Up to 20 people, unlimited pages</td><td><a class="go" href="/signup?plan=team">Start Team</a></td></tr>
+        <tr><th scope="row">Business</th><td class="p">$29 per person / month</td><td>Unlimited people, audit log, single sign-on</td><td><a class="go" href="/signup?plan=business">Start Business</a></td></tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>

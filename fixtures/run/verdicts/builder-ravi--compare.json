@@ -1,0 +1,241 @@
+{
+ "persona": "builder-ravi",
+ "lines": [
+  {
+   "dimension": "clarity",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme tells me it is shared notes for small teams in one line, Lantern's hero tells me nothing."
+  },
+  {
+   "dimension": "clarity",
+   "about": "cmp:acme-pricing",
+   "score": 4,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png",
+    "cmp:acme-pricing/pricing.walk.json#intro"
+   ],
+   "blockers": [],
+   "note": "Acme says what it is in the first sentence."
+  },
+  {
+   "dimension": "price",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme shows three prices in a table; Lantern hides the Team price behind contact us."
+  },
+  {
+   "dimension": "trust",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Buzzword headline, dead sign-up link and Team price withheld; I would put data in Acme first."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Hero is jargon, worse than Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.walk.json",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#feat-1-t",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Feature cards are concrete, a bit slower than Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.png",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Plans are readable cards, about as clear as Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.walk.json",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#plans",
+    "cmp:acme-pricing/pricing.walk.json#plans-table"
+   ],
+   "blockers": [],
+   "note": "Structure is fine, a list per plan rather than a table."
+  },
+  {
+   "dimension": "price",
+   "about": "home.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Home has no price."
+  },
+  {
+   "dimension": "price",
+   "about": "home.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json",
+    "cmp:acme-pricing/pricing.walk.json#price-team"
+   ],
+   "blockers": [],
+   "note": "No price on home; Acme lists price per cell."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.png",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Two prices shown, Team missing, otherwise like Acme."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.walk.json",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-studio",
+    "cmp:acme-pricing/pricing.walk.json#price-business"
+   ],
+   "blockers": [],
+   "note": "Studio $24 per person per month is explicit like Acme."
+  },
+  {
+   "dimension": "price",
+   "about": "cmp:acme-pricing",
+   "score": 4,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png",
+    "cmp:acme-pricing/pricing.walk.json#price-team"
+   ],
+   "blockers": [],
+   "note": "Every plan has a number."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Marketing claims with nothing shown."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Claims best-in-class with no proof."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Dead sign-up link and no Team price."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#btn-signup",
+    "cmp:acme-pricing/pricing.walk.json#btn-free"
+   ],
+   "blockers": [],
+   "note": "Acme's free link has a real path, Lantern's is '#'."
+  },
+  {
+   "dimension": "trust",
+   "about": "cmp:acme-pricing",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png",
+    "cmp:acme-pricing/pricing.walk.json#btn-free"
+   ],
+   "blockers": [],
+   "note": "Real signup links, plain table; says cancel any time."
+  }
+ ],
+ "pick": {
+  "choice": "cmp:acme-pricing",
+  "reason": "It states what it is, shows every price and has working sign-up links, which I could actually recommend."
+ }
+}

@@ -1,0 +1,1248 @@
+[
+  {
+    "stake": "primary",
+    "personas": [
+      "builder-ana",
+      "builder-mei",
+      "builder-ravi",
+      "newcomer-sofia"
+    ],
+    "cells": [
+      {
+        "lens": "critical",
+        "dimension": "works",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "blocks",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 1
+        },
+        "n": 4,
+        "median": 2,
+        "min": 1,
+        "max": 2,
+        "blockers": 9,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "missing",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 3
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "builder-ana": 4,
+          "builder-mei": 4,
+          "builder-ravi": 4,
+          "newcomer-sofia": 5
+        },
+        "n": 4,
+        "median": 4,
+        "min": 4,
+        "max": 5,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.png",
+        "scores": {
+          "builder-ana": 1,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 1,
+        "max": 2,
+        "blockers": 1,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.walk.json",
+        "scores": {
+          "builder-ana": 1,
+          "builder-mei": 2,
+          "builder-ravi": 3,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 1,
+        "max": 3,
+        "blockers": 1,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.png",
+        "scores": {
+          "builder-ana": 3,
+          "builder-mei": 4,
+          "builder-ravi": 3,
+          "newcomer-sofia": 4
+        },
+        "n": 4,
+        "median": 3,
+        "min": 3,
+        "max": 4,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.walk.json",
+        "scores": {
+          "builder-ana": 3,
+          "builder-mei": 4,
+          "builder-ravi": 3,
+          "newcomer-sofia": 4
+        },
+        "n": 4,
+        "median": 3,
+        "min": 3,
+        "max": 4,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "builder-ana": 5,
+          "builder-mei": 5,
+          "builder-ravi": 4,
+          "newcomer-sofia": 5
+        },
+        "n": 4,
+        "median": 5,
+        "min": 4,
+        "max": 5,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.png",
+        "scores": {
+          "builder-ana": 1,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 1
+        },
+        "n": 4,
+        "median": 1,
+        "min": 1,
+        "max": 2,
+        "blockers": 2,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.walk.json",
+        "scores": {
+          "builder-ana": 1,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 1
+        },
+        "n": 4,
+        "median": 1,
+        "min": 1,
+        "max": 2,
+        "blockers": 2,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.png",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 3,
+          "newcomer-sofia": 3
+        },
+        "n": 4,
+        "median": 3,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.walk.json",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 3,
+          "newcomer-sofia": 3
+        },
+        "n": 4,
+        "median": 3,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": null,
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "builder-ana": 3,
+          "builder-mei": 4,
+          "builder-ravi": 3,
+          "newcomer-sofia": 4
+        },
+        "n": 4,
+        "median": 3,
+        "min": 3,
+        "max": 4,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.png",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 2,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.walk.json",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.png",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.walk.json",
+        "scores": {
+          "builder-ana": 2,
+          "builder-mei": 3,
+          "builder-ravi": 2,
+          "newcomer-sofia": 2
+        },
+        "n": 4,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 4,
+          "told": 0,
+          "recalled": 0
+        }
+      }
+    ]
+  },
+  {
+    "stake": "secondary",
+    "personas": [
+      "company-george",
+      "company-hanna"
+    ],
+    "cells": [
+      {
+        "lens": "critical",
+        "dimension": "works",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "blocks",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "missing",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 1
+        },
+        "n": 2,
+        "median": 1,
+        "min": 1,
+        "max": 2,
+        "blockers": 1,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "company-george": 4,
+          "company-hanna": 5
+        },
+        "n": 2,
+        "median": 4,
+        "min": 4,
+        "max": 5,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.png",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 1
+        },
+        "n": 2,
+        "median": 1,
+        "min": 1,
+        "max": 2,
+        "blockers": 1,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.walk.json",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 1
+        },
+        "n": 2,
+        "median": 1,
+        "min": 1,
+        "max": 2,
+        "blockers": 1,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.png",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 3
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.walk.json",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 3
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "company-george": 5,
+          "company-hanna": 5
+        },
+        "n": 2,
+        "median": 5,
+        "min": 5,
+        "max": 5,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.png",
+        "scores": {
+          "company-george": 1,
+          "company-hanna": 1
+        },
+        "n": 2,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "blockers": 2,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.walk.json",
+        "scores": {
+          "company-george": 1,
+          "company-hanna": 1
+        },
+        "n": 2,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "blockers": 2,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.png",
+        "scores": {
+          "company-george": 3,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.walk.json",
+        "scores": {
+          "company-george": 3,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": null,
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "company-george": 3,
+          "company-hanna": 3
+        },
+        "n": 2,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.png",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.walk.json",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.png",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.walk.json",
+        "scores": {
+          "company-george": 2,
+          "company-hanna": 2
+        },
+        "n": 2,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 2,
+          "told": 0,
+          "recalled": 0
+        }
+      }
+    ]
+  },
+  {
+    "stake": "bystander",
+    "personas": [
+      "investor-claire"
+    ],
+    "cells": [
+      {
+        "lens": "critical",
+        "dimension": "works",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "blocks",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 2,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "critical",
+        "dimension": "missing",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "investor-claire": 4
+        },
+        "n": 1,
+        "median": 4,
+        "min": 4,
+        "max": 4,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.png",
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "home.walk.json",
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.png",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "clarity",
+        "about": "pricing.walk.json",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "investor-claire": 5
+        },
+        "n": 1,
+        "median": 5,
+        "min": 5,
+        "max": 5,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.png",
+        "scores": {
+          "investor-claire": 1
+        },
+        "n": 1,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "blockers": 1,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "home.walk.json",
+        "scores": {
+          "investor-claire": 1
+        },
+        "n": 1,
+        "median": 1,
+        "min": 1,
+        "max": 1,
+        "blockers": 1,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.png",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "price",
+        "about": "pricing.walk.json",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": null,
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "cmp:acme-pricing",
+        "scores": {
+          "investor-claire": 4
+        },
+        "n": 1,
+        "median": 4,
+        "min": 4,
+        "max": 4,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.png",
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "home.walk.json",
+        "scores": {
+          "investor-claire": 2
+        },
+        "n": 1,
+        "median": 2,
+        "min": 2,
+        "max": 2,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.png",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      },
+      {
+        "lens": "compare",
+        "dimension": "trust",
+        "about": "pricing.walk.json",
+        "scores": {
+          "investor-claire": 3
+        },
+        "n": 1,
+        "median": 3,
+        "min": 3,
+        "max": 3,
+        "blockers": 0,
+        "evidence": {
+          "seen": 1,
+          "told": 0,
+          "recalled": 0
+        }
+      }
+    ]
+  }
+]

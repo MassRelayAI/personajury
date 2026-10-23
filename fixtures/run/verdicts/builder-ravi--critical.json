@@ -1,0 +1,32 @@
+{
+  "persona": "builder-ravi",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.walk.json#h1", "home.walk.json#feat-1-t", "pricing.walk.json#btn-signup"],
+      "blockers": [],
+      "note": "The headline tells me nothing; I only learned it is a shared notebook with history from the feature paragraphs, and the free sign-up never goes anywhere, so I could not try it for runbooks."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.walk.json#btn-signup", "home.png"],
+      "blockers": ["The 'Sign up free' link points to '#' so the one path to try the tool is a dead end.", "The 'Get started' button on the home page is pale with white text and sends me to pricing instead of a sign-up."],
+      "note": "I tabbed to Sign up free and it goes nowhere; that is exactly the dead end I file an issue for."
+    },
+    {
+      "dimension": "missing",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.walk.json#price-team", "pricing.walk.json#plan-team", "pricing.walk.json#studio-3", "home.walk.json#feat-3-t"],
+      "blockers": [],
+      "note": "No screenshot or real product view, Team (25 people) has no price while Studio is $24 a seat, and nothing on export or access control on the lower plans, so I cannot see the plan boundary for runbooks."
+    }
+  ]
+}

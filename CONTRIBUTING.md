@@ -1,0 +1,33 @@
+<!-- adapted from comparegraph CONTRIBUTING.md -->
+# Contributing to JuryGraph
+
+Read `AGENTS.md` first: the rings, the invariants and the never-list apply to every change. Who decides, and what only a
+numbered decision may change, is in `GOVERNANCE.md`; personas follow `PERSONAS.md` and lenses `docs/lenses.md`.
+
+## Proposing a change
+1. Open an issue or a draft pull request saying what is wrong and how you saw it. A measurement beats an opinion.
+2. Tests first. A bug fix starts with a test that fails; a new behaviour starts with the test that describes it. A new
+   refusal is a test that was seen red before the refusal existed.
+3. Touching the fixtures (`fixtures/`)? Keep the answer key in `fixtures/README.md` true: it lists the defects planted in
+   the site, and the held-out check reads it.
+4. A provisional choice (a threshold, a default, a shape the design leaves open) gets one row in `docs/decisions.md`: the
+   choice, the alternative, why it is provisional, what would change it.
+5. Run `cargo test -p jurygraph` and `cargo clippy -p jurygraph --tests -- -D warnings`. Both must be clean.
+6. Conventional commit messages; stage named paths.
+
+A refusal that looks wrong is a report, not a loosening: file the wrong-refusal form with the code and the minimal verdict
+(`SUPPORT.md`). A refusal changes only with a red-first test and a numbered decision.
+
+## Out of bounds
+No LLM call, no network call and no API key enters the engine. New dependencies need a ruling in the issue first and a row
+in `docs/decisions.md`. Code from copyleft or community-licensed projects is not accepted; record the origin and licence of
+anything adapted in `docs/THIRD_PARTY_NOTICES.md`.
+
+## Releasing
+Maintainers only; the steps are in `docs/dev/release.md`. In short: bump the workspace version, date the changelog section,
+push a `v*` tag. The workflow builds the five platform binaries and publishes the GitHub release with `SHA256SUMS`.
+
+## Skills
+The markdown skills live in `skills/`. Keep each skill short, command-first, and honest about what the engine cannot see.
+
+By taking part you agree to the `CODE_OF_CONDUCT.md`. Contributions are licensed under Apache-2.0.

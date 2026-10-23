@@ -1,0 +1,35 @@
+{
+  "persona": "builder-mei",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#btn-start", "pricing.png"],
+      "blockers": [],
+      "note": "I got to pricing and could judge it, but only after squinting at the washed-out Get started button and ignoring a hero headline I could never explain to my client."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#btn-start", "home.walk.json#h1", "pricing.walk.json#btn-signup"],
+      "blockers": [
+        "The main Get started button is white text on pale blue and is hard to read, so I would not trust it on a projector.",
+        "The Sign up free button on pricing points to just # so it goes nowhere."
+      ],
+      "note": "The first button I zoomed into is the weakest thing on the page, and that alone makes me distrust the rest."
+    },
+    {
+      "dimension": "missing",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#price-team", "home.walk.json#feat-1-h"],
+      "blockers": [],
+      "note": "Plans and the $24 price are clear, but Team is just Contact us with no number and the hero never says plainly what the tool is, so I had to hunt in the feature headings."
+    }
+  ]
+}

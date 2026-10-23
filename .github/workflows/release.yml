@@ -1,0 +1,80 @@
+# adapted from comparegraph .github/workflows/release.yml
+name: release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { platform: linux-x64, os: ubuntu-latest, exe: jurygraph }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, exe: jurygraph }
+          - { platform: darwin-arm64, os: macos-15, exe: jurygraph }
+          - { platform: darwin-x64, os: macos-15-intel, exe: jurygraph }
+          - { platform: win32-x64, os: windows-latest, exe: jurygraph.exe }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Toolchain (pinned by rust-toolchain.toml)
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          key: release-${{ matrix.platform }}
+      - name: The tag must equal the Cargo.toml version (bump it in the tagged commit; exit 4)
+        shell: bash
+        run: |
+          v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="jurygraph") | .version')
+          [ "$v" = "${GITHUB_REF_NAME#v}" ] || { echo "Cargo.toml $v != tag ${GITHUB_REF_NAME#v}"; exit 4; }
+      - name: Build
+        run: cargo build --release --locked -p jurygraph
+      - name: Stage the release asset and its checksum
+        shell: bash
+        run: |
+          mkdir -p dist
+          ext=""; [ "${{ matrix.exe }}" = "jurygraph.exe" ] && ext=".exe"
+          out="jurygraph-${{ matrix.platform }}$ext"
+          cp "target/release/${{ matrix.exe }}" "dist/$out"
+          case "${{ matrix.platform }}" in linux-*) strip "dist/$out" ;; esac
+          (cd dist && (sha256sum "$out" 2>/dev/null || shasum -a 256 "$out") > "$out.sha256")
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: bin-${{ matrix.platform }}
+          path: dist/*
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write # the attestation is signed with this job's OIDC identity
+      attestations: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          pattern: bin-*
+          merge-multiple: true
+      - name: SHA256SUMS
+        working-directory: dist
+        run: |
+          cat jurygraph-*.sha256 > SHA256SUMS
+          sha256sum -c SHA256SUMS
+      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          files: dist/*
+          generate_release_notes: true
+      - name: Attest the binaries and the checksums (build provenance)
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: |
+            dist/jurygraph-*
+            dist/SHA256SUMS

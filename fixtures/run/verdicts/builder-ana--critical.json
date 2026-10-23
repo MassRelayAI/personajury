@@ -1,0 +1,36 @@
+{
+  "persona": "builder-ana",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#plan-solo", "pricing.walk.json#price-studio", "home.walk.json#feat-2-t"],
+      "blockers": [],
+      "note": "I came to pick a tool for two people on cost, export and search; the search line on home is clear, but Solo is one person and the plan that fits two of us says Talk to sales, so I cannot finish the evening's job."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.walk.json#btn-studio", "pricing.walk.json#price-team", "pricing.walk.json#btn-signup", "home.walk.json#h1"],
+      "blockers": [
+        "Team shows Contact us instead of a price, and a price I cannot see is one I cannot afford.",
+        "Studio, the only plan that lists export, ends in Talk to sales and not a way to try it.",
+        "The Sign up free button on Solo points nowhere (#)."
+      ],
+      "note": "The home headline is buzzword soup I skipped, and then the pricing page walls me twice, so I would close the tab."
+    },
+    {
+      "dimension": "missing",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#studio-3", "pricing.walk.json#team-list", "home.walk.json#feat-3-t"],
+      "blockers": [],
+      "note": "The $24 per person is there, but no Team price, nothing on export except Studio's Full history and export, and no way to see what a two-person plan costs, which is my biggest fear."
+    }
+  ]
+}

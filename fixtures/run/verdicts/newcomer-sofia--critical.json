@@ -1,0 +1,35 @@
+{
+  "persona": "newcomer-sofia",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#h1", "home.walk.json#feat-1-h"],
+      "blockers": [],
+      "note": "I never learned what this is from the headline; only the little 'One notebook for the team' bit further down made sense, so I would not get as far as using it."
+    },
+    {
+      "dimension": "blocks",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#h1", "home.walk.json#hero-text"],
+      "blockers": [
+        "The headline 'Orchestrate asynchronous knowledge synergies across your team's cognitive workflows' has words I cannot paraphrase, so I stop reading and go back to the chat saying 'no idea'.",
+        "The line under it ('AI-native collaborative substrate that operationalizes tacit insight') is just as unreadable, so there is no second chance."
+      ],
+      "note": "In the first ten seconds I hit a wall of jargon and I am gone."
+    },
+    {
+      "dimension": "missing",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#price-solo", "pricing.walk.json#btn-signup", "home.walk.json#btn-start"],
+      "blockers": [],
+      "note": "The Pricing page does say '$0 forever' with a 'Sign up free' button, which is what I feared not finding, but I had to leave the home page to learn it and nothing on the home page says it is for a student like me."
+    }
+  ]
+}

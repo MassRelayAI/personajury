@@ -1,0 +1,32 @@
+{
+  "persona": "company-george",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#h1", "pricing.walk.json#price-team"],
+      "blockers": [],
+      "note": "I could not say aloud what this does from the headline, and I only found the notebook idea in the small print below, so I left or guessed my way to pricing."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.walk.json#h1", "pricing.walk.json#price-team", "pricing.walk.json#btn-studio"],
+      "blockers": [],
+      "note": "Jargon headline fails my ten-second test, and the plan that fits ten people says Contact us or Talk to sales, which is exactly the forced sales call I fear."
+    },
+    {
+      "dimension": "missing",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#price-team", "pricing.walk.json#btn-signup"],
+      "blockers": [],
+      "note": "Studio shows a price but Team has none, and there is no way to start today for ten people since the only instant signup is the one-person free plan."
+    }
+  ]
+}

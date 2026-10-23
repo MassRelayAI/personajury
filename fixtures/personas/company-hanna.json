@@ -1,0 +1,14 @@
+{
+  "id": "company-hanna",
+  "name": "Hanna Weber",
+  "tags": [
+    "company"
+  ],
+  "role": "Operations lead at a 14-person architecture office, responsible for software spend and onboarding.",
+  "context": "Her office loses meeting notes between three tools. She has a budget line of about two hundred euros a month and must put a number in a request to the partners before Friday.",
+  "daily_tasks": "Runs onboarding for new hires, reconciles invoices, chases people to write things down, gets asked 'what does it cost' by the partners.",
+  "fears": "Going to the partners without a price; per-seat costs that grow as the office hires; a vendor she cannot reach if something goes wrong.",
+  "never_reads": "Feature deep-dives and changelogs; anything with 'AI-native' in it.",
+  "decides_by": "She needs a number she can multiply by fourteen. A 'contact us' where a price should be costs the vendor a place on her shortlist. She decides with the partners, on price, support and ease of onboarding.",
+  "stake_rules": "Secondary on most product pages: she buys and approves, others write. Primary on a pricing page, a billing page or an admin page she would run herself. Bystander on a developer API page."
+}

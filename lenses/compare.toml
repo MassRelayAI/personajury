@@ -1,0 +1,25 @@
+# The compare lens (report §2.4, §3): against named comparators, each a snapshot attached to the run. A line about a
+# comparator the run holds no snapshot of can only be `recalled` (report §5). `compares`: a `seen` line must be about a
+# comparator the run holds or cite one (D6 A2). The persona scores the options it weighs and picks one, with a reason.
+name = "compare"
+version = 1
+scale = [1, 5]
+asks_pick = true
+compares = true
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "clarity"
+title = "Clarity against the comparators"
+anchors = { "1" = "the comparators tell me what they are much faster than this does", "3" = "as clear as the comparators, no better", "5" = "clearer than every comparator I was shown" }
+
+[[dimension]]
+id = "price"
+title = "What it costs, against the comparators"
+anchors = { "1" = "I cannot find or understand the price, where the comparators show theirs", "3" = "I find the price as easily as on the comparators", "5" = "the price is clearer and easier to judge than on any comparator" }
+
+[[dimension]]
+id = "trust"
+title = "Trust against the comparators"
+anchors = { "1" = "I would give my money or data to a comparator before this", "3" = "I would trust it as much as the comparators", "5" = "it gives me more reasons to trust it than any comparator" }

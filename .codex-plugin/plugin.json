@@ -1,0 +1,28 @@
+{
+  "name": "jurygraph",
+  "version": "0.1.0",
+  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum. No LLM inside the engine. Needs the jurygraph binary on PATH.",
+  "author": {
+    "name": "Nicholas Andrea Sujitno",
+    "email": "support@massrelay.ai"
+  },
+  "homepage": "https://github.com/massrelay-ai/jurygraph",
+  "repository": "https://github.com/massrelay-ai/jurygraph",
+  "license": "Apache-2.0",
+  "keywords": ["persona-jury", "design-review", "rubric", "evidence", "mcp", "skills"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "JuryGraph",
+    "shortDescription": "A persona jury as an engine: evidence on every line, scores per stratum",
+    "longDescription": "Use JuryGraph to judge a page, diff, design or document with personas that your own agent runs: write the briefs, ingest the verdicts, refuse any verdict without evidence, and read the scores per stratum, never averaged.",
+    "developerName": "Nicholas Andrea Sujitno",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Run a jury on this page with three personas.",
+      "Help me write personas from this customer document."
+    ],
+    "websiteURL": "https://github.com/massrelay-ai/jurygraph",
+    "screenshots": []
+  }
+}

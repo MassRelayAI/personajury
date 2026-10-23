@@ -1,0 +1,15 @@
+{
+  "name": "jurygraph",
+  "displayName": "JuryGraph",
+  "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the jurygraph binary on PATH.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Nicholas Andrea Sujitno",
+    "email": "support@massrelay.ai"
+  },
+  "homepage": "https://github.com/massrelay-ai/jurygraph",
+  "repository": "https://github.com/massrelay-ai/jurygraph",
+  "license": "Apache-2.0",
+  "keywords": ["persona-jury", "design-review", "rubric", "evidence", "mcp", "skills"],
+  "skills": "./skills/"
+}

@@ -1,0 +1,32 @@
+{
+  "persona": "company-hanna",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#price-team", "pricing.walk.json#price-studio"],
+      "blockers": [],
+      "note": "I came for a number to multiply by fourteen; Studio gives $24 so I get 336 a month, but that is over my 200 and the Team plan that fits 14 people just says Contact us."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.walk.json#price-team", "pricing.walk.json#btn-team", "pricing.walk.json#btn-studio"],
+      "blockers": [],
+      "note": "Contact us on Team and Talk to sales on Studio mean I must email a stranger before Friday, which puts this vendor in doubt on my shortlist."
+    },
+    {
+      "dimension": "missing",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["pricing.png", "pricing.walk.json#price-team", "home.walk.json#h1"],
+      "blockers": [],
+      "note": "The Team price is missing, there is no word on support or onboarding, and the home headline is buzzword soup I would not read."
+    }
+  ]
+}

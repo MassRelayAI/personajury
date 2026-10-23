@@ -1,0 +1,247 @@
+{
+ "persona": "company-hanna",
+ "lines": [
+  {
+   "dimension": "clarity",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "Lantern's headline and subtext are jargon and do not say what the product is."
+   ],
+   "note": "Acme tells me in one table what it is and costs; Lantern's headline tells me nothing."
+  },
+  {
+   "dimension": "clarity",
+   "about": "cmp:acme-pricing",
+   "score": 5,
+   "anchor_met": 5,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Short heading, a table, done."
+  },
+  {
+   "dimension": "price",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme shows $12 and $29 per person so I get 168 a month for fourteen; Lantern hides Team behind Contact us."
+  },
+  {
+   "dimension": "trust",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme says cancel any time; Lantern says nothing can be bought and gives me only a mailto."
+  },
+  {
+   "dimension": "price",
+   "about": "cmp:acme-pricing",
+   "score": 5,
+   "anchor_met": 5,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Every plan has a price I can multiply by fourteen."
+  },
+  {
+   "dimension": "trust",
+   "about": "cmp:acme-pricing",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Plain, nothing to dislike, but no support info either."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.png",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "Does not say what the product is."
+   ],
+   "note": "Acme is much faster to read than this."
+  },
+  {
+   "dimension": "price",
+   "about": "home.png",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "No price shown."
+   ],
+   "note": "No price here."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "I would sooner give my data to Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.walk.json",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "Does not say what the product is."
+   ],
+   "note": "Acme is much faster to read than this."
+  },
+  {
+   "dimension": "price",
+   "about": "home.walk.json",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "No price shown."
+   ],
+   "note": "No price here."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "I would sooner give my data to Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.png",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "As clear as Acme's table."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Studio has a number but Team says Contact us, while Acme shows all."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "I would sooner give my data to Acme."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.walk.json",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "As clear as Acme's table."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Studio has a number but Team says Contact us, while Acme shows all."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "I would sooner give my data to Acme."
+  }
+ ],
+ "pick": {
+  "choice": "pricing.png",
+  "reason": "It is the only Lantern page with an actual number, though Acme's table is still better than anything here."
+ }
+}

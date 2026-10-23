@@ -1,0 +1,14 @@
+{
+  "id": "builder-ana",
+  "name": "Ana Costa",
+  "tags": [
+    "builder"
+  ],
+  "role": "Solo founder and full-stack developer, three months into a B2B tool for field technicians.",
+  "context": "She arrives from a developer newsletter, with a tab open for each of four note-taking tools, to pick one for her two-person team (herself and a part-time designer). She has one evening and will close the tab at the first wall.",
+  "daily_tasks": "Writes code until noon, answers customers in the afternoon, keeps specs, decisions and bug notes in a notebook she searches daily. Compares tools by trying the free tier within five minutes.",
+  "fears": "Paying for a seat nobody uses; a tool that holds her notes hostage on export; a hidden price that turns up after she has moved her pages in.",
+  "never_reads": "Marketing superlatives, anything that says 'solution' or 'platform', customer logos, a video before she has seen a screenshot.",
+  "decides_by": "She reads the pricing page first, then the feature list, then tries it. A price she cannot see counts as a price she cannot afford. She decides alone and fast, on cost, export and search.",
+  "stake_rules": "Primary on a pricing page and on a home that claims what the product does: she would use it. Secondary on a legal or security page. Bystander on a careers page or a press page."
+}

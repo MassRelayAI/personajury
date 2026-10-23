@@ -1,0 +1,8 @@
+# Refused on purpose: `money` is a human class and must never sit under a persona quorum (report §10).
+# A later test loads this file and expects the refusal.
+[[rule]]
+class = "money"
+paths = ["**/prices/**"]
+quorum = "low"
+lenses = ["critical"]
+spend = 3

@@ -1,0 +1,35 @@
+{
+  "persona": "investor-claire",
+  "lines": [
+    {
+      "dimension": "works",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "home.walk.json#h1", "pricing.walk.json#price-studio"],
+      "blockers": [],
+      "note": "I had to read the pricing page to work out what they sell, because the headline is word salad; the price only partly rescued it and I still see no reason this beats the other note tools."
+    },
+    {
+      "dimension": "blocks",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.walk.json#h1", "home.walk.json#hero-text", "pricing.walk.json#price-team"],
+      "blockers": [
+        "The hero headline and subline say nothing concrete, so a stranger cannot tell what the product is.",
+        "The middle Team plan says only Contact us, so the price is hidden where the mid-market would land."
+      ],
+      "note": "The buzzword headline stops me cold on the first screen and the hidden Team price makes me doubt the business model, though I did get through."
+    },
+    {
+      "dimension": "missing",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": ["home.png", "pricing.png", "pricing.walk.json#btn-signup"],
+      "blockers": [],
+      "note": "Prices for Solo and Studio are visible, but there is no proof, no customers, no differentiator, and Sign up free goes nowhere (#), so I cannot see what would convert a stranger."
+    }
+  ]
+}

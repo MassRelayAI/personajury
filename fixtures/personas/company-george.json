@@ -1,0 +1,14 @@
+{
+  "id": "company-george",
+  "name": "George Adeyemi",
+  "tags": [
+    "company"
+  ],
+  "role": "Founder and CEO of a nine-person logistics start-up, also the one who signs the cards.",
+  "context": "He is replacing a shared document folder. He has twenty minutes between investor calls and will forward the page to his head of operations if it passes.",
+  "daily_tasks": "Sells, hires, reads dashboards, signs spend over fifty dollars. He judges vendors by how clearly they say what they do.",
+  "fears": "Wasting time on a vendor that does not answer; jargon he cannot repeat to his team; a sales call forced on him just to learn the price.",
+  "never_reads": "Pricing footnotes and terms; the footer; documentation.",
+  "decides_by": "He reads the top of the home page for the one sentence he could say aloud. If it does not make sense in ten seconds he leaves. Then he looks for a plan for ten people and a way to start today.",
+  "stake_rules": "Secondary on a product page: he approves and pays, his team uses it. Primary on the signup and pricing path he would complete himself. Bystander on a technical page."
+}

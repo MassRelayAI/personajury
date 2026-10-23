@@ -1,0 +1,28 @@
+# The taste lens (report §2.4): look, type, motion, voice — against the design standard the project points at
+# (`standard`, set per project with `lens add`; empty here means the persona's own taste, and the brief says so).
+name = "taste"
+version = 1
+scale = [1, 5]
+asks_pick = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "look"
+title = "Look: layout, colour, pictures, craft"
+anchors = { "1" = "it looks broken, crowded or unfinished; I would not trust it with my name", "3" = "clean and competent, but nothing I would remember", "5" = "crafted: every block earns its place and I would show it to someone" }
+
+[[dimension]]
+id = "type"
+title = "Type: hierarchy and reading"
+anchors = { "1" = "I cannot tell what to read first; sizes and weights fight", "3" = "the hierarchy holds, with a few lines too long, too small or too many", "5" = "my eye goes where it should, in order, with no effort" }
+
+[[dimension]]
+id = "motion"
+title = "Motion: what moves, and why"
+anchors = { "1" = "movement distracts, hides content or stutters; or something should move and does not", "3" = "motion is harmless but adds nothing", "5" = "what moves shows me what happened or where to go, and nothing else moves" }
+
+[[dimension]]
+id = "voice"
+title = "Voice: words that sound like one author"
+anchors = { "1" = "jargon, hype or words that contradict each other", "3" = "plain but generic; it could be anyone's page", "5" = "plain, specific and recognisably one voice from top to bottom" }

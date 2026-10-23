@@ -1,0 +1,92 @@
+[
+  {
+    "stake": "primary",
+    "choices": [
+      {
+        "choice": "cmp:acme-pricing",
+        "count": 3,
+        "personas": [
+          "builder-mei",
+          "builder-ravi",
+          "newcomer-sofia"
+        ],
+        "reasons": [
+          {
+            "persona": "builder-mei",
+            "reason": "Its prices and dark buttons are readable at a glance and I would show it to a client."
+          },
+          {
+            "persona": "builder-ravi",
+            "reason": "It states what it is, shows every price and has working sign-up links, which I could actually recommend."
+          },
+          {
+            "persona": "newcomer-sofia",
+            "reason": "It says what it is in plain words, shows every price including free, and says cancel any time."
+          }
+        ]
+      },
+      {
+        "choice": "pricing.png",
+        "count": 1,
+        "personas": [
+          "builder-ana"
+        ],
+        "reasons": [
+          {
+            "persona": "builder-ana",
+            "reason": "It is the only Lantern page with visible prices, though Team is hidden, and I would go to Acme first."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "stake": "secondary",
+    "choices": [
+      {
+        "choice": "cmp:acme-pricing",
+        "count": 1,
+        "personas": [
+          "company-george"
+        ],
+        "reasons": [
+          {
+            "persona": "company-george",
+            "reason": "It tells me the price of a team plan for ten people in one table and lets me start today, with no sales call."
+          }
+        ]
+      },
+      {
+        "choice": "pricing.png",
+        "count": 1,
+        "personas": [
+          "company-hanna"
+        ],
+        "reasons": [
+          {
+            "persona": "company-hanna",
+            "reason": "It is the only Lantern page with an actual number, though Acme's table is still better than anything here."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "stake": "bystander",
+    "choices": [
+      {
+        "choice": "pricing.png",
+        "count": 1,
+        "personas": [
+          "investor-claire"
+        ],
+        "reasons": [
+          {
+            "persona": "investor-claire",
+            "reason": "It is the only subject page with a visible price and a plan structure a stranger could act on."
+          }
+        ]
+      }
+    ]
+  }
+]

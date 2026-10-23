@@ -1,0 +1,245 @@
+{
+ "persona": "builder-ana",
+ "lines": [
+  {
+   "dimension": "clarity",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme tells me price per person in one table; Lantern's home headline tells me nothing."
+  },
+  {
+   "dimension": "price",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Acme shows every price; Lantern hides Team behind 'Contact us' and I cannot cost my two people."
+  },
+  {
+   "dimension": "trust",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Footer says nothing can be bought and export hides in the $24 tier; Acme at least shows prices and cancel any time."
+  },
+  {
+   "dimension": "clarity",
+   "about": "cmp:acme-pricing",
+   "score": 4,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Table with plan, price, includes; I get it in seconds."
+  },
+  {
+   "dimension": "price",
+   "about": "cmp:acme-pricing",
+   "score": 5,
+   "anchor_met": 5,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Every price visible, per person per month, nothing to ask for."
+  },
+  {
+   "dimension": "trust",
+   "about": "cmp:acme-pricing",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Clear prices and cancel any time, but no export mention."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.png",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "Home headline does not say what the product is."
+   ],
+   "note": "Jargon headline loses to Acme's plain table."
+  },
+  {
+   "dimension": "price",
+   "about": "home.png",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "No price anywhere on the home page."
+   ],
+   "note": "No price here at all."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Hidden Team price and 'made-up' footer make me hesitate."
+  },
+  {
+   "dimension": "clarity",
+   "about": "home.walk.json",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "Home headline does not say what the product is."
+   ],
+   "note": "Jargon headline loses to Acme's plain table."
+  },
+  {
+   "dimension": "price",
+   "about": "home.walk.json",
+   "score": 1,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [
+    "No price anywhere on the home page."
+   ],
+   "note": "No price here at all."
+  },
+  {
+   "dimension": "trust",
+   "about": "home.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "home.walk.json#h1",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Hidden Team price and 'made-up' footer make me hesitate."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.png",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Plain enough, about as clear as Acme."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Team is 'Contact us', worse than Acme showing every price."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.png",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.png",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Hidden Team price and 'made-up' footer make me hesitate."
+  },
+  {
+   "dimension": "clarity",
+   "about": "pricing.walk.json",
+   "score": 3,
+   "anchor_met": 3,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Plain enough, about as clear as Acme."
+  },
+  {
+   "dimension": "price",
+   "about": "pricing.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Team is 'Contact us', worse than Acme showing every price."
+  },
+  {
+   "dimension": "trust",
+   "about": "pricing.walk.json",
+   "score": 2,
+   "anchor_met": 1,
+   "evidence": "seen",
+   "citations": [
+    "pricing.walk.json#price-team",
+    "cmp:acme-pricing/pricing.png"
+   ],
+   "blockers": [],
+   "note": "Hidden Team price and 'made-up' footer make me hesitate."
+  }
+ ],
+ "pick": {
+  "choice": "pricing.png",
+  "reason": "It is the only Lantern page with visible prices, though Team is hidden, and I would go to Acme first."
+ }
+}

@@ -1,0 +1,244 @@
+{
+  "persona": "newcomer-sofia",
+  "lines": [
+    {
+      "dimension": "clarity",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme says shared notes for small teams in plain words; Lantern's headline I cannot read."
+    },
+    {
+      "dimension": "price",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Lantern has $0 forever but Team says contact us; Acme shows every price in one table."
+    },
+    {
+      "dimension": "trust",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme says cancel any time; Lantern says nothing can be bought, which makes me unsure."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Jargon headline."
+    },
+    {
+      "dimension": "price",
+      "about": "home.png",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price or free mention anywhere on the home page."
+      ],
+      "note": "No price on the home page."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Buzzwords make me wary."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.walk.json#intro"
+      ],
+      "blockers": [],
+      "note": "Walk headline is jargon."
+    },
+    {
+      "dimension": "price",
+      "about": "home.walk.json",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#btn-start",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price is stated in the home walk."
+      ],
+      "note": "No price in the home walk."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#hero-text",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Hero text is vague."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.png",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Plans and what is in them are clear."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Free is clear, but Team has no price."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Footer says nothing can be bought."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.walk.json",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#intro",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Plain plan names and lists."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-solo",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "$0 forever found fast; Team contact us."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#footer-text",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The made-up line puts me off."
+    },
+    {
+      "dimension": "clarity",
+      "about": "cmp:acme-pricing",
+      "score": 5,
+      "anchor_met": 5,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#intro"
+      ],
+      "blockers": [],
+      "note": "Simple pricing, shared notes, I get it right away."
+    },
+    {
+      "dimension": "price",
+      "about": "cmp:acme-pricing",
+      "score": 5,
+      "anchor_met": 5,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#price-free"
+      ],
+      "blockers": [],
+      "note": "Every plan has a price and a free start button."
+    },
+    {
+      "dimension": "trust",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#intro"
+      ],
+      "blockers": [],
+      "note": "Cancel any time calms my card fear."
+    }
+  ],
+  "pick": {
+    "choice": "cmp:acme-pricing",
+    "reason": "It says what it is in plain words, shows every price including free, and says cancel any time."
+  }
+}

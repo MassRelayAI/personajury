@@ -1,0 +1,53 @@
+{
+  "url": "http://lantern.example/pricing.html",
+  "viewport": [1280, 800],
+  "nodes": [
+    { "id": "banner", "role": "banner", "name": "", "children": [
+      { "id": "brand", "role": "link", "name": "Lantern Notes (index.html)" },
+      { "id": "nav", "role": "navigation", "name": "Main", "children": [
+        { "id": "nav-home", "role": "link", "name": "Home (index.html)" },
+        { "id": "nav-pricing", "role": "link", "name": "Pricing (pricing.html)" },
+        { "id": "nav-signin", "role": "link", "name": "Sign in (https://app.lantern.example/signin)" }
+      ] }
+    ] },
+    { "id": "main", "role": "main", "name": "", "children": [
+      { "id": "h1", "role": "heading", "name": "Pricing" },
+      { "id": "intro", "role": "paragraph", "name": "Pick the plan that fits how many people write in your notebook." },
+      { "id": "plans", "role": "region", "name": "Plans", "children": [
+        { "id": "plan-solo", "role": "article", "name": "", "children": [
+          { "id": "plan-solo-h", "role": "heading", "name": "Solo" },
+          { "id": "price-solo", "role": "paragraph", "name": "$0 forever" },
+          { "id": "solo-list", "role": "list", "name": "", "children": [
+            { "id": "solo-1", "role": "listitem", "name": "1 person" },
+            { "id": "solo-2", "role": "listitem", "name": "50 pages" },
+            { "id": "solo-3", "role": "listitem", "name": "30 days of history" }
+          ] },
+          { "id": "btn-signup", "role": "link", "name": "Sign up free (#)" }
+        ] },
+        { "id": "plan-team", "role": "article", "name": "", "children": [
+          { "id": "plan-team-h", "role": "heading", "name": "Team" },
+          { "id": "price-team", "role": "paragraph", "name": "Contact us" },
+          { "id": "team-list", "role": "list", "name": "", "children": [
+            { "id": "team-1", "role": "listitem", "name": "Up to 25 people" },
+            { "id": "team-2", "role": "listitem", "name": "Unlimited pages" },
+            { "id": "team-3", "role": "listitem", "name": "1 year of history" }
+          ] },
+          { "id": "btn-team", "role": "link", "name": "Contact us (mailto:hello@lantern.example)" }
+        ] },
+        { "id": "plan-studio", "role": "article", "name": "", "children": [
+          { "id": "plan-studio-h", "role": "heading", "name": "Studio" },
+          { "id": "price-studio", "role": "paragraph", "name": "$24 per person, per month" },
+          { "id": "studio-list", "role": "list", "name": "", "children": [
+            { "id": "studio-1", "role": "listitem", "name": "Unlimited people" },
+            { "id": "studio-2", "role": "listitem", "name": "Unlimited pages" },
+            { "id": "studio-3", "role": "listitem", "name": "Full history and export" }
+          ] },
+          { "id": "btn-studio", "role": "link", "name": "Talk to sales (mailto:hello@lantern.example)" }
+        ] }
+      ] }
+    ] },
+    { "id": "footer", "role": "contentinfo", "name": "", "children": [
+      { "id": "footer-text", "role": "paragraph", "name": "Lantern Notes is a made-up product used to test JuryGraph. Nothing here can be bought." }
+    ] }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "url": "http://acme-pads.example/pricing",
+  "viewport": [1280, 800],
+  "nodes": [
+    { "id": "banner", "role": "banner", "name": "Acme Pads" },
+    { "id": "main", "role": "main", "name": "", "children": [
+      { "id": "h1", "role": "heading", "name": "Simple pricing, billed monthly" },
+      { "id": "intro", "role": "paragraph", "name": "Shared notes for small teams. Cancel any time." },
+      { "id": "plans-table", "role": "table", "name": "Plans and prices", "children": [
+        { "id": "row-head", "role": "row", "name": "", "children": [
+          { "id": "col-plan", "role": "columnheader", "name": "Plan" },
+          { "id": "col-price", "role": "columnheader", "name": "Price" },
+          { "id": "col-includes", "role": "columnheader", "name": "Includes" },
+          { "id": "col-action", "role": "columnheader", "name": "Action" }
+        ] },
+        { "id": "row-free", "role": "row", "name": "", "children": [
+          { "id": "plan-free", "role": "rowheader", "name": "Free" },
+          { "id": "price-free", "role": "cell", "name": "$0" },
+          { "id": "inc-free", "role": "cell", "name": "1 person, 20 pages" },
+          { "id": "btn-free", "role": "link", "name": "Start free (/signup?plan=free)" }
+        ] },
+        { "id": "row-team", "role": "row", "name": "", "children": [
+          { "id": "plan-team", "role": "rowheader", "name": "Team" },
+          { "id": "price-team", "role": "cell", "name": "$12 per person / month" },
+          { "id": "inc-team", "role": "cell", "name": "Up to 20 people, unlimited pages" },
+          { "id": "btn-team", "role": "link", "name": "Start Team (/signup?plan=team)" }
+        ] },
+        { "id": "row-business", "role": "row", "name": "", "children": [
+          { "id": "plan-business", "role": "rowheader", "name": "Business" },
+          { "id": "price-business", "role": "cell", "name": "$29 per person / month" },
+          { "id": "inc-business", "role": "cell", "name": "Unlimited people, audit log, single sign-on" },
+          { "id": "btn-business", "role": "link", "name": "Start Business (/signup?plan=business)" }
+        ] }
+      ] }
+    ] }
+  ]
+}

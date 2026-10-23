@@ -1,0 +1,14 @@
+# Line endings are LF everywhere the files are parsed by tools.
+* text=auto eol=lf
+*.sh text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yml text eol=lf
+*.rs text eol=lf
+*.sql text eol=lf
+*.html text eol=lf
+# Binary files, including the fixture screenshots (hashed by content, so no conversion).
+*.png binary
+# Lock file: do not show in diffs by default.
+Cargo.lock -diff

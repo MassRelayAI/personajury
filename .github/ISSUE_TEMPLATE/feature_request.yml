@@ -1,0 +1,37 @@
+# issue-form structure follows A2A's feature-request form (Apache-2.0); fields are our own
+name: Feature request
+description: Propose a verb, a flag, a lens or a persona set
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Out of bounds: a model call, a network call or an API key inside the engine. Anything that changes the evidence
+        classes, the strata, the refusals or the human classes needs a decision entry first (GOVERNANCE.md).
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What you tried to do and could not, with the command you ran. A measurement beats an opinion.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you propose
+      description: For a lens, attach the TOML; for a persona set, the JSON and the material it was written from.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: Including doing it in your agent's skill instead of the engine.
+  - type: checkboxes
+    id: conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct (CODE_OF_CONDUCT.md)
+          required: true

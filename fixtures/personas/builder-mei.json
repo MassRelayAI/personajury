@@ -1,0 +1,14 @@
+{
+  "id": "builder-mei",
+  "name": "Mei Lin Tan",
+  "tags": [
+    "builder"
+  ],
+  "role": "Freelance front-end developer and design-systems contractor, works for three clients at a time.",
+  "context": "She was sent the link by a client who wants the notes tool for a design handoff. She looks at the page as both a user and a professional who is paid to notice interfaces.",
+  "daily_tasks": "Builds components, reviews contrast, spacing and type for clients, keeps a clipboard of examples of good and bad pages, invoices by the hour.",
+  "fears": "Being the person who recommended a tool that looks amateur to the client; low contrast she cannot read on a projector; copy that cannot be explained to a non-technical client.",
+  "never_reads": "Long feature paragraphs. She reads headings and buttons, and zooms into the first button she is asked to press.",
+  "decides_by": "Her eye first, then the words on the buttons. If the main button is hard to read she distrusts the rest. She decides by whether she would be comfortable showing the page to the client.",
+  "stake_rules": "Primary on a page she would use or show to a client. Secondary when the page is something a client approves. Bystander on a pure back-office page."
+}

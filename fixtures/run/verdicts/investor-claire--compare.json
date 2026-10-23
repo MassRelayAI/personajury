@@ -1,0 +1,245 @@
+{
+  "persona": "investor-claire",
+  "lines": [
+    {
+      "dimension": "clarity",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme says shared notes for small teams in one line; Lantern's headline is fog."
+    },
+    {
+      "dimension": "price",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Lantern shows $0 and $24 but hides Team; Acme shows all three in one table, so slightly worse."
+    },
+    {
+      "dimension": "trust",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Buzzwords and a Contact us tier make me trust Acme's plain table first."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Home alone is vaguer than Acme."
+    },
+    {
+      "dimension": "price",
+      "about": "home.png",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price anywhere on the home page."
+      ],
+      "note": "Home shows no price at all, where Acme shows its prices."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Jargon reduces trust."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Walk text is jargon only."
+    },
+    {
+      "dimension": "price",
+      "about": "home.walk.json",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price node on the home walk."
+      ],
+      "note": "No price node on home, unlike Acme."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Nothing concrete to rely on."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Cards are readable, about as clear as Acme."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Two prices visible, one hidden; close to Acme."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Looks comparably credible."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-studio",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Plan structure clear, as at Acme."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-studio",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Contact us on Team makes it a bit worse than Acme's table."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-studio",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Comparable."
+    },
+    {
+      "dimension": "clarity",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#plans-table"
+      ],
+      "blockers": [],
+      "note": "Simple pricing headline and a table; I get it in seconds."
+    },
+    {
+      "dimension": "price",
+      "about": "cmp:acme-pricing",
+      "score": 5,
+      "anchor_met": 5,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#plans-table"
+      ],
+      "blockers": [],
+      "note": "Every plan has a number; I judge the business at once."
+    },
+    {
+      "dimension": "trust",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png",
+        "cmp:acme-pricing/pricing.walk.json#plans-table"
+      ],
+      "blockers": [],
+      "note": "Cancel any time line and plain prices read as honest."
+    }
+  ],
+  "pick": {
+    "choice": "pricing.png",
+    "reason": "It is the only subject page with a visible price and a plan structure a stranger could act on."
+  }
+}

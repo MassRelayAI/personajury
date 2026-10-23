@@ -1,0 +1,241 @@
+{
+  "persona": "company-george",
+  "lines": [
+    {
+      "dimension": "clarity",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme says shared notes for small teams in one line; Lantern's headline I cannot repeat."
+    },
+    {
+      "dimension": "price",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme shows a number for every plan; Lantern hides Team behind Contact us."
+    },
+    {
+      "dimension": "trust",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Lantern's footer says nothing here can be bought, and Acme at least looks like a real vendor."
+    },
+    {
+      "dimension": "clarity",
+      "about": "cmp:acme-pricing",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Acme says what it is and what each plan costs in a table I can read in seconds."
+    },
+    {
+      "dimension": "price",
+      "about": "cmp:acme-pricing",
+      "score": 5,
+      "anchor_met": 5,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Every plan has a price and a start button, nothing hidden."
+    },
+    {
+      "dimension": "trust",
+      "about": "cmp:acme-pricing",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Plain, no sales call, nothing odd, so as much as anyone."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Jargon headline loses to Acme's plain line."
+    },
+    {
+      "dimension": "price",
+      "about": "home.png",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price anywhere on the home page."
+      ],
+      "note": "Home shows no price at all."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The made-up footer and buzzwords make me hesitate against Acme."
+    },
+    {
+      "dimension": "clarity",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The h1 text is buzzwords next to Acme's plain intro."
+    },
+    {
+      "dimension": "price",
+      "about": "home.walk.json",
+      "score": 1,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [
+        "No price anywhere on the home page."
+      ],
+      "note": "Home shows no price at all."
+    },
+    {
+      "dimension": "trust",
+      "about": "home.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "home.walk.json#h1",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The made-up footer and buzzwords make me hesitate against Acme."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Cards are neat but Acme's table gets me to a price faster."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.png",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Solo and Studio are priced, Team is Contact us."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.png",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.png",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The made-up footer and buzzwords make me hesitate against Acme."
+    },
+    {
+      "dimension": "clarity",
+      "about": "pricing.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Team's price is missing where Acme lists it."
+    },
+    {
+      "dimension": "price",
+      "about": "pricing.walk.json",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "Solo and Studio are priced, Team is Contact us."
+    },
+    {
+      "dimension": "trust",
+      "about": "pricing.walk.json",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "pricing.walk.json#price-team",
+        "cmp:acme-pricing/pricing.png"
+      ],
+      "blockers": [],
+      "note": "The made-up footer and buzzwords make me hesitate against Acme."
+    }
+  ],
+  "pick": {
+    "choice": "cmp:acme-pricing",
+    "reason": "It tells me the price of a team plan for ten people in one table and lets me start today, with no sales call."
+  }
+}

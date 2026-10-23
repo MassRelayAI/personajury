@@ -1,0 +1,83 @@
+name: Wrong refusal
+description: The engine refused a verdict it should have accepted, or accepted one it should have refused
+title: "[Refusal]: "
+labels: ["refusal"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The refusals are the law of the tool (see docs/plans, "The refusals"). A report here is the most useful kind: it
+        becomes a test that is red first.
+  - type: dropdown
+    id: direction
+    attributes:
+      label: Which way was it wrong
+      options:
+        - Refused something it should have accepted
+        - Accepted something it should have refused
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `jurygraph --version`.
+    validations:
+      required: true
+  - type: input
+    id: verb
+    attributes:
+      label: The verb
+      description: For example `verdict`, `brief`, `matrix`, `pick`, `should-run`.
+    validations:
+      required: true
+  - type: input
+    id: code
+    attributes:
+      label: The error code
+      description: The `error.code` in the envelope. Write "none" if the engine accepted.
+    validations:
+      required: true
+  - type: textarea
+    id: verdict
+    attributes:
+      label: The minimal verdict JSON
+      description: Cut it to the fewest lines that still show it. Remove anything private.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: lens
+    attributes:
+      label: The lens
+      description: "Shipped (critical, taste, compare, recall) or your own; attach your TOML if it is your own."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and why
+      description: "Name the rule, such as the evidence class, the stratum, the citation, the comparator snapshot, the score range."
+    validations:
+      required: true
+  - type: dropdown
+    id: attachments
+    attributes:
+      label: Can the run's attachments be shared
+      description: |
+        Subjects and comparators are attached files (walks, screenshots, diffs, documents) and may contain private pages.
+        Do not post them unless you are sure. If they cannot be shared, say what kind they are and we will ask for a
+        stand-in.
+      options:
+        - Yes, they can be shared publicly
+        - No, they are private
+        - I used the fixtures in fixtures/
+    validations:
+      required: true
+  - type: checkboxes
+    id: conduct
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I agree to follow the Code of Conduct (CODE_OF_CONDUCT.md)
+          required: true

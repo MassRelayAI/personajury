@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Five tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Six tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -26,7 +26,7 @@ pub fn tools() -> Vec<Value> {
     vec![
         tool(
             "jurygraph_brief",
-            "Compose one deterministic, hashed brief per persona of a panel for each lens and create the run(s). The panel is a saved one (panel), an ad-hoc query (query, not saved) or a rule's (rule); a stake per persona comes from the panel's terms (\"3 builder=primary\") unless stakes overrides it. With rule, the rule's panel, lenses, spend and detail are the defaults; you may override any of them, and every value that differs, or any brief above 12 seats, needs reason (refusal override_without_reason) and is recorded on the run. Seats are capped at 12 unless allow_large (then 1000). The answer carries estimate {briefs, tokens} (the cost, before anyone spends it), the draw seed, and large:true above 12 seats. Returns each run id, each persona's brief (its hash and byte size) and the spend. The calling agent then gives each brief to one subagent.",
+            "Compose one deterministic, hashed brief per persona of a panel for each lens and create the run(s). The panel is a saved one (panel), an ad-hoc query (query, not saved) or a rule's (rule); a stake per persona comes from the panel's terms (\"3 builder=primary\") unless stakes overrides it. With rule, the rule's panel, lenses, spend and detail are the defaults; you may override any of them, and every value that differs, or any brief above 12 seats, needs reason (refusal override_without_reason) and is recorded on the run. Seats are capped at 12 unless allow_large (then 1000, and any brief above 12 seats needs reason, rule or not). The answer carries waves (the persona ids in waves of wave seats, default 30: run one wave, ingest it, then the next), estimate {briefs, tokens} (the cost, before anyone spends it), the draw seed, and large:true above 12 seats. Returns each run id, each persona's brief (its hash and byte size) and the spend. The calling agent then gives each brief to one subagent.",
             schema(
                 json!({
                     "subject": {"type":"string"},
@@ -46,13 +46,14 @@ pub fn tools() -> Vec<Value> {
                     "draw": {"type":"string","description":"the draw's seed as 16 hex digits; default: from the subject's name and the panel's"},
                     "allow_large": {"type":"boolean","description":"allow more than 12 seats (the most is 1000)"},
                     "reason": {"type":"string","description":"why this brief departs from its rule, or runs above 12 seats; recorded on the run"},
-                    "by": {"type":"string","description":"who departed from the rule; default agent"} }),
+                    "by": {"type":"string","description":"who departed from the rule; default agent"},
+                    "wave": {"type":"integer","minimum":1,"description":"seats per wave in the answer's waves (default 30): run one wave, ingest it, then the next"} }),
                 &["subject", "model"],
             ),
         ),
         tool(
             "jurygraph_verdict",
-            "Ingest one persona's verdict for a run: an object with the persona, its batch of lines (dimension, about, score, anchor_met, evidence kind, citations, blockers) and picks. Returns the stored lines. Append-only. Refusals, by error code: seen_without_citation, citation_unresolved, comparator_not_snapshotted, score_out_of_range, unknown_dimension, unknown_about, bad_anchor, bottom_score_without_blocker, evidence_not_allowed, seen_compare_without_comparator, duplicate_dimension, missing_dimension, dismissed_point_repeated, subject_moved, pick_without_reason, pick_unknown_option, pick_missing, not_found, invalid_arguments; the message names the line.",
+            "Ingest one persona's verdict for a run: an object with the persona, its batch of lines (dimension, about, score, anchor_met, evidence kind, citations, blockers) and picks. Returns the stored lines. Append-only. Refusals, by error code: seen_without_citation, citation_unresolved, comparator_not_snapshotted, score_out_of_range, unknown_dimension, unknown_about, bad_anchor, bottom_score_without_blocker, evidence_not_allowed, seen_compare_without_comparator, duplicate_dimension, missing_dimension, dismissed_point_repeated, subject_moved, pick_without_reason, pick_unknown_option, pick_missing, invalid_usage, not_found, invalid_arguments; the message names the line. The verdict may carry usage {input_tokens, output_tokens} (the tokens you spent on it, non-negative integers): matrix and doctor show it beside the estimate, labelled as reported by the agent.",
             schema(
                 json!({ "run": {"type":"integer","minimum":1,"description":"the run id a brief returned"},
                         "verdict": {"type":"object","description":"the persona's verdict JSON, as the brief asked for it"} }),
@@ -66,6 +67,14 @@ pub fn tools() -> Vec<Value> {
                 json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1},
                         "table": {"type":"boolean"}, "history": {"type":"boolean","description":"include superseded batches"},
                         "detail": detail_prop() }),
+                &["runs"],
+            ),
+        ),
+        tool(
+            "jurygraph_graph",
+            "Draw the jury of one or more runs of one subject as a single static SVG and return its text (data.svg): personas in three stratum columns, a column per lens of the dimensions they scored (edges coloured by score, the number on hover; a median badge per stratum, never one number), and the findings coloured by decision (open, fixed, dismissed, row). Several runs draw each finding's life as a strip of dots. Deterministic: the same store gives the same bytes. Reads only.",
+            schema(
+                json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids; several runs of one subject draw the rounds"} }),
                 &["runs"],
             ),
         ),
@@ -162,6 +171,18 @@ fn stakes_arg(a: &Value) -> Result<Vec<String>, String> {
     Ok(list)
 }
 
+fn runs_arg(a: &Value) -> Result<Vec<i64>, String> {
+    match a.get("runs") {
+        Some(Value::Array(v)) if !v.is_empty() => v
+            .iter()
+            .map(|x| id_of(x, "runs[]"))
+            .collect::<Result<Vec<_>, _>>(),
+        Some(Value::Array(_)) => Err("runs must name at least one run".into()),
+        None | Some(Value::Null) => Err("missing required argument runs".into()),
+        Some(_) => Err("runs must be an array of run ids".into()),
+    }
+}
+
 fn command(name: &str, a: &Value) -> Result<Cmd, String> {
     if !a.is_object() {
         return Err("arguments must be an object".into());
@@ -182,10 +203,12 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             "allow_large",
             "reason",
             "by",
+            "wave",
         ],
         "jurygraph_verdict" => &["run", "verdict"],
         "jurygraph_matrix" => &["runs", "table", "history", "detail"],
         "jurygraph_delta" => &["a", "b"],
+        "jurygraph_graph" => &["runs"],
         "jurygraph_should_run" => &["diff", "paths", "config", "subject"],
         _ => return Err(format!("unknown tool {name}")),
     };
@@ -225,6 +248,13 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             allow_large: bool_arg(a, "allow_large")?,
             reason: str_arg(a, "reason")?,
             by: str_arg(a, "by")?,
+            wave: match a.get("wave") {
+                None | Some(Value::Null) => None,
+                Some(v) => match v.as_u64() {
+                    Some(n) if n >= 1 => Some(n as usize),
+                    _ => return Err("wave must be an integer >= 1".into()),
+                },
+            },
         },
         "jurygraph_verdict" => {
             let run = id_arg(a, "run")?;
@@ -239,15 +269,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             }
         }
         "jurygraph_matrix" => {
-            let runs = match a.get("runs") {
-                Some(Value::Array(v)) if !v.is_empty() => v
-                    .iter()
-                    .map(|x| id_of(x, "runs[]"))
-                    .collect::<Result<Vec<_>, _>>()?,
-                Some(Value::Array(_)) => return Err("runs must name at least one run".into()),
-                None | Some(Value::Null) => return Err("missing required argument runs".into()),
-                Some(_) => return Err("runs must be an array of run ids".into()),
-            };
+            let runs = runs_arg(a)?;
             Cmd::Matrix {
                 runs,
                 across_strata: false,
@@ -256,6 +278,11 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                 detail: detail()?,
             }
         }
+        "jurygraph_graph" => Cmd::Graph {
+            runs: runs_arg(a)?,
+            svg: true,
+            out: None,
+        },
         "jurygraph_delta" => Cmd::Delta {
             a: id_arg(a, "a")?,
             b: id_arg(a, "b")?,

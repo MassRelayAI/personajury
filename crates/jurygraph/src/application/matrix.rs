@@ -1,5 +1,5 @@
 //! matrix: per stratum, never averaged across (plan Task 5)
-use super::verdict::{load_lens, load_run, open, score_rows};
+use super::verdict::{load_lens, load_run, open, score_rows, usage_line, usage_summary};
 use super::{AppError, Result};
 use crate::domain::*;
 use serde_json::{json, Value};
@@ -75,7 +75,10 @@ pub fn show(
         }
     }
     let mut m = matrix::build(&rows, &stakes, &lenses, Aggregate::PerStratum)?;
-    let table_text = table.then(|| override_header(&overrides, runs.len()) + &matrix::render_table(&m));
+    let usage = usage_summary(root, &store, runs)?;
+    let table_text = table.then(|| {
+        override_header(&overrides, runs.len()) + &matrix::render_table(&m) + &usage_line(&usage).unwrap_or_default()
+    });
     if detail == Detail::Compact {
         for s in &mut m.strata {
             for c in &mut s.cells {
@@ -83,7 +86,7 @@ pub fn show(
             }
         }
     }
-    let mut out = json!({ "runs": runs, "strata": m.strata });
+    let mut out = json!({ "runs": runs, "strata": m.strata, "usage": usage });
     if let Some(t) = table_text {
         out["table"] = json!(t);
     }
@@ -130,9 +133,13 @@ fn override_header(overrides: &[(Value, Vec<i64>)], total_runs: usize) -> String
             String::new()
         };
         let reason = o["reason"].as_str().unwrap_or("").replace('\r', "\\r").replace('\n', "\\n");
+        // no rule: a brief above 12 seats says why without naming one (D12)
+        let what = match o["rule"].as_str() {
+            Some(class) => format!("override (rule {class})"),
+            None => "override".to_string(),
+        };
         out.push_str(&format!(
-            "{lead}override (rule {}): {} \u{2014} reason: {reason}\n",
-            o["rule"].as_str().unwrap_or(""),
+            "{lead}{what}: {} \u{2014} reason: {reason}\n",
             fields.join(", ")
         ));
     }

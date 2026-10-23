@@ -385,6 +385,17 @@ pub struct VerdictInput {
     pub lines: Vec<VerdictLine>,
     #[serde(default)]
     pub pick: Option<PickInput>,
+    /// what the agent says this verdict cost: `{input_tokens, output_tokens}`, non-negative integers (D12). The engine
+    /// measures nothing; `validate` refuses a shape it cannot read as `invalid_usage`.
+    #[serde(default)]
+    pub usage: Option<serde_json::Value>,
+}
+
+/// Tokens an agent reported for one verdict (D12).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+pub struct Usage {
+    pub input_tokens: u64,
+    pub output_tokens: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -476,6 +487,7 @@ pub struct ValidVerdict {
     pub pick: Option<PickInput>,
     /// one per blocker, id = hash::finding_id(..)
     pub findings: Vec<Finding>,
+    pub usage: Option<Usage>,
 }
 
 // ---- what the store returns for judging ----

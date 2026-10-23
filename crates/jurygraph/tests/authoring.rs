@@ -758,9 +758,10 @@ fn critical_brief_has_no_options() {
     );
 }
 
-// sha256 of the compare brief for the pricing/acme fixture, recorded before `about` was scoped to pick/compare lenses
+// sha256 of the compare brief for the pricing/acme fixture, recorded before `about` was scoped to pick/compare lenses;
+// re-recorded in v0.3 (D12), when the brief began to state the allowed anchor_met values
 const COMPARE_BRIEF_SHA256: &str =
-    "2dbd7df162bbf2c91178b3f34b5d731d8350e341e3a8c1315ded137360d83a54";
+    "9e349bd1c68e8c65affb8a633d79d36e1e207a3e004ef16cc2038b2583a29e86";
 
 #[test]
 fn compare_brief_unchanged_by_about_scope() {

@@ -82,6 +82,7 @@ fn verdict(persona: &str, score: i64, blocker: Option<&str>, pick: bool) -> Vali
                 citation_hash: "ch1".into(),
             })
             .collect(),
+        usage: None,
     }
 }
 

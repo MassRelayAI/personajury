@@ -422,7 +422,7 @@ fn above_twelve_seats_needs_allow_large_and_above_a_thousand_is_never_allowed() 
     assert!(d["large"].is_null(), "12 is not large: {d}");
     // 13 with the flag: ok, flagged large, with the cost shown
     let mut a = base.to_vec();
-    a.push("--allow-large");
+    a.extend(["--allow-large", "--reason", "a wide read"]);
     let d = ok(brief(w, &a));
     assert_eq!(d["briefs"].as_array().unwrap().len(), 13);
     assert_eq!(d["large"], true);

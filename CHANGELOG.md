@@ -7,6 +7,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added (v0.3, D11 and D12)
+- `jurygraph graph RUN... --svg [--out F]` and the MCP tool `jurygraph_graph`: the jury as one deterministic SVG (personas
+  in three stratum columns, the dimensions they scored with a median badge per stratum, the findings coloured by decision;
+  several runs draw each finding's life). `docs/assets/jury-graph.svg`, checked against a fresh render by a test.
+- `check --history` lists each finding's life across runs (`data.lives`).
+- `brief` answers `waves` (`--wave N`, default 30).
+- A verdict may report `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed); `matrix` and `doctor` show
+  it beside the estimate, labelled as reported by the agent.
+- The brief states the allowed `anchor_met` values per lens (the recorded brief hashes changed).
+- `--comparator` takes a comma list.
+
+### Changed (v0.3)
+- A brief above 12 seats needs `--reason` with or without a rule and records `override_json` with `rule: null`.
+- `brief` refuses a malformed `jurygraph.toml` it reads (`invalid_config`).
+
 ### Added (v0.2, D9 and D10)
 - A stake per panel term (`3 builder=primary`) and a seeded draw: where a term's pool is bigger than its seats, the seats are
   drawn from the subject's name and the panel's, so round 2 of a subject keeps its bystanders and `delta` can land.

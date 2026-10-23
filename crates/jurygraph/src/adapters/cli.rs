@@ -22,6 +22,8 @@ pub struct Cli {
 }
 
 #[derive(Subcommand, Debug)]
+// one variant per verb: `brief` carries the most flags, and a Cmd lives for one call
+#[allow(clippy::large_enum_variant)]
 pub enum Cmd {
     /// Personas: add one from the fixed JSON, write the brief that asks an agent to generate them, list them
     Persona {
@@ -72,7 +74,7 @@ pub enum Cmd {
         #[arg(long)]
         model: String,
         /// comparator snapshots this run holds
-        #[arg(long = "comparator")]
+        #[arg(long = "comparator", value_delimiter = ',')]
         comparators: Vec<String>,
         /// compact (attachments by path) or full (text attachments inline); default: the rule's, else compact
         #[arg(long)]
@@ -92,6 +94,9 @@ pub enum Cmd {
         /// who departed from the rule (default: agent)
         #[arg(long)]
         by: Option<String>,
+        /// seats per wave in the answer's `waves` (default 30): run one wave, ingest it, then the next
+        #[arg(long)]
+        wave: Option<usize>,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
@@ -119,6 +124,17 @@ pub enum Cmd {
     },
     /// The forced choices of a run, per stratum, with reasons
     Pick { run: i64 },
+    /// Draw the jury as one static SVG: personas by stake, the dimensions they scored, the findings; several runs draw each finding's life
+    Graph {
+        #[arg(required = true)]
+        runs: Vec<i64>,
+        /// the only format for now
+        #[arg(long)]
+        svg: bool,
+        /// write the SVG to this file instead of answering it
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
     /// What moved between two runs on the same subject and lens
     Delta { a: i64, b: i64 },
     /// Stale runs (the subject moved) and findings with no decision; exits 1 on an unresolved finding
@@ -247,6 +263,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Brief { .. } => "brief",
         Cmd::Verdict { .. } => "verdict",
         Cmd::Matrix { .. } => "matrix",
+        Cmd::Graph { .. } => "graph",
         Cmd::Pick { .. } => "pick",
         Cmd::Delta { .. } => "delta",
         Cmd::Check { .. } => "check",
@@ -309,7 +326,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             app::subject::add(root, name, kind(k)?, attach, true)
         }
         Cmd::Brief {
-            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by,
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave,
         } => app::brief::compose(
             root,
             &app::brief::BriefArgs {
@@ -327,6 +344,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 allow_large: *allow_large,
                 reason: reason.clone(),
                 by: by.clone(),
+                wave: *wave,
             },
         ),
         Cmd::Verdict { run, file, json } => {
@@ -340,6 +358,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Matrix { runs, across_strata, history, table, detail: d } => {
             app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?)
         }
+        Cmd::Graph { runs, svg, out } => app::graph::show(root, runs, *svg, out.as_deref()),
         Cmd::Pick { run } => app::pick::show(root, *run),
         Cmd::Delta { a, b } => app::delta::show(root, *a, *b),
         Cmd::Check { history } => app::check::run(root, *history),

@@ -23,7 +23,8 @@ Read `error.code` in the envelope (`--pretty`). Codes are the contract in the pl
 | `unknown_about` | `about` is neither an attachment label of the subject nor `cmp:<name>` of the run | use a label or comparator named in the brief |
 | `seen_compare_without_comparator` | under the `compare` lens a `seen` line is not `about` a comparator and cites none | make it `about` or cite a held comparator, or label it `recalled` |
 | `bottom_score_without_blocker` | a score at the bottom of the scale names no blocker | name the blocker, or score higher |
-| `bad_anchor` | `anchor_met` is not an anchor of the lens at or below the score | pick one of the lens's anchors |
+| `bad_anchor` | `anchor_met` is not an anchor of the lens at or below the score | pick one of the lens's anchors; the brief lists them (`anchor_met: one of 1, 3, 5, at or below your score`) |
+| `invalid_usage` | a verdict's `usage` is not `{input_tokens, output_tokens}` of non-negative integers | fix the numbers or leave `usage` out |
 | `invalid_query`, `invalid_config` | a panel query or a `jurygraph.toml` is malformed | fix the text; the message says where |
 | `check_failed` | `check` found findings with no decision (exit 1); `data.unresolved` lists them, a fixed finding raised again is listed with `fix_not_landed`; `fixed_unverified` lists fixes no later run of that lens and persona has judged | `jurygraph decide` each; run the next round |
 

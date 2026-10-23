@@ -37,10 +37,16 @@ CREATE TABLE IF NOT EXISTS finding (
 CREATE TABLE IF NOT EXISTS decision (
   id INTEGER PRIMARY KEY, finding_id TEXT NOT NULL REFERENCES finding(id), outcome TEXT NOT NULL CHECK (outcome IN ('fixed','dismissed','row')),
   why TEXT, row_ref TEXT, by TEXT NOT NULL, created_at TEXT NOT NULL, after_run INTEGER NOT NULL);
+-- D12 (v0.3): what the agent reported a verdict cost; additive, so a v3 store gains it on open. Append-only.
+CREATE TABLE IF NOT EXISTS usage (
+  id INTEGER PRIMARY KEY, run_id INTEGER NOT NULL REFERENCES run(id), batch INTEGER NOT NULL, persona_id TEXT NOT NULL,
+  input_tokens INTEGER NOT NULL, output_tokens INTEGER NOT NULL, created_at TEXT NOT NULL);
 -- append-only: verdicts, picks and decisions are never rewritten (report §4)
 CREATE TRIGGER IF NOT EXISTS verdict_no_update BEFORE UPDATE ON verdict BEGIN SELECT RAISE(ABORT, 'verdict is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS verdict_no_delete BEFORE DELETE ON verdict BEGIN SELECT RAISE(ABORT, 'verdict is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS pick_no_update BEFORE UPDATE ON pick BEGIN SELECT RAISE(ABORT, 'pick is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS pick_no_delete BEFORE DELETE ON pick BEGIN SELECT RAISE(ABORT, 'pick is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS usage_no_update BEFORE UPDATE ON usage BEGIN SELECT RAISE(ABORT, 'usage is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS usage_no_delete BEFORE DELETE ON usage BEGIN SELECT RAISE(ABORT, 'usage is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS decision_no_update BEFORE UPDATE ON decision BEGIN SELECT RAISE(ABORT, 'decision is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS decision_no_delete BEFORE DELETE ON decision BEGIN SELECT RAISE(ABORT, 'decision is append-only'); END;

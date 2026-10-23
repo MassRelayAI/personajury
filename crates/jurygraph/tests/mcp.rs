@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/tests/mcp.rs
-//! The MCP server: protocol, five tools, and the envelope passed through unchanged. Verb behaviour is not tested here.
+//! The MCP server: protocol, six tools, and the envelope passed through unchanged. Verb behaviour is not tested here.
 use serde_json::{json, Value};
 use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
@@ -48,7 +48,7 @@ fn tools_list() -> Vec<Value> {
 }
 
 #[test]
-fn initialize_and_list_five_tools() {
+fn initialize_and_list_six_tools() {
     let ws = tempfile::tempdir().unwrap();
     let (ok, out) = session(
         ws.path(),
@@ -75,6 +75,7 @@ fn initialize_and_list_five_tools() {
         [
             "jurygraph_brief",
             "jurygraph_delta",
+            "jurygraph_graph",
             "jurygraph_matrix",
             "jurygraph_should_run",
             "jurygraph_verdict"

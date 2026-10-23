@@ -87,6 +87,8 @@ pub enum Refusal {
     OverrideWithoutReason { rule: String, fields: String },
     #[error("{path} falls under the human class {class}: a persona jury can advise on it but never decide it, under any rule or override")]
     HumanPathUnderPersonaQuorum { class: String, path: String },
+    #[error("usage: {0}; give {{\"input_tokens\": <integer >= 0>, \"output_tokens\": <integer >= 0>}} or leave it out")]
+    InvalidUsage(String),
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -127,6 +129,7 @@ impl Refusal {
             Refusal::PanelTermEmpty { .. } => "panel_term_empty",
             Refusal::OverrideWithoutReason { .. } => "override_without_reason",
             Refusal::HumanPathUnderPersonaQuorum { .. } => "human_class_under_persona_quorum",
+            Refusal::InvalidUsage(_) => "invalid_usage",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
@@ -163,6 +166,7 @@ pub fn validate(v: &VerdictInput, cx: &VerdictContext) -> Result<ValidVerdict, R
         .ok_or_else(|| Refusal::PersonaWithoutStake {
             persona: v.persona.clone(),
         })?;
+    let usage = v.usage.as_ref().map(parse_usage).transpose()?;
     let [min, max] = cx.lens.scale;
     let mut lines = Vec::new();
     let mut findings = Vec::new();
@@ -348,6 +352,27 @@ pub fn validate(v: &VerdictInput, cx: &VerdictContext) -> Result<ValidVerdict, R
         lines,
         pick: v.pick.clone(),
         findings,
+        usage,
+    })
+}
+
+/// The agent's reported usage: exactly `input_tokens` and `output_tokens`, each a non-negative integer (D12).
+fn parse_usage(u: &serde_json::Value) -> Result<Usage, Refusal> {
+    let bad = |why: &str| Refusal::InvalidUsage(why.to_string());
+    let m = u.as_object().ok_or_else(|| bad("must be an object"))?;
+    if let Some(k) = m.keys().find(|k| *k != "input_tokens" && *k != "output_tokens") {
+        return Err(Refusal::InvalidUsage(format!("{k} is not a usage field")));
+    }
+    let n = |k: &str| match m.get(k) {
+        None => Err(Refusal::InvalidUsage(format!("{k} is missing"))),
+        Some(v) => v
+            .as_u64()
+            .filter(|n| *n <= i64::MAX as u64)
+            .ok_or_else(|| Refusal::InvalidUsage(format!("{k} must be a non-negative integer no larger than {}", i64::MAX))),
+    };
+    Ok(Usage {
+        input_tokens: n("input_tokens")?,
+        output_tokens: n("output_tokens")?,
     })
 }
 
@@ -429,6 +454,7 @@ mod tests {
             persona: "ana".into(),
             lines,
             pick: None,
+            usage: None,
         }
     }
     fn code(v: &VerdictInput, cx: &VerdictContext) -> &'static str {

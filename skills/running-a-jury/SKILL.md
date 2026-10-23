@@ -42,6 +42,12 @@ personas, primary then secondary then bystander. `--detail full` inlines text at
 query that resolves to fewer personas than `--spend` is refused, and so is a term that resolves to nobody
 (`panel_term_empty`). A citation into a text file (`README.md#L153`) must name a line the file has.
 
+### Large juries: run in waves
+Every brief answers `waves`, the persona ids in groups of 30 (`--wave N` changes it; up to 12 seats it is one wave). **Run
+one wave at a time:** give its personas to subagents, ingest their verdicts, and only then start the next wave. A jury of a
+hundred or a thousand then never floods your rate limit. Above 12 seats the brief needs `--allow-large` and `--reason`,
+rule or no rule.
+
 ## 2. One subagent per persona
 Give each subagent its brief file path and nothing else. It reads the attachments the brief lists (the ARIA walk, the
 PNGs, the comparator snapshots) and writes exactly one verdict JSON in the shape the brief shows:
@@ -54,6 +60,10 @@ PNGs, the comparator snapshots) and writes exactly one verdict JSON in the shape
                "citations": ["cmp:acme-pricing/pricing.png"], "blockers": [], "note": "this line scores Acme itself" } ],
   "pick": { "choice": "cmp:acme-pricing", "reason": "..." } }
 ```
+Each brief states, per lens, the exact values `anchor_met` may take (`one of 1, 3, 5, at or below your score`): copy one of
+them, never a number in between. A juror may add `"usage": {"input_tokens": N, "output_tokens": M}` to its verdict (the
+tokens it spent, whole numbers); `matrix` and `doctor` then show the total next to the estimate, as reported by you.
+
 **Keep jurors independent.** Give each subagent a private output folder and tell it to open only its brief and the
 files the brief lists, by full path: a juror that globs a shared folder sees the others' scores, and its verdict is void.
 In the fixture run two of seven did exactly that; both were re-run.
@@ -87,6 +97,10 @@ jurygraph matrix N --table [--detail full]      # jurygraph pick N for the force
 Primary, secondary and bystander are side by side; the engine never averages across them, and neither do you. The
 interesting cell is where strata disagree. Within a stratum you get every score, the median (the lower middle value, an integer), min, max and the blockers. There is no
 mean anywhere.
+
+To look at the whole jury at once, `jurygraph graph N --svg --out jury.svg` (or `graph A B --svg` over two rounds, which
+draws each finding's life as a strip of dots). Personas by stake, the dimensions they scored, the findings by decision;
+the medians are per stratum, as in the matrix.
 
 ## 5. Foreman, then one decision per finding
 A foreman pass reads all verdicts and proposes fixes (report §7: Opus for the foreman, Sonnet per persona). Each blocker

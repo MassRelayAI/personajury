@@ -145,3 +145,54 @@ Fix round 1 (review of 2026-10-24, the maintainer's rulings):
 - The ceiling is applied to an ad-hoc `--query` by its total seats, to a saved panel at `panel add` and then by the seats a
   brief selects. A brief above 12 seats without `--rule` records nothing (no rule, no bookkeeping): the maintainer has not
   yet confirmed that reading of the amendment.
+
+## D11 — the jury graph: one deterministic SVG, and its layout rule (2026-10-24, the maintainer asked for it by name)
+The name promises a graph and v0.2 drew none. v0.3 adds `jurygraph graph RUN... --svg [--out F]` and the MCP tool
+`jurygraph_graph` (the tool count goes from 5 to 6; it answers the SVG text in `data.svg` and writes no file).
+- **One static picture, no simulation.** The layout is integer arithmetic over ordered containers (`domain/graphlayout.rs`,
+  pure and unit-tested; the string building is `application/graph.rs`, no new crate): the same store gives byte-identical
+  output, and `tests/graph.rs` says so. The chosen alternative was a force layout, which needs floats and an iteration
+  count and moves whenever a node is added.
+- **The layout rule.** The card is 1200 wide and grows in height with the rows. Left to right: three stratum columns of
+  persona nodes (name, id, a stake pill), a column per lens of dimension nodes with the `@about` options as sub-nodes, and
+  the findings (short id, the first words of the blocker with an ellipsis, the full text as the tooltip). The stratum
+  columns descend like stairs (each starts under the one before it, below its own title) so that an edge from one
+  stratum never runs behind another stratum's boxes; row heights are computed from the content, labels are cut to the
+  width they have, and a test lays out 30 personas and asserts no two boxes touch. Every dimension node carries one
+  median badge per stratum (P S B) and never one combined number; the medians are the matrix's, taken from
+  `domain::matrix::build`, not recomputed.
+- **Colour.** An edge persona to dimension takes one of five steps of the README's blue scale (and a heavier line for a
+  higher score), the number is its tooltip. An edge persona to finding is red (open), green (fixed), grey and dashed
+  (dismissed) or blue (row); a `fixed` finding that a later run raised again is open, as in `check`.
+- **Rounds.** Several runs of one subject: scores and medians come from the latest run of each lens, and when a lens was run
+  more than once every finding carries a strip of dots, one per run of its lens: raised, raised again after a fix
+  (`fix_not_landed`), fixed (absent after a fix, the persona judged), not judged, absent. The lives come from
+  `check --history` (`data.lives`, one entry per finding with `status`, `decision` and `life`), which is the same function.
+  Runs of two subjects are refused.
+- **The asset.** `docs/assets/jury-graph.svg` is the graph of the recorded fixture run; `tests/graph_asset.rs` rebuilds the
+  workspace as the replay does and fails when the committed file differs from a fresh render (`JURYGRAPH_ASSET_REGEN=1` rewrites it; the replay outputs have their own `JURYGRAPH_FIXTURE_REGEN`). It looks at the SVG
+  through Chrome headless at 1200 px and at 800 px.
+Fix round 1 (review of 2026-10-24): above 30 personas the strata sit side by side with their own heights (stairs make the card as tall as the sum of the strata); a life strip draws the last 8 runs with a `+N` mark and a tooltip for the rest; SVG text drops the characters XML 1.0 forbids; a finding's life is rebuilt from every `fixed` decision, so a second `fixed` never hides a `fix_not_landed` step.\nWould change: a collapsed stratum for a very large jury, or a third lens that
+wants its own lane (more than two lenses already stack in two lanes).
+
+## D12 — waves, reported usage, the allowed anchors, a reason for any large brief (2026-10-24)
+- **Waves.** Every brief answers `waves`: its persona ids in brief order, cut into waves of `--wave N` seats (default 30;
+  one wave up to 12 seats; `--wave 0` is `invalid_arguments`). The engine runs nothing, so the throttle is advice the skill
+  gives: run a wave, ingest it, then the next. A 100-seat brief answers 30/30/30/10.
+- **Reported usage.** A verdict may carry `usage {input_tokens, output_tokens}`: two non-negative integers and nothing else,
+  else `invalid_usage` (red first); each value must also fit in i64 (a larger one is refused, sums saturate). It is stored in a new append-only table `usage` (`CREATE TABLE IF NOT EXISTS`, so a v3
+  store gains it on open and the schema version stays 3; no column of `verdict` changed). `matrix` and `doctor` answer
+  `usage {reported, estimate}`: `reported` sums every verdict that carried one and is labelled "reported by the agent",
+  `estimate` is briefs × `tokens_per_brief`. The engine still measures no token.
+- **The allowed anchors are in the brief.** `bad_anchor` was the commonest refusal in two real runs (the logo jury). The
+  answer-shape rules now say, per lens, `anchor_met: one of 1, 3, 5, at or below your score`. This changes the bytes of
+  every brief: the 14 recorded hashes of `fixtures/run/briefs.json` were regenerated (14 of 14 changed) and so was the
+  one compare-brief hash in `tests/authoring.rs`; the recorded verdicts, matrix and picks are untouched and
+  `fixture_replay` is unchanged and green.
+- **A large brief needs a reason, rule or not (closes review M9 of v0.2).** A brief above 12 seats without `--rule` now needs
+  `--reason` (`override_without_reason`) and records `override_json = {rule: null, fields: {seats: {rule: 12, given: N}},
+  reason, by}`; `matrix` shows it (`override: seats 12→N — reason: …`).
+- **A malformed `jurygraph.toml` is refused** by `brief` and `matrix` (`invalid_config`) instead of silently ignored (M7); `doctor` reports it as a limitation item and still answers.
+- `--comparator` takes a comma list as `--lens` does, and still repeats; an empty element is `invalid_arguments`.
+Would change: a measured wave size (the 30 is the mirror of a rate limit, not a measurement); an agent that cannot report
+usage, which leaves `reported` null.

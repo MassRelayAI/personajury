@@ -1,20 +1,20 @@
 {
   "critical": {
-    "builder-ana": "ea7efee57dca8337bd36ed72beb1b5184abafc655d55fc1ddbb127fa52070c3c",
-    "builder-mei": "30e58ee8dc7a6a153432da44ac5df3a9c1be2fd4b3032c2f6823ca6d5456e19e",
-    "builder-ravi": "6cd35db065504a4de039709aa0f0b1c427d40904967034db5e0561ef07d3fbd7",
-    "company-george": "ed3162c7ec6baa4cbb2374b90738db4a00183e71d4d2f826d7feba247e8cfb07",
-    "company-hanna": "8efb30a1399091263eb88af7bb8429e02c2dd22307bcc80df72cabeb01d69818",
-    "investor-claire": "9e2147189123ee3c5555fa714f104f7e42d9fa1fcf90a1e70ff3d1e7dc022215",
-    "newcomer-sofia": "8244a90c5f8712a368dda46b4427a81bceca22d2933527e34328ba9264332faa"
+    "builder-ana": "97a5922908a2be19e20087bda066c1d5c0c16f0ee08c2d1df59ff6676aeed82f",
+    "builder-mei": "00aaac437738a9e91efd2225636e8915d5e08b6a7c6fca9aee5889ebe08b6cac",
+    "builder-ravi": "e582793bd11d363d24751040a9f8b57202fd44f8ede5f7cee0350992e7b05887",
+    "company-george": "f9f94736f3322e4dafcf35c781b3337acfea54a91bc7e53413f974c52cc3b2a2",
+    "company-hanna": "54c35df9b332813b5212e7d7d4eeef1dc228f43fb6664d851a52783262bf24a0",
+    "investor-claire": "49b4acacf48d26f67902f97dc352d6c350e5d4a17aaf9efa784561cbb0c3b5a2",
+    "newcomer-sofia": "b38448399d64124c1c944c62b5d7f48599b94ea606ae3f97986c2401dbe8e095"
   },
   "compare": {
-    "builder-ana": "1a026e8292c1842de4af0fc56211db0ef31ac691a157fa0e628df72326af98b4",
-    "builder-mei": "1dc31408ffcb3df80d992b6321a58ad24582669f411d0d0ca45933a6adb356ff",
-    "builder-ravi": "798f44adeb4a0a79afc4ef6ef9d49252d8cde8af658502225b8fed454c69a655",
-    "company-george": "870e9b95e2ac0d407cefbae8f141bc80c4aabaf4089846552858ec86661effb7",
-    "company-hanna": "8739a8b360c653f5b0b784f2c080bba40a7dc11f96bad737537151a28a32eae8",
-    "investor-claire": "d2a91fc9b40c175fdc9bf931abfa38eef8c35faf720931ec1009241ea0b21afa",
-    "newcomer-sofia": "40f78db076aa08f8f5c2a331be11f037269b643ecd4d23d6f368d5735c6ecc8d"
+    "builder-ana": "361731fd02c65b61a78c9d8ad7a746b999c8d396db92319086745d5f1e40873b",
+    "builder-mei": "4a3ac54e0c26c7872d2f90070ad6cc321bd5a45668eb8ed5f26709f12ae93aaf",
+    "builder-ravi": "963303ffe693d89e7532dd5ba87bc6706fbfeaecec7abfeb06e7563cb973fe73",
+    "company-george": "9799bf69c461b207e6796f254993bafb278ac63f27feaefa43828a71cf7782b5",
+    "company-hanna": "57f26c9cb76ee002a823592e41d1f1da6019fdba5a431001bda53f2d5f5d9bcd",
+    "investor-claire": "258fdf33630da36764b98da9c78b1108f173ecf862baa5cf0f3b5874e25785ad",
+    "newcomer-sofia": "b28d899c3f562cdc6e6af4c9bc0d3bdc571c9972c7cde01248cedd4a6eb38875"
   }
 }

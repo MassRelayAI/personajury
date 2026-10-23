@@ -32,10 +32,15 @@ pub struct BriefArgs {
     pub allow_large: bool,
     pub reason: Option<String>,
     pub by: Option<String>,
+    /// seats per wave in the `waves` answer (D12); default 30
+    pub wave: Option<usize>,
 }
 
+/// Seats per wave when the caller does not say (D12).
+pub const DEFAULT_WAVE: usize = 30;
+
 /// What a brief costs the agent when the project says nothing (the same default `should-run` documents).
-const DEFAULT_TOKENS_PER_BRIEF: u64 = 15_000;
+pub(crate) const DEFAULT_TOKENS_PER_BRIEF: u64 = 15_000;
 
 fn stake_meaning(s: Stake) -> &'static str {
     match s {
@@ -277,7 +282,11 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
         "- `score` is an integer from {} to {}.\n",
         lens.scale[0], lens.scale[1]
     ));
-    t.push_str("- `anchor_met` is one of the anchor scores at or below `score`.\n");
+    let anchors: Vec<String> = lens.anchor_scores().iter().map(i64::to_string).collect();
+    t.push_str(&format!(
+        "- `anchor_met`: one of {}, at or below your `score`.\n",
+        anchors.join(", ")
+    ));
     t.push_str(
         "- A `seen` line needs at least one citation that names something this run holds.\n",
     );
@@ -413,6 +422,7 @@ struct Shared<'a> {
     detail: Detail,
     seed_hex: &'a str,
     override_json: Option<&'a Value>,
+    wave: usize,
 }
 
 /// Compose and write the briefs of one lens and create its run.
@@ -513,6 +523,8 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
             }).collect::<Vec<_>>(),
         },
         "detail": if sh.detail == Detail::Full { "full" } else { "compact" },
+        // run one wave, ingest it, then the next (D12): persona ids in the order of `briefs`
+        "waves": sh.selected.chunks(sh.wave).map(|c| c.to_vec()).collect::<Vec<_>>(),
         "briefs": briefs,
         "bytes_total": bytes_total,
     }))
@@ -527,6 +539,14 @@ fn detail_name(d: Detail) -> &'static str {
 }
 
 pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
+    if a.wave == Some(0) {
+        return Err(AppError::InvalidArguments("--wave must be at least 1".into()));
+    }
+    if a.comparators.iter().any(|c| c.trim().is_empty()) {
+        return Err(AppError::InvalidArguments(
+            "--comparator has an empty element; name each comparator".into(),
+        ));
+    }
     if a.model.trim().is_empty() {
         return Err(AppError::InvalidArguments(
             "--model names the model the run is pinned to; it cannot be empty".into(),
@@ -547,9 +567,11 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
     let cfg_path = root.join("jurygraph.toml");
     let cfg: Option<TriggerConfig> = match &a.rule {
         Some(_) => Some(trigger::parse_config(&super::read_text(&cfg_path)?)?),
-        None => std::fs::read_to_string(&cfg_path)
-            .ok()
-            .and_then(|t| trigger::parse_config(&t).ok()),
+        // a toml that is there but malformed is refused, not ignored (M7)
+        None => match std::fs::read_to_string(&cfg_path) {
+            Ok(t) => Some(trigger::parse_config(&t)?),
+            Err(_) => None,
+        },
     };
     let tokens_per_brief = cfg
         .as_ref()
@@ -775,6 +797,23 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
 
     // where the caller departs from the rule, or runs more than 12 seats, the run says so and says why
     let override_json: Option<Value> = match rule {
+        // no rule, no departure; but a brief above 12 seats still says why, with `rule: null` (D12, review M9)
+        None if large => {
+            let reason = a.reason.as_deref().map(str::trim).unwrap_or("");
+            if reason.is_empty() {
+                return Err(Refusal::OverrideWithoutReason {
+                    rule: "(none)".into(),
+                    fields: "seats".into(),
+                }
+                .into());
+            }
+            Some(json!({
+                "rule": Value::Null,
+                "fields": {"seats": {"rule": SEAT_CEILING, "given": selected.len()}},
+                "reason": reason,
+                "by": a.by.as_deref().map(str::trim).filter(|b| !b.is_empty()).unwrap_or("agent"),
+            }))
+        }
         None => None,
         Some(r) => {
             let mut fields = serde_json::Map::new();
@@ -879,6 +918,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         detail,
         seed_hex: &seed_hex,
         override_json: override_json.as_ref(),
+        wave: a.wave.unwrap_or(DEFAULT_WAVE),
     };
     let mut runs = Vec::new();
     for lens in &lenses {

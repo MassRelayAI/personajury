@@ -697,6 +697,12 @@ impl Store {
                 params![run_id, batch, v.persona, p.choice, p.reason, now],
             )?;
         }
+        if let Some(u) = &v.usage {
+            tx.execute(
+                "INSERT INTO usage(run_id, batch, persona_id, input_tokens, output_tokens, created_at) VALUES (?1,?2,?3,?4,?5,?6)",
+                params![run_id, batch, v.persona, u.input_tokens as i64, u.output_tokens as i64, now],
+            )?;
+        }
         // A finding id seen before keeps its first row (and run): the same point raised again is the same finding.
         // Whether that repeat is refused at verdict time (R12) depends only on a `dismissed` decision, which the
         // application layer checks through `dismissed_citations`; the store just keeps the first row for `check`.
@@ -750,6 +756,24 @@ impl Store {
                 Ok(row)
             })
             .collect()
+    }
+    /// The tokens the agent reported over every verdict of these runs (all batches: a re-run was spent too), and how
+    /// many verdicts reported. None when nothing was reported. `run_ids` empty = every run.
+    pub fn reported_usage(&self, run_ids: &[i64]) -> Result<Option<(u64, u64, u64)>> {
+        let (mut input, mut output, mut n) = (0u64, 0u64, 0u64);
+        let mut st = self
+            .conn
+            .prepare("SELECT run_id, input_tokens, output_tokens FROM usage")?;
+        let rows = st.query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, i64>(1)?, r.get::<_, i64>(2)?)))?;
+        for row in rows {
+            let (run, i, o) = row?;
+            if run_ids.is_empty() || run_ids.contains(&run) {
+                input = input.saturating_add(i.max(0) as u64);
+                output = output.saturating_add(o.max(0) as u64);
+                n += 1;
+            }
+        }
+        Ok((n > 0).then_some((input, output, n)))
     }
     pub fn picks(&self, run_id: i64, history: bool) -> Result<Vec<PickRow>> {
         // "latest" is the persona's latest verdict batch: a later batch without a pick shows no pick

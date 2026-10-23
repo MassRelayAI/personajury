@@ -58,6 +58,51 @@ pub(crate) fn sources_moved(s: &Subject) -> Result<Option<String>> {
     Ok(None)
 }
 
+/// What the agent reported beside what the project estimates, for these runs (all runs when empty), D12. The engine
+/// measures no token: `reported` is whatever verdicts carried, labelled so; `estimate` is briefs x `tokens_per_brief`.
+pub(crate) fn usage_summary(root: &Path, store: &Store, run_ids: &[i64]) -> Result<Value> {
+    let per = tokens_per_brief(root)?;
+    usage_summary_with(store, run_ids, per)
+}
+
+/// The project's tokens per brief: the toml's, the default when there is no toml, a refusal when it is malformed.
+pub(crate) fn tokens_per_brief(root: &Path) -> Result<u64> {
+    match std::fs::read_to_string(root.join("jurygraph.toml")) {
+        Ok(t) => Ok(crate::domain::trigger::parse_config(&t)?
+            .tokens_per_brief
+            .unwrap_or(super::brief::DEFAULT_TOKENS_PER_BRIEF)),
+        Err(_) => Ok(super::brief::DEFAULT_TOKENS_PER_BRIEF),
+    }
+}
+
+pub(crate) fn usage_summary_with(store: &Store, run_ids: &[i64], per: u64) -> Result<Value> {
+    let runs = store.runs()?;
+    let briefs: u64 = runs
+        .iter()
+        .filter(|r| run_ids.is_empty() || run_ids.contains(&r.id))
+        .map(|r| r.briefs.len() as u64)
+        .sum();
+    let reported = match store.reported_usage(run_ids)? {
+        Some((i, o, n)) => json!({
+            "input_tokens": i, "output_tokens": o, "verdicts": n, "by": "reported by the agent",
+        }),
+        None => Value::Null,
+    };
+    Ok(json!({
+        "reported": reported,
+        "estimate": {"briefs": briefs, "tokens": briefs.saturating_mul(per)},
+    }))
+}
+
+/// The one line `matrix --table` adds when verdicts reported usage; none otherwise (the recorded table is unchanged).
+pub(crate) fn usage_line(u: &Value) -> Option<String> {
+    let r = u["reported"].as_object()?;
+    Some(format!(
+        "usage (reported by the agent, over {} verdicts): {} input, {} output tokens; the project's estimate is {} tokens for {} briefs\n",
+        r["verdicts"], r["input_tokens"], r["output_tokens"], u["estimate"]["tokens"], u["estimate"]["briefs"]
+    ))
+}
+
 fn collect_ids(nodes: &Value, out: &mut BTreeSet<String>) {
     if let Some(list) = nodes.as_array() {
         for n in list {

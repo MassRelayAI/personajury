@@ -48,8 +48,17 @@ pub fn report(root: &Path, bin: Option<&str>) -> Result<Value> {
         }));
     }
     let store = Store::open_existing(root)?;
+    // a malformed jurygraph.toml is a diagnosis here, not a failure of doctor
+    let per = match super::verdict::tokens_per_brief(root) {
+        Ok(p) => p,
+        Err(e) => {
+            limitations.push(json!({ "code": "invalid_config", "detail": e.to_string() }));
+            super::brief::DEFAULT_TOKENS_PER_BRIEF
+        }
+    };
     Ok(json!({
         "store": store.path(), "schema_version": store.schema_version()?, "counts": counts(&store)?,
+        "usage": super::verdict::usage_summary_with(&store, &[], per)?,
         "clients": clients, "engine": engine, "limitation_items": limitations,
     }))
 }

@@ -18,12 +18,11 @@ refusals, the MCP server, two skills, the fixture site and its replayed run. Sta
 The split rule and `apply-check` (D13), `lens generate` (D14), a model per panel term (D15), packaging with the `.mcpb` bundle
 (D16), effort (D17), independence (D18), experts and a human verdict (D19). See `../CHANGELOG.md`.
 
-## v0.5 (what is left)
-- **Calibration.** `calibrate <jury-run> <human-run>`: the jury's rank order against human batches per stratum, never a pooled
-  number; `apply-check --calibration` turns an uncalibrated jury's `apply` into `escalate`. Needs real people's verdicts
-  (`verdict --by-human` ships now so they can be collected).
-- **CSV cell locators** (`<label>#R<row>C<col>`) for spreadsheets and tables.
-- **A composite GitHub Action:** `should-run` on a PR diff, and `apply-check` when the store is in the checkout.
-- **The Claude Agent SDK recipe** (a docs page, no code in the tree), which replaces the idea of a runner of our own.
+## v0.5 (done)
+Calibration (D20), CSV cell locators (D21), the GitHub Action (D22), the Claude Agent SDK recipe (D23), and the answer display `summary`
+(D24). See `../CHANGELOG.md`.
+
+## After v0.5 (what is left)
+- **Calibration with real people.** `calibrate` ships; it needs a person's verdicts (`verdict --by-human`) on a real subject to say anything.
 - **Listings:** the official Claude plugin marketplace and the Codex plugin directory, after a first published result.
 - A `.mcpb` bundle checked on a real Claude Desktop (v0.4 ships it unverified).

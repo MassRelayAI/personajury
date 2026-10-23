@@ -154,11 +154,47 @@ pub enum Cmd {
     },
     /// The verdict to obey last: apply | escalate | human | advise, with the reasons as data; applies nothing itself
     ApplyCheck {
-        #[arg(required = true)]
         runs: Vec<i64>,
+        /// instead of naming runs: every subject that has runs, each judged on its own; the worst answer wins (what CI reads)
+        #[arg(long)]
+        latest: bool,
+        /// with --latest: only this subject
+        #[arg(long)]
+        subject: Option<String>,
         /// the rule class of jurygraph.toml this change falls under (its quorum is the current level)
         #[arg(long)]
         rule: Option<String>,
+        /// a file written by `calibrate --out`: `calibrated: false` turns apply into advise (`uncalibrated`)
+        #[arg(long)]
+        calibration: Option<PathBuf>,
+    },
+    /// Set the jury's rank order beside a human run's, per stratum (a human run holds `verdict --by-human` batches)
+    Calibrate {
+        jury_run: i64,
+        human_run: i64,
+        /// also write the answer to this file, for `apply-check --calibration`
+        #[arg(long)]
+        out: Option<PathBuf>,
+    },
+    /// The answer display: sentences, the numbers "for checking", then Next; --html / --md / --save write views
+    Summary {
+        #[arg(required = true)]
+        runs: Vec<i64>,
+        /// one self-contained html file (inline CSS, the jury graph, every per-stratum table)
+        #[arg(long)]
+        html: Option<PathBuf>,
+        /// the same summary as markdown, with the decisions per finding, the run ids and brief hashes, and the date
+        #[arg(long)]
+        md: Option<PathBuf>,
+        /// write the markdown to <report_dir>/<date>-<subject>.md (refused when jurygraph.toml has no report_dir)
+        #[arg(long)]
+        save: bool,
+        /// the text's width in characters (30 to 200, default 80)
+        #[arg(long)]
+        width: Option<usize>,
+        /// set by the MCP adapter: --html/--md must be relative paths inside the root (I2); a typed CLI path may be anywhere
+        #[arg(skip)]
+        confined: bool,
     },
     /// A person's word on a finding: fixed, dismissed (with --why) or row (with --row)
     Decide {
@@ -300,6 +336,8 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Delta { .. } => "delta",
         Cmd::Check { .. } => "check",
         Cmd::ApplyCheck { .. } => "apply-check",
+        Cmd::Summary { .. } => "summary",
+        Cmd::Calibrate { .. } => "calibrate",
         Cmd::Decide { .. } => "decide",
         Cmd::ShouldRun { .. } => "should-run",
         Cmd::Setup { .. } => "setup",
@@ -405,7 +443,18 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Pick { run } => app::pick::show(root, *run),
         Cmd::Delta { a, b } => app::delta::show(root, *a, *b),
         Cmd::Check { history } => app::check::run(root, *history),
-        Cmd::ApplyCheck { runs, rule } => app::apply_check::run(root, runs, rule.as_deref()),
+        Cmd::ApplyCheck { runs, latest, subject, rule, calibration } => {
+            let groups = app::apply_check::runs_to_judge(root, runs, *latest, subject.as_deref())?;
+            if *latest {
+                app::apply_check::worst(root, &groups, rule.as_deref(), calibration.as_deref())
+            } else {
+                app::apply_check::run(root, &groups[0], rule.as_deref(), calibration.as_deref())
+            }
+        }
+        Cmd::Calibrate { jury_run, human_run, out } => app::calibrate::show(root, *jury_run, *human_run, out.as_deref()),
+        Cmd::Summary { runs, html, md, save, width, confined } => {
+            app::summary::show(root, runs, html.as_deref(), md.as_deref(), *save, *width, *confined)
+        }
         Cmd::Decide { finding, outcome, why, row, by, by_human } => app::decide::record(
             root,
             finding,

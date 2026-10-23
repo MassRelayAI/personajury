@@ -23,7 +23,7 @@ the version.
 | `graph` | `RUN...` `--svg` `[--out F]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
 | `delta` | `A B` | what moved between two runs on the same subject and lens |
-| `apply-check` | `RUN...` `[--rule CLASS]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
+| `apply-check` | `RUN...` or `--latest [--subject S]`, `[--rule CLASS]` `[--calibration F]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
 | `check` | `[--history]` | stale runs (source changed or a newer subject version), `fixed_unverified`, and findings with no decision from any batch or fixed and raised again (`fix_not_landed`); exits 1 with `check_failed` listing `unresolved`; `--history` adds `decisions` and `lives`, each finding's life across the runs (`raised`, `raised_again`, `fixed`, `unjudged`, `absent`) |
 | `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` or `--by-human NAME` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`); a finding a human batch raised needs `--by-human` (`human_decision_required`) |
 | `should-run` | `[--diff F]` `[--paths a,b]` `[--subject S]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend; `--subject` classifies the subject's recorded source paths (a page added by hand has no diff); `warnings` names a rule's panel or lens the store lacks |
@@ -149,3 +149,39 @@ stratum. A lens's `standard` is shown in every brief and in the matrix header. `
 person's batch with the same refusals: the file's `persona` is the seat whose stratum the person speaks in. The rows stand beside the
 jury's (matrix JSON `human`, an `H` block under the table), never in a cell, a median or a split. Only a person enters one: the MCP
 verdict tool has no such argument. A blocker in it escalates `apply-check` until a recorded `decide --by-human` closes the finding. See D19.
+
+### `summary`
+`jurygraph summary RUN... [--html F] [--md F] [--save] [--width N]` (MCP `jurygraph_summary`, which takes `runs`, `width`, `md` and `html`) answers `text`: 2 to 5
+plain sentences (the apply-check answer in words with its counts, who won with counts per stratum, the weakest dimension per stratum,
+the change since the previous round as "15 → 6", and up to three blockers quoted with their persona and decision, taken in turns across jurors, primary first, one per juror before anyone's
+second), then the
+numbers table "for checking" (one row per option or subject, one column per dimension, each cell the medians `P·S·B`, a dash for a stratum
+nobody judged, the top 5 rows by the primary stratum), then `Next:` chosen from the apply-check answer. No bars, no pooled number.
+`--width` is 30 to 200 (default 80). `--html F` writes one offline file (inline CSS, the `graph --svg` picture, every per-stratum table, the
+quotes; no scripts), `--md F` the same summary as markdown with the decisions per finding, the run ids and brief hashes and the date of the
+latest run. `--save` writes the markdown to `<report_dir>/<date>-<subject>.md` and is refused (`no_report_dir`) when `jurygraph.toml` has no
+top-level `report_dir`. `report_dir` must be relative, hold no `..` and resolve inside the project root (a symlink out is refused), else
+`invalid_report_dir`; the MCP tool's `md` and `html` paths are checked the same way and are relative to the root. A path typed at the CLI
+may be anywhere. Nothing is written without one of the three flags. **Text safety:** everything the summary prints (text, markdown,
+html) has ESC sequences removed whole, and every other C0 control but the newline, DEL and the C1 controls removed (a tab becomes a
+space). A quote keeps the juror's words; runs of whitespace, newlines included, fold to one space. A long quote is cut only between words
+and ends with `…`; a word is never cut (one longer than the line stands whole on its own line). The golden outputs are `fixtures/run/summary.txt` and `summary.md`.
+
+### `calibrate`
+`jurygraph calibrate JURY_RUN HUMAN_RUN [--out F]`: the human run is an ordinary run whose verdict batches were entered with `--by-human`
+(else `not_human_run`), on the same subject and lens version. Per stratum, the cells (lens, dimension, about) are ranked by the stratum's
+median, high first, ties sharing a rank, for the jury and for the people; each cell answers both ranks and `within_one_rank`. `calibrated`
+is true iff every primary-stratum cell is within one rank and every primary cell the jury judged was also judged by a person; bystander and
+secondary differences are listed in `outside_primary`, never averaged in. `apply-check RUN... --calibration F` (MCP `calibration`) turns
+`apply` into `advise` with the reason `uncalibrated` when the file says `calibrated: false`. The file must be the calibration of the
+runs given: its `subject`, `lens`, `lens_version` and `jury_run` (one of the runs given) must match, else `calibration_mismatch`.
+`apply-check --latest` judges the latest round of every subject that has runs, each on its own, and answers the worst (`human` >
+`escalate` > `advise` > `apply`); `subjects` lists each subject's own answer and reasons, and the flat `reasons` name their `subject`.
+`--latest --subject S` judges S only. This is what CI reads.
+
+### CSV cell locators
+A text attachment whose label ends `.csv` can be cited by cell: `prices.csv#R2C3`, 1-based, the header row is row 1. A row is a record
+(RFC 4180: quoted fields, doubled quotes, CRLF), not a line: a quoted line break does not add a row. Out of range is `citation_unresolved`;
+`R01C1`, `R+1C1`, lowercase `r9c9`, `R1c1` and `RC1` are refused like `L01`. A quote opens a quoted field only at the start of a
+field; in the middle of an unquoted field (`27" screen`) it is a literal character (RFC 4180 leaves that case malformed; JuryGraph
+reads it the lenient way). `#L<n>` keeps working.

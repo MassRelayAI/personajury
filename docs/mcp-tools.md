@@ -1,7 +1,7 @@
 <!-- shape follows comparegraph docs/mcp-tools.md -->
 # MCP tools
 
-`jurygraph mcp` serves MCP over stdio. Seven tools, each the same call as its CLI verb and answering with the same envelope
+`jurygraph mcp` serves MCP over stdio. Eight tools, each the same call as its CLI verb and answering with the same envelope
 (including the same refusals). Their arguments carry the CLI flags' names. This is the v0.1 contract in the plan; the server
 is built in plan Task 6.
 
@@ -12,7 +12,8 @@ is built in plan Task 6.
 | `jurygraph_matrix` | `matrix` | takes `detail` (`compact` default, `full`); scores per stratum and `usage {reported, estimate}` |
 | `jurygraph_graph` | `graph` | `runs` (one or more runs of one subject); answers the SVG text in `data.svg`; reads only, writes no file |
 | `jurygraph_delta` | `delta` | two runs |
-| `jurygraph_apply_check` | `apply-check` | `runs` and `rule`; answers `apply`, `escalate`, `human` or `advise` with the reasons as data; reads only |
+| `jurygraph_apply_check` | `apply-check` | `runs`, `rule` and `calibration` (a file from `calibrate --out`); answers `apply`, `escalate`, `human` or `advise` with the reasons as data; reads only |
+| `jurygraph_summary` | `summary` | `runs`, `width`, and optional `md` / `html` (relative paths inside the project root, else `invalid_report_dir`); answers the text in `data.text` (sentences, numbers for checking, Next); writes a file only when `md` or `html` is given |
 | `jurygraph_should_run` | `should-run` | classifies a diff, a list of paths or a subject's recorded source paths (`subject`) |
 
 There is no tool that enters a person's verdict (`--by-human`) or records a decision: a person does that. Everything else (adding personas, panels, lenses and subjects, `lens generate`, `pick`, `check`, `decide`) is CLI only. Register the

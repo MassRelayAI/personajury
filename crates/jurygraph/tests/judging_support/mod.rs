@@ -240,3 +240,47 @@ pub fn told(persona: &str, blockers: &[&str]) -> Value {
 pub fn fixtures() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures")
 }
+
+// ---- the fixture jury, up to its fourteen accepted verdicts and no decisions (shared by summary and the Action tests) ----
+const STAKES: &str = "builder-ana=primary,builder-mei=primary,builder-ravi=primary,newcomer-sofia=primary,\
+company-george=secondary,company-hanna=secondary,investor-claire=bystander";
+
+pub fn repo() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
+}
+pub fn fx(rel: &str) -> String {
+    repo().join("fixtures").join(rel).to_string_lossy().into_owned()
+}
+pub fn j(ws: &Path, args: &[&str]) -> Value {
+    let v = cli_in(ws, args);
+    assert_eq!(v["ok"], true, "{args:?} refused: {}", v["error"]);
+    v
+}
+/// The fixture jury, up to its fourteen accepted verdicts and no decisions: returns the two run ids.
+pub fn fixture_run(ws: &Path) -> (i64, i64) {
+    let mut personas: Vec<_> = std::fs::read_dir(repo().join("fixtures/personas")).unwrap().map(|e| e.unwrap().path()).collect();
+    personas.sort();
+    for p in personas {
+        j(ws, &["persona", "add", "--file", p.to_str().unwrap()]);
+    }
+    j(ws, &["panel", "add", "fixture", "--query", "3 builder, 2 company, 2 others"]);
+    let (hw, hp, pw, pp) = (fx("site-walk/home.walk.json"), fx("site-walk/home.png"), fx("site-walk/pricing.walk.json"), fx("site-walk/pricing.png"));
+    j(ws, &["subject", "add", "lantern-site", "--kind", "page", "--attach", &hw, &hp, &pw, &pp]);
+    let (cw, cp) = (fx("comparators/acme-pricing/pricing.walk.json"), fx("comparators/acme-pricing/pricing.png"));
+    j(ws, &["comparator", "add", "acme-pricing", "--kind", "prices", "--attach", &cw, &cp]);
+    let common = ["--subject", "lantern-site", "--panel", "fixture", "--stake", STAKES, "--spend", "7", "--model", "claude-sonnet-5-5"];
+    let mut critical = vec!["brief", "--lens", "critical"];
+    critical.extend(common);
+    let mut compare = vec!["brief", "--lens", "compare", "--comparator", "acme-pricing"];
+    compare.extend(common);
+    let a = j(ws, &critical)["data"]["run"].as_i64().unwrap();
+    let b = j(ws, &compare)["data"]["run"].as_i64().unwrap();
+    let mut files: Vec<_> = std::fs::read_dir(repo().join("fixtures/run/verdicts")).unwrap().map(|e| e.unwrap().path()).collect();
+    files.sort();
+    for f in &files {
+        let name = f.file_stem().unwrap().to_str().unwrap();
+        let run = if name.ends_with("--critical") { a } else { b };
+        j(ws, &["verdict", "--run", &run.to_string(), "--file", f.to_str().unwrap()]);
+    }
+    (a, b)
+}

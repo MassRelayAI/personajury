@@ -79,6 +79,7 @@ fn initialize_and_list_seven_tools() {
             "jurygraph_graph",
             "jurygraph_matrix",
             "jurygraph_should_run",
+            "jurygraph_summary",
             "jurygraph_verdict"
         ]
     );

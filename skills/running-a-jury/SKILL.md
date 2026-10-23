@@ -15,6 +15,19 @@ jurygraph should-run --diff change.diff          # or --paths site/pricing.html,
 ```
 It answers `none | low | high | human` and the spend. `none`: stop, tests and the adversarial read decide. `human`: a
 person decides; a jury may advise but cannot apply the change. The hook runs at lane finish, not per save.
+`should-run` also lists `unmatched` paths: say them in plain words ("N files matched no rule and got no jury: ...; add a rule
+if one of them is something people see").
+
+For a choice no rule covers, three questions: 1. Do people with different stakes see or choose it? 2. Is it a matter of
+judgement that a test, a benchmark or a common convention cannot settle? 3. Is it costly to undo? All three yes: run a jury,
+sized by effort. Any no: decide directly and record why. Example of a no: "where reports are written" is a convention three
+comparable tools share, and it is reversible.
+
+### What goes to a jury
+Code correctness goes to tests (an unmatched path gets none). Visible surfaces go to a jury that sees the rendered result
+(screenshots, walks, rendered docs), never the diff of code. Technical-but-read surfaces (API docs, CLI output, error messages)
+go to builder personas through the rule's panel. Code is also a fine subject for judgement (readability, API ergonomics,
+trade-offs between options: `fixtures/lenses/tradeoffs.toml`, `docs/playbooks/a-technical-decision.md`): never correctness.
 
 ## 1. Brief
 Subject, panel and lens exist already (`subject add`, `panel add`, `lens list`). The panel's own terms give each persona
@@ -156,11 +169,37 @@ Run it last and obey it. It answers `apply | escalate | human | advise` and the 
 A split is two strata whose `anchor_met` ranges on a cell do not overlap (touching ranges overlap); `matrix` lists them as
 `splits`. Count blockers and agreement; never add scores across strata.
 
+## 8. Show the summary, last
+```
+jurygraph summary <run>... [--html summary.html] [--md summary.md] [--save] [--width 80]
+```
+The last step of every run: paste the `text` it returns to the person **as it is** (sentences, then the numbers "for checking", then
+`Next:`), and offer the `--html` file (one offline page with the jury graph and every per-stratum table). Show it in chat first, then
+offer to save it as markdown (`--md`). When `jurygraph.toml` sets `report_dir = "docs/juries"`, save without asking: `--save` writes
+`<report_dir>/<date>-<subject>.md`. Without a `report_dir`, `--save` is refused (`no_report_dir`) and nothing is written; a `report_dir`
+outside the project root is refused (`invalid_report_dir`). The MCP tool `jurygraph_summary` returns the same text, and writes `md` or
+`html` only at a relative path inside the project root.
+
+## Display is free, the verdict is not
+The summary layout is a recommendation: any agent may restyle the JSON (a table, a chart, a sentence), with two rules: never pool
+strata, and never write a number the data lacks. `apply-check` is a verdict the engine cannot enforce by itself. It becomes binding where it
+is wired: the GitHub Action (`action.yml`, `fail-on`), a hook before merge or push (a Claude Code `PreToolUse` hook on `git merge|push`,
+or a git pre-merge-commit hook, both in `docs/usage.md`), or a project's own gate.
+
 ## Experts
 A persona may carry a `credential` (shown in its brief and badged `(C)` in the matrix); a lens's `standard` names the source of its
 anchors. A real expert's word is `verdict --run N --file v.json --by-human "Dr Rao, ward nurse"`: the same refusals, a seat of the
 run to speak from, and the rows stand beside the jury's, never in a cell. Only a person enters one; you never do. A blocker in it
 makes `apply-check` escalate until a person closes the finding with `decide --by-human "<name>"`; you cannot.
+
+**Calibrate** the jury against people: enter a person's verdicts as a human run (`--by-human`), then
+`jurygraph calibrate <jury-run> <human-run> --out cal.json`. It ranks the cells per stratum for each side and says which are within one
+rank; `calibrated` is true when every primary cell is. Then `apply-check <run> --calibration cal.json`: an uncalibrated jury advises
+(`uncalibrated`), it never applies. Bystander differences are reported, never averaged in.
+
+**CI:** `action.yml` runs `should-run` on a pull request's diff and, with a committed store, `check` and `apply-check --latest`
+(`docs/ci.md`). A CSV attachment can be cited by cell: `prices.csv#R2C3` (row, column, 1-based, the header is row 1; a row is a record, so a
+quoted line break does not add one).
 
 ## The dial: what you decide, what needs a reason, what a person decides
 The default is the fast one. You move freely inside the rule and the effort; to leave the rule you give a reason that is

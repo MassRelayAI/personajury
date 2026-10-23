@@ -97,6 +97,8 @@ pub enum Refusal {
     },
     #[error("finding {finding} was raised by a human batch: only a person decides it; give --by-human \"<name>\"")]
     HumanDecisionRequired { finding: String },
+    #[error("run {run} has no verdict entered with --by-human: calibrate compares the jury with a human run")]
+    NotHumanRun { run: i64 },
     #[error("the credential is {len} characters; keep it a line of at most {max}")]
     CredentialTooLong { len: usize, max: usize },
     #[error("{0}")]
@@ -141,6 +143,7 @@ impl Refusal {
             Refusal::HumanPathUnderPersonaQuorum { .. } => "human_class_under_persona_quorum",
             Refusal::OverBudget { .. } => "over_budget",
             Refusal::CredentialTooLong { .. } => "credential_too_long",
+            Refusal::NotHumanRun { .. } => "not_human_run",
             Refusal::HumanDecisionRequired { .. } => "human_decision_required",
             Refusal::InvalidUsage(_) => "invalid_usage",
             Refusal::InvalidQuery(_) => "invalid_query",

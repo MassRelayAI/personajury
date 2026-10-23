@@ -7,6 +7,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed (the v0.5 review)
+- `apply-check --latest` judges every subject that has runs and answers the worst (`human` > `escalate` > `advise` > `apply`), with each
+  subject's answer under `subjects`; `--subject S` narrows it. It no longer answers `apply` for the newest subject while another escalates.
+- The Action fails closed: an engine error, a missing binary or output that is not JSON answers `unavailable`, which fails the job unless
+  `fail-on` leaves it out; default `fail-on: human,escalate,unavailable`; `--rule` is passed when `should-run` matched exactly one rule;
+  file names are markdown-escaped in the step summary; `version` defaults to `v0.5.0`.
+- `summary`: `report_dir` and MCP `md`/`html` paths must stay inside the root (`invalid_report_dir`); printed text is terminal-safe;
+  quotes are cut only between words; the first sentence is plain words; quoted blockers rotate across jurors.
+- `apply-check --calibration` refuses a file for another subject, lens, lens version or run (`calibration_mismatch`).
+- CSV locators refuse lowercase and `RC1`; a quote inside an unquoted field is literal.
+
+## [0.5.0] - 2026-10-24
+
+### Added (v0.5, D20 to D24)
+- `jurygraph calibrate JURY_RUN HUMAN_RUN [--out F]` and `apply-check --calibration F`: the jury's rank order against a human run, per
+  stratum, never pooled; an uncalibrated jury advises (`uncalibrated`) (D20). `apply-check --latest` judges the subject of the newest run.
+- CSV cell locators `<label>#R<row>C<col>` on `.csv` text attachments, with an RFC 4180 reader in `domain/csv.rs` (D21).
+- `action.yml`, a composite GitHub Action (`scripts/action-run.sh`, `docs/ci.md`): `should-run` on the PR diff, `check` and `apply-check`
+  with a committed store, outputs `quorum`, `spend`, `effort`, `answer`, `check`, `fail-on`, unmatched paths in plain words (D22).
+- `docs/agent-sdk.md` and `examples/agent-sdk/run_jury.py`: the Claude Agent SDK recipe, one context per brief (D23).
+- `jurygraph summary RUN... [--html F] [--md F] [--save] [--width N]` and the MCP tool `jurygraph_summary` (eight tools): sentences, the numbers
+  "for checking", then Next; no bars; `report_dir` in `jurygraph.toml` (D24). Golden files `fixtures/run/summary.txt` and `summary.md`.
+- `fixtures/lenses/tradeoffs.toml` and `docs/playbooks/a-technical-decision.md`.
+- Docs: "Display is free, the verdict is not", "What goes to a jury", "Where results live"; a three-question rule in the skill.
+
 ## [0.4.0] - 2026-10-24
 Everything below this heading ships together as 0.4.0; the manifests still read 0.1.0 until the release commit bumps them
 (`docs/dev/release.md`).

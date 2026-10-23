@@ -1,0 +1,26 @@
+JuryGraph summary: lantern-site, runs 1 2 (critical, compare)
+
+The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree
+on 2 scores, and 26 findings have no decision yet.
+Even without that, the jury could only advise: no rule was given.
+On the pick, primary chose cmp:acme-pricing, 3 of 4; secondary was split, 1 of 2
+each for the top choices; bystander chose pricing.png, 1 of 1. The runner-up
+with primary was pricing.png, 1 of 4.
+The weakest dimension is works for primary (median 2), clarity for secondary
+(median 1), and works for bystander (median 2).
+Blockers, in the jurors' words: builder-ana (primary) on blocks: "Team shows
+Contact us instead of a price, and a price I…" (no decision yet); builder-mei
+(primary) on blocks: "The main Get started button is white text on pale blue
+and…" (no decision yet); builder-ravi (primary) on blocks: "The 'Sign up free'
+link points to '#' so the one path to…" (no decision yet) and 23 more.
+
+Numbers, for checking (medians primary·secondary·bystander; - = nobody):
+                   works  blocks  missing  clarity  price  trust
+cmp:acme-pricing   -      -       -        4·4·4    5·5·5  3·3·4
+pricing.png        -      -       -        3·2·3    3·2·3  2·2·3
+pricing.walk.json  -      -       -        3·2·3    3·2·3  2·2·3
+lantern-site       2·2·2  2·2·2   2·2·2    2·1·2    2·2·2  2·2·2
+home.png           -      -       -        2·1·2    1·1·1  2·2·2
+(1 more not shown)
+
+Next: run the high quorum with these reasons in hand before applying anything.

@@ -517,6 +517,8 @@ pub struct AttachmentView {
     pub lines: usize,
     /// a `file` that decodes as UTF-8: its `#L<n>` locators are checked against `lines`
     pub text: bool,
+    /// a text attachment whose label ends `.csv`: the fields in each record, for `R<row>C<col>` locators (D21)
+    pub csv: Option<Vec<usize>>,
 }
 
 /// Everything a run holds as evidence: the subject's attachments by label, each comparator's by name then label.
@@ -789,6 +791,9 @@ pub struct TriggerConfig {
     /// a hard cap on a brief's estimated tokens (D17): the run is fitted under it or refused as `over_budget`
     #[serde(default)]
     pub budget_tokens: Option<u64>,
+    /// where `summary --save` writes `<date>-<subject>.md` (D24); unset: nothing is written
+    #[serde(default)]
+    pub report_dir: Option<String>,
     #[serde(rename = "rule", default)]
     pub rules: Vec<TriggerRule>,
 }

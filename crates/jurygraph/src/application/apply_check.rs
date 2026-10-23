@@ -63,7 +63,82 @@ fn is_human_class(class: &str, quorum: Quorum) -> bool {
     quorum == Quorum::Human || HUMAN_CLASSES.contains(&trigger::normalise_class(class).as_str())
 }
 
-pub fn run(root: &Path, runs: &[i64], rule: Option<&str>) -> Result<Value> {
+/// The runs to judge: the ones named, or (`--latest`) every run of each subject that has runs (`--subject` narrows it to
+/// one). Each group is judged on its own; `latest` answers the worst of them.
+pub fn runs_to_judge(root: &Path, named: &[i64], latest: bool, subject: Option<&str>) -> Result<Vec<Vec<i64>>> {
+    match (named.is_empty(), latest) {
+        (false, true) => Err(AppError::InvalidArguments("name runs or pass --latest, not both".into())),
+        (true, false) => Err(AppError::InvalidArguments("name at least one run, or pass --latest".into())),
+        (false, false) if subject.is_some() => {
+            Err(AppError::InvalidArguments("--subject narrows --latest; named runs already name their subject".into()))
+        }
+        (false, false) => Ok(vec![named.to_vec()]),
+        (true, true) => {
+            let all = open(root)?.runs()?;
+            if all.is_empty() {
+                return Err(AppError::NotFound("the store holds no run".into()));
+            }
+            let mut by_subject: std::collections::BTreeMap<&str, Vec<i64>> = std::collections::BTreeMap::new();
+            for r in &all {
+                if subject.is_none_or(|s| s == r.subject_name) {
+                    by_subject.entry(r.subject_name.as_str()).or_default().push(r.id);
+                }
+            }
+            if by_subject.is_empty() {
+                return Err(AppError::NotFound(format!("no run of subject {}", subject.unwrap_or(""))));
+            }
+            Ok(by_subject.into_values().collect())
+        }
+    }
+}
+
+/// The worst first: `human` beats `escalate` beats `advise` beats `apply` (an unknown word counts as worst).
+fn severity(answer: &Value) -> u8 {
+    match answer.as_str() {
+        Some("apply") => 0,
+        Some("advise") => 1,
+        Some("escalate") => 2,
+        _ => 3,
+    }
+}
+
+/// `apply-check --latest`: judge every subject that has runs, each on its own, and answer the worst. One group (one
+/// subject, or `--subject`) answers exactly as naming its runs would, plus `subjects`.
+pub fn worst(root: &Path, groups: &[Vec<i64>], rule: Option<&str>, calibration: Option<&Path>) -> Result<Value> {
+    let mut answers = Vec::new();
+    for g in groups {
+        answers.push(run(root, g, rule, calibration)?);
+    }
+    let w = answers.iter().max_by_key(|a| severity(&a["answer"])).cloned().ok_or_else(|| AppError::NotFound("the store holds no run".into()))?;
+    if answers.len() == 1 {
+        let mut out = w;
+        out["subjects"] = json!([out.clone()]);
+        return Ok(out);
+    }
+    let mut runs: Vec<Value> = Vec::new();
+    let mut reasons: Vec<Value> = Vec::new();
+    for a in &answers {
+        runs.extend(a["runs"].as_array().cloned().unwrap_or_default());
+        for r in a["reasons"].as_array().into_iter().flatten() {
+            let mut r = r.clone();
+            r["subject"] = a["subject"].clone();
+            reasons.push(r);
+        }
+    }
+    let mut out = json!({
+        "answer": w["answer"],
+        "worst": w["subject"],
+        "runs": runs,
+        "reasons": reasons,
+        "subjects": answers,
+    });
+    if !w["next_quorum"].is_null() {
+        out["next_quorum"] = w["next_quorum"].clone();
+    }
+    Ok(out)
+}
+
+pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&Path>) -> Result<Value> {
     if runs.is_empty() {
         return Err(AppError::InvalidArguments("name at least one run".into()));
     }
@@ -178,6 +253,45 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>) -> Result<Value> {
                     json!({"via": "run", "run": r.id, "rule": class, "quorum": rq.map(quorum_name), "sources": quorum_name(sq), "sources_rule": sources_rule}),
                 ));
             }
+        }
+    }
+
+    // D20: the jury does not rank like the people it was set beside: it advises, it never applies
+    if let Some(p) = calibration {
+        let text = super::read_text(p)?;
+        let c: Value = serde_json::from_str(&text)
+            .map_err(|e| AppError::InvalidArguments(format!("{}: not a calibration file ({e})", p.display())))?;
+        let Some(ok) = c["calibrated"].as_bool() else {
+            return Err(AppError::InvalidArguments(format!("{}: not a calibration file (no `calibrated`)", p.display())));
+        };
+        // the file must be the calibration of this subject, lens and lens version, from one of the runs given (M1)
+        let jury_run = c["jury_run"].as_i64().and_then(|id| given.iter().find(|r| r.id == id));
+        let mismatch = match jury_run {
+            None => Some(format!("its jury_run {} is not one of the runs given", c["jury_run"])),
+            Some(r) if c["subject"].as_str() != Some(subject.name.as_str()) => {
+                Some(format!("calibrated on subject {}, not on {}", c["subject"], r.subject_name))
+            }
+            Some(r) if c["lens"].as_str() != Some(r.lens_name.as_str()) => {
+                Some(format!("calibrated on lens {}, run {} is {}", c["lens"], r.id, r.lens_name))
+            }
+            Some(r) if c["lens_version"].as_i64() != Some(r.lens_version) => {
+                Some(format!("calibrated on lens version {}, run {} is v{}", c["lens_version"], r.id, r.lens_version))
+            }
+            Some(_) => None,
+        };
+        if let Some(why) = mismatch {
+            return Err(AppError::CalibrationMismatch(format!(
+                "{}: {why}; calibrate this run (`calibrate <jury-run> <human-run> --out F`)",
+                p.display()
+            )));
+        }
+        if !ok {
+            reasons.push(reason(
+                "uncalibrated",
+                "advise",
+                json!({"calibration": p.display().to_string(), "outside_primary": c["outside_primary"],
+                       "remedy": "the jury ranks differently from the people it was compared with on the primary stratum; ask a person, or calibrate again"}),
+            ));
         }
     }
 

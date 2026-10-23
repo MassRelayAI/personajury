@@ -319,3 +319,58 @@ in a median, never in a split. The MCP verdict tool has no `by_human`: an agent 
 human batch makes `apply-check` answer `escalate` (`human_blocker`) whatever the stratum, until a recorded `decide` closes the finding;
 that decision is the only way a human verdict is overruled, and `decide` takes it only with `--by-human "<name>"` (a `--by` of
 the agent, the foreman or anyone is refused, `human_decision_required`; the MCP has no `decide`). `calibrate` (v0.5) will compare human batches with persona batches.
+
+## D20 — calibration (2026-10-24)
+`jurygraph calibrate <jury-run> <human-run> [--out F]`. The human run is an ordinary run whose batches were entered with `--by-human`
+(`not_human_run` otherwise) on the same subject and lens version. For each stratum, the cells (lens, dimension, about) are ranked by the
+stratum's median (the lower middle), high first, ties sharing a rank (1, 1, 3); `within_one_rank` per cell. **`calibrated` is true iff every
+primary-stratum cell is within one rank**, and every primary cell the jury judged was compared (a cell no person judged is not proven).
+Differences on the other strata are listed (`outside_primary`) and never change `calibrated`; no number spans strata. `apply-check
+--calibration F` reads the `--out` file: `calibrated: false` is the advise reason `uncalibrated` (so `apply` becomes `advise`; `escalate`
+and `human` still take precedence). The roadmap said "escalate"; this is `advise` by the principle of D13 (an unproven jury advises, it does
+not send the change up a quorum). A file for another subject, or not a calibration, is `invalid_arguments`. Pure code in `domain/calibrate.rs`.
+
+## D21 — CSV cell locators (2026-10-24)
+`<label>#R<row>C<col>` on a text attachment whose label ends `.csv`, 1-based, the header is row 1, canonical digits only. Rows are records
+(RFC 4180, `domain/csv.rs`: quoted fields, doubled quotes, CRLF, line breaks in quotes; no crate), so a quoted newline does not add a row.
+The column must exist in that record (ragged rows are allowed). Out of range or non-canonical: `citation_unresolved`. `R` followed by a
+letter stays an anchor; `#L<n>` keeps working.
+
+## D22 — the GitHub Action (2026-10-24)
+`action.yml` (composite) installs the released binary through `scripts/install.sh` (checksum verified), then `scripts/action-run.sh` takes
+`git diff base...HEAD`, runs `should-run`, and with `store` runs `check` and `apply-check --latest`. Outputs `quorum`, `spend`, `effort`,
+`answer`, `check`. The job fails on a failing `check` always, and on an answer or a `human` quorum named in `fail-on` (default `human`).
+No model, no secret, no network but the download. `apply-check --latest` (new flag) judges every run of the newest run's subject, so CI
+needs no run ids. The script needs `jq`. Tested against a local binary in `tests/action.rs`.
+- **Amended after the v0.5 review (the maintainer's rulings, 2026-10-24; D13 "gates fail closed"):** `--latest` without `--subject`
+  judges every subject that has runs, each on its own, and answers the worst (`human` > `escalate` > `advise` > `apply`), listing each
+  subject's answer and reasons; `--subject S` judges S only. The Action passes no subject, and passes `--rule` when `should-run` matched
+  exactly one rule. The Action fails closed: an error from `should-run`, `check` or `apply-check`, a missing binary or output that is not
+  JSON answers `unavailable`, which fails the job unless `fail-on` is set without it; the default `fail-on` is
+  `human,escalate,unavailable`. File names are markdown-escaped in the step summary. The `version` input defaults to the Action's own
+  release (`v0.5.0`), not `latest`. A calibration file must name the subject, lens, lens version and a jury run among those given, else
+  `calibration_mismatch`. CSV: lowercase and `RC1` locators are refused; a quote in the middle of an unquoted field is literal.
+
+## D23 — the Claude Agent SDK recipe (2026-10-24)
+Docs and one example, no runner of our own. `docs/agent-sdk.md`, `examples/agent-sdk/run_jury.py` (Python; the SDK's names are marked "check
+the SDK version"). One `query()` session per brief; private folders; a coordinator session ingests through `jurygraph mcp`. The test only
+checks the example compiles and holds no key or environment read.
+
+## D24 — the answer display (2026-10-24, the maintainer, with a display jury of 8 mixed personas)
+`jurygraph summary RUN... [--html F] [--md F] [--save] [--width N]`, MCP `jurygraph_summary`. The jury preferred sentences (the non-technical
+readers) and numbers (the technical readers) over bars, which got 0 of 8 picks: so **no bars anywhere**. Layout: 2 to 5 plain sentences (the
+apply-check answer in words, who won with counts per stratum, the weakest dimension, the change "15 → 6", up to three quoted blockers with
+persona and decision), a numbers table "for checking" (medians `P·S·B`, a dash for an empty stratum, top 5 rows), then `Next:` from a fixed
+set keyed by the answer. Rows are ordered by the primary stratum's medians; nothing pools strata. `--html`: one offline file, the README
+palette, the `graph` SVG inline, no scripts, deterministic. `--md` adds decisions per finding, run ids, brief hashes and the date of the latest
+run (no clock: the file is the same on any day). `report_dir` (top-level toml key) names where `--save` writes `<date>-<subject>.md`; unset,
+`--save` is refused (`no_report_dir`) and nothing is written. Display is free, the verdict is not: the layout is a recommendation, `apply-check`
+is binding only where wired (Action, hook, own gate). Golden: `fixtures/run/summary.txt`, `summary.md`.
+- **Amended after the v0.5 review (2026-10-24):** `report_dir`, and the MCP tool's `md`/`html` paths, must be relative, hold no `..`
+  and resolve inside the root, else `invalid_report_dir`; a CLI path the person types may be anywhere. Everything printed is
+  terminal-safe (ESC sequences, C0 controls but the newline, DEL and C1 controls removed). Quotes keep the juror's words with runs of
+  whitespace folded to one space, are cut only between words with `…`, and never inside a word. The first sentence uses plain words
+  ("The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree on 2 scores, and 26 findings have no decision
+  yet."), and a lesser reason follows in its own sentence ("Even without that, the jury could only advise: no rule was given."). The
+  quoted blockers rotate across jurors, primary first, one per juror before anyone's second.
+

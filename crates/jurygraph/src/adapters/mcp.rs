@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Seven tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Eight tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -94,7 +94,19 @@ pub fn tools() -> Vec<Value> {
             "The verdict to obey last, over the runs of one subject: apply, escalate, human or advise, with the reasons as data (human_class; escalate: primary_blocker, split, check_failed, delta_not_landed, human_blocker; advise: incomplete_jury, quorum_unknown, rule_below_sources, overridden_down, effort_below_quorum, independence_sequential, stale_run, delta_unavailable). apply only when every condition is proven: anything unknown, missing or lowered answers advise or worse. human: the change falls under a human class (named by rule, or found in the subject's recorded sources): a person decides, the jury only advises. escalate: run the next quorum up (next_quorum: low to high, high to human). advise: the jury was incomplete, cheap, overridden down, stale or weak; it may advise but never apply. apply: nothing stands in the way. It applies nothing itself and reads only.",
             schema(
                 json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids of one subject; the latest run of each lens is judged, earlier ones are the rounds before it"},
-                        "rule": {"type":"string","description":"the rule class of jurygraph.toml this change falls under: its quorum is the current level"} }),
+                        "rule": {"type":"string","description":"the rule class of jurygraph.toml this change falls under: its quorum is the current level"},
+                        "calibration": {"type":"string","description":"path of a file written by `calibrate --out`; calibrated:false turns apply into advise (uncalibrated)"} }),
+                &["runs"],
+            ),
+        ),
+        tool(
+            "jurygraph_summary",
+            "The answer display for the person: plain sentences (the apply-check answer in words, who won with counts per stratum, the weakest dimension, the top blockers in the jurors' own words), a numbers table \"for checking\" (medians as primary·secondary·bystander, never pooled), then a fixed Next sentence. Returns the text in data.text; paste it as is. No bars. With `md` or `html` it also writes that file, at a relative path inside the project root (else invalid_report_dir).",
+            schema(
+                json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids of one subject; two rounds of a lens show the change"},
+                        "width": {"type":"integer","minimum":30,"maximum":200,"description":"characters per line, default 80"},
+                        "md": {"type":"string","description":"write the markdown summary here: a relative path inside the project root"},
+                        "html": {"type":"string","description":"write the self-contained html here: a relative path inside the project root"} }),
                 &["runs"],
             ),
         ),
@@ -222,7 +234,8 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "jurygraph_matrix" => &["runs", "table", "history", "detail"],
         "jurygraph_delta" => &["a", "b"],
         "jurygraph_graph" => &["runs"],
-        "jurygraph_apply_check" => &["runs", "rule"],
+        "jurygraph_apply_check" => &["runs", "rule", "calibration"],
+        "jurygraph_summary" => &["runs", "width", "md", "html"],
         "jurygraph_should_run" => &["diff", "paths", "config", "subject"],
         _ => return Err(format!("unknown tool {name}")),
     };
@@ -302,7 +315,24 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         },
         "jurygraph_apply_check" => Cmd::ApplyCheck {
             runs: runs_arg(a)?,
+            latest: false,
+            subject: None,
             rule: str_arg(a, "rule")?,
+            calibration: str_arg(a, "calibration")?.map(PathBuf::from),
+        },
+        "jurygraph_summary" => Cmd::Summary {
+            runs: runs_arg(a)?,
+            html: str_arg(a, "html")?.map(PathBuf::from),
+            md: str_arg(a, "md")?.map(PathBuf::from),
+            save: false,
+            confined: true,
+            width: match a.get("width") {
+                None | Some(Value::Null) => None,
+                Some(v) => match v.as_u64() {
+                    Some(n) => Some(n as usize),
+                    _ => return Err("width must be an integer".into()),
+                },
+            },
         },
         "jurygraph_delta" => Cmd::Delta {
             a: id_arg(a, "a")?,

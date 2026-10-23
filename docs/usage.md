@@ -54,6 +54,49 @@ into `-` and reading `license` as `licence` (so `Money`, `public_claim` and `lic
 
 Publishing a result outside the project: [`publishing-results.md`](publishing-results.md). Lenses: [`lenses.md`](lenses.md).
 
+## What goes to a jury
+Code correctness goes to tests, so a path no rule matches gets no jury: `should-run` lists it under `unmatched`, and the Action's step
+summary says so in plain words ("N files matched no rule and got no jury: ...; add a rule if one of them is something people see").
+Visible surfaces (pages, decks, designs, rendered docs) go to a jury that sees the rendered result, screenshots and walks, never the diff
+of code. Technical-but-read surfaces (API docs, CLI output, error messages) go to builder personas through the rule's panel. Code is a
+fine subject for judgement (readability, API ergonomics, trade-offs between libraries: `fixtures/lenses/tradeoffs.toml` and
+[`playbooks/a-technical-decision.md`](playbooks/a-technical-decision.md)): judgement, never correctness.
+
+## Display is free, the verdict is not
+The `summary` layout is a recommendation. Any agent may restyle the JSON an envelope returns, with two rules: never pool strata, and never
+write a number the data lacks. `apply-check` is different: it is a verdict, and the engine cannot enforce it by itself. It becomes binding
+where it is wired:
+
+- **The GitHub Action** (`action.yml`, [`ci.md`](ci.md)): `fail-on: human,escalate` fails the job.
+- **A Claude Code hook before merge or push**, in `.claude/settings.json`:
+  ```json
+  { "hooks": { "PreToolUse": [ { "matcher": "Bash", "hooks": [ { "type": "command", "command": "sh .claude/hooks/jury-gate.sh" } ] } ] } }
+  ```
+  with `.claude/hooks/jury-gate.sh`:
+  ```sh
+  #!/bin/sh
+  cmd="$(jq -r '.tool_input.command // ""')"
+  case "$cmd" in *"git merge"*|*"git push"*) ;; *) exit 0 ;; esac
+  git diff main...HEAD > /tmp/jg.diff
+  jurygraph should-run --diff /tmp/jg.diff | jq -r '.data.unmatched | select(length > 0) | "\(length) files matched no rule and got no jury: \(join(", ")); add a rule if one of them is something people see"' >&2
+  a="$(jurygraph apply-check --latest | jq -r '.data.answer // "advise"')"
+  case "$a" in escalate|human) echo "jurygraph: apply-check says $a; not merging" >&2; exit 2 ;; esac
+  ```
+- **A git pre-merge hook** (`.git/hooks/pre-merge-commit`, made executable; use `pre-push` for pushes):
+  ```sh
+  #!/bin/sh
+  a="$(jurygraph apply-check --latest | jq -r '.data.answer // "advise"')"
+  [ "$a" = escalate ] || [ "$a" = human ] && { echo "jurygraph: apply-check says $a" >&2; exit 1; }
+  exit 0
+  ```
+- **Your own gate**: any script that runs `jurygraph apply-check --latest` and reads `.data.answer`.
+
+## Where results live
+The store (`.jurygraph/`) is the record: append-only, and not meant for git unless CI reads it (`store:` in the Action). Reports are views of it,
+written on request (`jurygraph summary RUN... --md summary.md` or `--html summary.html`) or automatically into `report_dir`
+(`report_dir = "docs/juries"` in `jurygraph.toml`; `summary --save` writes `<report_dir>/<date>-<subject>.md`, and is refused with
+`no_report_dir` when it is unset). With no `report_dir` nothing is written.
+
 ## Try it on the fixture site
 The five-minute example in the README uses only files in `fixtures/`.
 

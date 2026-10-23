@@ -141,6 +141,9 @@ fn views(root: &Path, s: &Subject) -> Result<BTreeMap<String, AttachmentView>> {
                 if let Some(t) = std::str::from_utf8(&bytes).ok().filter(|_| !bytes.contains(&0)) {
                     v.lines = t.lines().count();
                     v.text = true;
+                    if a.label.to_ascii_lowercase().ends_with(".csv") {
+                        v.csv = Some(crate::domain::csv::shape(t));
+                    }
                 }
             }
             _ => {}

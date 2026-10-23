@@ -2,6 +2,7 @@
 //! Workflows, one module per verb. Each returns the envelope's `data` as a serde_json::Value.
 pub mod apply_check;
 pub mod brief;
+pub mod calibrate;
 pub mod check;
 pub mod decide;
 pub mod delta;
@@ -15,6 +16,7 @@ pub mod pick;
 pub mod setup;
 pub mod should_run;
 pub mod subject;
+pub mod summary;
 pub mod verdict;
 use crate::domain::Refusal;
 use serde_json::Value;
@@ -36,6 +38,14 @@ pub enum AppError {
     CheckFailed(String, Value),
     #[error("{0}: {1}")]
     Io(PathBuf, std::io::Error),
+    #[error("summary --save needs report_dir in jurygraph.toml (for example report_dir = \"docs/juries\"); nothing is written by default")]
+    NoReportDir,
+    /// a calibration file written for another subject, lens, lens version or run (M1)
+    #[error("{0}")]
+    CalibrationMismatch(String),
+    /// a report directory or an MCP output path that is absolute, holds `..`, or resolves outside the root (I2)
+    #[error("{0}")]
+    InvalidReportDir(String),
     #[error("{0} is not implemented yet")]
     NotImplemented(&'static str),
 }
@@ -51,6 +61,9 @@ impl AppError {
             AppError::CheckFailed(..) => "check_failed",
             AppError::Io(..) => "io_error",
             AppError::NotImplemented(_) => "not_implemented",
+            AppError::NoReportDir => "no_report_dir",
+            AppError::CalibrationMismatch(_) => "calibration_mismatch",
+            AppError::InvalidReportDir(_) => "invalid_report_dir",
         }
     }
     /// Data carried by a failing gate, shown in the envelope beside the error.

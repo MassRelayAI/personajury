@@ -1,0 +1,35 @@
+# The tradeoffs lens: which technical option do we choose, weighing advantages against disadvantages. Anchors in words, 1 / 3 / 5.
+# Fixture data, not seeded: load it with `jurygraph lens add --file fixtures/lenses/tradeoffs.toml`. Attach each option as files
+# (a README excerpt, a usage snippet, the licence, the release cadence); each juror scores every option (`about`) and picks one.
+# Correctness is for tests: a jury cannot tell you the library is right, only whether it is the one to live with.
+name = "tradeoffs"
+version = 1
+scale = [1, 5]
+asks_pick = true
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "fit"
+title = "It fits what we use it for"
+anchors = { "1" = "it solves a neighbouring problem; we would bend our use to suit it", "3" = "it covers our use, with one or two things we must work around", "5" = "it does what we need in the way we need it, and little we do not" }
+
+[[dimension]]
+id = "risk"
+title = "Licence, maintenance and lock-in are safe"
+anchors = { "1" = "the licence is unclear or hostile, or one tired maintainer holds it, or leaving it means a rewrite", "3" = "the licence is fine and there is activity, but a single company or person could stop it", "5" = "a permissive licence, several maintainers, steady releases, and a way out that costs days" }
+
+[[dimension]]
+id = "cost-to-change"
+title = "It is cheap to change our mind later"
+anchors = { "1" = "it spreads through the code; switching later means touching most files", "3" = "it sits behind a few call sites; switching is a sprint", "5" = "it hides behind one small seam; switching is an afternoon" }
+
+[[dimension]]
+id = "operability"
+title = "Running it at 3 a.m. is manageable"
+anchors = { "1" = "when it fails the errors say nothing, there is no way to see inside, and the fix is a guess", "3" = "failures are logged and documented, but finding the cause takes digging", "5" = "it fails loudly and clearly, shows its state, and the runbook is one page" }
+
+[[dimension]]
+id = "learning-curve"
+title = "A new hire can use it in their first week"
+anchors = { "1" = "the docs assume knowledge we do not teach; a new hire would copy and hope", "3" = "the basics are quick, the edges need an experienced colleague", "5" = "the docs and examples get a new hire to a working change in a day" }

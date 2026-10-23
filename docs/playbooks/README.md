@@ -10,5 +10,6 @@ attach to the decision you make. They are not rules. For the rules, see [`skills
 | [Pick a name or a logo](pick-a-name-or-logo.md) | you have a few candidates and must choose one |
 | [Test a deck or a pitch](deck-or-pitch.md) | a client, a CFO or a board will read your slides without you there |
 | [Check a change in a pull request](a-change-in-a-pull-request.md) | you want only the changes that need a jury to get one, and to know when the agent may apply the fixes |
+| [Choose between technical options](a-technical-decision.md) | a team must pick a library or an API shape and the trade-offs, not correctness, are the question |
 
 Every number in these pages points at a file: a report, a fixture, or the public CompareGraph report.

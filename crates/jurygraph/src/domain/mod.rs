@@ -1,6 +1,8 @@
 //! The standard: personas, lenses, subjects, verdicts and the refusals. Pure, no I/O.
 pub mod apply;
+pub mod calibrate;
 pub mod citation;
+pub mod csv;
 pub mod delta;
 pub mod graphlayout;
 pub mod hash;
@@ -8,6 +10,7 @@ pub mod matrix;
 pub mod model;
 pub mod query;
 pub mod rng;
+pub mod summary;
 pub mod refuse;
 pub mod trigger;
 pub use model::*;

@@ -33,6 +33,37 @@ fn check_line(c: &str, label: &str, locator: &str, lines: usize, what: &str) -> 
     Ok(())
 }
 
+/// `R` or `r` followed by anything but a letter, or by `C`/`c` and a digit: an attempt at a cell (`R1C2`, `R01C1`, `R+1C1`,
+/// `r9c9`, `RC1`), refused unless canonical; not an anchor like `Rationale`.
+fn cell_shaped(loc: &str) -> bool {
+    let Some(r) = loc.strip_prefix('R').or_else(|| loc.strip_prefix('r')) else { return false };
+    let mut c = r.chars();
+    match c.next() {
+        Some('C' | 'c') => c.next().is_some_and(|d| d.is_ascii_digit()),
+        Some(x) => !x.is_alphabetic(),
+        None => false,
+    }
+}
+/// `R<row>C<col>` in canonical form (1-based, the header row is row 1, no sign, no leading zero) inside the CSV's records.
+fn check_cell(c: &str, label: &str, locator: &str, rows: &[usize]) -> Result<(), Refusal> {
+    let canon = |d: &str| -> Option<usize> {
+        let n = d.parse::<usize>().ok().filter(|_| !d.is_empty() && d.bytes().all(|b| b.is_ascii_digit()))?;
+        (d == n.to_string()).then_some(n)
+    };
+    let (row, col) = locator
+        .strip_prefix('R')
+        .and_then(|r| r.split_once('C'))
+        .and_then(|(r, c)| Some((canon(r)?, canon(c)?)))
+        .ok_or_else(|| unresolved(c, "a CSV cell locator reads R<row>C<col> (1-based, digits, no sign, no leading zero)"))?;
+    if row < 1 || row > rows.len() {
+        return Err(unresolved(c, format!("{label} has {} rows (records, the header is row 1); R{row} is outside", rows.len())));
+    }
+    if col < 1 || col > rows[row - 1] {
+        return Err(unresolved(c, format!("{label} row {row} has {} fields; C{col} is outside", rows[row - 1])));
+    }
+    Ok(())
+}
+
 /// Resolve to `<attachment hash>#<locator>` (locator may be empty), or refuse with `citation_unresolved`.
 pub fn resolve(c: &str, ev: &RunEvidence) -> Result<String, Refusal> {
     let (view, label, locator): (&AttachmentView, &str, &str) =
@@ -69,6 +100,9 @@ pub fn resolve(c: &str, ev: &RunEvidence) -> Result<String, Refusal> {
             }
             // a diff takes only line locators; a text file takes anchors as v0.1 did, and checks the `L<n>` ones
             "diff" => check_line(c, label, locator, view.lines, "diff")?,
+            "file" if view.csv.is_some() && cell_shaped(locator) => {
+                check_cell(c, label, locator, view.csv.as_deref().unwrap_or(&[]))?
+            }
             "file" if view.text && line_shaped(locator) => {
                 check_line(c, label, locator, view.lines, "text file")?
             }
@@ -200,6 +234,50 @@ mod tests {
         for c in ["doc#L+1", "doc#L01", "doc#L 1", "doc#L-1", "doc#L1x", "patch#L+1", "patch#L01"] {
             assert_eq!(resolve(c, &ev()).unwrap_err().code(), "citation_unresolved", "{c}");
         }
+    }
+    fn csv_ev() -> RunEvidence {
+        // name,price / "Team, annual",12 / "two\nlines",7,extra   -> 3 records of 2, 2, 3 fields
+        let sheet = AttachmentView {
+            hash: "H6".into(),
+            media: "file".into(),
+            lines: 4,
+            text: true,
+            csv: Some(crate::domain::csv::shape("name,price\n\"Team, annual\",12\n\"two\nlines\",7,extra\n")),
+            ..Default::default()
+        };
+        RunEvidence { attachments: BTreeMap::from([("prices.csv".into(), sheet)]), comparators: BTreeMap::new() }
+    }
+    #[test]
+    fn a_csv_cell_resolves_in_range() {
+        let e = csv_ev();
+        assert_eq!(resolve("prices.csv#R1C1", &e).unwrap(), "H6#R1C1");
+        assert_eq!(resolve("prices.csv#R2C2", &e).unwrap(), "H6#R2C2");
+        // a quoted comma and an embedded newline do not add fields or rows
+        assert_eq!(resolve("prices.csv#R3C3", &e).unwrap(), "H6#R3C3");
+        // line locators keep working
+        assert_eq!(resolve("prices.csv#L4", &e).unwrap(), "H6#L4");
+    }
+    #[test]
+    fn a_csv_cell_out_of_range_is_unresolved() {
+        let e = csv_ev();
+        for c in ["prices.csv#R4C1", "prices.csv#R2C3", "prices.csv#R1C9", "prices.csv#R0C1", "prices.csv#R1C0"] {
+            assert_eq!(resolve(c, &e).unwrap_err().code(), "citation_unresolved", "{c}");
+        }
+        let m = resolve("prices.csv#R4C1", &e).unwrap_err().to_string();
+        assert!(m.contains("3 rows"), "{m}");
+    }
+    #[test]
+    fn a_csv_cell_must_be_canonical() {
+        let e = csv_ev();
+        for c in ["prices.csv#R01C1", "prices.csv#R+1C1", "prices.csv#R1C01", "prices.csv#R1", "prices.csv#R1C", "prices.csv#R-1C1", "prices.csv#R1c1"] {
+            assert_eq!(resolve(c, &e).unwrap_err().code(), "citation_unresolved", "{c}");
+        }
+        // an anchor that merely starts with R stays an anchor
+        assert_eq!(resolve("prices.csv#Rationale", &e).unwrap(), "H6#Rationale");
+    }
+    #[test]
+    fn a_cell_locator_on_a_file_that_is_not_a_csv_is_left_alone() {
+        assert_eq!(resolve("doc#R9C9", &ev()).unwrap(), "H4#R9C9");
     }
     #[test]
     fn a_file_that_is_not_text_keeps_its_locator_unchecked() {

@@ -1,0 +1,59 @@
+name: JuryGraph
+description: Classify a pull request against jurygraph.toml and, with a committed store, run check and apply-check. No model and no secret.
+branding:
+  icon: users
+  color: blue
+inputs:
+  config:
+    description: The rules file
+    default: jurygraph.toml
+  base:
+    description: The commit to diff against (default the pull request base)
+    default: ""
+  store:
+    description: A project root that holds a committed .jurygraph; when set, check and apply-check run on its latest runs
+    default: ""
+  version:
+    description: The release to install (default this Action's own release; `latest` follows the newest release)
+    default: v0.5.0
+  fail-on:
+    description: "Comma list of answers that fail the job: human, escalate, advise, unavailable (an error, a missing binary or output that is not JSON). A failing check always fails it."
+    default: human,escalate,unavailable
+outputs:
+  quorum:
+    description: none, low, high, human, or unavailable when the rules could not be read
+    value: ${{ steps.run.outputs.quorum }}
+  spend:
+    description: The rule's panel and lenses, as JSON
+    value: ${{ steps.run.outputs.spend }}
+  effort:
+    description: The configured effort word
+    value: ${{ steps.run.outputs.effort }}
+  answer:
+    description: apply, escalate, human, advise, unavailable (nothing proven), or none when no store is given
+    value: ${{ steps.run.outputs.answer }}
+  check:
+    description: ok, failed, unavailable (check errored), or skipped
+    value: ${{ steps.run.outputs.check }}
+runs:
+  using: composite
+  steps:
+    - name: Install the released binary (checksum verified)
+      shell: sh
+      env:
+        JURYGRAPH_VERSION: ${{ inputs.version }}
+        JURYGRAPH_INSTALL_DIR: ${{ runner.temp }}/jurygraph-bin
+      run: |
+        sh "$GITHUB_ACTION_PATH/scripts/install.sh"
+        echo "$JURYGRAPH_INSTALL_DIR" >> "$GITHUB_PATH"
+    - name: Classify the diff, check the store
+      id: run
+      shell: sh
+      env:
+        JG_CONFIG: ${{ inputs.config }}
+        JG_BASE: ${{ inputs.base }}
+        JG_STORE: ${{ inputs.store }}
+        JG_FAIL_ON: ${{ inputs.fail-on }}
+        PATH_ADD: ${{ runner.temp }}/jurygraph-bin
+      run: |
+        PATH="$PATH_ADD:$PATH" sh "$GITHUB_ACTION_PATH/scripts/action-run.sh"

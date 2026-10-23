@@ -90,7 +90,14 @@ fn views(root: &Path, s: &Subject) -> Result<BTreeMap<String, AttachmentView>> {
                     }
                 }
             }
-            "diff" | "file" => v.lines = String::from_utf8_lossy(&bytes).lines().count(),
+            "diff" => v.lines = String::from_utf8_lossy(&bytes).lines().count(),
+            // a text file: its line locators are checked; bytes that are not UTF-8 stay unchecked
+            "file" => {
+                if let Some(t) = std::str::from_utf8(&bytes).ok().filter(|_| !bytes.contains(&0)) {
+                    v.lines = t.lines().count();
+                    v.text = true;
+                }
+            }
             _ => {}
         }
         out.insert(a.label.clone(), v);

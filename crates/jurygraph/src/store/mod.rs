@@ -7,7 +7,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 const SCHEMA: &str = include_str!("schema.sql");
-pub const SCHEMA_VERSION: i64 = 2;
+pub const SCHEMA_VERSION: i64 = 3;
 pub const DIR: &str = ".jurygraph";
 pub const DB: &str = "store.db";
 
@@ -99,7 +99,7 @@ fn brief_from_value(v: &serde_json::Value) -> Result<BriefRef> {
     })
 }
 
-const RUN_COLS: &str = "id, subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at";
+const RUN_COLS: &str = "id, subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json";
 fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
     let text = |i: usize| r.get::<_, String>(i);
     let conv = |what: &'static str, e: StoreError| {
@@ -141,6 +141,11 @@ fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
         comparators: json_vec("run comparators", &text(12)?).map_err(|e| conv("comparators", e))?,
         briefs,
         created_at: r.get(14)?,
+        draw_seed: r.get(15)?,
+        override_json: match r.get::<_, Option<String>>(16)? {
+            None => None,
+            Some(t) => Some(json_vec("run override", &t).map_err(|e| conv("override", e))?),
+        },
     })
 }
 
@@ -223,6 +228,26 @@ impl Store {
             source,
         };
         let conn = Connection::open(&path).map_err(open_err)?;
+        // refuse a store of another version before anything is written to it (no pragma, no table)
+        let has_meta = conn
+            .query_row(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'meta'",
+                [],
+                |r| r.get::<_, i64>(0),
+            )
+            .optional()?
+            .is_some();
+        if has_meta {
+            let v: Option<String> = conn
+                .query_row("SELECT value FROM meta WHERE key = 'schema_version'", [], |r| r.get(0))
+                .optional()?;
+            if let Some(v) = v.filter(|v| v.parse::<i64>().ok() != Some(SCHEMA_VERSION)) {
+                return Err(StoreError::Schema(format!(
+                    "{} has schema_version {v}, this binary needs {SCHEMA_VERSION}",
+                    path.display()
+                )));
+            }
+        }
         conn.execute_batch(
             "PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;",
         )
@@ -245,10 +270,12 @@ impl Store {
             Some(Ok(v)) if v == SCHEMA_VERSION => {}
             Some(other) => {
                 return Err(StoreError::Schema(format!(
-                    "{} has schema_version {:?}, this binary needs {}",
+                    "{} has schema_version {}, this binary needs {SCHEMA_VERSION}",
                     path.display(),
-                    other,
-                    SCHEMA_VERSION
+                    match other {
+                        Ok(v) => v.to_string(),
+                        Err(_) => "(unreadable)".into(),
+                    },
                 )))
             }
         }
@@ -569,7 +596,7 @@ impl Store {
     // ---- runs ----
     pub fn insert_run(&self, r: &RunRow) -> Result<i64> {
         self.conn.execute(
-            "INSERT INTO run(subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14)",
+            "INSERT INTO run(subject_name, subject_version, subject_hash, panel_name, panel_hash, lens_name, lens_version, model, spend, stakes_json, personas_json, comparators_json, briefs_json, created_at, draw_seed, override_json) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15,?16)",
             params![
                 r.subject_name,
                 r.subject_version,
@@ -584,7 +611,9 @@ impl Store {
                 to_json(&r.personas),
                 to_json(&r.comparators),
                 to_json(&r.briefs),
-                r.created_at
+                r.created_at,
+                r.draw_seed,
+                r.override_json.as_ref().map(to_json)
             ],
         )?;
         Ok(self.conn.last_insert_rowid())

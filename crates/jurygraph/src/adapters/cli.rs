@@ -52,15 +52,21 @@ pub enum Cmd {
     Brief {
         #[arg(long)]
         subject: String,
+        /// a saved panel (or `--query`, or `--rule` for the rule's panel)
         #[arg(long)]
-        panel: String,
+        panel: Option<String>,
+        /// an ad-hoc panel, not saved: "3 builder=primary, 2 others=bystander"
         #[arg(long)]
-        lens: String,
+        query: Option<String>,
+        /// one run per lens, repeated or comma-separated (default: the rule's)
+        #[arg(long, value_delimiter = ',')]
+        lens: Vec<String>,
         /// take the first N personas of the panel, primary → secondary → bystander (default: all)
         #[arg(long)]
         spend: Option<usize>,
-        /// a stake for every panel persona: `<persona>=primary|secondary|bystander`, repeated or comma-separated
-        #[arg(long = "stake", value_delimiter = ',', required = true)]
+        /// `<persona>=primary|secondary|bystander`, repeated or comma-separated: wins over the panel's term stake, and
+        /// is needed for a persona whose term has none
+        #[arg(long = "stake", value_delimiter = ',')]
         stakes: Vec<String>,
         /// the model the agent will run the personas on (the run is pinned to it)
         #[arg(long)]
@@ -68,9 +74,24 @@ pub enum Cmd {
         /// comparator snapshots this run holds
         #[arg(long = "comparator")]
         comparators: Vec<String>,
-        /// compact (attachments by path) or full (text attachments inline)
-        #[arg(long, default_value = "compact")]
-        detail: String,
+        /// compact (attachments by path) or full (text attachments inline); default: the rule's, else compact
+        #[arg(long)]
+        detail: Option<String>,
+        /// take panel, lenses, spend and detail from this rule of jurygraph.toml; any value you change needs --reason
+        #[arg(long)]
+        rule: Option<String>,
+        /// the draw's seed as 16 hex digits (default: from the subject's name and the panel's)
+        #[arg(long)]
+        draw: Option<String>,
+        /// allow more than 12 seats (the most is 1000)
+        #[arg(long)]
+        allow_large: bool,
+        /// why this brief departs from its rule (or runs more than 12 seats); recorded on the run
+        #[arg(long)]
+        reason: Option<String>,
+        /// who departed from the rule (default: agent)
+        #[arg(long)]
+        by: Option<String>,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
@@ -124,6 +145,9 @@ pub enum Cmd {
         paths: Vec<String>,
         #[arg(long)]
         config: Option<PathBuf>,
+        /// classify the recorded source paths of this subject (a page added by hand has no diff)
+        #[arg(long)]
+        subject: Option<String>,
     },
     /// Register the MCP server with agent clients: a plan by default, `--apply` writes (additive, backed up)
     Setup {
@@ -175,10 +199,19 @@ pub enum PersonaCmd {
 pub enum PanelCmd {
     Add {
         name: String,
+        /// "3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 1 others=bystander"; a stake per term is optional
         #[arg(long)]
         query: String,
+        /// allow more than 12 seats (the most is 1000)
+        #[arg(long)]
+        allow_large: bool,
     },
-    Resolve { name: String },
+    Resolve {
+        name: String,
+        /// draw the seats for this subject (the seed comes from its name); without it the seats are the first by id
+        #[arg(long)]
+        subject: Option<String>,
+    },
 }
 #[derive(Subcommand, Debug)]
 pub enum LensCmd {
@@ -262,8 +295,8 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             PersonaCmd::List => app::persona::list(root),
         },
         Cmd::Panel { what } => match what {
-            PanelCmd::Add { name, query } => app::panel::add(root, name, query),
-            PanelCmd::Resolve { name } => app::panel::resolve(root, name),
+            PanelCmd::Add { name, query, allow_large } => app::panel::add(root, name, query, *allow_large),
+            PanelCmd::Resolve { name, subject } => app::panel::resolve(root, name, subject.as_deref()),
         },
         Cmd::Lens { what } => match what {
             LensCmd::Add { file } => app::lens::add(root, file),
@@ -275,17 +308,25 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Comparator { what: SubjectCmd::Add { name, kind: k, attach } } => {
             app::subject::add(root, name, kind(k)?, attach, true)
         }
-        Cmd::Brief { subject, panel, lens, spend, stakes, model, comparators, detail: d } => app::brief::compose(
+        Cmd::Brief {
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by,
+        } => app::brief::compose(
             root,
             &app::brief::BriefArgs {
                 subject: subject.clone(),
                 panel: panel.clone(),
-                lens: lens.clone(),
+                query: query.clone(),
+                lenses: lens.clone(),
                 spend: *spend,
                 stakes: parse_stakes(stakes)?,
                 model: model.clone(),
                 comparators: comparators.clone(),
-                detail: detail(d)?,
+                detail: d.as_deref().map(detail).transpose()?,
+                rule: rule.clone(),
+                draw: draw.clone(),
+                allow_large: *allow_large,
+                reason: reason.clone(),
+                by: by.clone(),
             },
         ),
         Cmd::Verdict { run, file, json } => {
@@ -305,8 +346,8 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Decide { finding, outcome, why, row, by } => {
             app::decide::record(root, finding, outcome, why.as_deref(), row.as_deref(), by)
         }
-        Cmd::ShouldRun { diff, paths, config } => {
-            app::should_run::classify(root, diff.as_deref(), paths, config.as_deref())
+        Cmd::ShouldRun { diff, paths, config, subject } => {
+            app::should_run::classify(root, diff.as_deref(), paths, config.as_deref(), subject.as_deref())
         }
         Cmd::Setup { client, scope, apply, force, bin, no_rules, no_hook } => app::setup::run(
             root,

@@ -13,6 +13,7 @@ pub fn classify(
     diff: Option<&Path>,
     paths: &[String],
     config: Option<&Path>,
+    subject: Option<&str>,
 ) -> Result<Value> {
     let config_path: PathBuf = config
         .map(Path::to_path_buf)
@@ -26,9 +27,19 @@ pub fn classify(
     if let Some(d) = diff {
         all.extend(trigger::paths_from_diff(&read(d)?)?);
     }
+    // a page added by hand has no diff: its recorded source paths land on a rule instead
+    if let Some(name) = subject {
+        let store = Store::open_existing(root)?;
+        let sub = store
+            .subject(name)?
+            .ok_or_else(|| AppError::NotFound(format!("no subject named {name}")))?;
+        for a in &sub.attachments {
+            all.insert(super::persona::display_path(root, Path::new(&a.source_path)));
+        }
+    }
     if all.is_empty() {
         return Err(AppError::InvalidArguments(
-            "give --diff <file> or --paths <a,b,...>".into(),
+            "give --diff <file>, --paths <a,b,...> or --subject <name>".into(),
         ));
     }
     let all: Vec<String> = all.into_iter().collect();
@@ -36,6 +47,8 @@ pub fn classify(
     // no store is needed: the stored panel only sharpens the persona count
     let store = Store::open_existing(root).ok();
     let mut spend = Vec::new();
+    // a rule that names a panel or lens this store lacks would refuse at `brief --rule`: say so now (it may run with no store)
+    let mut warnings: Vec<String> = Vec::new();
     if matches!(c.quorum, Quorum::Low | Quorum::High) {
         for hit in c.hits.iter().filter(|h| h.quorum == c.quorum) {
             for rule in cfg
@@ -43,6 +56,24 @@ pub fn classify(
                 .iter()
                 .filter(|r| r.class == hit.class && r.quorum == c.quorum)
             {
+                if let Some(st) = store.as_ref() {
+                    if let Some(p) = rule.panel.as_deref() {
+                        if !matches!(st.panel(p), Ok(Some(_))) {
+                            warnings.push(format!(
+                                "rule {}: panel {p} is not in the store; add it with `jurygraph panel add`",
+                                rule.class
+                            ));
+                        }
+                    }
+                    for l in &rule.lenses {
+                        if !matches!(st.lens(l), Ok(Some(_))) {
+                            warnings.push(format!(
+                                "rule {}: lens {l} is not in the store; add it with `jurygraph lens add`",
+                                rule.class
+                            ));
+                        }
+                    }
+                }
                 let stored = rule.panel.as_deref().and_then(|name| {
                     store
                         .as_ref()?
@@ -70,12 +101,16 @@ pub fn classify(
                     let briefs = n * lenses;
                     e["briefs"] = json!(briefs);
                     if let Some(t) = cfg.tokens_per_brief {
-                        e["tokens"] = json!(briefs as u64 * t);
+                        e["tokens"] = json!((briefs as u64).saturating_mul(t));
                     }
                 }
                 spend.push(e);
             }
         }
     }
-    Ok(json!({ "quorum": c.quorum, "hits": c.hits, "unmatched": c.unmatched, "spend": spend }))
+    let mut out = json!({ "quorum": c.quorum, "hits": c.hits, "unmatched": c.unmatched, "spend": spend });
+    if !warnings.is_empty() {
+        out["warnings"] = json!(warnings);
+    }
+    Ok(out)
 }

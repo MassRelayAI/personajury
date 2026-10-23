@@ -10,25 +10,50 @@ the version.
 | `persona add` | `--file F` `[--generated-from HASH]` | add one persona from the fixed JSON |
 | `persona generate` | `--from PATH` `[--count N]` (default 7) | write the brief that asks your agent to write personas from material |
 | `persona list` | | list personas |
-| `panel add` | `NAME` `--query Q` | save a query over persona tags, e.g. `"5 builder, 3 company, 2 others"` |
-| `panel resolve` | `NAME` | the personas the query resolves to now |
+| `panel add` | `NAME` `--query Q` `[--allow-large]` | save a query over persona tags with a stake per term, e.g. `"3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 1 others=bystander"`; more than 12 seats is refused (`panel_too_large`) unless `--allow-large`, and more than 1000 always |
+| `panel resolve` | `NAME` `[--subject S]` | the personas the query resolves to now; with `--subject` the seats a draw gives that subject (`draw.seed`), without it the first by id (`draw: "none (no subject)"`) |
 | `lens add` | `--file F` | add a lens (TOML) |
 | `lens list` | | list lenses; four ship (a 1 to 10 `site` lens is fixture data: `lens add --file fixtures/lenses/site.toml`) |
 | `subject add` | `NAME` `--kind K` `--attach FILE...` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu` or `prices` |
 | `comparator add` | same as `subject add` | a comparator, stored the same way and flagged |
-| `brief` | `--subject S` `--panel P` `--lens L` `--model M` `--stake p=stake,...` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` | one deterministic, hashed brief per persona; creates the run |
+| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--allow-large]` `[--rule R` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; the answer carries `estimate {briefs, tokens}` and `draw.seed` |
 | `verdict` | `--run N` and `--file F` or `--json J` | ingest one persona's verdict; refused without evidence |
 | `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` | scores per stratum; `--across-strata` exists only so the refusal is explicit |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
 | `delta` | `A B` | what moved between two runs on the same subject and lens |
 | `check` | `[--history]` | stale runs (source changed or a newer subject version), `fixed_unverified`, and findings with no decision from any batch or fixed and raised again (`fix_not_landed`); exits 1 with `check_failed` listing `unresolved` |
 | `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`) |
-| `should-run` | `[--diff F]` `[--paths a,b]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend |
+| `should-run` | `[--diff F]` `[--paths a,b]` `[--subject S]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend; `--subject` classifies the subject's recorded source paths (a page added by hand has no diff); `warnings` names a rule's panel or lens the store lacks |
 | `setup` | `[--client C]` `[--scope S]` `[--apply]` `[--force]` `[--bin B]` `[--no-rules]` `[--no-hook]` | register the MCP server; a plan unless `--apply` |
 | `doctor` | `[--bin B]` `[--brief]` | the store, counts and registrations; `--brief` is two plain lines for a hook |
 | `mcp` | | serve MCP over stdio |
 
-`--stake` takes `persona=primary|secondary|bystander`, repeated or comma-separated, for every persona in the panel.
+A panel term may carry the stake its seats get (`3 builder=primary`); `brief` uses it. `--stake` takes
+`persona=primary|secondary|bystander`, repeated or comma-separated: it wins over the term, and is required only for a
+persona whose term has none (`persona_without_stake`). A term that resolves to no persona is refused (`panel_term_empty`).
+
+### The seeded draw
+When a term's pool of personas is bigger than its seats, `brief` draws the seats: the pool sorted by id, then a
+Fisher-Yates shuffle seeded (SplitMix64) from `sha256("draw\t" + subject name + "\t" + panel name)`. The seed comes from the
+subject's name, so round 2 of the same subject draws the same bystanders and `delta` can land; another subject draws
+others. A term whose pool equals its seats is not shuffled. `--draw HEX` (16 hex digits) sets the seed; the run records
+the one used (`run.draw_seed`).
+
+### `brief --rule`
+`--rule CLASS` reads `<root>/jurygraph.toml` and takes the rule's panel, lenses, spend (`0` = the whole panel) and detail
+as defaults, one run per lens (the answer has `runs`). A rule with quorum `low` or `high` must name a `panel` and at least
+one lens (`rule_without_panel`, `invalid_config`); a rule naming a panel or lens the store lacks is `rule_panel_unknown` /
+`rule_lens_unknown`; a rule of a human class, or quorum `human`, is refused (`human_class_under_persona_quorum`), and
+quorum `none` runs no jury. The caller may override with `--panel`, `--query "<terms with =stake>"` (an ad-hoc panel,
+not saved), `--spend`, `--lens`, `--detail`. Every value that differs from the rule, and every brief above 12 seats,
+needs `--reason "<text>"` (`override_without_reason`); the run records `{rule, fields:{name:{rule,given}}, reason, by}` in
+`run.override_json` (`--by`, default `agent`), `matrix` JSON carries it as `override`, and `matrix --table` opens with
+`override: <fields> — <reason>`. No rule, no override bookkeeping.
+
+### Seat ceilings
+A panel or a brief seats at most 12 unless `--allow-large` (on `panel add` and on `brief`), and never more than 1000
+(`panel_too_large`, `error` data `{ceiling}`). A brief above 12 seats answers `large: true`. Every brief answers
+`estimate {briefs, tokens}` = briefs × `tokens_per_brief` of `jurygraph.toml` (default 15000), before anything is spent.
 A verdict line may carry `about` (an attachment label of the subject or `cmp:<name>`). `jurygraph.toml` rules may set
-`detail = "compact" | "full"`. Citations in a verdict are `<label>[#locator]` or `cmp:<name>/<label>[#locator]`. The refusals and their error codes are in
+`detail = "compact" | "full"`. Citations in a verdict are `<label>[#locator]` or `cmp:<name>/<label>[#locator]`; `#L<n>` on a diff or a UTF-8 text attachment (a `.md`) must name a line the file has (`citation_unresolved`). The refusals and their error codes are in
 the plan's "The refusals" table and in [`troubleshooting.md`](troubleshooting.md).

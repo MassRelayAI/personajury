@@ -52,9 +52,10 @@ impl AppError {
         }
     }
     /// Data carried by a failing gate, shown in the envelope beside the error.
-    pub fn data(&self) -> Option<&Value> {
+    pub fn data(&self) -> Option<Value> {
         match self {
-            AppError::CheckFailed(_, v) => Some(v),
+            AppError::CheckFailed(_, v) => Some(v.clone()),
+            AppError::Refused(r) => r.data(),
             _ => None,
         }
     }

@@ -26,19 +26,28 @@ pub fn tools() -> Vec<Value> {
     vec![
         tool(
             "jurygraph_brief",
-            "Compose one deterministic, hashed brief per persona of a panel for a lens and create the run. Returns the run id, each persona's brief (its hash and byte size) and the spend. The calling agent then gives each brief to one subagent.",
+            "Compose one deterministic, hashed brief per persona of a panel for each lens and create the run(s). The panel is a saved one (panel), an ad-hoc query (query, not saved) or a rule's (rule); a stake per persona comes from the panel's terms (\"3 builder=primary\") unless stakes overrides it. With rule, the rule's panel, lenses, spend and detail are the defaults; you may override any of them, and every value that differs, or any brief above 12 seats, needs reason (refusal override_without_reason) and is recorded on the run. Seats are capped at 12 unless allow_large (then 1000). The answer carries estimate {briefs, tokens} (the cost, before anyone spends it), the draw seed, and large:true above 12 seats. Returns each run id, each persona's brief (its hash and byte size) and the spend. The calling agent then gives each brief to one subagent.",
             schema(
                 json!({
-                    "subject": {"type":"string"}, "panel": {"type":"string"}, "lens": {"type":"string"},
-                    "stakes": {"description":"a stake for every panel persona: an object persona -> primary|secondary|bystander, or an array of \"persona=stake\"",
+                    "subject": {"type":"string"},
+                    "panel": {"type":"string","description":"a saved panel"},
+                    "query": {"type":"string","description":"an ad-hoc panel, not saved: \"3 builder=primary, 2 others=bystander\""},
+                    "lens": {"description":"a lens name, or an array of them (one run each); default: the rule's",
+                             "oneOf": [{"type":"string"},{"type":"array","items":{"type":"string"}}]},
+                    "rule": {"type":"string","description":"a rule class of jurygraph.toml: its panel, lenses, spend and detail are the defaults"},
+                    "stakes": {"description":"a stake for a panel persona, over the panel's own term stake: an object persona -> primary|secondary|bystander, or an array of \"persona=stake\"",
                                "oneOf": [
                                    {"type":"object","additionalProperties":{"type":"string","enum":["primary","secondary","bystander"]}},
                                    {"type":"array","items":{"type":"string"}}]},
                     "model": {"type":"string","description":"the model the agent will run the personas on; the run is pinned to it"},
                     "spend": {"type":"integer","minimum":1,"description":"take the first N personas of the panel, primary then secondary then bystander; default all"},
                     "comparators": {"type":"array","items":{"type":"string"},"description":"comparator snapshots this run holds"},
-                    "detail": detail_prop() }),
-                &["subject", "panel", "lens", "stakes", "model"],
+                    "detail": detail_prop(),
+                    "draw": {"type":"string","description":"the draw's seed as 16 hex digits; default: from the subject's name and the panel's"},
+                    "allow_large": {"type":"boolean","description":"allow more than 12 seats (the most is 1000)"},
+                    "reason": {"type":"string","description":"why this brief departs from its rule, or runs above 12 seats; recorded on the run"},
+                    "by": {"type":"string","description":"who departed from the rule; default agent"} }),
+                &["subject", "model"],
             ),
         ),
         tool(
@@ -75,7 +84,8 @@ pub fn tools() -> Vec<Value> {
             schema(
                 json!({ "diff": {"type":"string","description":"path of a unified diff"},
                         "paths": {"type":"array","items":{"type":"string"}},
-                        "config": {"type":"string","description":"path of the jurygraph.toml; default <root>/jurygraph.toml"} }),
+                        "config": {"type":"string","description":"path of the jurygraph.toml; default <root>/jurygraph.toml"},
+                        "subject": {"type":"string","description":"classify the recorded source paths of this subject instead of a diff"} }),
                 &[],
             ),
         ),
@@ -133,7 +143,7 @@ fn strings_arg(a: &Value, k: &str) -> Result<Vec<String>, String> {
 /// stakes as the CLI's `--stake` strings: the object form becomes `persona=stake` in key order.
 fn stakes_arg(a: &Value) -> Result<Vec<String>, String> {
     let list = match a.get("stakes") {
-        None | Some(Value::Null) => return Err("missing required argument stakes".into()),
+        None | Some(Value::Null) => return Ok(vec![]),
         Some(Value::Object(m)) => m
             .iter()
             .map(|(p, s)| {
@@ -149,9 +159,6 @@ fn stakes_arg(a: &Value) -> Result<Vec<String>, String> {
             )
         }
     };
-    if list.is_empty() {
-        return Err("stakes must name a stake for every panel persona".into());
-    }
     Ok(list)
 }
 
@@ -163,17 +170,23 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "jurygraph_brief" => &[
             "subject",
             "panel",
+            "query",
             "lens",
+            "rule",
             "stakes",
             "model",
             "spend",
             "comparators",
             "detail",
+            "draw",
+            "allow_large",
+            "reason",
+            "by",
         ],
         "jurygraph_verdict" => &["run", "verdict"],
         "jurygraph_matrix" => &["runs", "table", "history", "detail"],
         "jurygraph_delta" => &["a", "b"],
-        "jurygraph_should_run" => &["diff", "paths", "config"],
+        "jurygraph_should_run" => &["diff", "paths", "config", "subject"],
         _ => return Err(format!("unknown tool {name}")),
     };
     if let Some(k) = a
@@ -188,8 +201,14 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
     Ok(match name {
         "jurygraph_brief" => Cmd::Brief {
             subject: req(a, "subject")?,
-            panel: req(a, "panel")?,
-            lens: req(a, "lens")?,
+            panel: str_arg(a, "panel")?,
+            query: str_arg(a, "query")?,
+            lens: match a.get("lens") {
+                None | Some(Value::Null) => vec![],
+                Some(Value::String(s)) => vec![s.clone()],
+                Some(Value::Array(_)) => strings_arg(a, "lens")?,
+                Some(_) => return Err("lens must be a string or an array of strings".into()),
+            },
             spend: match a.get("spend") {
                 None | Some(Value::Null) => None,
                 Some(v) => match v.as_u64() {
@@ -200,7 +219,12 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             stakes: stakes_arg(a)?,
             model: req(a, "model")?,
             comparators: strings_arg(a, "comparators")?,
-            detail: detail()?,
+            detail: str_arg(a, "detail")?,
+            rule: str_arg(a, "rule")?,
+            draw: str_arg(a, "draw")?,
+            allow_large: bool_arg(a, "allow_large")?,
+            reason: str_arg(a, "reason")?,
+            by: str_arg(a, "by")?,
         },
         "jurygraph_verdict" => {
             let run = id_arg(a, "run")?;
@@ -240,6 +264,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             diff: str_arg(a, "diff")?.map(PathBuf::from),
             paths: strings_arg(a, "paths")?,
             config: str_arg(a, "config")?.map(PathBuf::from),
+            subject: str_arg(a, "subject")?,
         },
     })
 }

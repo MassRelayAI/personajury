@@ -56,6 +56,20 @@ pub fn parse_config(s: &str) -> Result<TriggerConfig, Refusal> {
         }
         build_set(&r.paths)
             .map_err(|e| Refusal::InvalidConfig(format!("rule {}: {e}", r.class)))?;
+        if matches!(r.quorum, Quorum::Low | Quorum::High) {
+            if r.panel.as_deref().is_none_or(|p| p.trim().is_empty()) {
+                return Err(Refusal::RuleWithoutPanel {
+                    class: r.class.clone(),
+                });
+            }
+            if r.lenses.is_empty() {
+                return Err(Refusal::InvalidConfig(format!(
+                    "rule {}: lenses is empty; a {} quorum runs at least one lens",
+                    r.class,
+                    quorum_name(r.quorum)
+                )));
+            }
+        }
     }
     Ok(cfg)
 }
@@ -231,11 +245,15 @@ mod tests {
 class = "docs"
 paths = ["docs/**", "*.md"]
 quorum = "low"
+panel = "public"
+lenses = ["recall"]
 
 [[rule]]
 class = "ui"
 paths = ["src/ui/**"]
 quorum = "high"
+panel = "public"
+lenses = ["critical"]
 
 [[rule]]
 class = "money"
@@ -285,11 +303,35 @@ quorum = "human"
         }
     }
     #[test]
+    fn a_low_or_high_rule_needs_a_panel() {
+        for q in ["low", "high"] {
+            let s = format!(
+                "[[rule]]\nclass = \"copy\"\npaths = [\"a\"]\nquorum = \"{q}\"\nlenses = [\"recall\"]\n"
+            );
+            let e = parse_config(&s).unwrap_err();
+            assert_eq!(e.code(), "rule_without_panel", "{q}");
+            assert!(e.to_string().contains("copy"));
+        }
+        for q in ["none", "human"] {
+            let s = format!("[[rule]]\nclass = \"copy\"\npaths = [\"a\"]\nquorum = \"{q}\"\n");
+            assert!(parse_config(&s).is_ok(), "{q} needs no panel");
+        }
+    }
+    #[test]
+    fn a_low_or_high_rule_needs_lenses() {
+        for q in ["low", "high"] {
+            let s = format!(
+                "[[rule]]\nclass = \"copy\"\npaths = [\"a\"]\nquorum = \"{q}\"\npanel = \"p\"\n"
+            );
+            assert_eq!(parse_config(&s).unwrap_err().code(), "invalid_config", "{q}");
+        }
+    }
+    #[test]
     fn rule_detail_default_compact() {
         use crate::domain::model::Detail;
         let cfg = parse_config(CFG).unwrap();
         assert!(cfg.rules.iter().all(|r| r.detail == Detail::Compact));
-        let s = "[[rule]]\nclass = \"ui\"\npaths = [\"a\"]\nquorum = \"high\"\ndetail = \"full\"\n";
+        let s = "[[rule]]\nclass = \"ui\"\npaths = [\"a\"]\nquorum = \"none\"\ndetail = \"full\"\n";
         assert_eq!(parse_config(s).unwrap().rules[0].detail, Detail::Full);
         let s = "[[rule]]\nclass = \"ui\"\npaths = [\"a\"]\nquorum = \"high\"\ndetail = \"huge\"\n";
         assert_eq!(parse_config(s).unwrap_err().code(), "invalid_config");

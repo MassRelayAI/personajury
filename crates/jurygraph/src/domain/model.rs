@@ -3,6 +3,11 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
 
+/// The most seats a panel or a brief holds unless the caller says `--allow-large` (D10).
+pub const SEAT_CEILING: usize = 12;
+/// The most seats any panel or brief holds, even with `--allow-large` (D10).
+pub const SEAT_HARD_MAX: usize = 1000;
+
 /// A persona's stake in one run (report §2.3). Ordered primary < secondary < bystander: the `--spend` order.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -356,13 +361,19 @@ pub struct RunRow {
     pub comparators: Vec<(String, i64)>,
     pub briefs: Vec<BriefRef>,
     pub created_at: String,
+    /// the hex seed the panel draw used (schema v3); none for a run made before the draw existed
+    pub draw_seed: Option<String>,
+    /// `{rule, fields:{name:{rule,given}}, reason, by}` when the caller departed from a rule (schema v3, D10)
+    pub override_json: Option<serde_json::Value>,
 }
 
-/// One term of a panel query: "5 builders" → { count: 5, tag: "builders" }.
+/// One term of a panel query: "5 builders" → { count: 5, tag: "builders", stake: None };
+/// "3 builder=primary" carries the stake the audience gives those seats.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Term {
     pub count: usize,
     pub tag: String,
+    pub stake: Option<Stake>,
 }
 
 // ---- the verdict file the agent writes (ingested by `jurygraph verdict`) ----
@@ -412,6 +423,8 @@ pub struct AttachmentView {
     pub aria_ids: BTreeSet<String>,
     /// line count of a diff or text file
     pub lines: usize,
+    /// a `file` that decodes as UTF-8: its `#L<n>` locators are checked against `lines`
+    pub text: bool,
 }
 
 /// Everything a run holds as evidence: the subject's attachments by label, each comparator's by name then label.

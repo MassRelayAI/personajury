@@ -29,6 +29,51 @@ fn code(r: &Value) -> &str {
 }
 
 #[test]
+fn verdict_citation_into_a_text_file_checks_the_line() {
+    let ws = Ws::new();
+    ws.subject(
+        "doc",
+        jurygraph::domain::SubjectKind::Document,
+        false,
+        &[
+            ("page.json", br#"{"nodes":[{"id":"n1"}]}"#),
+            ("readme.md", b"one\ntwo\nthree\n"),
+        ],
+    );
+    let run = ws.run_of("doc", "critical", &TWO, false);
+    for c in ["readme.md#L9", "readme.md#L0"] {
+        let r = verdict(&ws, run, &critical("ana", [3, 3, 3], &[], &[c]));
+        assert_eq!(code(&r), "citation_unresolved", "{c}");
+    }
+    let ok = verdict(&ws, run, &critical("ana", [3, 3, 3], &[], &["readme.md#L3"]));
+    assert_eq!(ok["ok"], true, "{ok}");
+}
+
+#[test]
+fn i6_only_line_locators_of_a_text_file_are_checked_and_nul_bytes_are_not_text() {
+    let ws = Ws::new();
+    ws.subject(
+        "doc",
+        jurygraph::domain::SubjectKind::Document,
+        false,
+        &[
+            ("page.json", br#"{"nodes":[{"id":"n1"}]}"#),
+            ("notes.md", b"a\r\nb\r\nc\r\n"),
+            ("mod.wasm", b"\0asm\x01\0\0\0\0\0"),
+        ],
+    );
+    let run = ws.run_of("doc", "critical", &TWO, false);
+    let try_cite = |c: &str| verdict(&ws, run, &critical("ana", [3, 3, 3], &[], &[c]));
+    for c in ["notes.md#intro", "notes.md#Latest", "notes.md#L3", "mod.wasm#L99", "mod.wasm#intro"] {
+        let r = try_cite(c);
+        assert_eq!(r["ok"], true, "{c}: {r}");
+    }
+    for c in ["notes.md#L4", "notes.md#L0", "notes.md#L+1", "notes.md#L01", "notes.md#L 1", "notes.md#L-1"] {
+        assert_eq!(code(&try_cite(c)), "citation_unresolved", "{c}");
+    }
+}
+
+#[test]
 fn verdict_seen_without_citation() {
     let (ws, run) = setup("critical", false);
     let mut v = critical("ana", [3, 3, 3], &[], &[]);

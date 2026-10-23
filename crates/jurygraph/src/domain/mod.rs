@@ -5,6 +5,7 @@ pub mod hash;
 pub mod matrix;
 pub mod model;
 pub mod query;
+pub mod rng;
 pub mod refuse;
 pub mod trigger;
 pub use model::*;

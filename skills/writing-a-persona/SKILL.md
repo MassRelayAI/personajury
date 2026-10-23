@@ -24,6 +24,11 @@ Exactly these keys; any other key is refused.
 fixture --query "3 builder, 2 company, 2 others"`; `others` means none of the query's other tags, and the first term wins a
 persona. Use one tag form (`builder`, not `builders`).
 
+A panel term may carry the stake its seats get: `panel add docs-public --query "3 builder=primary, 1 newcomer=primary, 2
+approver=secondary, 1 others=bystander"`. Keep the pool bigger than the seats where a stratum should vary between subjects
+(six `others` for one bystander seat): the engine draws the seats from the subject's name, and the same subject keeps them
+between rounds. A panel is 12 seats or fewer unless you pass `--allow-large`.
+
 ## Add it
 ```
 jurygraph persona add --file personas/builder-ana.json
@@ -42,13 +47,19 @@ and the same material regenerates the same panel:
 ```
 jurygraph persona add --file personas/new-one.json --generated-from <hash from the brief>
 ```
+The brief works in two steps. First list the roles, sectors and objections the material names or implies (who it speaks
+to, who pays, who is turned away, what each pushes back on), and hand that `roles` list to the caller; mark which role uses,
+which buys or approves, and which only passes by. Then write the `--count` personas, spread over those roles and over the
+tags a panel needs. The count is the caller's, never the number of roles: a role may go without a persona, and one persona
+may combine two roles.
+
 Write from the material, not from habit: take the roles, sectors and objections it names. Spread the tags across the
 strata you will need. Personas are composites, never identifiable real people: no real names, no scraped profiles, no customer list turned into a person (`PERSONAS.md`).
 
 ## Stake is not in the persona
-A persona has `stake_rules` in words as guidance, but the stake itself is declared per run, for every panel persona, with
-`brief --stake <persona>=primary|secondary|bystander`. The same persona is primary on one page and a bystander on
-another, and scores are reported per stake.
+A persona has `stake_rules` in words as guidance, but the stake itself belongs to the audience: the panel's term
+(`2 approver=secondary`) gives it, and `brief --stake <persona>=primary|secondary|bystander` overrides it for one run. The
+same persona is primary on one page and a bystander on another, and scores are reported per stake.
 
 ## What the engine cannot see
 It does not judge whether a persona is realistic or distinct; it only checks the shape. Read the set yourself: could two of

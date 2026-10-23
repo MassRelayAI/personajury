@@ -1,4 +1,4 @@
--- JuryGraph store, schema v2 (report §4; plan docs/plans/2026-10-23-v0-1-the-engine.md; D8). Verdicts, picks and decisions are append-only.
+-- JuryGraph store, schema v3 (report §4; plan docs/plans/2026-10-23-v0-1-the-engine.md; D8; D9 adds run.draw_seed and run.override_json). Verdicts, picks and decisions are append-only.
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS persona (
   id TEXT NOT NULL, version INTEGER NOT NULL, name TEXT NOT NULL, tags_json TEXT NOT NULL, stake_rules TEXT NOT NULL,
@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS run (
   id INTEGER PRIMARY KEY, subject_name TEXT NOT NULL, subject_version INTEGER NOT NULL, subject_hash TEXT NOT NULL,
   panel_name TEXT NOT NULL, panel_hash TEXT NOT NULL, lens_name TEXT NOT NULL, lens_version INTEGER NOT NULL,
   model TEXT NOT NULL, spend INTEGER NOT NULL, stakes_json TEXT NOT NULL, personas_json TEXT NOT NULL,
-  comparators_json TEXT NOT NULL, briefs_json TEXT NOT NULL, created_at TEXT NOT NULL);
+  comparators_json TEXT NOT NULL, briefs_json TEXT NOT NULL, created_at TEXT NOT NULL,
+  draw_seed TEXT, override_json TEXT);
 CREATE TABLE IF NOT EXISTS verdict (
   id INTEGER PRIMARY KEY, run_id INTEGER NOT NULL REFERENCES run(id), batch INTEGER NOT NULL, persona_id TEXT NOT NULL,
   persona_version INTEGER NOT NULL, dimension TEXT NOT NULL, score INTEGER NOT NULL, anchor_met INTEGER NOT NULL,

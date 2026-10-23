@@ -53,7 +53,7 @@ impl Envelope {
             ok: false,
             verb: verb.to_string(),
             schema: 1,
-            data: e.data().cloned().unwrap_or(Value::Null),
+            data: e.data().unwrap_or(Value::Null),
             evidence: Evidence { model_calls: false, limitations: vec![] },
             cost: Cost { rows: 0, bytes: 0 },
             error: Some(ErrorBody { code: e.code(), message: e.to_string() }),

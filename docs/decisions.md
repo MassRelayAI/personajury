@@ -85,3 +85,63 @@ pass that never happened. The orchestrator's rulings, built in lane `final-fixes
   so there is no migration: a v1 store is refused by its `schema_version`.
 - Ids and names (persona, lens, subject, comparator, panel) match `^[a-z0-9][a-z0-9._-]{0,63}$` without `..`.
 Would change: the maintainer's answer on the "same point" key (R12/B3), which stays provisional.
+
+## D9 — schema v3, the seeded draw, a stake per panel term, `brief --rule` (2026-10-24, the maintainer's call on the design author's read)
+The persona-structure read (kept privately by the maintainer) found that a rule already carries `panel`, `lenses`, `spend` and
+`detail`, but `brief` did not read it, the panel resolved in persona-id order (the same bystanders on every subject) and
+every stake was typed by hand. v0.2 builds option A1:
+- **Schema v3** (`store/schema.sql`): `run.draw_seed TEXT` (the hex seed the draw used) and `run.override_json TEXT`
+  (D10). A v2 store is refused by its `schema_version`; no store predates v0.2, so there is no migration.
+- **The seeded draw.** For every panel term whose pool is bigger than its seat count, the seats are drawn by a Fisher-Yates
+  shuffle of the pool (sorted by id) seeded from the first 8 bytes of `sha256("draw\t" + subject name + "\t" + panel name)`.
+  The seed comes from the subject's NAME, not its hash: a hash moves with every edit, and `delta` (D8) needs the same
+  (persona, lens, dimension, about) cells in both rounds. The generator is SplitMix64 in `domain/rng.rs`, standard library
+  only, no new dependency. A term whose pool equals its seats is not shuffled, so every v0.1 brief is byte-identical
+  (`tests/fixture_replay.rs` is unchanged and green). `brief --draw HEX` overrides the seed; the run records the one used.
+  `panel resolve` without a subject keeps the id order and says `draw: none (no subject)`.
+- **A stake per panel term** (`3 builder=primary`): the stake belongs to the audience, not the persona. `--stake` stays,
+  wins over the term, and is needed only where a term has none. Supersedes the D5 row "`--stake` is required for every
+  panel persona".
+- **`brief --rule <class>`** takes panel, lenses, spend and detail from the rule and writes one run per lens. A rule with
+  quorum `low` or `high` must name a `panel` and lenses (`rule_without_panel`); the other new refusals are
+  `rule_panel_unknown`, `rule_lens_unknown` and `panel_term_empty` (a "public" panel that silently became an insiders'
+  panel).
+- `#L<n>` on a UTF-8 text attachment is checked against its line count, as a diff's already was; `should-run --subject`
+  classifies a subject's recorded source paths and warns about a panel or lens the store lacks; the `persona generate`
+  brief asks for the roles, sectors and objections first (an entity pass; the count stays the caller's `--count`).
+Would change: a saturation run (brief 12, count new findings per added persona) that moves the ceiling of D10; a need to
+rotate bystanders between rounds, which would break `delta` and so needs its own decision.
+
+## D10 — seat ceilings 12 and 1000, and the agent's overrides with a reason (2026-10-24, the maintainer)
+The maintainer, 2026-10-24: "allow llm to override the persona count, type, etc on top of us for flexibility … if they want
+to run 1000 maximum also can right? in a crazy sense". Built as:
+- **Two ceilings** (`domain/model.rs`): `SEAT_CEILING = 12` and `SEAT_HARD_MAX = 1000`. A panel (`panel add`) or a brief
+  (`brief`) above 12 seats is refused as `panel_too_large` unless `--allow-large`; above 1000 it is refused always, with
+  `error` data `{ceiling: 1000}`. The 12 is a guess until the saturation run of D9 measures it.
+- **Overrides on top of the rule.** With `--rule`, the caller (the agent) may change the panel (`--panel`, or an ad-hoc
+  `--query` that is not saved), the lenses, the spend and the detail. Any value that differs from the rule, and any brief
+  above 12 seats, needs `--reason` (`override_without_reason`) and is recorded on every run it made as
+  `run.override_json = {rule, fields:{name:{rule,given}}, reason, by}` (`--by`, default `agent`). Nothing is silent:
+  `matrix` JSON carries `override`, and `matrix --table` opens with `override: <fields> — <reason>`. With no `--rule` there
+  is no override bookkeeping (v0.1 behaviour).
+- **The cost is shown before it is spent.** Every brief answers `estimate {briefs, tokens}` = briefs × `tokens_per_brief`
+  (`jurygraph.toml`, default 15000) and `large: true` above 12 seats. The engine still counts no token and calls no model.
+- **The human classes are untouched.** No override can run a jury on a human class (or quorum `human`) as if it decided:
+  the refusal of D5 stands. Strata are never averaged at any size.
+Would change: the maintainer's word; or a measured ceiling that is not 12.
+Fix round 1 (review of 2026-10-24, the maintainer's rulings):
+- Under `--rule`, `--stake` (when it differs from the panel's term) and `--draw` (when it differs from the derived seed) are
+  overrides like the others: they need `--reason` and are recorded as `stakes` / `draw` fields of `override_json`. The order
+  of lenses is not a departure.
+- Each term draws from its own stream, seeded from the run's seed and the term's tag (`hash::term_seed`), so a persona
+  added to one term never moves another term's seats. The ad-hoc query is seeded by its normalised terms.
+- `brief --rule` classifies the subject's recorded source paths: a path under a human class is refused
+  (`human_class_under_persona_quorum`, data `{class, path}`) under any rule and any override.
+- A rule's `spend = 0` is the whole panel capped at 12 (1000 with `--allow-large`, which then needs a reason above 12); the
+  seats beyond the cap are cut in draw order and the answer says `capped: true`. It is not a refusal.
+- Seat totals and the estimate use checked arithmetic; an overflow is `panel_too_large`, never a panic and never a saved 0.
+- Only `L<n>` locators of a text file are checked (canonical form: no sign, no leading zero; a diff's too); any other
+  anchor behaves as in v0.1, and a file with a NUL byte is not text.
+- The ceiling is applied to an ad-hoc `--query` by its total seats, to a saved panel at `panel add` and then by the seats a
+  brief selects. A brief above 12 seats without `--rule` records nothing (no rule, no bookkeeping): the maintainer has not
+  yet confirmed that reading of the amendment.

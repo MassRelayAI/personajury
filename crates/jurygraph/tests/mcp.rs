@@ -250,7 +250,7 @@ fn bad_stakes_detail_and_runs_are_invalid_arguments() {
             call(
                 1,
                 "jurygraph_brief",
-                json!({"subject":"s","panel":"p","lens":"l","model":"m"}),
+                json!({"subject":"s","panel":"p","lens":7,"model":"m"}),
             ),
             call(
                 2,

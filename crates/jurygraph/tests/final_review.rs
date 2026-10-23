@@ -447,7 +447,7 @@ fn i7_human_classes_are_matched_after_normalising_the_spelling() {
 #[test]
 fn i8_quoted_paths_in_a_diff_are_read() {
     let ws = Ws::new();
-    let cfg = "[[rule]]\nclass = \"web\"\npaths = [\"apps/web/**\"]\nquorum = \"low\"\n\
+    let cfg = "[[rule]]\nclass = \"web\"\npaths = [\"apps/web/**\"]\nquorum = \"low\"\npanel = \"p\"\nlenses = [\"recall\"]\n\
 [[rule]]\nclass = \"brand\"\npaths = [\"brand/**\"]\nquorum = \"human\"\n";
     let diff = "diff --git \"a/brand/logo-\\303\\251.svg\" \"b/brand/logo-\\303\\251.svg\"\nindex 1..2 100644\n\
 --- \"a/brand/logo-\\303\\251.svg\"\n+++ \"b/brand/logo-\\303\\251.svg\"\n@@ -1 +1 @@\n-a\n+b\n\

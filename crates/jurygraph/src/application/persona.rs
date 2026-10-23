@@ -133,8 +133,17 @@ pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
     for s in &sources {
         t.push_str(&format!("- {s}\n"));
     }
+    t.push_str(
+        "\n## Step 1: the roles the material names\n\n\
+List the roles, the sectors and the objections the material names or implies: who is spoken to, who pays, who is \
+turned away, what each of them would push back on. Give the list to the caller as a `roles` list in your answer; \
+it is not part of any persona file. Mark which role is the product's user, which one buys or approves it, and which \
+only passes by: those become the primary, secondary and bystander seats of a panel. The number of personas below is \
+the caller's `--count`, never the number of roles you found; a role may be left without a persona, and one persona \
+may combine two roles.\n",
+    );
     t.push_str(&format!(
-        "\nWrite {count} personas: real kinds of people who would meet a product like the one this material describes. \
+        "\n## Step 2: the personas\n\nWrite {count} personas: real kinds of people who would meet a product like the one this material describes, spread over the roles of step 1 and over the tags a panel will need. \
 Write one JSON file per persona, named `<id>.json`. Each file holds exactly these keys and no others:\n\n"
     ));
     for (k, m) in [

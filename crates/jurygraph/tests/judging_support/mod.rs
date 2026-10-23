@@ -143,6 +143,8 @@ impl Ws {
                 })
                 .collect(),
             created_at: "2026-10-23T00:00:00Z".into(),
+            draw_seed: None,
+            override_json: None,
         };
         self.store.insert_run(&r).unwrap()
     }

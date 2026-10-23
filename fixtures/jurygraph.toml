@@ -20,11 +20,12 @@ class = "internals"
 paths = ["crates/**", "tests/**", "migrations/**"]
 quorum = "none"
 
-# Copy only: one persona, the cheap lens.
+# Copy only: one persona, the cheap lens, the same panel; the seeded draw picks which one sits.
 [[rule]]
 class = "copy"
 paths = ["copy/**"]
 quorum = "low"
+panel = "fixture"
 lenses = ["recall"]
 spend = 1
 

@@ -38,6 +38,8 @@ fn run_row() -> RunRow {
         comparators: vec![("rival".into(), 1)],
         briefs: vec![],
         created_at: "2026-10-23T00:00:00Z".into(),
+        draw_seed: None,
+        override_json: None,
     }
 }
 
@@ -111,9 +113,41 @@ fn subject(name: &str, hash: &str) -> Subject {
 fn open_creates_store_and_schema_version() {
     let (d, s) = tmp();
     assert!(d.path().join(".jurygraph/store.db").exists());
-    assert_eq!(s.schema_version().unwrap(), 2);
-    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 2);
+    assert_eq!(s.schema_version().unwrap(), 3);
+    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 3);
     assert!(Store::open_existing(d.path()).is_ok());
+}
+
+#[test]
+fn a_v2_store_is_refused_by_version() {
+    let (d, s) = tmp();
+    s.conn()
+        .execute("UPDATE meta SET value = '2' WHERE key = 'schema_version'", [])
+        .unwrap();
+    drop(s);
+    let err = Store::open(d.path()).map(|_| ()).expect_err("a v2 store is refused");
+    assert!(matches!(err, StoreError::Schema(_)), "{err}");
+    assert!(err.to_string().contains("schema_version"), "{err}");
+}
+
+#[test]
+fn a_run_keeps_its_draw_seed_and_override() {
+    let (_d, s) = tmp();
+    let mut r = run_row();
+    r.draw_seed = Some("0123456789abcdef".into());
+    r.override_json = Some(serde_json::json!({
+        "rule": "public-surface",
+        "fields": {"spend": {"rule": 0, "given": 3}},
+        "reason": "cheap pass",
+        "by": "agent"
+    }));
+    let with = s.insert_run(&r).unwrap();
+    let without = s.insert_run(&run_row()).unwrap();
+    let got = s.run(with).unwrap().unwrap();
+    assert_eq!(got.draw_seed.as_deref(), Some("0123456789abcdef"));
+    assert_eq!(got.override_json, r.override_json);
+    let plain = s.run(without).unwrap().unwrap();
+    assert_eq!((plain.draw_seed, plain.override_json), (None, None));
 }
 
 #[test]

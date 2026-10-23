@@ -17,16 +17,30 @@ It answers `none | low | high | human` and the spend. `none`: stop, tests and th
 person decides; a jury may advise but cannot apply the change. The hook runs at lane finish, not per save.
 
 ## 1. Brief
-Subject, panel and lens exist already (`subject add`, `panel add`, `lens list`). Every panel persona needs a stake in this
-run, declared here and nowhere else:
+Subject, panel and lens exist already (`subject add`, `panel add`, `lens list`). The panel's own terms give each persona
+its stake (`3 builder=primary, 2 approver=secondary, 1 others=bystander`), and where a term's pool is bigger than its seats
+the engine draws them, seeded from the subject's name: the same subject keeps its bystanders between rounds.
+
+When a rule matched, let it brief for you:
 ```
-jurygraph brief --subject home --panel fixture --lens critical \
-  --stake builder-ana=primary,company-hanna=secondary,investor-claire=bystander,... \
-  --model sonnet --spend 3 --detail compact [--comparator acme-pricing]
+jurygraph brief --subject home --rule public-surface --model sonnet
 ```
-`--spend N` takes the first N personas, primary then secondary then bystander. `--detail full` inlines text attachments
-(more tokens per persona); `compact` lists attachment paths and hashes. The answer names the run id and one brief file per
-persona and lens. A panel query that resolves to fewer personas than `--spend` is refused.
+The rule's panel, lenses, spend and detail are the defaults, one run per lens. The answer shows `estimate {briefs, tokens}`
+before anyone spends them. You may override anything: `--panel`, `--query "2 builder=primary, 1 others=bystander"` (an
+ad-hoc panel, not saved), `--spend`, `--lens`, `--detail`. A value that differs from the rule, or a brief above 12 seats,
+needs `--reason "<why>"`, and is recorded on the run (`--by` names you); `matrix` shows it. Above 12 seats needs
+`--allow-large`, and 1000 is the most. No override can run a jury on a human class.
+
+Without a rule, name everything:
+```
+jurygraph brief --subject home --panel fixture --lens critical --model sonnet --spend 3 --detail compact \
+  [--stake builder-ana=bystander] [--comparator acme-pricing]
+```
+`--stake` wins over the panel's term and is needed only for a persona whose term has none. `--spend N` takes the first N
+personas, primary then secondary then bystander. `--detail full` inlines text attachments (more tokens per persona);
+`compact` lists attachment paths and hashes. The answer names the run id and one brief file per persona and lens. A panel
+query that resolves to fewer personas than `--spend` is refused, and so is a term that resolves to nobody
+(`panel_term_empty`). A citation into a text file (`README.md#L153`) must name a line the file has.
 
 ## 2. One subagent per persona
 Give each subagent its brief file path and nothing else. It reads the attachments the brief lists (the ARIA walk, the

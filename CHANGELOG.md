@@ -7,6 +7,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added (v0.2, D9 and D10)
+- A stake per panel term (`3 builder=primary`) and a seeded draw: where a term's pool is bigger than its seats, the seats are
+  drawn from the subject's name and the panel's, so round 2 of a subject keeps its bystanders and `delta` can land.
+  `brief --draw HEX`, `panel resolve --subject S`; `run.draw_seed` records the seed.
+- `brief --rule CLASS`: panel, lenses, spend and detail from `jurygraph.toml`, one run per lens. A `low` or `high` rule
+  must name a `panel` (`rule_without_panel`) and lenses.
+- Agent overrides on top of a rule (`--panel`, `--query`, `--spend`, `--lens`, `--detail`), each needing `--reason`
+  (`override_without_reason`), recorded in `run.override_json` and shown by `matrix` (JSON `override`, a table header).
+- Seat ceilings: 12, or 1000 with `--allow-large` on `panel add` and `brief`; above 1000 never (`panel_too_large`).
+  Every brief answers `estimate {briefs, tokens}`, and `large: true` above 12 seats.
+- Further refusals: `rule_panel_unknown`, `rule_lens_unknown`, `panel_term_empty`; `#L<n>` into a UTF-8 text attachment
+  must name a line the file has (`citation_unresolved`).
+- `should-run --subject S` and warnings for a panel or lens the store lacks; `persona generate` asks for the roles first.
+
+### Fixed (review round 1)
+- `--stake` and `--draw` under a rule need a reason; each term draws from its own stream; `brief --rule` refuses a subject
+  under a human rule; `spend = 0` caps at 12; overflow in seat totals and the estimate is `panel_too_large`; only `L<n>`
+  locators of a text file are checked; the matrix override header names the rule and the runs; a v2 store is refused
+  before anything is written.
+
+### Changed
+- Store schema v3 (`run.draw_seed`, `run.override_json`); a v2 store is refused by its `schema_version`.
+- `brief --stake` is optional when the panel's terms carry stakes; `--panel` is optional with `--rule` or `--query`.
+
 ## [0.1.0] - unreleased
 
 ### Added

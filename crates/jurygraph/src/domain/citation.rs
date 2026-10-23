@@ -10,6 +10,29 @@ fn unresolved(c: &str, why: impl Into<String>) -> Refusal {
     }
 }
 
+/// `L` followed by anything but a letter: an attempt at a line (`L3`, `L+1`, `L01`, `L 1`), not an anchor like `Latest`.
+fn line_shaped(loc: &str) -> bool {
+    loc.strip_prefix('L')
+        .and_then(|r| r.chars().next())
+        .is_some_and(|c| !c.is_alphabetic())
+}
+/// `L<n>` in canonical form (no sign, no leading zero, so one line has one citation hash) inside `1..=lines`.
+fn check_line(c: &str, label: &str, locator: &str, lines: usize, what: &str) -> Result<(), Refusal> {
+    let n = locator
+        .strip_prefix('L')
+        .filter(|d| !d.is_empty() && d.bytes().all(|b| b.is_ascii_digit()))
+        .and_then(|d| d.parse::<usize>().ok())
+        .filter(|n| locator == format!("L{n}"))
+        .ok_or_else(|| unresolved(c, format!("a {what} locator reads L<n> (digits, no sign, no leading zero)")))?;
+    if n < 1 || n > lines {
+        return Err(unresolved(
+            c,
+            format!("{label} has {lines} lines; L{n} is outside"),
+        ));
+    }
+    Ok(())
+}
+
 /// Resolve to `<attachment hash>#<locator>` (locator may be empty), or refuse with `citation_unresolved`.
 pub fn resolve(c: &str, ev: &RunEvidence) -> Result<String, Refusal> {
     let (view, label, locator): (&AttachmentView, &str, &str) =
@@ -44,17 +67,10 @@ pub fn resolve(c: &str, ev: &RunEvidence) -> Result<String, Refusal> {
                     return Err(unresolved(c, format!("{label} has no ARIA node {locator}")));
                 }
             }
-            "diff" => {
-                let n = locator
-                    .strip_prefix('L')
-                    .and_then(|d| d.parse::<usize>().ok())
-                    .ok_or_else(|| unresolved(c, "a diff locator reads L<n>"))?;
-                if n < 1 || n > view.lines {
-                    return Err(unresolved(
-                        c,
-                        format!("{label} has {} lines; L{n} is outside", view.lines),
-                    ));
-                }
+            // a diff takes only line locators; a text file takes anchors as v0.1 did, and checks the `L<n>` ones
+            "diff" => check_line(c, label, locator, view.lines, "diff")?,
+            "file" if view.text && line_shaped(locator) => {
+                check_line(c, label, locator, view.lines, "text file")?
             }
             _ => {}
         }
@@ -80,27 +96,45 @@ mod tests {
             media: "aria-json".into(),
             aria_ids: BTreeSet::from(["n1".to_string(), "n2".to_string()]),
             lines: 0,
+            ..Default::default()
         };
         let diff = AttachmentView {
             hash: "H2".into(),
             media: "diff".into(),
             aria_ids: BTreeSet::new(),
             lines: 10,
+            ..Default::default()
         };
         let img = AttachmentView {
             hash: "H3".into(),
             media: "image".into(),
             aria_ids: BTreeSet::new(),
             lines: 0,
+            ..Default::default()
         };
         let cmp = AttachmentView {
             hash: "H9".into(),
             media: "aria-json".into(),
             aria_ids: BTreeSet::from(["c1".to_string()]),
             lines: 0,
+            ..Default::default()
+        };
+        let doc = AttachmentView {
+            hash: "H4".into(),
+            media: "file".into(),
+            lines: 5,
+            text: true,
+            ..Default::default()
+        };
+        let blob = AttachmentView {
+            hash: "H5".into(),
+            media: "file".into(),
+            ..Default::default()
         };
         RunEvidence {
             attachments: BTreeMap::from([
+                ("doc".into(), doc),
+                ("blob".into(), blob),
                 ("page".into(), aria),
                 ("patch".into(), diff),
                 ("shot".into(), img),
@@ -142,6 +176,34 @@ mod tests {
                 "{c}"
             );
         }
+    }
+    #[test]
+    fn text_file_line_resolves_and_past_end_unresolved() {
+        assert_eq!(resolve("doc#L1", &ev()).unwrap(), "H4#L1");
+        assert_eq!(resolve("doc#L5", &ev()).unwrap(), "H4#L5");
+        assert_eq!(resolve("doc", &ev()).unwrap(), "H4#");
+        for c in ["doc#L6", "doc#L0"] {
+            assert_eq!(
+                resolve(c, &ev()).unwrap_err().code(),
+                "citation_unresolved",
+                "{c}"
+            );
+        }
+        let e = resolve("doc#L6", &ev()).unwrap_err();
+        assert!(e.to_string().contains("5 lines"), "{e}");
+    }
+    #[test]
+    fn only_line_locators_of_a_text_file_are_checked_and_they_are_canonical() {
+        for c in ["doc#intro", "doc#Latest", "doc#install"] {
+            assert_eq!(resolve(c, &ev()).unwrap(), format!("H4#{}", &c[4..]), "{c}");
+        }
+        for c in ["doc#L+1", "doc#L01", "doc#L 1", "doc#L-1", "doc#L1x", "patch#L+1", "patch#L01"] {
+            assert_eq!(resolve(c, &ev()).unwrap_err().code(), "citation_unresolved", "{c}");
+        }
+    }
+    #[test]
+    fn a_file_that_is_not_text_keeps_its_locator_unchecked() {
+        assert_eq!(resolve("blob#L99", &ev()).unwrap(), "H5#L99");
     }
     #[test]
     fn image_locator_is_unchecked() {

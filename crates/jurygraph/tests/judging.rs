@@ -633,7 +633,7 @@ fn should_run_spend_carries_the_rule_detail() {
     let cfg = d.path().join("jurygraph.toml");
     std::fs::write(
         &cfg,
-        "[[rule]]\nclass = \"public\"\npaths = [\"site/**\"]\nquorum = \"high\"\nlenses = [\"critical\"]\nspend = 3\ndetail = \"full\"\n",
+        "[[rule]]\nclass = \"public\"\npaths = [\"site/**\"]\nquorum = \"high\"\npanel = \"p\"\nlenses = [\"critical\"]\nspend = 3\ndetail = \"full\"\n",
     )
     .unwrap();
     let r = cli_in(d.path(), &["should-run", "--paths", "site/a.html"]);

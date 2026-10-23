@@ -51,6 +51,22 @@ pub fn subject_hash(kind: SubjectKind, atts: &[Attachment]) -> String {
     }
     sha256_hex(s.as_bytes())
 }
+/// The seed of a draw: the first 8 bytes of sha256("draw\t" + subject name + "\t" + panel name). The subject's NAME,
+/// not its hash: round 2 of the same subject draws the same seats, so `delta` can land.
+pub fn draw_seed(subject_name: &str, panel_name: &str) -> [u8; 8] {
+    let d = Sha256::digest(format!("draw\t{subject_name}\t{panel_name}").as_bytes());
+    let mut out = [0u8; 8];
+    out.copy_from_slice(&d[..8]);
+    out
+}
+/// The seed of one term's stream: the first 8 bytes of sha256("draw\t" + the run's seed in hex + "\t" + the term's tag).
+/// A term draws from its own stream, so a persona added to one term never moves another term's seats.
+pub fn term_seed(seed: [u8; 8], tag: &str) -> [u8; 8] {
+    let d = Sha256::digest(format!("draw\t{}\t{tag}", hex::encode(seed)).as_bytes());
+    let mut out = [0u8; 8];
+    out.copy_from_slice(&d[..8]);
+    out
+}
 /// sha256 of the query, a newline, then the persona ids in the given (spend) order joined by `\n`.
 pub fn panel_hash(query: &str, ids: &[String]) -> String {
     sha256_hex(format!("{}\n{}", query, ids.join("\n")).as_bytes())
@@ -136,5 +152,15 @@ mod tests {
         assert_eq!(on_a, sha256_hex(b"s\tp\td\ta.png\tt\tc")[..16]);
         assert_ne!(on_a, a);
         assert_ne!(on_a, finding_id("s", "p", "d", Some("cmp:x"), "t", "c"));
+    }
+
+    #[test]
+    fn draw_seed_is_the_head_of_sha256_over_subject_name_and_panel_name() {
+        let want = sha256_hex(b"draw\tpricing\tdocs-public");
+        let got = draw_seed("pricing", "docs-public");
+        assert_eq!(hex::encode(got), want[..16]);
+        assert_eq!(got, draw_seed("pricing", "docs-public"));
+        assert_ne!(got, draw_seed("changelog", "docs-public"));
+        assert_ne!(got, draw_seed("pricing", "internal"));
     }
 }

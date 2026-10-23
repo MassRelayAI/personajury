@@ -73,6 +73,20 @@ pub enum Refusal {
         persona: String,
         citation_hash: String,
     },
+    #[error("the panel asks for {seats} seats, above the ceiling of {ceiling}{}", if *ceiling == SEAT_CEILING { "; pass --allow-large to go up to 1000" } else { "; 1000 is the most any panel or brief can seat" })]
+    PanelTooLarge { seats: usize, ceiling: usize },
+    #[error("rule {class}: a rule with quorum low or high needs a `panel`")]
+    RuleWithoutPanel { class: String },
+    #[error("rule {rule} names the panel {panel}, which the store lacks; add it with `jurygraph panel add`")]
+    RulePanelUnknown { rule: String, panel: String },
+    #[error("rule {rule} names the lens {lens}, which the store lacks; add it with `jurygraph lens add`")]
+    RuleLensUnknown { rule: String, lens: String },
+    #[error("panel {panel}: the term {tag:?} resolves to no persona in the pool; a panel with an empty term is not the audience it names")]
+    PanelTermEmpty { panel: String, tag: String },
+    #[error("this brief departs from rule {rule} ({fields}); say why with --reason \"<text>\"")]
+    OverrideWithoutReason { rule: String, fields: String },
+    #[error("{path} falls under the human class {class}: a persona jury can advise on it but never decide it, under any rule or override")]
+    HumanPathUnderPersonaQuorum { class: String, path: String },
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -106,9 +120,31 @@ impl Refusal {
             Refusal::PanelTooSmall { .. } => "panel_too_small",
             Refusal::HumanClassUnderPersonaQuorum { .. } => "human_class_under_persona_quorum",
             Refusal::DismissedPointRepeated { .. } => "dismissed_point_repeated",
+            Refusal::PanelTooLarge { .. } => "panel_too_large",
+            Refusal::RuleWithoutPanel { .. } => "rule_without_panel",
+            Refusal::RulePanelUnknown { .. } => "rule_panel_unknown",
+            Refusal::RuleLensUnknown { .. } => "rule_lens_unknown",
+            Refusal::PanelTermEmpty { .. } => "panel_term_empty",
+            Refusal::OverrideWithoutReason { .. } => "override_without_reason",
+            Refusal::HumanPathUnderPersonaQuorum { .. } => "human_class_under_persona_quorum",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
+        }
+    }
+}
+
+impl Refusal {
+    /// Data an envelope carries beside the error: the ceiling a too-large panel ran into.
+    pub fn data(&self) -> Option<serde_json::Value> {
+        match self {
+            Refusal::PanelTooLarge { seats, ceiling } => {
+                Some(serde_json::json!({"ceiling": ceiling, "seats": seats}))
+            }
+            Refusal::HumanPathUnderPersonaQuorum { class, path } => {
+                Some(serde_json::json!({"class": class, "path": path}))
+            }
+            _ => None,
         }
     }
 }
@@ -348,6 +384,7 @@ mod tests {
             media: "aria-json".into(),
             aria_ids: BTreeSet::from(["n1".to_string()]),
             lines: 0,
+            ..Default::default()
         };
         VerdictContext {
             lens: lens(false, &[Evidence::Seen, Evidence::Told, Evidence::Recalled]),
@@ -588,6 +625,7 @@ mod tests {
             media: "aria-json".into(),
             aria_ids: BTreeSet::from(["r1".to_string()]),
             lines: 0,
+            ..Default::default()
         };
         c.evidence.comparators.insert(
             "rival".into(),

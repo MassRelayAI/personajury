@@ -41,6 +41,9 @@ You give PersonaJury the files people would see: screenshots of a page, a docume
    ```bash
    curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
    ```
+   It downloads one file for your system from the [v0.5.0 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.5.0),
+   checks it against `SHA256SUMS`, and puts it in `~/.local/bin`. No sudo, nothing else. To read it before running it,
+   see [Install](#install). To remove everything later, see [Uninstall](#uninstall).
 2. **Connect your agent.** In Claude Code, type:
    ```text
    /plugin marketplace add massrelay-ai/personajury
@@ -130,7 +133,7 @@ In Claude Code, the plugin does this instead (`/plugin marketplace add massrelay
 
 An entry named `personajury` that points elsewhere is left alone unless you pass `--force`. `--client NAME` limits it to one agent.
 
-### Remove it
+### Uninstall
 
 There is no uninstall command yet. By hand:
 

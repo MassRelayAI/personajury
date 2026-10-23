@@ -1,6 +1,6 @@
 # PersonaJury in five minutes
 
-PersonaJury keeps the jury; your agent runs it. The engine never calls a model: it writes a brief per persona, your agent's
+PersonaJury is free and open source (Apache-2.0); it keeps the jury and your agent runs it. The engine never calls a model: it writes a brief per persona, your agent's
 subagents answer in JSON, and the engine refuses any answer without evidence and reports scores per stratum.
 
 Before you start: install the binary ([README, Install](../README.md#install)). The words (persona, stake, lens, brief,
@@ -13,6 +13,7 @@ to read it, and `personajury summary RUN --html jury.html` writes a page you ope
 cd my-project
 
 # 1. personas: the fixed JSON (see skills/writing-a-persona); tags feed panel queries
+#    an example to copy: fixtures/personas/builder-ana.json (or: personajury persona generate --from notes.md)
 personajury persona add --file personas/ana.json          # once per persona
 personajury panel add devs --query "2 builder, 1 others"   # "<N> <tag>, ..."; `others` = none of the named tags
 personajury panel resolve devs

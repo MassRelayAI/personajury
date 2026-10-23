@@ -7,7 +7,7 @@ flags are in [`commands.md`](commands.md). Behaviour described here is the v0.1 
 ## The loop
 1. **Set up once.** Install the binary ([README](../README.md#install)), then `personajury setup --apply` registers the MCP
    server with the agents it finds (without `--apply` it prints a plan; [what it writes](../README.md#what-setup-writes),
-   [how to remove it](../README.md#remove-it)). In Claude Code the plugin does this instead. `personajury doctor` reports the store and each registration. The store is `.personajury/store.db` under `--root`
+   [how to remove it](../README.md#uninstall)). In Claude Code the plugin does this instead. `personajury doctor` reports the store and each registration. The store is `.personajury/store.db` under `--root`
    (default `.`).
 2. **Personas and a panel.** `personajury persona add --file p.json` per persona, or `personajury persona generate --from
    material.md` to write a brief that asks your agent to write them. `personajury panel add NAME --query "3 builder, 2 company,

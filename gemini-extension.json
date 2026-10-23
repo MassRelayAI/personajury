@@ -1,11 +1,11 @@
 {
-  "name": "jurygraph",
-  "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the jurygraph binary on PATH.",
-  "version": "0.1.0",
+  "name": "personajury",
+  "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the personajury binary on PATH.",
+  "version": "0.5.0",
   "contextFileName": "GEMINI.md",
   "mcpServers": {
-    "jurygraph": {
-      "command": "jurygraph",
+    "personajury": {
+      "command": "personajury",
       "args": ["mcp"]
     }
   }

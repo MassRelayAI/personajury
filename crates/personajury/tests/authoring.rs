@@ -9,7 +9,7 @@ pub fn fx(rel: &str) -> PathBuf {
         .join(rel)
 }
 pub fn jg(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(ws)
@@ -137,7 +137,7 @@ fn generate_same_material_same_hash() {
     ));
     assert_eq!(x["material_hash"], y["material_hash"]);
     let hash = x["material_hash"].as_str().unwrap();
-    let p = format!(".jurygraph/generate/{hash}.md");
+    let p = format!(".personajury/generate/{hash}.md");
     assert_eq!(read(a.path(), &p), read(b.path(), &p));
     assert!(read(a.path(), &p).contains("persona add --file"));
     assert_eq!(x["sources"].as_array().unwrap().len(), 7);
@@ -246,7 +246,7 @@ fn site_lens_loads_with_lens_add() {
         (d["name"].as_str(), d["version"].as_i64()),
         (Some("site"), Some(1))
     );
-    let store = jurygraph::store::Store::open(ws.path()).unwrap();
+    let store = personajury::store::Store::open(ws.path()).unwrap();
     let l = store.lens("site").unwrap().unwrap();
     assert_eq!(l.scale, [1, 10]);
     assert_eq!(l.anchor_scores(), vec![1, 4, 7, 10]);
@@ -269,7 +269,7 @@ fn site_lens_loads_with_lens_add() {
     }
     // fixture data, not seeded: a fresh store does not hold it
     let fresh = tempfile::tempdir().unwrap();
-    let names: Vec<String> = jurygraph::store::Store::open(fresh.path())
+    let names: Vec<String> = personajury::store::Store::open(fresh.path())
         .unwrap()
         .lenses()
         .unwrap()
@@ -300,12 +300,12 @@ fn subject_add_copies_blobs() {
     assert_eq!(at[1]["media"], "aria-json");
     for x in at {
         let h = x["hash"].as_str().unwrap();
-        assert!(ws.path().join(".jurygraph/blobs").join(h).is_file());
+        assert!(ws.path().join(".personajury/blobs").join(h).is_file());
     }
     let png = std::fs::read(fx("site-walk/pricing.png")).unwrap();
     let h = at[0]["hash"].as_str().unwrap();
     assert_eq!(
-        std::fs::read(ws.path().join(".jurygraph/blobs").join(h)).unwrap(),
+        std::fs::read(ws.path().join(".personajury/blobs").join(h)).unwrap(),
         png
     );
     // same files, same version and hash
@@ -375,7 +375,7 @@ fn brief_is_deterministic() {
     }
     assert_eq!(x["bytes_total"], y["bytes_total"]);
     let first = read(a.path(), x["briefs"][0]["path"].as_str().unwrap());
-    assert!(first.starts_with("jurygraph-brief 1\n"));
+    assert!(first.starts_with("personajury-brief 1\n"));
     // no model name, no run id in the text
     assert!(!first.contains("test-model"));
     // a second brief in the same workspace is the same bytes under a new run
@@ -408,7 +408,7 @@ fn brief_orders_by_stake() {
     let p = d["briefs"][0]["path"].as_str().unwrap();
     assert_eq!(
         p,
-        format!(".jurygraph/runs/{}/builder-ana--critical.md", d["run"])
+        format!(".personajury/runs/{}/builder-ana--critical.md", d["run"])
     );
     let bytes = read(ws.path(), p).len();
     assert_eq!(d["briefs"][0]["bytes"], bytes);
@@ -439,7 +439,7 @@ fn brief_pins_persona_version() {
     assert!(
         read(ws.path(), one["briefs"][0]["path"].as_str().unwrap()).contains("Paying for a seat")
     );
-    let store = jurygraph::store::Store::open(ws.path()).unwrap();
+    let store = personajury::store::Store::open(ws.path()).unwrap();
     assert_eq!(
         store.run(run1).unwrap().unwrap().briefs[0].persona_version,
         1
@@ -576,7 +576,7 @@ fn brief_lists_comparator_snapshots() {
     assert!(text.contains("cmp:acme/pricing.html"));
     assert!(text.contains("cmp:acme"));
     // the run holds the snapshot
-    let store = jurygraph::store::Store::open(ws.path()).unwrap();
+    let store = personajury::store::Store::open(ws.path()).unwrap();
     let run = store.run(d["run"].as_i64().unwrap()).unwrap().unwrap();
     assert_eq!(run.comparators, vec![("acme".to_string(), 1)]);
     // duplicates are removed
@@ -645,7 +645,7 @@ fn brief_full_inlines_walk_compact_does_not() {
     assert_eq!(full["detail"], "full");
     assert!(full["bytes_total"].as_u64() > compact["bytes_total"].as_u64());
     // the image stays by path in both
-    assert!(f.contains(".jurygraph/blobs/") && f.contains("pricing.png"));
+    assert!(f.contains(".personajury/blobs/") && f.contains("pricing.png"));
 }
 
 #[test]
@@ -759,9 +759,10 @@ fn critical_brief_has_no_options() {
 }
 
 // sha256 of the compare brief for the pricing/acme fixture, recorded before `about` was scoped to pick/compare lenses;
-// re-recorded in v0.3 (D12), when the brief began to state the allowed anchor_met values
+// re-recorded in v0.3 (D12), when the brief began to state the allowed anchor_met values;
+// re-recorded in v0.5.0 (D25), when the brief text began to carry the product name PersonaJury
 const COMPARE_BRIEF_SHA256: &str =
-    "9e349bd1c68e8c65affb8a633d79d36e1e207a3e004ef16cc2038b2583a29e86";
+    "b2e3ae360c90ecddc41f0e5a84e898996a97e3d336c5057d7264f5f9e9b1df58";
 
 #[test]
 fn compare_brief_unchanged_by_about_scope() {

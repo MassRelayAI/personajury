@@ -341,7 +341,7 @@ pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
     let n_dims: usize = lenses.iter().map(|l| l.dimensions.len()).sum();
     let status_n = |s: &str| findings.iter().filter(|f| f.status == s).count();
     let desc = format!(
-        "The jury graph of {subject}: {n_personas} personas ({}), scoring {n_dims} dimensions across {} lens{}, and {} findings: {} open, {} fixed, {} dismissed, {} row. Edges from a persona to a dimension are coloured by the score from 1 to 5; edges to a finding are coloured by its decision. Each dimension shows a median badge per stratum, never one number across strata.",
+        "PersonaJury · {subject}: {n_personas} personas ({}), scoring {n_dims} dimensions across {} lens{}, and {} findings: {} open, {} fixed, {} dismissed, {} row. Edges from a persona to a dimension are coloured by the score from 1 to 5; edges to a finding are coloured by its decision. Each dimension shows a median badge per stratum, never one number across strata.",
         STAKES.iter().zip(&counts).map(|(s, n)| format!("{} {n}", s.name())).collect::<Vec<_>>().join(", "),
         lenses.len(),
         if lenses.len() == 1 { "" } else { "es" },
@@ -355,11 +355,11 @@ pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
     let mut o = String::new();
     let w = lay::WIDTH;
     let _ = writeln!(o, "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {w} {height}\" width=\"{w}\" height=\"{height}\" role=\"img\" aria-labelledby=\"t d\">");
-    let _ = writeln!(o, "<title id=\"t\">The jury graph of {}</title><desc id=\"d\">{}</desc>", esc(&subject), esc(&desc));
+    let _ = writeln!(o, "<title id=\"t\">PersonaJury · {}</title><desc id=\"d\">{}</desc>", esc(&subject), esc(&desc));
     let _ = writeln!(o, "<rect width=\"100%\" height=\"100%\" fill=\"#ffffff\"/>");
     let _ = writeln!(o, "<rect x=\"1\" y=\"1\" width=\"{}\" height=\"{}\" rx=\"10\" fill=\"#ffffff\" stroke=\"{LINE}\" stroke-width=\"1.2\"/>", w - 2, height - 2);
     let _ = writeln!(o, "<g font-family=\"{FONT}\" fill=\"{INK}\">");
-    let _ = writeln!(o, "<text x=\"30\" y=\"40\" font-size=\"18\" font-weight=\"700\">The jury graph of {}</text>", esc(&lay::fit(&subject, 760, 18)));
+    let _ = writeln!(o, "<text x=\"30\" y=\"40\" font-size=\"18\" font-weight=\"700\">PersonaJury · {}</text>", esc(&lay::fit(&subject, 760, 18)));
     let _ = writeln!(o, "<text x=\"30\" y=\"62\" font-size=\"13\" fill=\"{MUTED}\">Personas by stake, the dimensions they scored, the blockers they raised. Edge colour is the score; badges are medians per stratum, never one number.</text>");
     let rounds = format!(
         "run{} {}",

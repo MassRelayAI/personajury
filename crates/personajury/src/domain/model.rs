@@ -457,7 +457,7 @@ pub struct Term {
     pub model: Option<String>,
 }
 
-// ---- the verdict file the agent writes (ingested by `jurygraph verdict`) ----
+// ---- the verdict file the agent writes (ingested by `personajury verdict`) ----
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

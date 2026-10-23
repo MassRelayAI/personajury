@@ -19,16 +19,16 @@ jobs:
         run: rustup show active-toolchain || rustup toolchain install
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       - name: Test
-        run: cargo test -p jurygraph
+        run: cargo test -p personajury
       - name: Clippy
-        run: cargo clippy -p jurygraph --tests -- -D warnings
+        run: cargo clippy -p personajury --tests -- -D warnings
       - name: README illustration script tests
         run: node --test scripts/test/*.test.mjs
       - name: README illustrations are current
         run: node scripts/readme-assets.mjs --check
       - name: server.json version equals Cargo.toml
         run: |
-          v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="jurygraph") | .version')
+          v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="personajury") | .version')
           [ "$(jq -r .version server.json)" = "$v" ] || { echo "server.json != Cargo.toml $v"; exit 1; }
   deny:
     runs-on: ubuntu-latest

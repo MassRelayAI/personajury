@@ -101,7 +101,7 @@ pub fn add(
             )));
         }
     }
-    let dir = root.join(".jurygraph").join("blobs");
+    let dir = root.join(".personajury").join("blobs");
     std::fs::create_dir_all(&dir).map_err(|e| AppError::Io(dir.clone(), e))?;
     for (hash, bytes) in &blobs {
         let p = dir.join(hash);

@@ -15,7 +15,7 @@ fn root() -> PathBuf {
 fn action_yml_declares_the_inputs_the_outputs_and_composite_steps() {
     let y = std::fs::read_to_string(root().join("action.yml")).expect("action.yml at the repo root");
     for key in [
-        "name:", "description:", "inputs:", "  config:", "    default: jurygraph.toml", "  base:", "  store:", "  version:", "  fail-on:",
+        "name:", "description:", "inputs:", "  config:", "    default: personajury.toml", "  base:", "  store:", "  version:", "  fail-on:",
         "outputs:", "  quorum:", "  spend:", "  effort:", "  answer:", "  check:", "runs:", "  using: composite", "  steps:",
         "scripts/install.sh", "scripts/action-run.sh", "shell: sh",
     ] {
@@ -40,8 +40,8 @@ fn repo_with_change(files: &[&str]) -> tempfile::TempDir {
         assert!(o.status.success(), "git {args:?}: {}", String::from_utf8_lossy(&o.stderr));
     };
     git(&["init", "-q", "-b", "main"]);
-    std::fs::copy(root().join("fixtures/jurygraph.toml"), p.join("jurygraph.toml")).unwrap();
-    git(&["add", "jurygraph.toml"]);
+    std::fs::copy(root().join("fixtures/personajury.toml"), p.join("personajury.toml")).unwrap();
+    git(&["add", "personajury.toml"]);
     git(&["commit", "-q", "-m", "base"]);
     git(&["branch", "base"]);
     for f in files {
@@ -64,8 +64,8 @@ fn action(cwd: &Path, store: &str, fail_on: &str) -> Out {
     let r = Command::new("sh")
         .arg(root().join("scripts/action-run.sh"))
         .current_dir(cwd)
-        .env("JG_BIN", assert_cmd::cargo::cargo_bin("jurygraph"))
-        .env("JG_CONFIG", "jurygraph.toml")
+        .env("JG_BIN", assert_cmd::cargo::cargo_bin("personajury"))
+        .env("JG_CONFIG", "personajury.toml")
         .env("JG_BASE", "base")
         .env("JG_STORE", store)
         .env("JG_FAIL_ON", fail_on)
@@ -130,7 +130,7 @@ fn with_a_store_check_and_apply_check_run_and_a_failing_check_fails_the_job() {
     let ws = tempfile::tempdir().unwrap();
     fixture_run(ws.path());
     // the store's root holds the project's rules: the Action passes should-run's one rule to apply-check (C1)
-    std::fs::copy(root().join("fixtures/jurygraph.toml"), ws.path().join("jurygraph.toml")).unwrap();
+    std::fs::copy(root().join("fixtures/personajury.toml"), ws.path().join("personajury.toml")).unwrap();
     let o = action(d.path(), ws.path().to_str().unwrap(), "human");
     assert_eq!(output(&o, "check"), "failed", "{}", o.outputs);
     assert_eq!(output(&o, "answer"), "escalate", "{}", o.outputs);
@@ -143,12 +143,12 @@ fn escalate_fails_only_when_fail_on_names_it() {
     let d = repo_with_change(&["site/pricing.html"]);
     let ws = Ws::new();
     ws.site();
-    let r = ws.run("critical", &[("ana", jurygraph::domain::Stake::Primary), ("bob", jurygraph::domain::Stake::Secondary)], false);
+    let r = ws.run("critical", &[("ana", personajury::domain::Stake::Primary), ("bob", personajury::domain::Stake::Secondary)], false);
     let v = critical("ana", [3, 3, 3], &["the price is hidden"], &["page.json#n1"]);
     let finding = ws.ingest(r, &v)["findings"][0].as_str().unwrap().to_string();
     ws.ingest(r, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
     assert_eq!(ws.cli(&["decide", &finding, "dismissed", "--why", "intended", "--by", "ana"])["ok"], json!(true));
-    std::fs::copy(root().join("fixtures/jurygraph.toml"), ws.root().join("jurygraph.toml")).unwrap();
+    std::fs::copy(root().join("fixtures/personajury.toml"), ws.root().join("personajury.toml")).unwrap();
     let store = ws.root().to_str().unwrap().to_string();
     let o = action(d.path(), &store, "human");
     assert_eq!(output(&o, "check"), "ok", "{}", o.outputs);
@@ -168,5 +168,5 @@ fn the_script_defaults_the_base_to_the_pull_request_base() {
 #[test]
 fn ci_docs_carry_a_workflow_example() {
     let d = std::fs::read_to_string(root().join("docs/ci.md")).expect("docs/ci.md");
-    assert!(d.contains("uses: massrelay-ai/jurygraph@") && d.contains("fail-on:"), "{d}");
+    assert!(d.contains("uses: massrelay-ai/personajury@") && d.contains("fail-on:"), "{d}");
 }

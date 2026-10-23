@@ -1,5 +1,5 @@
-use jurygraph::domain::*;
-use jurygraph::store::{Store, StoreError};
+use personajury::domain::*;
+use personajury::store::{Store, StoreError};
 use std::collections::BTreeMap;
 
 fn tmp() -> (tempfile::TempDir, Store) {
@@ -118,7 +118,7 @@ fn subject(name: &str, hash: &str) -> Subject {
 #[test]
 fn open_creates_store_and_schema_version() {
     let (d, s) = tmp();
-    assert!(d.path().join(".jurygraph/store.db").exists());
+    assert!(d.path().join(".personajury/store.db").exists());
     assert_eq!(s.schema_version().unwrap(), 4);
     assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 4);
     assert!(Store::open_existing(d.path()).is_ok());
@@ -162,7 +162,7 @@ fn open_existing_refuses_missing_workspace() {
     let err = Store::open_existing(d.path()).unwrap_err();
     assert!(matches!(err, StoreError::NotFound(_)));
     assert!(err.to_string().contains("no workspace at"), "{err}");
-    assert!(!d.path().join(".jurygraph").exists());
+    assert!(!d.path().join(".personajury").exists());
 }
 
 #[test]

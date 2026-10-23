@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/store/mod.rs (error type, now_iso, open/open_existing)
-//! The SQLite store at `<root>/.jurygraph/store.db`. Verdicts, picks and decisions are append-only (triggers in schema.sql).
+//! The SQLite store at `<root>/.personajury/store.db`. Verdicts, picks and decisions are append-only (triggers in schema.sql).
 use crate::domain::*;
 use rusqlite::{params, Connection, OptionalExtension};
 use sha2::{Digest, Sha256};
@@ -17,7 +17,7 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
     ("rule_class", "TEXT"),
     ("quorum", "TEXT"),
 ];
-pub const DIR: &str = ".jurygraph";
+pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
 
 /// The four shipped lenses, seeded into a store that has no lens of that name (plan Task 2).
@@ -252,12 +252,12 @@ pub struct Store {
 }
 
 impl Store {
-    /// Open a store that must already exist; never creates `.jurygraph`. Read verbs use this.
+    /// Open a store that must already exist; never creates `.personajury`. Read verbs use this.
     pub fn open_existing(root: &Path) -> Result<Store> {
         let dir = root.join(DIR);
         if !dir.join(DB).is_file() {
             return Err(StoreError::NotFound(format!(
-                "no workspace at {} — run a jurygraph verb that writes first",
+                "no workspace at {} — run a personajury verb that writes first",
                 dir.display()
             )));
         }

@@ -1,5 +1,5 @@
 <!-- adapted from comparegraph CONTRIBUTING.md -->
-# Contributing to JuryGraph
+# Contributing to PersonaJury
 
 Read `AGENTS.md` first: the rings, the invariants and the never-list apply to every change. Who decides, and what only a
 numbered decision may change, is in `GOVERNANCE.md`; personas follow `PERSONAS.md` and lenses `docs/lenses.md`.
@@ -12,7 +12,7 @@ numbered decision may change, is in `GOVERNANCE.md`; personas follow `PERSONAS.m
    the site, and the held-out check reads it.
 4. A provisional choice (a threshold, a default, a shape the design leaves open) gets one row in `docs/decisions.md`: the
    choice, the alternative, why it is provisional, what would change it.
-5. Run `cargo test -p jurygraph` and `cargo clippy -p jurygraph --tests -- -D warnings`. Both must be clean.
+5. Run `cargo test -p personajury` and `cargo clippy -p personajury --tests -- -D warnings`. Both must be clean.
 6. Conventional commit messages; stage named paths.
 
 A refusal that looks wrong is a report, not a loosening: file the wrong-refusal form with the code and the minimal verdict

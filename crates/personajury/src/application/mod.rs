@@ -38,7 +38,7 @@ pub enum AppError {
     CheckFailed(String, Value),
     #[error("{0}: {1}")]
     Io(PathBuf, std::io::Error),
-    #[error("summary --save needs report_dir in jurygraph.toml (for example report_dir = \"docs/juries\"); nothing is written by default")]
+    #[error("summary --save needs report_dir in personajury.toml (for example report_dir = \"docs/juries\"); nothing is written by default")]
     NoReportDir,
     /// a calibration file written for another subject, lens, lens version or run (M1)
     #[error("{0}")]

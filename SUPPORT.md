@@ -1,6 +1,6 @@
 # Getting help
 
-- **A question about using JuryGraph**: read `docs/usage.md`, `docs/faq.md` and `docs/troubleshooting.md` first. Then open an
+- **A question about using PersonaJury**: read `docs/usage.md`, `docs/faq.md` and `docs/troubleshooting.md` first. Then open an
   issue on the repository.
 - **A bug**: use the bug report form. If the engine refused a verdict it should have accepted, or accepted one it should
   have refused, use the wrong-refusal form; a minimal verdict JSON and the error code make it quick to settle.

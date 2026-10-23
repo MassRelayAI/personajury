@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "jurygraph": {
-      "command": "jurygraph",
+    "personajury": {
+      "command": "personajury",
       "args": ["mcp"]
     }
   }

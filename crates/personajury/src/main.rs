@@ -1,3 +1,3 @@
 fn main() {
-    std::process::exit(jurygraph::adapters::cli::run());
+    std::process::exit(personajury::adapters::cli::run());
 }

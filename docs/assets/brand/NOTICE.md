@@ -1,7 +1,7 @@
 # Notice
 
 The wordmark in `lockup.svg`, `lockup-dark.svg` and `social-preview.svg` is outlined, not live text. Its glyph
-outlines come from **Noto Sans** (Bold for "Jury", Regular for "Graph"; the claim and the stratum labels in the
+outlines come from **Noto Sans** (Bold for "Persona", Regular for "Jury"; the claim and the stratum labels in the
 social preview are Regular). The files used were `NotoSans-Bold.ttf` and
 `NotoSans-Regular.ttf` from the Debian package `fonts-noto-core`.
 

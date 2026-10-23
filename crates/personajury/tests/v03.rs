@@ -1,12 +1,12 @@
 //! v0.3 (D11, D12): waves, reported usage, the allowed anchors in the brief, a reason for any large brief, a
 //! comma list of comparators. Every refusal here was seen red first.
 use assert_cmd::Command;
-use jurygraph::store::Store;
+use personajury::store::Store;
 use serde_json::{json, Value};
 use std::path::Path;
 
 fn jg(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(ws)
@@ -53,7 +53,7 @@ fn brief(w: &Path, extra: &[&str]) -> Value {
     a.extend_from_slice(extra);
     jg(w, &a)
 }
-fn run_row(w: &Path, id: i64) -> jurygraph::domain::RunRow {
+fn run_row(w: &Path, id: i64) -> personajury::domain::RunRow {
     Store::open_existing(w).unwrap().run(id).unwrap().unwrap()
 }
 fn sized(n: usize) -> tempfile::TempDir {
@@ -126,10 +126,10 @@ fn the_matrix_names_a_large_brief_with_no_rule() {
 fn a_malformed_toml_is_refused_by_brief_not_ignored() {
     let ws = sized(2);
     let w = ws.path();
-    std::fs::write(w.join("jurygraph.toml"), "[[rule]\nclass = ").unwrap();
+    std::fs::write(w.join("personajury.toml"), "[[rule]\nclass = ").unwrap();
     let r = brief(w, &["--query", "2 reader=bystander"]);
     assert_eq!(code(&r), "invalid_config", "{r}");
-    std::fs::remove_file(w.join("jurygraph.toml")).unwrap();
+    std::fs::remove_file(w.join("personajury.toml")).unwrap();
     ok(brief(w, &["--query", "2 reader=bystander"]));
 }
 
@@ -230,7 +230,7 @@ fn reported_usage_shows_beside_the_estimate_in_matrix_and_doctor() {
     assert_eq!(m["usage"]["estimate"], json!({"briefs": 2, "tokens": 30000}));
     assert!(m["table"].as_str().unwrap().contains("reported by the agent"), "{m}");
     let home = tempfile::tempdir().unwrap();
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .env("HOME", home.path())
         .env("XDG_CONFIG_HOME", home.path().join(".config"))
@@ -279,11 +279,11 @@ fn a_malformed_toml_is_refused_by_matrix_and_diagnosed_by_doctor() {
     let w = ws.path();
     let d = ok(brief(w, &["--query", "1 reader=bystander"]));
     let run = d["run"].as_i64().unwrap().to_string();
-    std::fs::write(w.join("jurygraph.toml"), "[[rule]\nclass = ").unwrap();
+    std::fs::write(w.join("personajury.toml"), "[[rule]\nclass = ").unwrap();
     let r = jg(w, &["matrix", &run]);
     assert_eq!(code(&r), "invalid_config", "{r}");
     let home = tempfile::tempdir().unwrap();
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .env("HOME", home.path())
         .env("XDG_CONFIG_HOME", home.path().join(".config"))

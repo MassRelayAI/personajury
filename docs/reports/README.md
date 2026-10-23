@@ -22,6 +22,7 @@ status: measured        # measured | decided | stale | superseded
 
 | date | report | verdict in one line | status |
 |---|---|---|---|
+| 2026-10-24 | [The name, picked by a persona jury](2026-10-24-the-name-picked-by-a-persona-jury.md) | PersonaJury, 8 of 8 forced picks over seven other names | decided |
 
 No report exists yet. The first is expected from the held-out check: a jury run on the fixture site compared with the
 answer key in `fixtures/README.md` (see `../testing.md`).

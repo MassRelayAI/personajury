@@ -77,9 +77,9 @@ pub enum Refusal {
     PanelTooLarge { seats: usize, ceiling: usize },
     #[error("rule {class}: a rule with quorum low or high needs a `panel`")]
     RuleWithoutPanel { class: String },
-    #[error("rule {rule} names the panel {panel}, which the store lacks; add it with `jurygraph panel add`")]
+    #[error("rule {rule} names the panel {panel}, which the store lacks; add it with `personajury panel add`")]
     RulePanelUnknown { rule: String, panel: String },
-    #[error("rule {rule} names the lens {lens}, which the store lacks; add it with `jurygraph lens add`")]
+    #[error("rule {rule} names the lens {lens}, which the store lacks; add it with `personajury lens add`")]
     RuleLensUnknown { rule: String, lens: String },
     #[error("panel {panel}: the term {tag:?} resolves to no persona in the pool; a panel with an empty term is not the audience it names")]
     PanelTermEmpty { panel: String, tag: String },

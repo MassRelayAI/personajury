@@ -34,7 +34,7 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
         Some(h) => {
             if !store.material_exists(h)? {
                 return Err(AppError::NotFound(format!(
-                    "no generated material with hash {h}; run `jurygraph persona generate` first"
+                    "no generated material with hash {h}; run `personajury persona generate` first"
                 )));
             }
             Origin::GeneratedFrom(h.to_string())
@@ -129,7 +129,7 @@ pub(crate) fn material_of(root: &Path, from: &Path) -> Result<(String, Vec<Strin
     Ok((sha256_hex(lines.as_bytes()), sources))
 }
 
-/// Hash the material, write `.jurygraph/generate/<hash>.md` (the brief asking the agent for `count` personas), record it.
+/// Hash the material, write `.personajury/generate/<hash>.md` (the brief asking the agent for `count` personas), record it.
 pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
     if count == 0 {
         return Err(AppError::InvalidArguments(
@@ -138,7 +138,7 @@ pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
     }
     let (hash, sources) = material_of(root, from)?;
     let mut t = String::new();
-    t.push_str("jurygraph-generate 1\n\n");
+    t.push_str("personajury-generate 1\n\n");
     t.push_str(&format!(
         "# Write {count} persona{} from this material\n\n",
         if count == 1 { "" } else { "s" }
@@ -178,13 +178,13 @@ Write one JSON file per persona, named `<id>.json`. Each file holds exactly thes
     }
     t.push_str(&format!(
         "\nBase every persona on the material above; do not invent facts it does not support. \
-Then add each file with:\n\n`jurygraph persona add --file <file> --generated-from {hash}`\n"
+Then add each file with:\n\n`personajury persona add --file <file> --generated-from {hash}`\n"
     ));
-    let dir = root.join(".jurygraph").join("generate");
+    let dir = root.join(".personajury").join("generate");
     std::fs::create_dir_all(&dir).map_err(|e| AppError::Io(dir.clone(), e))?;
     let path = dir.join(format!("{hash}.md"));
     std::fs::write(&path, t.as_bytes()).map_err(|e| AppError::Io(path.clone(), e))?;
-    let rel = format!(".jurygraph/generate/{hash}.md");
+    let rel = format!(".personajury/generate/{hash}.md");
     let store = Store::open(root)?;
     store.insert_material(&hash, &sources, &rel)?;
     Ok(json!({"material_hash": hash, "brief": rel, "sources": sources}))

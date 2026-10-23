@@ -1,4 +1,4 @@
-//! `should-run`: the trigger classifier over a diff (report §10). Rules are data in jurygraph.toml.
+//! `should-run`: the trigger classifier over a diff (report §10). Rules are data in personajury.toml.
 use super::model::{Classification, Quorum, RuleHit, TriggerConfig, HUMAN_CLASSES};
 use super::refuse::Refusal;
 use globset::{Glob, GlobSet, GlobSetBuilder};

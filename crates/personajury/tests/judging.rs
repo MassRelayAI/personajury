@@ -2,7 +2,7 @@
 //! into the store; the `brief` verb is not a dependency.
 #[path = "judging_support/mod.rs"]
 mod support;
-use jurygraph::domain::{Stake, SubjectKind};
+use personajury::domain::{Stake, SubjectKind};
 use serde_json::{json, Value};
 use support::*;
 
@@ -542,7 +542,7 @@ fn check_reports_stale_runs_without_failing() {
 }
 
 fn should_run(root: &std::path::Path, extra: &[&str]) -> Value {
-    let cfg = fixtures().join("jurygraph.toml");
+    let cfg = fixtures().join("personajury.toml");
     let mut args = vec!["should-run", "--config", cfg.to_str().unwrap()];
     args.extend(extra);
     cli_in(root, &args)
@@ -553,7 +553,7 @@ fn should_run_internal_is_none() {
     let d = tempfile::tempdir().unwrap();
     let r = should_run(
         d.path(),
-        &["--paths", "crates/jurygraph/src/lib.rs,tests/x.rs"],
+        &["--paths", "crates/personajury/src/lib.rs,tests/x.rs"],
     );
     assert_eq!(r["ok"], true, "{r}");
     assert_eq!(r["data"]["quorum"], "none");
@@ -561,7 +561,7 @@ fn should_run_internal_is_none() {
     assert_eq!(r["data"]["hits"][0]["class"], "internals");
     assert_eq!(r["data"]["unmatched"], json!([]));
     assert!(
-        !d.path().join(".jurygraph").exists(),
+        !d.path().join(".personajury").exists(),
         "should-run needs no store"
     );
 }
@@ -630,7 +630,7 @@ fn should_run_spend_from_rule_and_diff_file() {
 #[test]
 fn should_run_spend_carries_the_rule_detail() {
     let d = tempfile::tempdir().unwrap();
-    let cfg = d.path().join("jurygraph.toml");
+    let cfg = d.path().join("personajury.toml");
     std::fs::write(
         &cfg,
         "[[rule]]\nclass = \"public\"\npaths = [\"site/**\"]\nquorum = \"high\"\npanel = \"p\"\nlenses = [\"critical\"]\nspend = 3\ndetail = \"full\"\n",
@@ -651,18 +651,18 @@ fn should_run_human_quorum_has_no_persona_spend() {
 #[test]
 fn should_run_needs_paths_and_a_config() {
     let d = tempfile::tempdir().unwrap();
-    let cfg = fixtures().join("jurygraph.toml");
+    let cfg = fixtures().join("personajury.toml");
     let r = cli_in(d.path(), &["should-run", "--config", cfg.to_str().unwrap()]);
     assert_eq!(r["error"]["code"], "invalid_arguments");
     let r = cli_in(d.path(), &["should-run", "--paths", "a"]);
     assert_eq!(
         r["error"]["code"], "not_found",
-        "no <root>/jurygraph.toml: {r}"
+        "no <root>/personajury.toml: {r}"
     );
-    std::fs::copy(&cfg, d.path().join("jurygraph.toml")).unwrap();
+    std::fs::copy(&cfg, d.path().join("personajury.toml")).unwrap();
     let r = cli_in(d.path(), &["should-run", "--paths", "site/a"]);
     assert_eq!(
         r["data"]["quorum"], "high",
-        "default config is <root>/jurygraph.toml: {r}"
+        "default config is <root>/personajury.toml: {r}"
     );
 }

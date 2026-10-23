@@ -17,7 +17,7 @@ pub fn classify(
 ) -> Result<Value> {
     let config_path: PathBuf = config
         .map(Path::to_path_buf)
-        .unwrap_or_else(|| root.join("jurygraph.toml"));
+        .unwrap_or_else(|| root.join("personajury.toml"));
     let cfg = trigger::parse_config(&read(&config_path)?)?;
     let mut all: BTreeSet<String> = paths
         .iter()
@@ -60,7 +60,7 @@ pub fn classify(
                     if let Some(p) = rule.panel.as_deref() {
                         if !matches!(st.panel(p), Ok(Some(_))) {
                             warnings.push(format!(
-                                "rule {}: panel {p} is not in the store; add it with `jurygraph panel add`",
+                                "rule {}: panel {p} is not in the store; add it with `personajury panel add`",
                                 rule.class
                             ));
                         }
@@ -68,7 +68,7 @@ pub fn classify(
                     for l in &rule.lenses {
                         if !matches!(st.lens(l), Ok(Some(_))) {
                             warnings.push(format!(
-                                "rule {}: lens {l} is not in the store; add it with `jurygraph lens add`",
+                                "rule {}: lens {l} is not in the store; add it with `personajury lens add`",
                                 rule.class
                             ));
                         }

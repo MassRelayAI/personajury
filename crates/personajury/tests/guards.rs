@@ -63,7 +63,7 @@ fn no_network_crate_in_lock() {
     let lock = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../Cargo.lock");
     let text = std::fs::read_to_string(&lock).expect("Cargo.lock at the workspace root");
     assert!(
-        text.contains("name = \"jurygraph\""),
+        text.contains("name = \"personajury\""),
         "scanned the right lock"
     );
     assert_eq!(network_crates_in_lock(&text), Vec::<String>::new());

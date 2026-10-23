@@ -2,7 +2,7 @@
 //! `fixtures/run/setup.sh` does, checks every brief against the hashes recorded when the jury ran, ingests the fourteen
 //! verdicts the persona subagents wrote, and compares the matrix and the picks with the checked-in files byte for byte.
 //! A changed brief, a refused verdict or a moved score turns this red. The matrix, table and picks are engine output:
-//! `JURYGRAPH_FIXTURE_REGEN=1 cargo test -p jurygraph --test fixture_replay` rewrites them from this replay (the
+//! `PERSONAJURY_FIXTURE_REGEN=1 cargo test -p personajury --test fixture_replay` rewrites them from this replay (the
 //! briefs, verdicts and decisions are never rewritten).
 use assert_cmd::Command;
 use serde_json::Value;
@@ -15,7 +15,7 @@ fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 fn j(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(ws)
@@ -36,7 +36,7 @@ fn read(rel: &str) -> String {
 }
 /// Compare engine output with its checked-in file, or rewrite the file when regenerating.
 fn same(rel: &str, got: &str, what: &str) {
-    if std::env::var_os("JURYGRAPH_FIXTURE_REGEN").is_some() {
+    if std::env::var_os("PERSONAJURY_FIXTURE_REGEN").is_some() {
         std::fs::write(repo().join("fixtures/run").join(rel), got).unwrap();
     }
     assert_eq!(got, read(rel), "{what}");
@@ -81,13 +81,28 @@ fn fixture_jury_replays_byte_for_byte() {
     let (critical, compare) = build(ws.path());
 
     // the briefs the jurors read are the briefs this build composes
+    if std::env::var_os("PERSONAJURY_FIXTURE_REGEN").is_some() {
+        let mut out = serde_json::Map::new();
+        for (run, lens) in [(critical, "critical"), (compare, "compare")] {
+            let dir = ws.path().join(format!(".personajury/runs/{run}"));
+            let mut m = serde_json::Map::new();
+            let mut names: Vec<_> = std::fs::read_dir(&dir).unwrap().map(|e| e.unwrap().file_name().to_string_lossy().into_owned()).collect();
+            names.sort();
+            for n in names.iter().filter(|n| n.ends_with(&format!("--{lens}.md"))) {
+                let bytes = std::fs::read(dir.join(n)).unwrap();
+                m.insert(n.trim_end_matches(&format!("--{lens}.md")).to_string(), Value::String(personajury::domain::hash::sha256_hex(&bytes)));
+            }
+            out.insert(lens.to_string(), Value::Object(m));
+        }
+        std::fs::write(repo().join("fixtures/run/briefs.json"), serde_json::to_string_pretty(&Value::Object(out)).unwrap() + "\n").unwrap();
+    }
     let recorded: Value = serde_json::from_str(&read("briefs.json")).unwrap();
     for (run, lens) in [(critical, "critical"), (compare, "compare")] {
-        let dir = ws.path().join(format!(".jurygraph/runs/{run}"));
+        let dir = ws.path().join(format!(".personajury/runs/{run}"));
         for (persona, hash) in recorded[lens].as_object().unwrap() {
             let bytes = std::fs::read(dir.join(format!("{persona}--{lens}.md"))).unwrap();
             assert_eq!(
-                jurygraph::domain::hash::sha256_hex(&bytes),
+                personajury::domain::hash::sha256_hex(&bytes),
                 hash.as_str().unwrap(),
                 "brief {persona}--{lens} differs from the one the jury read"
             );
@@ -117,7 +132,7 @@ fn fixture_jury_replays_byte_for_byte() {
     same("picks.json", &picks, "the picks moved");
 
     // every finding blocks the finish until a person's word is on it (report §10(1)) ...
-    let out = Command::cargo_bin("jurygraph").unwrap().arg("--root").arg(ws.path()).arg("check").output().unwrap();
+    let out = Command::cargo_bin("personajury").unwrap().arg("--root").arg(ws.path()).arg("check").output().unwrap();
     let c: Value = serde_json::from_slice(&out.stdout).unwrap();
     assert_eq!(c["error"]["code"], "check_failed");
     let decisions = read("decisions.jsonl");

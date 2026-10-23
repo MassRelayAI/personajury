@@ -10,7 +10,7 @@ use std::path::Path;
 /// Per-attachment cap of a full brief (D3).
 const CAP: usize = 65_536;
 
-/// What `jurygraph brief` was asked for. A caller that names a `rule` takes its panel, lenses, spend and detail as
+/// What `personajury brief` was asked for. A caller that names a `rule` takes its panel, lenses, spend and detail as
 /// defaults and may override any of them, with a `reason` (D10).
 #[derive(Debug, Clone, Default)]
 pub struct BriefArgs {
@@ -89,7 +89,7 @@ fn inline(root: &Path, a: &Attachment) -> Result<Option<String>> {
     if a.media == "image" {
         return Ok(None);
     }
-    let p = root.join(".jurygraph").join("blobs").join(&a.hash);
+    let p = root.join(".personajury").join("blobs").join(&a.hash);
     let bytes = std::fs::read(&p).map_err(|e| AppError::Io(p.clone(), e))?;
     let mut text = if a.media == "aria-json" {
         match serde_json::from_slice::<Value>(&bytes) {
@@ -133,7 +133,7 @@ fn attachment_block(
 ) -> Result<()> {
     for a in atts {
         out.push_str(&format!(
-            "- `{prefix}{}` — {}, file `.jurygraph/blobs/{}`, sha256 {}\n",
+            "- `{prefix}{}` — {}, file `.personajury/blobs/{}`, sha256 {}\n",
             a.label, a.media, a.hash, a.hash
         ));
         if detail == Detail::Full {
@@ -164,7 +164,7 @@ fn compose_text(
     run_on: Option<&str>,
 ) -> Result<String> {
     let mut t = String::new();
-    t.push_str("jurygraph-brief 1\n\n");
+    t.push_str("personajury-brief 1\n\n");
     t.push_str(&format!(
         "# {} judges {} under the {} lens\n\n",
         persona.name, subject.name, lens.name
@@ -497,7 +497,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         texts.push((id.clone(), persona.version, stake, text, model));
     }
     let run_id = store.insert_run(&run)?;
-    let dir_rel = format!(".jurygraph/runs/{run_id}");
+    let dir_rel = format!(".personajury/runs/{run_id}");
     let dir = root.join(&dir_rel);
     // a write that fails leaves no orphan run (final review: an orphan clears nothing and confuses check)
     let written = (|| -> Result<Vec<BriefRef>> {
@@ -625,7 +625,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
     }
 
     // the rule, when one is named: its panel, lenses, spend and detail are the defaults (D9)
-    let cfg_path = root.join("jurygraph.toml");
+    let cfg_path = root.join("personajury.toml");
     let cfg: Option<TriggerConfig> = match &a.rule {
         Some(_) => Some(trigger::parse_config(&super::read_text(&cfg_path)?)?),
         // a toml that is there but malformed is refused, not ignored (M7)
@@ -788,7 +788,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             .ok_or_else(|| AppError::NotFound(format!("no comparator named {n}")))?;
         if !c.is_comparator {
             return Err(AppError::InvalidArguments(format!(
-                "{n} is a subject, not a comparator; add it with `jurygraph comparator add`"
+                "{n} is a subject, not a comparator; add it with `personajury comparator add`"
             )));
         }
         cmps.push(Cmp { subject: c });

@@ -1,6 +1,6 @@
 //! v0.5 (D20..D23): calibration, CSV cell locators, the GitHub Action, the Agent SDK recipe. Every test was seen red first.
 mod judging_support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use judging_support::*;
 use serde_json::{json, Value};
 
@@ -134,7 +134,7 @@ fn out_writes_the_answer_and_apply_check_reads_it() {
     let j = ws.run("critical", &PB, false);
     ws.ingest(j, &critical("ana", [5, 4, 3], &[], &["page.json#n1"]));
     ws.ingest(j, &critical("bob", [5, 4, 3], &[], &["page.json#n1"]));
-    std::fs::write(ws.root().join("jurygraph.toml"), LOW_RULE).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), LOW_RULE).unwrap();
     ws.store.conn().execute("UPDATE run SET rule_class = 'public-surface', quorum = 'low' WHERE id = ?1", [j]).unwrap();
     let a = data(ws.cli(&["apply-check", &rs(j)]));
     assert_eq!(a["answer"], "apply", "{a}");
@@ -164,7 +164,7 @@ fn a_verdict_cites_a_csv_cell_and_an_out_of_range_cell_is_refused() {
     let ws = Ws::new();
     ws.subject(
         "sheet",
-        jurygraph::domain::SubjectKind::Prices,
+        personajury::domain::SubjectKind::Prices,
         false,
         &[("prices.csv", b"plan,price\n\"Team, annual\",12\n\"two\nlines\",7\n")],
     );
@@ -198,7 +198,7 @@ fn apply_check_latest_judges_the_subject_of_the_newest_run() {
     assert_eq!(a["runs"], json!([r1]), "{a}");
     // naming runs and --latest together is refused, and so is naming neither
     assert_eq!(code(&ws.cli(&["apply-check", "1", "--latest"])), "invalid_arguments");
-    let e = std::process::Command::new(assert_cmd::cargo::cargo_bin("jurygraph")).arg("--root").arg(ws.root()).arg("apply-check").output().unwrap();
+    let e = std::process::Command::new(assert_cmd::cargo::cargo_bin("personajury")).arg("--root").arg(ws.root()).arg("apply-check").output().unwrap();
     assert!(!e.status.success());
     // an empty store has nothing to judge
     let empty = Ws::new();
@@ -214,7 +214,7 @@ fn root() -> std::path::PathBuf {
 #[test]
 fn the_agent_sdk_recipe_exists_and_the_example_parses() {
     let doc = std::fs::read_to_string(root().join("docs/agent-sdk.md")).expect("docs/agent-sdk.md");
-    for w in ["jurygraph mcp", "mcp_servers", "one context", "private", "apply-check", "check the SDK version"] {
+    for w in ["personajury mcp", "mcp_servers", "one context", "private", "apply-check", "check the SDK version"] {
         assert!(doc.contains(w), "docs/agent-sdk.md lacks `{w}`");
     }
     let py = root().join("examples/agent-sdk/run_jury.py");
@@ -223,7 +223,7 @@ fn the_agent_sdk_recipe_exists_and_the_example_parses() {
     for bad in ["sk-ant", "api_key", "API_KEY", "os.environ", "getenv"] {
         assert!(!src.contains(bad), "the example mentions {bad}");
     }
-    assert!(src.contains("claude_agent_sdk") && src.contains("mcp_servers") && src.contains("jurygraph_apply_check"));
+    assert!(src.contains("claude_agent_sdk") && src.contains("mcp_servers") && src.contains("personajury_apply_check"));
     // it compiles; skipped with a note when there is no python3
     match std::process::Command::new("python3").arg("-I").arg("-m").arg("py_compile").arg(&py).output() {
         Ok(o) => assert!(o.status.success(), "py_compile: {}", String::from_utf8_lossy(&o.stderr)),
@@ -279,7 +279,7 @@ fn the_docs_say_that_display_is_free_and_the_verdict_is_not_and_what_goes_to_a_j
         assert!(p.contains(w), "playbook lacks `{w}`");
     }
     assert!(read("docs/playbooks/README.md").contains("a-technical-decision.md"));
-    for (p, w) in [("docs/commands.md", "calibrate"), ("docs/commands.md", "summary"), ("docs/mcp-tools.md", "jurygraph_summary"), ("CHANGELOG.md", "[0.5.0]"), ("docs/decisions.md", "## D24")] {
+    for (p, w) in [("docs/commands.md", "calibrate"), ("docs/commands.md", "summary"), ("docs/mcp-tools.md", "personajury_summary"), ("CHANGELOG.md", "[0.5.0]"), ("docs/decisions.md", "## D24")] {
         assert!(read(p).contains(w), "{p} lacks {w}");
     }
 }

@@ -2,14 +2,14 @@
 
 Numbered from D1. A decision names who made it and why; a provisional one says what would change it.
 
-## D1 — JuryGraph is built, under this name (2026-10-23, accepted by the maintainer)
-The maintainer accepted the name JuryGraph on 2026-10-23. A model-free Rust engine with a
-SQLite store, sibling of CompareGraph, Apache-2.0, binary and crate `jurygraph`, repository `massrelay-ai/jurygraph` (the
+## D1 — PersonaJury is built, under this name (2026-10-23, accepted by the maintainer)
+The maintainer accepted the name PersonaJury on 2026-10-23. A model-free Rust engine with a
+SQLite store, sibling of CompareGraph, Apache-2.0, binary and crate `personajury`, repository `massrelay-ai/personajury` (the
 maintainer creates it and pushes). Design: the design report (kept privately by the maintainer; docs/design.md is its public summary).
 
 ## D2 — v0.1 dependencies (2026-10-23, orchestrator)
 CompareGraph's set without tree-sitter (clap, rusqlite bundled, serde, serde_json, sha2, hex, thiserror) plus `toml` 0.8
-(lenses and `jurygraph.toml` are TOML) and `globset` 0.4 (trigger paths). Both MIT/Apache or Unlicense/MIT. `deny.toml`
+(lenses and `personajury.toml` are TOML) and `globset` 0.4 (trigger paths). Both MIT/Apache or Unlicense/MIT. `deny.toml`
 bans every HTTP client crate. Would change: a need the standard library cannot meet.
 
 ## D3 — spend has two knobs: how many, and how much each carries (2026-10-23, maintainer, mid-build)
@@ -22,7 +22,7 @@ to 64 KiB each. Every brief reports its byte size. "External" stays a snapshot a
 ## D4 — `decide` writes the decisions table (2026-10-23, orchestrator; open to the maintainer)
 The build prompt's verb list has no writer for `decisions`, but report §4 stores them and §10(1) and §10(3) need them (a
 finding with no decision blocks the finish; a dismissed point cannot return without new evidence). Added
-`jurygraph decide <finding> fixed|dismissed|row [--why] [--row] --by <who>`. Open question 3 of the v0.1 hand-back.
+`personajury decide <finding> fixed|dismissed|row [--why] [--row] --by <who>`. Open question 3 of the v0.1 hand-back.
 
 ## D5 — the shapes the report leaves to the build (2026-10-23, orchestrator, provisional)
 | choice | alternative | what would change it |
@@ -54,7 +54,7 @@ Fable read the plan against the report (the maintainer's notes, copied to
 - A6: the median of an even count is the lower middle value, an integer — no arithmetic mean anywhere (§10 "nothing averages").
 - B3: "the same point" (§10(3)) = same persona, same dimension, same citation hash (an uncited point: the same finding id).
   `check` also lists `fixed_unverified`: findings decided `fixed` whose subject has no later run (§10(2)).
-- C: `detail` is also a `jurygraph.toml` rule field (default compact), so the trigger rule sets the brief's weight where it
+- C: `detail` is also a `personajury.toml` rule field (default compact), so the trigger rule sets the brief's weight where it
   sets the run's size.
 Deferred: A1 (a `brief#<section>` locator for `told` lines) — the report does not require told lines to cite.
 Not built, left to the maintainer: the detector's target and the split rule (Fable recommends a hand-scored jury table the maintainer keeps privately (six criteria on a 1–10 scale) with a 1–10
@@ -125,7 +125,7 @@ to run 1000 maximum also can right? in a crazy sense". Built as:
   `matrix` JSON carries `override`, and `matrix --table` opens with `override: <fields> — <reason>`. With no `--rule` there
   is no override bookkeeping (v0.1 behaviour).
 - **The cost is shown before it is spent.** Every brief answers `estimate {briefs, tokens}` = briefs × `tokens_per_brief`
-  (`jurygraph.toml`, default 15000) and `large: true` above 12 seats. The engine still counts no token and calls no model.
+  (`personajury.toml`, default 15000) and `large: true` above 12 seats. The engine still counts no token and calls no model.
 - **The human classes are untouched.** No override can run a jury on a human class (or quorum `human`) as if it decided:
   the refusal of D5 stands. Strata are never averaged at any size.
 Would change: the maintainer's word; or a measured ceiling that is not 12.
@@ -147,8 +147,8 @@ Fix round 1 (review of 2026-10-24, the maintainer's rulings):
   yet confirmed that reading of the amendment.
 
 ## D11 — the jury graph: one deterministic SVG, and its layout rule (2026-10-24, the maintainer asked for it by name)
-The name promises a graph and v0.2 drew none. v0.3 adds `jurygraph graph RUN... --svg [--out F]` and the MCP tool
-`jurygraph_graph` (the tool count goes from 5 to 6; it answers the SVG text in `data.svg` and writes no file).
+The name promises a graph and v0.2 drew none. v0.3 adds `personajury graph RUN... --svg [--out F]` and the MCP tool
+`personajury_graph` (the tool count goes from 5 to 6; it answers the SVG text in `data.svg` and writes no file).
 - **One static picture, no simulation.** The layout is integer arithmetic over ordered containers (`domain/graphlayout.rs`,
   pure and unit-tested; the string building is `application/graph.rs`, no new crate): the same store gives byte-identical
   output, and `tests/graph.rs` says so. The chosen alternative was a force layout, which needs floats and an iteration
@@ -169,8 +169,8 @@ The name promises a graph and v0.2 drew none. v0.3 adds `jurygraph graph RUN... 
   (`fix_not_landed`), fixed (absent after a fix, the persona judged), not judged, absent. The lives come from
   `check --history` (`data.lives`, one entry per finding with `status`, `decision` and `life`), which is the same function.
   Runs of two subjects are refused.
-- **The asset.** `docs/assets/jury-graph.svg` is the graph of the recorded fixture run; `tests/graph_asset.rs` rebuilds the
-  workspace as the replay does and fails when the committed file differs from a fresh render (`JURYGRAPH_ASSET_REGEN=1` rewrites it; the replay outputs have their own `JURYGRAPH_FIXTURE_REGEN`). It looks at the SVG
+- **The asset.** `docs/assets/personajury-graph.svg` is the graph of the recorded fixture run; `tests/graph_asset.rs` rebuilds the
+  workspace as the replay does and fails when the committed file differs from a fresh render (`PERSONAJURY_ASSET_REGEN=1` rewrites it; the replay outputs have their own `PERSONAJURY_FIXTURE_REGEN`). It looks at the SVG
   through Chrome headless at 1200 px and at 800 px.
 Fix round 1 (review of 2026-10-24): above 30 personas the strata sit side by side with their own heights (stairs make the card as tall as the sum of the strata); a life strip draws the last 8 runs with a `+N` mark and a tooltip for the rest; SVG text drops the characters XML 1.0 forbids; a finding's life is rebuilt from every `fixed` decision, so a second `fixed` never hides a `fix_not_landed` step.\nWould change: a collapsed stratum for a very large jury, or a third lens that
 wants its own lane (more than two lenses already stack in two lanes).
@@ -192,7 +192,7 @@ wants its own lane (more than two lenses already stack in two lanes).
 - **A large brief needs a reason, rule or not (closes review M9 of v0.2).** A brief above 12 seats without `--rule` now needs
   `--reason` (`override_without_reason`) and records `override_json = {rule: null, fields: {seats: {rule: 12, given: N}},
   reason, by}`; `matrix` shows it (`override: seats 12→N — reason: …`).
-- **A malformed `jurygraph.toml` is refused** by `brief` and `matrix` (`invalid_config`) instead of silently ignored (M7); `doctor` reports it as a limitation item and still answers.
+- **A malformed `personajury.toml` is refused** by `brief` and `matrix` (`invalid_config`) instead of silently ignored (M7); `doctor` reports it as a limitation item and still answers.
 - `--comparator` takes a comma list as `--lens` does, and still repeats; an empty element is `invalid_arguments`.
 Would change: a measured wave size (the 30 is the mirror of a rate limit, not a measurement); an agent that cannot report
 usage, which leaves `reported` null.
@@ -204,8 +204,8 @@ Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what count
   (`{lens, dimension, about, strata: [{stake, min, max}, {stake, min, max}]}`, one per disagreeing pair); it is a sibling key,
   never a field of a stratum or a cell, so `Matrix` still has no field that spans strata and the recorded fixture matrix and
   table are unchanged.
-- **`jurygraph apply-check RUN... [--rule CLASS]`** (named `apply-check`, `verdict-of` reads badly) and the MCP tool
-  `jurygraph_apply_check` (seven tools) answer `apply | escalate | human | advise` with the reasons as data. The latest given
+- **`personajury apply-check RUN... [--rule CLASS]`** (named `apply-check`, `verdict-of` reads badly) and the MCP tool
+  `personajury_apply_check` (seven tools) answer `apply | escalate | human | advise` with the reasons as data. The latest given
   run of each lens is judged; earlier given runs are the rounds before it, and the previous round of the same subject and lens
   is found in the store.
 - **The principle (the maintainer's ruling, 2026-10-24, after the v0.4 review): `apply` only when every condition is proven;
@@ -240,7 +240,7 @@ Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what count
 Would change: a measured false-escalation rate; the calibration lane (v0.5), which can turn `apply` into `escalate`.
 
 ## D14 — `lens generate` (2026-10-24)
-`jurygraph lens generate --from PATH [--dimensions N]` (default 4, at most 12) writes `.jurygraph/generate/lens-<hash>.md`
+`personajury lens generate --from PATH [--dimensions N]` (default 4, at most 12) writes `.personajury/generate/lens-<hash>.md`
 the way `persona generate` writes its brief, with the same material hash and the same record in `material`. Two steps for the
 agent: list what the material says good looks like (not part of the lens file), then draft a lens in the exact TOML shape, with
 the anchors in words at 1, 3 and 5 and `standard = "material:<hash>"`. The brief's example is a valid lens (a test adds it with
@@ -258,7 +258,7 @@ informational reason `single_model` when every juror used one model.
 
 ## D16 — packaging: the `.mcpb` bundle, `mcp.json`, registry packages (2026-10-24)
 No engine change. `packaging/mcpb/manifest.json` (manifest 0.4, `server.type` `binary`, `mcp_config.command`
-`${__dirname}/bin/jurygraph`, args `["--root", "${user_config.root}", "mcp"]`, a required `directory` setting) and
+`${__dirname}/bin/personajury`, args `["--root", "${user_config.root}", "mcp"]`, a required `directory` setting) and
 `scripts/build-mcpb.sh <platform> <binary>` (zip of the manifest for that platform and the binary; prints the sha256; no network).
 `release.yml` builds four bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64), validates them with a pinned
 `@anthropic-ai/mcpb` (the one place the build touches the network), and gains `publish-registry` ported from CompareGraph's
@@ -271,7 +271,7 @@ Unverified against Claude Desktop until the maintainer installs a bundle by hand
 is files (`docs/usage.md`).
 
 ## D17 — effort: one word for how much a jury may spend (2026-10-24, the maintainer: "keep it simple")
-`effort = "low" | "medium" | "high" | "max"` in `jurygraph.toml`, `brief --effort` per run (recorded), and an optional
+`effort = "low" | "medium" | "high" | "max"` in `personajury.toml`, `brief --effort` per run (recorded), and an optional
 `budget_tokens`. The rule says what a change needs; effort says what you will spend; the run gets the smaller.
 | effort | seats | lenses |
 |---|---|---|
@@ -321,7 +321,7 @@ that decision is the only way a human verdict is overruled, and `decide` takes i
 the agent, the foreman or anyone is refused, `human_decision_required`; the MCP has no `decide`). `calibrate` (v0.5) will compare human batches with persona batches.
 
 ## D20 — calibration (2026-10-24)
-`jurygraph calibrate <jury-run> <human-run> [--out F]`. The human run is an ordinary run whose batches were entered with `--by-human`
+`personajury calibrate <jury-run> <human-run> [--out F]`. The human run is an ordinary run whose batches were entered with `--by-human`
 (`not_human_run` otherwise) on the same subject and lens version. For each stratum, the cells (lens, dimension, about) are ranked by the
 stratum's median (the lower middle), high first, ties sharing a rank (1, 1, 3); `within_one_rank` per cell. **`calibrated` is true iff every
 primary-stratum cell is within one rank**, and every primary cell the jury judged was compared (a cell no person judged is not proven).
@@ -353,11 +353,11 @@ needs no run ids. The script needs `jq`. Tested against a local binary in `tests
 
 ## D23 — the Claude Agent SDK recipe (2026-10-24)
 Docs and one example, no runner of our own. `docs/agent-sdk.md`, `examples/agent-sdk/run_jury.py` (Python; the SDK's names are marked "check
-the SDK version"). One `query()` session per brief; private folders; a coordinator session ingests through `jurygraph mcp`. The test only
+the SDK version"). One `query()` session per brief; private folders; a coordinator session ingests through `personajury mcp`. The test only
 checks the example compiles and holds no key or environment read.
 
 ## D24 — the answer display (2026-10-24, the maintainer, with a display jury of 8 mixed personas)
-`jurygraph summary RUN... [--html F] [--md F] [--save] [--width N]`, MCP `jurygraph_summary`. The jury preferred sentences (the non-technical
+`personajury summary RUN... [--html F] [--md F] [--save] [--width N]`, MCP `personajury_summary`. The jury preferred sentences (the non-technical
 readers) and numbers (the technical readers) over bars, which got 0 of 8 picks: so **no bars anywhere**. Layout: 2 to 5 plain sentences (the
 apply-check answer in words, who won with counts per stratum, the weakest dimension, the change "15 → 6", up to three quoted blockers with
 persona and decision), a numbers table "for checking" (medians `P·S·B`, a dash for an empty stratum, top 5 rows), then `Next:` from a fixed
@@ -374,3 +374,13 @@ is binding only where wired (Action, hook, own gate). Golden: `fixtures/run/summ
   yet."), and a lesser reason follows in its own sentence ("Even without that, the jury could only advise: no rule was given."). The
   quoted blockers rotate across jurors, primary first, one per juror before anyone's second.
 
+## D25 — the name: PersonaJury, renamed from JuryGraph before the first release (2026-10-24, the maintainer, "let the persona jury decide")
+The working name did not say what the tool does (a persona jury scored it 2 of 5 on *understood* in every stratum) and a persona jury
+picked PersonaJury 8 of 8 (`docs/reports/2026-10-24-the-name-picked-by-a-persona-jury.md`). Nothing was ever released, so the rename is
+complete and carries no shim: the crate, package and binary `personajury`, the config file `personajury.toml`, the store directory
+`.personajury/`, the MCP tools `personajury_*`, the environment variables `PERSONAJURY_*`, the manifests and ids, the repository
+`massrelay-ai/personajury`, the release assets `personajury-<target>`, and the wordmark re-outlined ("Persona" Bold, "Jury" Regular).
+Old stores and old `JURYGRAPH_*` variables are not read. The verb `graph` stays, and the asset is `docs/assets/personajury-graph.svg`
+with the title "PersonaJury · <subject>". The brief text carries the product name, so the recorded brief hashes in
+`fixtures/run/briefs.json` and the pinned compare-brief hash in `tests/authoring.rs` were regenerated (and the golden `fixtures/run/summary.md`, which lists them); the recorded verdicts, matrix
+and picks are byte-identical. The version of every manifest is 0.5.0, and the CHANGELOG is one `[0.5.0] - unreleased` entry.

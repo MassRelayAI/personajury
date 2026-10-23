@@ -14,8 +14,8 @@ One subject, one attachment per option, each a plain text file you assemble by h
 (`option-b.md#L12`), so every claim points at text the whole panel can read.
 
 ```
-jurygraph lens add --file fixtures/lenses/tradeoffs.toml
-jurygraph subject add queue-choice --kind document --attach option-a.md option-b.md option-c.md
+personajury lens add --file fixtures/lenses/tradeoffs.toml
+personajury subject add queue-choice --kind document --attach option-a.md option-b.md option-c.md
 ```
 
 ## 2. The panel
@@ -27,17 +27,17 @@ jurygraph subject add queue-choice --kind document --attach option-a.md option-b
 
 Briefed with the tradeoffs lens, each juror scores every option on five dimensions (a line per option with `about`) and picks one.
 ```
-jurygraph brief --subject queue-choice --panel tech-choice --lens tradeoffs --model <model>
+personajury brief --subject queue-choice --panel tech-choice --lens tradeoffs --model <model>
 ```
 
 ## 3. Read the disagreement
-`jurygraph summary` leads with who won and by how many in each stratum, then the numbers for checking. The per-stratum
+`personajury summary` leads with who won and by how many in each stratum, then the numbers for checking. The per-stratum
 disagreement is the finding: if the maintainers pick B and the SRE pair picks A, that is the conversation, and it is cheaper to
 have it now. A split on `risk` between security and the new hire says which fear is real.
 
 ## 4. An expert overrules by a recorded decide
 If your most senior engineer knows the jury is wrong about an option, they say so on the record: a blocker the jury raised is closed with
-`jurygraph decide <finding> dismissed --why "<the reason>" --by <name>`, and the choice is theirs. The jury advises; the decision and
+`personajury decide <finding> dismissed --why "<the reason>" --by <name>`, and the choice is theirs. The jury advises; the decision and
 its reason stay in the store.
 
 ## What it cannot do

@@ -1,12 +1,12 @@
 //! v0.2 panel-draw (D9, D10): a stake per panel term, the seeded draw, `brief --rule`, the seat ceilings and the agent's
 //! overrides with a reason. Every refusal here was seen red first.
-use jurygraph::store::Store;
+use personajury::store::Store;
 use assert_cmd::Command;
 use serde_json::{json, Value};
 use std::path::Path;
 
 fn jg(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(ws)
@@ -185,14 +185,14 @@ fn world(w: &Path) {
             "3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 2 others=bystander",
         ],
     ));
-    std::fs::write(w.join("jurygraph.toml"), TOML).unwrap();
+    std::fs::write(w.join("personajury.toml"), TOML).unwrap();
 }
 fn brief(w: &Path, extra: &[&str]) -> Value {
     let mut a = vec!["brief", "--subject", "pricing", "--model", "m"];
     a.extend_from_slice(extra);
     jg(w, &a)
 }
-fn run_row(w: &Path, id: i64) -> jurygraph::domain::RunRow {
+fn run_row(w: &Path, id: i64) -> personajury::domain::RunRow {
     Store::open_existing(w).unwrap().run(id).unwrap().unwrap()
 }
 /// Who sat and what they were handed, without the run folder the path names.
@@ -226,7 +226,7 @@ fn brief_takes_each_stake_from_the_panel_term_and_records_the_seed() {
     let seed = d["draw"]["seed"].as_str().unwrap().to_string();
     assert_eq!(
         seed,
-        hex::encode(jurygraph::domain::hash::draw_seed("pricing", "docs-public"))
+        hex::encode(personajury::domain::hash::draw_seed("pricing", "docs-public"))
     );
     let row = run_row(w, d["run"].as_i64().unwrap());
     assert_eq!(row.draw_seed.as_deref(), Some(seed.as_str()));
@@ -251,7 +251,7 @@ fn stake_flag_overrides_a_term_stake_and_the_answer_says_so() {
         json!([{"persona": "bld-000", "panel": "primary", "given": "bystander"}])
     );
     let row = run_row(w, d["run"].as_i64().unwrap());
-    assert_eq!(row.stakes["bld-000"], jurygraph::domain::Stake::Bystander);
+    assert_eq!(row.stakes["bld-000"], personajury::domain::Stake::Bystander);
     // a stake for someone outside the panel is still refused
     let r = brief(w, &["--panel", "docs-public", "--lens", "critical", "--stake", "rdr-005=primary"]);
     assert_eq!(code(&r), "invalid_arguments", "{r}");
@@ -285,7 +285,7 @@ fn a_term_that_resolves_to_nobody_is_refused() {
     let r = brief(w, &["--panel", "ghosts", "--lens", "critical"]);
     assert_eq!(code(&r), "panel_term_empty", "{r}");
     assert!(r["error"]["message"].as_str().unwrap().contains("ghost"));
-    assert!(!w.join(".jurygraph/runs").exists(), "nothing was written");
+    assert!(!w.join(".personajury/runs").exists(), "nothing was written");
 }
 
 #[test]
@@ -332,9 +332,9 @@ fn a_rule_that_cannot_run_is_refused_by_name() {
     }
     assert_eq!(code(&brief(w, &["--rule", "internals"])), "invalid_arguments");
     assert_eq!(code(&brief(w, &["--rule", "nosuch"])), "not_found");
-    std::fs::remove_file(w.join("jurygraph.toml")).unwrap();
+    std::fs::remove_file(w.join("personajury.toml")).unwrap();
     assert_eq!(code(&brief(w, &["--rule", "copy"])), "not_found");
-    assert!(!w.join(".jurygraph/runs").exists());
+    assert!(!w.join(".personajury/runs").exists());
 }
 
 #[test]
@@ -345,7 +345,7 @@ fn a_departure_from_the_rule_needs_a_reason_and_is_recorded_on_the_run() {
     let r = brief(w, &["--rule", "public-surface", "--spend", "3"]);
     assert_eq!(code(&r), "override_without_reason", "{r}");
     assert!(r["error"]["message"].as_str().unwrap().contains("spend"));
-    assert!(!w.join(".jurygraph/runs").exists(), "nothing was written");
+    assert!(!w.join(".personajury/runs").exists(), "nothing was written");
     let blank = brief(w, &["--rule", "public-surface", "--spend", "3", "--reason", "  "]);
     assert_eq!(code(&blank), "override_without_reason");
     let d = ok(brief(
@@ -415,7 +415,7 @@ fn above_twelve_seats_needs_allow_large_and_above_a_thousand_is_never_allowed() 
     let r = brief(w, &base);
     assert_eq!(code(&r), "panel_too_large", "{r}");
     assert_eq!(r["data"]["ceiling"], 12);
-    assert!(!w.join(".jurygraph/runs").exists());
+    assert!(!w.join(".personajury/runs").exists());
     // spending 12 of them is within the ceiling
     let mut a = base.to_vec();
     a.extend(["--spend", "12"]);
@@ -446,7 +446,7 @@ fn a_brief_above_twelve_seats_under_a_rule_needs_a_reason() {
     doc(w, "pricing");
     ok(jg(w, &["panel", "add", "wide", "--query", "14 reader=bystander", "--allow-large"]));
     std::fs::write(
-        w.join("jurygraph.toml"),
+        w.join("personajury.toml"),
         "effort = \"max\"\n[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"low\"\npanel = \"wide\"\nlenses = [\"recall\"]\n",
     )
     .unwrap();
@@ -494,7 +494,7 @@ fn the_estimate_is_briefs_times_tokens_per_brief() {
     world(w);
     let d = ok(brief(w, &["--panel", "docs-public", "--lens", "critical", "--spend", "5"]));
     assert_eq!(d["estimate"], json!({"briefs": 5, "tokens": 100000}), "toml says 20000");
-    std::fs::remove_file(w.join("jurygraph.toml")).unwrap();
+    std::fs::remove_file(w.join("personajury.toml")).unwrap();
     let d = ok(brief(w, &["--panel", "docs-public", "--lens", "critical", "--spend", "5"]));
     assert_eq!(d["estimate"], json!({"briefs": 5, "tokens": 75000}), "default 15000");
 }
@@ -539,7 +539,7 @@ fn should_run_classifies_the_recorded_source_paths_of_a_subject() {
     let w = ws.path();
     world(w);
     std::fs::write(
-        w.join("jurygraph.toml"),
+        w.join("personajury.toml"),
         "[[rule]]\nclass = \"docs\"\npaths = [\"src/**\"]\nquorum = \"low\"\npanel = \"docs-public\"\nlenses = [\"recall\"]\nspend = 2\n",
     )
     .unwrap();
@@ -623,7 +623,7 @@ fn i1_stake_and_draw_under_a_rule_are_overrides() {
     ));
     assert_eq!(d["override"]["fields"]["draw"]["given"], "00000000000000ff");
     // the derived seed, given by hand, is none
-    let derived = hex::encode(jurygraph::domain::hash::draw_seed("pricing", "docs-public"));
+    let derived = hex::encode(personajury::domain::hash::draw_seed("pricing", "docs-public"));
     let same = brief(w, &["--rule", "public-surface", "--draw", &derived]);
     assert_eq!(same["ok"], true, "{same}");
 }
@@ -670,7 +670,7 @@ fn i3_a_subject_that_falls_under_a_human_rule_is_never_briefed_under_another_rul
         assert_eq!(r["data"]["path"], "prices/table.md", "{r}");
         assert_eq!(r["data"]["class"], "money", "{r}");
     }
-    assert!(!w.join(".jurygraph/runs").exists());
+    assert!(!w.join(".personajury/runs").exists());
 }
 
 #[test]
@@ -684,7 +684,7 @@ fn i4_a_rule_with_spend_zero_caps_the_full_panel_at_twelve() {
         &["panel", "add", "big", "--query", "3 builder=primary, 1 newcomer=primary, 10 others=bystander", "--allow-large"],
     ));
     std::fs::write(
-        w.join("jurygraph.toml"),
+        w.join("personajury.toml"),
         "effort = \"max\"\n[[rule]]\nclass = \"crowd\"\npaths = [\"c/**\"]\nquorum = \"high\"\npanel = \"big\"\nlenses = [\"recall\"]\nspend = 0\n",
     )
     .unwrap();
@@ -712,10 +712,10 @@ fn i5_overflowing_seat_totals_and_estimates_are_refused_never_panic_or_saved() {
     let r = brief(w, &["--query", "18446744073709551615 reader=bystander, 1 builder=primary", "--lens", "recall", "--allow-large"]);
     assert_eq!(code(&r), "panel_too_large", "{r}");
     // the estimate
-    std::fs::write(w.join("jurygraph.toml"), "tokens_per_brief = 9223372036854775807\n").unwrap();
+    std::fs::write(w.join("personajury.toml"), "tokens_per_brief = 9223372036854775807\n").unwrap();
     let r = brief(w, &["--panel", "docs-public", "--lens", "recall", "--spend", "3"]);
     assert_eq!(code(&r), "panel_too_large", "{r}");
-    assert!(!w.join(".jurygraph/runs").exists(), "no orphan run");
+    assert!(!w.join(".personajury/runs").exists(), "no orphan run");
 }
 
 #[test]
@@ -759,7 +759,7 @@ fn m4_lens_order_is_not_a_departure_and_m5_query_spacing_does_not_change_the_dra
 #[test]
 fn m6_a_v2_store_is_refused_untouched_with_a_readable_message() {
     let d = tempfile::tempdir().unwrap();
-    let dir = d.path().join(".jurygraph");
+    let dir = d.path().join(".personajury");
     std::fs::create_dir_all(&dir).unwrap();
     let db = dir.join("store.db");
     {

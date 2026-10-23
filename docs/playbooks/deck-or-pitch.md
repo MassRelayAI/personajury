@@ -13,7 +13,7 @@ Export one PNG per slide, plus the PDF and the speaker notes if you have them. N
 `02-problem.png`, … A juror cites a slide by its file name, so every claim points at a slide.
 
 ```bash
-jurygraph subject add q3-deck --kind document --attach slides/*.png notes.txt
+personajury subject add q3-deck --kind document --attach slides/*.png notes.txt
 ```
 
 ## 2. Personas who will be in the room
@@ -28,7 +28,7 @@ Write each one from real notes when you can: what they asked last time, what mad
 
 ## 3. Two lenses that ship as examples
 
-Both are in [`fixtures/lenses/`](../../fixtures/lenses/). Load one with `jurygraph lens add --file`.
+Both are in [`fixtures/lenses/`](../../fixtures/lenses/). Load one with `personajury lens add --file`.
 
 **`consulting-deck`** asks four things:
 - **storyline:** reading only the titles, can I retell the argument?

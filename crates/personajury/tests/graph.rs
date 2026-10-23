@@ -2,7 +2,7 @@
 //! here was seen red first.
 #[path = "judging_support/mod.rs"]
 mod support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use serde_json::{json, Value};
 use support::*;
 
@@ -208,14 +208,14 @@ fn names_are_escaped() {
     let ws = Ws::new();
     ws.site();
     ws.store
-        .insert_persona(&jurygraph::domain::Persona {
+        .insert_persona(&personajury::domain::Persona {
             id: "ana".into(),
             version: 0,
             name: "A<b>&\"x".into(),
             tags: vec![],
             stake_rules: "r".into(),
             profile_json: "{}".into(),
-            origin: jurygraph::domain::Origin::Hand,
+            origin: personajury::domain::Origin::Hand,
             hash: "h".into(),
         })
         .unwrap();
@@ -307,7 +307,7 @@ fn a_fix_that_did_not_land_is_drawn_raised_again_and_red() {
 #[test]
 fn runs_of_two_subjects_are_refused() {
     let (ws, r, _) = world(3);
-    ws.subject("other", jurygraph::domain::SubjectKind::Page, false, &[("o.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
+    ws.subject("other", personajury::domain::SubjectKind::Page, false, &[("o.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
     let r2 = ws.run_of("other", "critical", &AC, false);
     let v = ws.cli(&["graph", &r.to_string(), &r2.to_string(), "--svg"]);
     assert_eq!(v["error"]["code"], "invalid_arguments", "{v}");
@@ -319,11 +319,11 @@ fn the_mcp_tool_returns_the_same_svg_and_checks_its_arguments() {
     let (ws, r, _) = world(3);
     let want = svg_of(&ws, &[r]);
     let lines = [
-        json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"jurygraph_graph","arguments":{"runs":[r]}}}),
-        json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"jurygraph_graph","arguments":{"runs":[]}}}),
-        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"jurygraph_graph","arguments":{"runs":[r],"out":"x.svg"}}}),
+        json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"personajury_graph","arguments":{"runs":[r]}}}),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"personajury_graph","arguments":{"runs":[]}}}),
+        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"personajury_graph","arguments":{"runs":[r],"out":"x.svg"}}}),
     ];
-    let mut ch = std::process::Command::new(assert_cmd::cargo::cargo_bin("jurygraph"))
+    let mut ch = std::process::Command::new(assert_cmd::cargo::cargo_bin("personajury"))
         .arg("--root")
         .arg(ws.root())
         .arg("mcp")

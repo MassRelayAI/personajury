@@ -7,11 +7,11 @@ reviewer: scoped re-review of the single fix wave (Opus), read-only
 scope: final-fixes-package.diff (lane/final-fixes, 4e72c51..f6f8d31 on e2ba78d), against final-review.md and the progress.md rulings
 ---
 
-# JuryGraph v0.1: re-review of the final fix wave
+# PersonaJury v0.1: re-review of the final fix wave
 
 ## How this was checked
-- `cargo test -p jurygraph` in the final-fixes worktree (HEAD f6f8d31): **244 passed, 0 failed**.
-- `cargo build -p jurygraph`. The fixed binary was copied to `scratchpad/rr/jgnew` and the reviewer's binary to
+- `cargo test -p personajury` in the final-fixes worktree (HEAD f6f8d31): **244 passed, 0 failed**.
+- `cargo build -p personajury`. The fixed binary was copied to `scratchpad/rr/jgnew` and the reviewer's binary to
   `scratchpad/rr/jgold`. Every C and I reproduction was run on both binaries in fresh workspaces under
   `/tmp/claude-1001/-mnt-extra-disk-repos/10cc8f43-f927-415f-a4e9-2945df54356e/scratchpad/rr/`, built with `rr/mk.sh` and `rr/lib.sh`
   (the same base case as `rv/mk.sh`).

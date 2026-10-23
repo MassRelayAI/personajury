@@ -1,7 +1,7 @@
 <!-- shape follows comparegraph docs/faq.md -->
 # FAQ
 
-**Does JuryGraph call a model?** No. It composes briefs and ingests verdicts. Your agent runs the personas on its own model
+**Does PersonaJury call a model?** No. It composes briefs and ingests verdicts. Your agent runs the personas on its own model
 and bill. There is no API key setting and no network call at brief or verdict time.
 
 **Why was my verdict refused?** The engine refuses what has no evidence. See [`troubleshooting.md`](troubleshooting.md) for
@@ -32,11 +32,11 @@ cite the screenshot.
 
 **Are the personas real people?** No. They are composites, never identifiable real people (`PERSONAS.md`). The engine cannot tell whether a persona is realistic.
 
-**Does the jury decide for me?** Only where `jurygraph.toml` says so, and never for money, permission, deploy, secret,
+**Does the jury decide for me?** Only where `personajury.toml` says so, and never for money, permission, deploy, secret,
 licence, public-claim or brand. A split or a primary-stratum blocker escalates one level; in v0.1 the agent applies that rule.
 
 **How much does a run cost?** The model calls your agent makes. The engine reports each brief's byte size and nothing more;
 no benchmark is published for v0.1.
 
-**How do I add a lens?** `jurygraph lens add --file my-lens.toml`, with anchors in words at 1, 3 and 5 ([`lenses.md`](lenses.md); editing an anchor means a new version). To get it shipped in
+**How do I add a lens?** `personajury lens add --file my-lens.toml`, with anchors in words at 1, 3 and 5 ([`lenses.md`](lenses.md); editing an anchor means a new version). To get it shipped in
 the repository, see `GOVERNANCE.md`.

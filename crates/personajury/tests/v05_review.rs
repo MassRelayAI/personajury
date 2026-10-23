@@ -2,7 +2,7 @@
 //! D13: `apply` only when every condition is proven; gates fail closed.
 mod judging_support;
 use judging_support::*;
-use jurygraph::domain::{Stake, SubjectKind};
+use personajury::domain::{Stake, SubjectKind};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -26,7 +26,7 @@ fn root() -> PathBuf {
 /// `site` escalates (a primary blocker in run a); `other` is clean (run b, the newest).
 fn two_subjects() -> (Ws, i64, i64) {
     let ws = Ws::new();
-    std::fs::write(ws.root().join("jurygraph.toml"), RULE_ALL).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), RULE_ALL).unwrap();
     ws.site();
     let a = ws.run("critical", &PB, false);
     let f = ws.ingest(a, &critical("ana", [2, 2, 2], &["the button is broken"], &["page.json#n1"]))["findings"][0]
@@ -83,7 +83,7 @@ fn c1_worst_order_is_human_escalate_advise_apply() {
     // a third subject with no rule recorded and whose sources fall under none: it can only advise
     ws.subject("third", SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
     std::fs::write(
-        ws.root().join("jurygraph.toml"),
+        ws.root().join("personajury.toml"),
         "[[rule]]\nclass = \"public-surface\"\npaths = [\"sources/site/**\", \"sources/other/**\"]\nquorum = \"low\"\npanel = \"p\"\nlenses = [\"critical\"]\n\
          [[rule]]\nclass = \"money\"\npaths = [\"sources/fourth/**\"]\nquorum = \"human\"\n",
     )
@@ -111,8 +111,8 @@ fn git_repo(files: &[&str]) -> tempfile::TempDir {
         assert!(o.status.success(), "git {args:?}");
     };
     git(&["init", "-q", "-b", "main"]);
-    std::fs::copy(root().join("fixtures/jurygraph.toml"), p.join("jurygraph.toml")).unwrap();
-    git(&["add", "jurygraph.toml"]);
+    std::fs::copy(root().join("fixtures/personajury.toml"), p.join("personajury.toml")).unwrap();
+    git(&["add", "personajury.toml"]);
     git(&["commit", "-q", "-m", "base"]);
     git(&["branch", "base"]);
     for f in files {
@@ -158,7 +158,7 @@ fn output<'a>(o: &'a Out, k: &str) -> &'a str {
     o.outputs.lines().find_map(|l| l.strip_prefix(&format!("{k}="))).unwrap_or_else(|| panic!("no output {k}:\n{}\n{}", o.outputs, o.stderr))
 }
 fn bin() -> PathBuf {
-    assert_cmd::cargo::cargo_bin("jurygraph")
+    assert_cmd::cargo::cargo_bin("personajury")
 }
 /// A store whose one finding is dismissed (check ok) and whose root toml is broken (apply-check errors).
 fn broken_toml_store() -> Ws {
@@ -168,7 +168,7 @@ fn broken_toml_store() -> Ws {
     let f = ws.ingest(r, &critical("ana", [2, 2, 2], &["broken"], &["page.json#n1"]))["findings"][0].as_str().unwrap().to_string();
     ws.ingest(r, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
     assert_eq!(ws.cli(&["decide", &f, "dismissed", "--why", "x", "--by", "ana"])["ok"], true);
-    std::fs::write(ws.root().join("jurygraph.toml"), "this is = = not toml").unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), "this is = = not toml").unwrap();
     ws
 }
 
@@ -192,7 +192,7 @@ fn i1_an_apply_check_error_fails_the_job_by_default() {
 #[test]
 fn i1_a_missing_binary_or_unparsable_json_fails_the_job() {
     let d = git_repo(&["site/pricing.html"]);
-    let o = act(d.path(), Path::new("/nonexistent/jurygraph"), "", None);
+    let o = act(d.path(), Path::new("/nonexistent/personajury"), "", None);
     assert_eq!(o.code, 1, "{}", o.stderr);
     assert_eq!(output(&o, "answer"), "unavailable", "{}", o.outputs);
     // a binary that prints something that is not JSON
@@ -211,8 +211,8 @@ fn i1_a_missing_binary_or_unparsable_json_fails_the_job() {
 fn i1_a_check_error_is_unavailable_not_ok() {
     // a store root whose store cannot be opened: check errors (not check_failed)
     let t = tempfile::tempdir().unwrap();
-    std::fs::create_dir_all(t.path().join(".jurygraph")).unwrap();
-    std::fs::write(t.path().join(".jurygraph/store.db"), "not a database").unwrap();
+    std::fs::create_dir_all(t.path().join(".personajury")).unwrap();
+    std::fs::write(t.path().join(".personajury/store.db"), "not a database").unwrap();
     let d = git_repo(&["site/pricing.html"]);
     let o = act(d.path(), &bin(), t.path().to_str().unwrap(), None);
     assert_eq!(o.code, 1, "{}", o.stderr);
@@ -223,7 +223,7 @@ fn i1_a_check_error_is_unavailable_not_ok() {
 #[test]
 fn c1_the_action_passes_the_rule_when_should_run_matched_exactly_one() {
     let (ws, _, _) = two_subjects();
-    std::fs::copy(root().join("fixtures/jurygraph.toml"), ws.root().join("jurygraph.toml")).unwrap();
+    std::fs::copy(root().join("fixtures/personajury.toml"), ws.root().join("personajury.toml")).unwrap();
     let t = tempfile::tempdir().unwrap();
     let log = t.path().join("args.log");
     let wrap = t.path().join("jg");
@@ -285,14 +285,14 @@ fn i2_a_report_dir_outside_the_root_is_refused_and_nothing_is_written() {
         if dir.is_empty() {
             continue;
         }
-        std::fs::write(ws.root().join("jurygraph.toml"), format!("report_dir = {dir:?}\n")).unwrap();
+        std::fs::write(ws.root().join("personajury.toml"), format!("report_dir = {dir:?}\n")).unwrap();
         let r = ws.cli(&["summary", &a.to_string(), "--save"]);
         assert_eq!(code(&r), "invalid_report_dir", "{dir}: {r}");
     }
     assert!(!ws.root().parent().unwrap().join("escaped-by-test").exists());
     assert_eq!(std::fs::read_dir(outside.path()).unwrap().count(), 0, "nothing written outside");
     // inside the root is fine
-    std::fs::write(ws.root().join("jurygraph.toml"), "report_dir = \"docs/juries\"\n").unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), "report_dir = \"docs/juries\"\n").unwrap();
     assert_eq!(ws.cli(&["summary", &a.to_string(), "--save"])["ok"], true);
 }
 
@@ -316,11 +316,11 @@ fn i2_mcp_output_paths_stay_inside_the_root_and_a_typed_cli_path_may_be_anywhere
     let outside = tempfile::tempdir().unwrap();
     let abs = outside.path().join("s.md");
     for (k, p) in [("md", abs.to_str().unwrap()), ("html", "../x.html"), ("md", "a/../../x.md")] {
-        let r = mcp(ws.root(), "jurygraph_summary", json!({"runs": [a], k: p}));
+        let r = mcp(ws.root(), "personajury_summary", json!({"runs": [a], k: p}));
         assert_eq!(code(&r), "invalid_report_dir", "{k} {p}: {r}");
     }
     assert!(!abs.exists());
-    let r = mcp(ws.root(), "jurygraph_summary", json!({"runs": [a], "md": "out/s.md", "html": "out/s.html"}));
+    let r = mcp(ws.root(), "personajury_summary", json!({"runs": [a], "md": "out/s.md", "html": "out/s.html"}));
     assert_eq!(r["ok"], true, "{r}");
     assert!(ws.root().join("out/s.md").exists() && ws.root().join("out/s.html").exists());
     // the person at the CLI may write anywhere
@@ -375,7 +375,7 @@ fn i3_a_long_quote_is_cut_between_words_and_ends_with_an_ellipsis() {
 
 #[test]
 fn i3_the_wrap_never_cuts_inside_a_word() {
-    use jurygraph::domain::summary::wrap;
+    use personajury::domain::summary::wrap;
     let w = "a".repeat(50);
     let lines = wrap(&format!("short {w} tail"), 30);
     assert!(lines.contains(&w), "the long word stays whole on its own line: {lines:?}");
@@ -429,7 +429,7 @@ fn polish_blocker_quotes_rotate_across_jurors_primary_first() {
 #[test]
 fn m1_a_calibration_for_another_lens_or_run_is_refused() {
     let ws = Ws::new();
-    std::fs::write(ws.root().join("jurygraph.toml"), RULE_ALL).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), RULE_ALL).unwrap();
     ws.site();
     let a = ws.run("critical", &PB, false);
     ws.ingest(a, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));

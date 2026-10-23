@@ -67,7 +67,7 @@ pub(crate) fn usage_summary(root: &Path, store: &Store, run_ids: &[i64]) -> Resu
 
 /// The project's tokens per brief: the toml's, the default when there is no toml, a refusal when it is malformed.
 pub(crate) fn tokens_per_brief(root: &Path) -> Result<u64> {
-    match std::fs::read_to_string(root.join("jurygraph.toml")) {
+    match std::fs::read_to_string(root.join("personajury.toml")) {
         Ok(t) => Ok(crate::domain::trigger::parse_config(&t)?
             .tokens_per_brief
             .unwrap_or(super::brief::DEFAULT_TOKENS_PER_BRIEF)),

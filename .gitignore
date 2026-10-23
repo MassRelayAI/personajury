@@ -3,5 +3,5 @@ target/
 *.db-journal
 *.db-wal
 *.db-shm
-.jurygraph/
+.personajury/
 .superpowers/

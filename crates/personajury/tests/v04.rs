@@ -1,7 +1,7 @@
 //! v0.4 (D13..D19): the split rule and `apply-check`, effort, independence, experts, model per term, `lens generate`.
 //! Every refusal and every answer here was seen red first.
 mod judging_support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use std::process::Command;
 use judging_support::*;
 use serde_json::{json, Value};
@@ -22,7 +22,7 @@ fn has(d: &Value, c: &str) -> bool {
     reasons(d).iter().any(|r| r == c)
 }
 fn toml(ws: &Ws, body: &str) {
-    std::fs::write(ws.root().join("jurygraph.toml"), body).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), body).unwrap();
 }
 const LOW_RULE: &str = "[[rule]]\nclass = \"public-surface\"\npaths = [\"sources/site/**\"]\nquorum = \"low\"\npanel = \"p\"\nlenses = [\"critical\"]\n";
 const HIGH_RULE: &str = "[[rule]]\nclass = \"public-surface\"\npaths = [\"sources/site/**\"]\nquorum = \"high\"\npanel = \"p\"\nlenses = [\"critical\"]\n";
@@ -209,7 +209,7 @@ fn the_fixture_run_escalates_it_has_primary_blockers() {
 
 // ---- item 7: effort, one word for how much a jury may spend (D17) ----
 
-use jurygraph::store::Store;
+use personajury::store::Store;
 
 fn pool(w: &Path, specs: &[(&str, &str, usize)]) {
     let dir = w.join("pool");
@@ -243,7 +243,7 @@ fn effort_ws(extra_toml: &str) -> tempfile::TempDir {
     data(cli(w, &["panel", "add", "p", "--query", "3 builder=primary, 2 approver=secondary, 2 visitor=bystander"]));
     doc(w, "pricing");
     std::fs::write(
-        w.join("jurygraph.toml"),
+        w.join("personajury.toml"),
         format!("{extra_toml}\n[[rule]]\nclass = \"public-surface\"\npaths = [\"sources/site/**\"]\nquorum = \"high\"\npanel = \"p\"\nlenses = [\"critical\", \"taste\", \"recall\"]\n"),
     )
     .unwrap();
@@ -474,7 +474,7 @@ fn medium_caps_at_seven_and_keeps_a_seat_of_every_stratum() {
     pool(w, &[("bld", "builder", 8), ("apr", "approver", 2), ("oth", "visitor", 2)]);
     data(cli(w, &["panel", "add", "p", "--query", "8 builder=primary, 2 approver=secondary, 2 visitor=bystander"]));
     doc(w, "pricing");
-    std::fs::write(w.join("jurygraph.toml"), LOW_RULE).unwrap();
+    std::fs::write(w.join("personajury.toml"), LOW_RULE).unwrap();
     let d = data(rule_brief(w, &[]));
     let briefs = runs_of(&d)[0]["briefs"].as_array().unwrap().clone();
     let stakes: Vec<&str> = briefs.iter().map(|b| b["stake"].as_str().unwrap()).collect();
@@ -676,7 +676,7 @@ fn delta_echoes_the_independence_of_both_runs_and_a_pair_with_one_sequential_adv
 fn mcp_session(ws: &Path, lines: &[String]) -> Vec<Value> {
     use std::io::{BufRead, BufReader, Write};
     use std::process::{Command, Stdio};
-    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("jurygraph"))
+    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("personajury"))
         .arg("--root")
         .arg(ws)
         .arg("mcp")
@@ -699,7 +699,7 @@ fn mcp_session(ws: &Path, lines: &[String]) -> Vec<Value> {
 #[test]
 fn the_mcp_brief_takes_independence_and_echoes_the_sequence() {
     let ws = plain_ws();
-    let line = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"jurygraph_brief","arguments":{
+    let line = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"personajury_brief","arguments":{
         "subject":"pricing","lens":"recall","query":"3 reader=bystander","model":"m","independence":"sequential"}}})
     .to_string();
     let out = mcp_session(ws.path(), &[line]);
@@ -880,7 +880,7 @@ fn two_humans_on_one_seat_both_stand() {
 #[test]
 fn the_mcp_verdict_tool_has_no_by_human_an_agent_never_enters_one() {
     let ws = plain_ws();
-    let line = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"jurygraph_verdict","arguments":{
+    let line = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"personajury_verdict","arguments":{
         "run": 1, "verdict": {"persona": "x", "lines": []}, "by_human": "Dr Rao"}}})
     .to_string();
     let out = mcp_session(ws.path(), &[line]);
@@ -1109,7 +1109,7 @@ fn dial_table(file: &str) -> Vec<Vec<String>> {
 
 #[test]
 fn every_brief_flag_is_in_exactly_one_column_of_the_dial() {
-    let help = Command::new(assert_cmd::cargo::cargo_bin("jurygraph")).args(["brief", "--help"]).output().unwrap();
+    let help = Command::new(assert_cmd::cargo::cargo_bin("personajury")).args(["brief", "--help"]).output().unwrap();
     let help = String::from_utf8(help.stdout).unwrap();
     let mut flags: Vec<String> = help
         .lines()

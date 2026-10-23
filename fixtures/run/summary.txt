@@ -1,4 +1,4 @@
-JuryGraph summary: lantern-site, runs 1 2 (critical, compare)
+PersonaJury summary: lantern-site, runs 1 2 (critical, compare)
 
 The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree
 on 2 scores, and 26 findings have no decision yet.

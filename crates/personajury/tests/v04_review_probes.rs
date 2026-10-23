@@ -1,6 +1,6 @@
 //! Review probes for v0.4: each test asserts the behaviour the brief requires; a failure is a finding.
 mod judging_support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use judging_support::*;
 use serde_json::{json, Value};
 use std::path::Path;
@@ -44,7 +44,7 @@ fn p2_a_run_whose_primary_never_answered_does_not_apply() {
 fn p3_one_seat_on_a_high_quorum_change_does_not_apply() {
     let ws = Ws::new();
     ws.site();
-    std::fs::write(ws.root().join("jurygraph.toml"), HIGH_RULE).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), HIGH_RULE).unwrap();
     let run = ws.run("critical", &[("ana", Stake::Primary)], false);
     ws.ingest(run, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
     let a = ac(&ws, &[&run.to_string()]);
@@ -94,7 +94,7 @@ fn p7_a_run_on_an_old_subject_version_does_not_apply() {
     let run = ws.run("critical", &TWO, false);
     ws.ingest(run, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
     ws.ingest(run, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
-    ws.subject("site", jurygraph::domain::SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
+    ws.subject("site", personajury::domain::SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
     let a = ac(&ws, &[&run.to_string()]);
     let c = ws.cli(&["check"]);
     eprintln!("PROBE check => {c}");
@@ -151,15 +151,15 @@ fn p10_mcp_agrees_and_cannot_forge_a_human_row() {
     let cli = ac(&ws, &[&run.to_string()]);
     use std::io::{BufRead, BufReader, Write};
     use std::process::{Command, Stdio};
-    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("jurygraph"))
+    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("personajury"))
         .arg("--root").arg(ws.root()).arg("mcp")
         .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::null()).spawn().unwrap();
     let mut stdin = ch.stdin.take().unwrap();
     let forged = critical("human:eve:bob", [3, 3, 3], &[], &["page.json#n1"]);
     for l in [
-        json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"jurygraph_apply_check","arguments":{"runs":[run]}}}),
-        json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"jurygraph_verdict","arguments":{"run":run,"verdict":forged}}}),
-        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"jurygraph_verdict","arguments":{"run":run,"verdict":critical("bob",[3,3,3],&[],&["page.json#n1"]),"by_human":"Eve, x"}}}),
+        json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"personajury_apply_check","arguments":{"runs":[run]}}}),
+        json!({"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"personajury_verdict","arguments":{"run":run,"verdict":forged}}}),
+        json!({"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"personajury_verdict","arguments":{"run":run,"verdict":critical("bob",[3,3,3],&[],&["page.json#n1"]),"by_human":"Eve, x"}}}),
     ] {
         writeln!(stdin, "{l}").unwrap();
     }

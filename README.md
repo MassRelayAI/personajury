@@ -1,19 +1,19 @@
 <!-- adapted from comparegraph README.md (shape only) -->
-<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/jury-graph.svg <desc> (hero alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size) -->
+<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (hero alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size) -->
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/lockup-dark.svg">
-    <img src="docs/assets/brand/lockup.svg" alt="JuryGraph" height="64">
+    <img src="docs/assets/brand/lockup.svg" alt="PersonaJury" height="64">
   </picture>
 </p>
 
 <p align="center">
-  <b>For builders with a coding agent: put your page, docs, deck or diff before a jury of personas, and keep only the verdicts that cite evidence.</b>
+  <b>PersonaJury: synthetic users as a jury. AI personas judge your page, docs, deck or change, and only verdicts with evidence count. Local, no model calls.</b>
 </p>
 
 <p align="center">
-  <a href="https://github.com/massrelay-ai/jurygraph/actions/workflows/ci.yml"><img src="https://github.com/massrelay-ai/jurygraph/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml"><img src="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%2C%20free-blue.svg" alt="License: Apache-2.0, free"></a>
   <img src="https://img.shields.io/badge/engine-no%20model%20calls-brightgreen.svg" alt="The engine makes no model calls">
   <img src="https://img.shields.io/badge/MCP-server%20%2B%20CLI-555.svg" alt="An MCP server and a CLI">
@@ -28,7 +28,7 @@
   <a href="docs/faq.md">FAQ</a>
 </p>
 
-<p align="center"><img src="docs/assets/jury-graph.svg" alt="The jury graph of the fixture run on the Lantern Notes site, drawn by jurygraph graph: 7 personas in three strata (primary 4, secondary 2, bystander 1) on the left, the 6 dimensions they scored across 2 lenses in the middle, each with one median badge per stratum and never one number across strata, and the 26 findings on the right, coloured by their decision: 0 open, 0 fixed, 11 dismissed, 15 sent to a row." width="100%"></p>
+<p align="center"><img src="docs/assets/personajury-graph.svg" alt="PersonaJury · lantern-site, the fixture run on the Lantern Notes site, drawn by personajury graph: 7 personas in three strata (primary 4, secondary 2, bystander 1) on the left, the 6 dimensions they scored across 2 lenses in the middle, each with one median badge per stratum and never one number across strata, and the 26 findings on the right, coloured by their decision: 0 open, 0 fixed, 11 dismissed, 15 sent to a row." width="100%"></p>
 
 <p align="center"><i>The engine never calls a model; your agent's subagents are the jurors.</i></p>
 
@@ -38,39 +38,39 @@
 
 ## Get started
 
-One binary, SQLite at `.jurygraph/store.db`, no API key. Linux, macOS and Windows.
+One binary, SQLite at `.personajury/store.db`, no API key. Linux, macOS and Windows.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/massrelay-ai/jurygraph/main/scripts/install.sh | sh
-# or from source: cargo install --locked --git https://github.com/massrelay-ai/jurygraph jurygraph
-jurygraph setup --apply   # registers the MCP server with your agents (without --apply: a plan)
-jurygraph doctor          # the store, the counts, each agent's registration
+curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
+# or from source: cargo install --locked --git https://github.com/massrelay-ai/personajury personajury
+personajury setup --apply   # registers the MCP server with your agents (without --apply: a plan)
+personajury doctor          # the store, the counts, each agent's registration
 ```
 
-In Claude Code, `/plugin install jurygraph --marketplace massrelay-ai/jurygraph` adds the skills and the MCP server.
+In Claude Code, `/plugin install personajury --marketplace massrelay-ai/personajury` adds the skills and the MCP server.
 
 **The five-minute loop**, on the fixture site in this repository:
 
 ```bash
-git clone https://github.com/massrelay-ai/jurygraph && cd jurygraph
-for f in fixtures/personas/*.json; do jurygraph persona add --file "$f"; done
-jurygraph panel add fixture \
+git clone https://github.com/massrelay-ai/personajury && cd personajury
+for f in fixtures/personas/*.json; do personajury persona add --file "$f"; done
+personajury panel add fixture \
   --query "3 builder=primary, 1 newcomer=primary, 2 company=secondary, 1 investor=bystander"
-jurygraph subject add lantern-site --kind page --attach fixtures/site-walk/*
-jurygraph brief --subject lantern-site --panel fixture --lens critical --model sonnet  # a brief per persona
+personajury subject add lantern-site --kind page --attach fixtures/site-walk/*
+personajury brief --subject lantern-site --panel fixture --lens critical --model sonnet  # a brief per persona
 # your agent: one subagent per brief, each writes one verdict JSON (skills/running-a-jury)
-jurygraph verdict --run 1 --file verdicts/builder-ana.json  # refused without evidence: it answers again
-jurygraph matrix 1 --table                                  # scores per stratum, never averaged across
-jurygraph graph 1 --svg --out jury.svg                      # the picture above
-jurygraph decide <finding> fixed --by me                    # or: dismissed --why "...", or: row --row ISSUE-12
-jurygraph check                                             # exits 1 while a finding has no decision
+personajury verdict --run 1 --file verdicts/builder-ana.json  # refused without evidence: it answers again
+personajury matrix 1 --table                                  # scores per stratum, never averaged across
+personajury graph 1 --svg --out jury.svg                      # the picture above
+personajury decide <finding> fixed --by me                    # or: dismissed --why "...", or: row --row ISSUE-12
+personajury check                                             # exits 1 while a finding has no decision
 ```
 
 Every call prints one JSON envelope (`--pretty` to read it). The full walk, with comparators and the second round, is [`docs/quickstart.md`](docs/quickstart.md).
 
-## Why JuryGraph
+## Why PersonaJury
 
-An agent asked "is this page good?" answers with confidence and no evidence. One number then hides that the people who pay and the people who pass by disagree. JuryGraph is three laws, each enforced by a refusal:
+An agent asked "is this page good?" answers with confidence and no evidence. One number then hides that the people who pay and the people who pass by disagree. PersonaJury is three laws, each enforced by a refusal:
 
 1. **The engine never calls a model.** It stores personas, panels, lenses and subjects, writes the briefs and checks the verdicts. Your agent runs the personas on its own model and its own bill. No network call at brief or verdict time.
 2. **Evidence, or it is labelled.** Every verdict line is `seen` (it cites an attachment of the run: an ARIA node, a screenshot, a diff line), `told` (the brief said it) or `recalled` (the model's memory, shown as such). A `seen` line with no citation is refused, and the persona answers again.
@@ -86,7 +86,7 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 
 `should-run` says whether a change needs a jury. `brief` writes one hashed brief per persona. Your agent's subagents answer, and `verdict` ingests or refuses each answer. `matrix` reports per stratum. `decide` closes each finding as `fixed`, `dismissed` (with a why) or `row` (an issue). `delta` says whether the next round landed.
 
-- **Rules pick the panel per audience.** `brief --rule CLASS` takes the panel, lenses, spend and detail from `jurygraph.toml`, one run per lens.
+- **Rules pick the panel per audience.** `brief --rule CLASS` takes the panel, lenses, spend and detail from `personajury.toml`, one run per lens.
 - **A seeded draw.** When a pool holds more personas than seats, the seats are drawn from the subject's name, so round 2 meets the same jurors and `delta` can land.
 - **Agent overrides carry a reason.** The agent may change a rule's panel, spend, lens or detail, but each change needs `--reason`, and `matrix` shows it. A brief seats 12 by default, up to 1000 with `--allow-large`.
 - **Waves.** Every brief lists its jurors in waves of 30 (`--wave N`). The agent runs a wave, ingests it, then the next.
@@ -133,7 +133,7 @@ Anything people read or look at, as long as you can attach it as files. The jury
 | Pricing | the pricing page as walk and screenshot; rivals' pages as comparators | who pays / who approves the spend / someone shopping around | `compare`, with a forced pick |
 | Logos and design | one board per candidate: small and large, light and dark | the users / the approvers / a passer-by | your own lens with a forced pick, as the [logo jury](docs/reports/2026-10-24-logo-jury.md) did |
 
-The three sector lenses ship as data in `fixtures/lenses/`, not seeded: `jurygraph lens add --file fixtures/lenses/investor-pitch.toml`. Each has four dimensions with anchors in words at 1, 3 and 5.
+The three sector lenses ship as data in `fixtures/lenses/`, not seeded: `personajury lens add --file fixtures/lenses/investor-pitch.toml`. Each has four dimensions with anchors in words at 1, 3 and 5.
 
 **What a jury must not judge:**
 - **Correctness.** Tests do that. A financial-model jury reads the model; it never checks the arithmetic.
@@ -155,7 +155,7 @@ A lens is a set of dimensions with anchors in words: what a 1, a 3 and a 5 look 
 | `financial-model` | assumptions-visible, sensitivities, risks-stated, a-lender-would-sign | `fixtures/lenses/` |
 | `site` | six criteria on a 1 to 10 scale, for the held-out check | `fixtures/lenses/` |
 
-Add your own with `jurygraph lens add --file my-lens.toml`; `jurygraph lens list` shows them.
+Add your own with `personajury lens add --file my-lens.toml`; `personajury lens list` shows them.
 
 ## What the engine refuses
 
@@ -168,11 +168,11 @@ Each refusal is a test that was seen failing first. The codes are in [`docs/trou
 - a `pick` without a reason;
 - a rule override, or a brief above 12 seats, without a reason;
 - reported usage in any shape but two non-negative token counts;
-- a `jurygraph.toml` that puts a human class under a persona quorum.
+- a `personajury.toml` that puts a human class under a persona quorum.
 
 ## Not every change needs a jury
 
-`jurygraph.toml` holds trigger rules as data ([`fixtures/jurygraph.toml`](fixtures/jurygraph.toml) is an example). `should-run` classifies a diff:
+`personajury.toml` holds trigger rules as data ([`fixtures/personajury.toml`](fixtures/personajury.toml) is an example). `should-run` classifies a diff:
 
 | quorum | who decides |
 |---|---|
@@ -187,7 +187,7 @@ The human classes are money, permission, deploy, secret, licence, public-claim a
 
 ## Agents and platforms
 
-`jurygraph setup` registers the MCP server with Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes, Windsurf, Antigravity, Kiro, GitHub Copilot, Copilot CLI and Qwen Code; any other MCP client can run `jurygraph mcp`. The CLI does everything the tools do. Release builds: Linux x64 and arm64, macOS arm64 and x64, Windows x64. Two skills, [`running-a-jury`](skills/running-a-jury) and [`writing-a-persona`](skills/writing-a-persona), teach your agent the loop.
+`personajury setup` registers the MCP server with Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes, Windsurf, Antigravity, Kiro, GitHub Copilot, Copilot CLI and Qwen Code; any other MCP client can run `personajury mcp`. The CLI does everything the tools do. Release builds: Linux x64 and arm64, macOS arm64 and x64, Windows x64. Two skills, [`running-a-jury`](skills/running-a-jury) and [`writing-a-persona`](skills/writing-a-persona), teach your agent the loop.
 
 ## Docs
 

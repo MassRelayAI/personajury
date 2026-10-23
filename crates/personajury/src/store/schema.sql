@@ -1,5 +1,5 @@
--- JuryGraph store, schema v4 (D17 adds run.effort and run.trimmed_json, D18 run.independence, D13 run.rule_class and run.quorum)
--- JuryGraph store, schema v3 (report §4; plan docs/plans/2026-10-23-v0-1-the-engine.md; D8; D9 adds run.draw_seed and run.override_json). Verdicts, picks and decisions are append-only.
+-- PersonaJury store, schema v4 (D17 adds run.effort and run.trimmed_json, D18 run.independence, D13 run.rule_class and run.quorum)
+-- PersonaJury store, schema v3 (report §4; plan docs/plans/2026-10-23-v0-1-the-engine.md; D8; D9 adds run.draw_seed and run.override_json). Verdicts, picks and decisions are append-only.
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS persona (
   id TEXT NOT NULL, version INTEGER NOT NULL, name TEXT NOT NULL, tags_json TEXT NOT NULL, stake_rules TEXT NOT NULL,

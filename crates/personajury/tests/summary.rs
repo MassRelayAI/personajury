@@ -17,7 +17,7 @@ fn the_fixture_run_summary_is_the_golden_file_byte_for_byte() {
     let (a, b) = fixture_run(ws.path());
     let got = text(&j(ws.path(), &["summary", &a.to_string(), &b.to_string()]));
     let golden = repo().join("fixtures/run/summary.txt");
-    if std::env::var_os("JURYGRAPH_FIXTURE_REGEN").is_some() {
+    if std::env::var_os("PERSONAJURY_FIXTURE_REGEN").is_some() {
         std::fs::write(&golden, &got).unwrap();
     }
     assert_eq!(got, std::fs::read_to_string(&golden).unwrap(), "the summary moved");
@@ -132,7 +132,7 @@ fn the_mcp_tool_returns_the_same_text() {
     let ws = tempfile::tempdir().unwrap();
     let (a, b) = fixture_run(ws.path());
     let want = text(&j(ws.path(), &["summary", &a.to_string(), &b.to_string()]));
-    let mut child = std::process::Command::new(assert_cmd::cargo::cargo_bin("jurygraph"))
+    let mut child = std::process::Command::new(assert_cmd::cargo::cargo_bin("personajury"))
         .arg("--root")
         .arg(ws.path())
         .arg("mcp")
@@ -141,13 +141,13 @@ fn the_mcp_tool_returns_the_same_text() {
         .spawn()
         .unwrap();
     use std::io::Write;
-    let req = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"jurygraph_summary","arguments":{"runs":[a,b]}}});
+    let req = json!({"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"personajury_summary","arguments":{"runs":[a,b]}}});
     writeln!(child.stdin.take().unwrap(), "{req}").unwrap();
     let out = child.wait_with_output().unwrap();
     let reply: Value = serde_json::from_slice(out.stdout.split(|b| *b == b'\n').next().unwrap()).unwrap();
     let env: Value = serde_json::from_str(reply["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
     assert_eq!(env["data"]["text"], want, "{env}");
-    let _ = Command::cargo_bin("jurygraph");
+    let _ = Command::cargo_bin("personajury");
 }
 
 // ---- --md and --save (the maintainer's addition) ----
@@ -164,7 +164,7 @@ fn the_markdown_summary_is_a_golden_file_with_the_sentences_the_table_the_decisi
     // recorded briefs, whose created_at is the run's, so the date line is masked here
     let masked: String = got.lines().map(|l| if l.starts_with("Date: ") { "Date: <run date>" } else { l }).collect::<Vec<_>>().join("\n") + "\n";
     let golden = repo().join("fixtures/run/summary.md");
-    if std::env::var_os("JURYGRAPH_FIXTURE_REGEN").is_some() {
+    if std::env::var_os("PERSONAJURY_FIXTURE_REGEN").is_some() {
         std::fs::write(&golden, &masked).unwrap();
     }
     assert_eq!(masked, std::fs::read_to_string(&golden).unwrap(), "the markdown summary moved");
@@ -191,7 +191,7 @@ fn save_without_a_report_dir_is_refused_and_nothing_is_written() {
 fn save_with_a_report_dir_writes_the_dated_path() {
     let ws = tempfile::tempdir().unwrap();
     let (a, b) = fixture_run(ws.path());
-    std::fs::write(ws.path().join("jurygraph.toml"), "report_dir = \"docs/juries\"\n").unwrap();
+    std::fs::write(ws.path().join("personajury.toml"), "report_dir = \"docs/juries\"\n").unwrap();
     let r = j(ws.path(), &["summary", &a.to_string(), &b.to_string(), "--save"]);
     let path = r["data"]["saved"].as_str().unwrap().to_string();
     let name = Path::new(&path).file_name().unwrap().to_str().unwrap().to_string();

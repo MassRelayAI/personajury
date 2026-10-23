@@ -1,5 +1,5 @@
 # The tradeoffs lens: which technical option do we choose, weighing advantages against disadvantages. Anchors in words, 1 / 3 / 5.
-# Fixture data, not seeded: load it with `jurygraph lens add --file fixtures/lenses/tradeoffs.toml`. Attach each option as files
+# Fixture data, not seeded: load it with `personajury lens add --file fixtures/lenses/tradeoffs.toml`. Attach each option as files
 # (a README excerpt, a usage snippet, the licence, the release cadence); each juror scores every option (`about`) and picks one.
 # Correctness is for tests: a jury cannot tell you the library is right, only whether it is the one to live with.
 name = "tradeoffs"

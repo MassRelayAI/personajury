@@ -5,7 +5,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::process::{Command, Stdio};
 
 fn bin() -> String {
-    assert_cmd::cargo::cargo_bin("jurygraph")
+    assert_cmd::cargo::cargo_bin("personajury")
         .to_string_lossy()
         .into_owned()
 }
@@ -62,7 +62,7 @@ fn initialize_and_list_seven_tools() {
     assert!(ok);
     assert_eq!(out.len(), 3, "the notification gets no reply");
     assert_eq!(out[0]["result"]["protocolVersion"], "2025-06-18");
-    assert_eq!(out[0]["result"]["serverInfo"]["name"], "jurygraph");
+    assert_eq!(out[0]["result"]["serverInfo"]["name"], "personajury");
     assert!(out[0]["result"]["capabilities"]["tools"].is_object());
     let tools = out[1]["result"]["tools"].as_array().unwrap();
     let mut names: Vec<_> = tools
@@ -73,14 +73,14 @@ fn initialize_and_list_seven_tools() {
     assert_eq!(
         names,
         [
-            "jurygraph_apply_check",
-            "jurygraph_brief",
-            "jurygraph_delta",
-            "jurygraph_graph",
-            "jurygraph_matrix",
-            "jurygraph_should_run",
-            "jurygraph_summary",
-            "jurygraph_verdict"
+            "personajury_apply_check",
+            "personajury_brief",
+            "personajury_delta",
+            "personajury_graph",
+            "personajury_matrix",
+            "personajury_should_run",
+            "personajury_summary",
+            "personajury_verdict"
         ]
     );
     for t in tools {
@@ -116,7 +116,7 @@ fn unknown_method_and_parse_error() {
 fn matrix_tool_has_no_across_strata() {
     let t = tools_list()
         .into_iter()
-        .find(|t| t["name"] == "jurygraph_matrix")
+        .find(|t| t["name"] == "personajury_matrix")
         .unwrap();
     let props = t["inputSchema"]["properties"].as_object().unwrap();
     assert!(!props.contains_key("across_strata"));
@@ -131,7 +131,7 @@ fn matrix_tool_has_no_across_strata() {
         ws.path(),
         &[call(
             1,
-            "jurygraph_matrix",
+            "personajury_matrix",
             json!({"runs":[1],"across_strata":true}),
         )],
     );
@@ -152,7 +152,7 @@ fn verdict_tool_passes_the_envelope() {
         ws.path(),
         &[call(
             1,
-            "jurygraph_verdict",
+            "personajury_verdict",
             json!({"run": 1, "verdict": {"persona": "p", "lines": []}}),
         )],
     );
@@ -171,9 +171,9 @@ fn verdict_tool_checks_its_arguments() {
     let (_, out) = session(
         ws.path(),
         &[
-            call(1, "jurygraph_verdict", json!({"run": 1})),
-            call(2, "jurygraph_verdict", json!({"run": "1", "verdict": {}})),
-            call(3, "jurygraph_verdict", json!({"run": 1, "verdict": "text"})),
+            call(1, "personajury_verdict", json!({"run": 1})),
+            call(2, "personajury_verdict", json!({"run": "1", "verdict": {}})),
+            call(3, "personajury_verdict", json!({"run": 1, "verdict": "text"})),
         ],
     );
     for o in &out {
@@ -190,11 +190,11 @@ fn should_run_tool() {
         &[
             call(
                 1,
-                "jurygraph_should_run",
+                "personajury_should_run",
                 json!({"paths": ["src/a.rs", "web/b.tsx"]}),
             ),
-            call(2, "jurygraph_should_run", json!({"bogus": 1})),
-            call(3, "jurygraph_should_run", json!({"paths": "src/a.rs"})),
+            call(2, "personajury_should_run", json!({"bogus": 1})),
+            call(3, "personajury_should_run", json!({"paths": "src/a.rs"})),
         ],
     );
     let env = tool_env(&out[0]);
@@ -216,18 +216,18 @@ fn brief_delta_and_matrix_tools_reach_their_verbs() {
         &[
             call(
                 1,
-                "jurygraph_brief",
+                "personajury_brief",
                 json!({"subject":"s","panel":"p","lens":"critical","stakes":{"a":"primary","b":"bystander"},"model":"m","comparators":["c"],"detail":"full","spend":2}),
             ),
             call(
                 2,
-                "jurygraph_brief",
+                "personajury_brief",
                 json!({"subject":"s","panel":"p","lens":"critical","stakes":["a=primary","b=secondary"],"model":"m"}),
             ),
-            call(3, "jurygraph_delta", json!({"a": 1, "b": 2})),
+            call(3, "personajury_delta", json!({"a": 1, "b": 2})),
             call(
                 4,
-                "jurygraph_matrix",
+                "personajury_matrix",
                 json!({"runs":[1,2],"table":true,"history":true,"detail":"compact"}),
             ),
         ],
@@ -252,24 +252,24 @@ fn bad_stakes_detail_and_runs_are_invalid_arguments() {
         &[
             call(
                 1,
-                "jurygraph_brief",
+                "personajury_brief",
                 json!({"subject":"s","panel":"p","lens":7,"model":"m"}),
             ),
             call(
                 2,
-                "jurygraph_brief",
+                "personajury_brief",
                 json!({"subject":"s","panel":"p","lens":"l","model":"m","stakes":{"a":"loud"}}),
             ),
             call(
                 3,
-                "jurygraph_brief",
+                "personajury_brief",
                 json!({"subject":"s","panel":"p","lens":"l","model":"m","stakes":{"a":"primary"},"detail":"huge"}),
             ),
-            call(4, "jurygraph_matrix", json!({"runs": []})),
-            call(5, "jurygraph_matrix", json!({})),
-            call(6, "jurygraph_delta", json!({"a": 1})),
-            call(7, "jurygraph_nope", json!({})),
-            call(8, "jurygraph_delta", json!([1, 2])),
+            call(4, "personajury_matrix", json!({"runs": []})),
+            call(5, "personajury_matrix", json!({})),
+            call(6, "personajury_delta", json!({"a": 1})),
+            call(7, "personajury_nope", json!({})),
+            call(8, "personajury_delta", json!([1, 2])),
         ],
     );
     for o in &out {
@@ -283,7 +283,7 @@ fn apply_check_over_mcp_answers_the_same_envelope() {
     let ws = tempfile::tempdir().unwrap();
     let (ok, out) = session(
         ws.path(),
-        &[call(1, "jurygraph_apply_check", json!({"runs": [1]})), call(2, "jurygraph_apply_check", json!({}))],
+        &[call(1, "personajury_apply_check", json!({"runs": [1]})), call(2, "personajury_apply_check", json!({}))],
     );
     assert!(ok);
     // no store yet: the verb's own refusal, as an envelope with isError

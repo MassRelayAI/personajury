@@ -2,8 +2,8 @@
 //! `subject add` stores them), runs inserted straight into the store, and the CLI as a black box.
 #![allow(dead_code)]
 use assert_cmd::Command;
-use jurygraph::domain::{hash, *};
-use jurygraph::store::Store;
+use personajury::domain::{hash, *};
+use personajury::store::Store;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
@@ -32,7 +32,7 @@ impl Ws {
     ) -> (i64, BTreeMap<String, PathBuf>) {
         let src = self.root().join("sources").join(name);
         std::fs::create_dir_all(&src).unwrap();
-        let blobs = self.root().join(".jurygraph/blobs");
+        let blobs = self.root().join(".personajury/blobs");
         std::fs::create_dir_all(&blobs).unwrap();
         let mut atts = Vec::new();
         let mut paths = BTreeMap::new();
@@ -172,7 +172,7 @@ impl Ws {
 }
 
 pub fn cli_in(root: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(root)

@@ -1,18 +1,21 @@
 # adapted from comparegraph crates/comparegraph/Cargo.toml
 [package]
-name = "jurygraph"
+name = "personajury"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 rust-version.workspace = true
-description = "A persona jury as an engine: personas, panels, lenses and evidence-checked verdicts, per stratum. No model inside."
+description = "A persona jury for your agent: personas, panels, lenses and evidence-checked verdicts, per stratum. No model inside."
+keywords = ["personas", "synthetic-users", "jury", "mcp", "ux"]
+categories = ["command-line-utilities", "development-tools"]
+repository = "https://github.com/massrelay-ai/personajury"
 
 [[bin]]
-name = "jurygraph"
+name = "personajury"
 path = "src/main.rs"
 
 [lib]
-name = "jurygraph"
+name = "personajury"
 path = "src/lib.rs"
 
 [dependencies]

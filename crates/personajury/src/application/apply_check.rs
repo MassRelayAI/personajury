@@ -171,7 +171,7 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
         .ok_or_else(|| AppError::NotFound(format!("no subject {}", judged[0].subject_name)))?;
 
     // ---- the quorum: the highest of the runs' recorded quorum, the caller's rule and the sources' (C2, C3) ----
-    let cfg_path = root.join("jurygraph.toml");
+    let cfg_path = root.join("personajury.toml");
     let cfg: Option<TriggerConfig> = match std::fs::read_to_string(&cfg_path) {
         Ok(t) => Some(trigger::parse_config(&t)?),
         Err(_) => None,

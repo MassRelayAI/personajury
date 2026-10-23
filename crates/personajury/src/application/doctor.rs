@@ -48,7 +48,7 @@ pub fn report(root: &Path, bin: Option<&str>) -> Result<Value> {
         }));
     }
     let store = Store::open_existing(root)?;
-    // a malformed jurygraph.toml is a diagnosis here, not a failure of doctor
+    // a malformed personajury.toml is a diagnosis here, not a failure of doctor
     let per = match super::verdict::tokens_per_brief(root) {
         Ok(p) => p,
         Err(e) => {
@@ -57,7 +57,7 @@ pub fn report(root: &Path, bin: Option<&str>) -> Result<Value> {
         }
     };
     // the effort the toml sets (D17) and what the agent reported spending over the last 7 days
-    let configured = std::fs::read_to_string(root.join("jurygraph.toml"))
+    let configured = std::fs::read_to_string(root.join("personajury.toml"))
         .ok()
         .and_then(|t| crate::domain::trigger::parse_config(&t).ok())
         .and_then(|c| c.effort)
@@ -107,7 +107,7 @@ pub fn brief_lines(root: &Path, bin: Option<&str>) -> String {
         format!("server: {}", all.join(", "))
     };
     let mut out = format!(
-        "jurygraph: {personas} personas, {runs} runs (store {}); {server}\n",
+        "personajury: {personas} personas, {runs} runs (store {}); {server}\n",
         store.path().display()
     );
     if !off.is_empty() {
@@ -122,7 +122,7 @@ pub fn brief_lines(root: &Path, bin: Option<&str>) -> String {
             " --force"
         };
         out.push_str(&format!(
-            "Run `jurygraph setup --apply{force}` (state: {}).\n",
+            "Run `personajury setup --apply{force}` (state: {}).\n",
             list.join(", ")
         ));
     }

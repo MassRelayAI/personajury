@@ -2,8 +2,8 @@
 # Testing
 
 ```
-cargo test -p jurygraph
-cargo clippy -p jurygraph --tests -- -D warnings
+cargo test -p personajury
+cargo clippy -p personajury --tests -- -D warnings
 ```
 Tests run through the cargo runner in `.cargo/config.toml` (`tools/pidns-run.sh`). Tests that use `setup --apply` run against
 a temporary HOME only.
@@ -29,7 +29,7 @@ A guard that has never been seen to fail is not known to work. A check that pass
 - **Append-only.** `tests/store.rs::verdict_is_append_only` goes red if the SQLite trigger on `verdict` is dropped.
 
 ## Where the tests live
-All under `crates/jurygraph/tests/`:
+All under `crates/personajury/tests/`:
 | file | covers |
 |---|---|
 | `store.rs` | the schema, versioning of personas, lenses and subjects, append-only verdicts, picks and decisions |

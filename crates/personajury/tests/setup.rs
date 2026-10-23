@@ -4,7 +4,7 @@ use assert_cmd::Command;
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-const BIN: &str = "/opt/jg/bin/jurygraph";
+const BIN: &str = "/opt/jg/bin/personajury";
 struct Env {
     home: tempfile::TempDir,
     xdg: tempfile::TempDir,
@@ -26,13 +26,13 @@ impl Env {
         self.run_with(Some(bin), args)
     }
     fn run_with(&self, bin: Option<&str>, args: &[&str]) -> Value {
-        let mut c = Command::cargo_bin("jurygraph").unwrap();
+        let mut c = Command::cargo_bin("personajury").unwrap();
         c.env("HOME", self.home.path())
             .env("XDG_CONFIG_HOME", self.xdg.path())
-            .env("JURYGRAPH_NOW", "1700000000")
-            .env_remove("JURYGRAPH_BIN");
+            .env("PERSONAJURY_NOW", "1700000000")
+            .env_remove("PERSONAJURY_BIN");
         if let Some(b) = bin {
-            c.env("JURYGRAPH_BIN", b);
+            c.env("PERSONAJURY_BIN", b);
         }
         c.current_dir(self.proj.path())
             .arg("--root")
@@ -162,36 +162,36 @@ fn apply_writes_each_clients_documented_shape() {
     let v = e.setup(&["--client", "cursor", "--scope", "project", "--apply"]);
     assert_eq!(row(&v, "cursor")["written"], true, "{v}");
     assert_eq!(
-        read_json(&e.user(".claude.json"))["mcpServers"]["jurygraph"],
+        read_json(&e.user(".claude.json"))["mcpServers"]["personajury"],
         json!({"command": BIN, "args": args})
     );
     assert_eq!(
-        read_json(&e.proj.path().join(".cursor/mcp.json"))["mcpServers"]["jurygraph"],
+        read_json(&e.proj.path().join(".cursor/mcp.json"))["mcpServers"]["personajury"],
         json!({"command": BIN, "args": args})
     );
     assert_eq!(
-        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["jurygraph"],
+        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["personajury"],
         json!({"command": BIN, "args": args})
     );
     let oc = read_json(&e.xdg.path().join("opencode/opencode.json"));
     assert_eq!(
-        oc["mcp"]["jurygraph"],
+        oc["mcp"]["personajury"],
         json!({"type": "local", "command": [BIN, "--root", ws, "mcp"]})
     );
     let toml = std::fs::read_to_string(e.user(".codex/config.toml")).unwrap();
     assert_eq!(
         toml,
         format!(
-            "[mcp_servers.jurygraph]\ncommand = \"{BIN}\"\nargs = [\"--root\",\"{ws}\",\"mcp\"]\n"
+            "[mcp_servers.personajury]\ncommand = \"{BIN}\"\nargs = [\"--root\",\"{ws}\",\"mcp\"]\n"
         )
     );
     let yaml = std::fs::read_to_string(e.user(".hermes/config.yaml")).unwrap();
-    assert_eq!(yaml, format!("mcp_servers:\n  jurygraph:\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n"));
+    assert_eq!(yaml, format!("mcp_servers:\n  personajury:\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n"));
     // 2-space indent
     assert!(
         std::fs::read_to_string(e.proj.path().join(".cursor/mcp.json"))
             .unwrap()
-            .contains("\n  \"mcpServers\": {\n    \"jurygraph\"")
+            .contains("\n  \"mcpServers\": {\n    \"personajury\"")
     );
 }
 
@@ -206,7 +206,7 @@ fn apply_is_idempotent_and_backs_up_what_it_changes() {
     let j = read_json(&e.user(".claude.json"));
     assert_eq!(j["theme"], "dark");
     assert_eq!(j["mcpServers"]["other"], json!({"command": "x"}));
-    assert_eq!(j["mcpServers"]["jurygraph"]["command"], BIN);
+    assert_eq!(j["mcpServers"]["personajury"]["command"], BIN);
     let bak = baks(e.home.path());
     assert_eq!(bak.len(), 1, "{bak:?}");
     assert!(bak[0].starts_with(".claude.json.bak-"));
@@ -233,7 +233,7 @@ fn apply_is_idempotent_and_backs_up_what_it_changes() {
 #[test]
 fn a_conflicting_entry_is_untouched_unless_forced() {
     let e = Env::new();
-    let other = "{\"mcpServers\":{\"jurygraph\":{\"command\":\"/elsewhere/cg\",\"args\":[\"--root\",\"/other\",\"mcp\"]}}}\n";
+    let other = "{\"mcpServers\":{\"personajury\":{\"command\":\"/elsewhere/cg\",\"args\":[\"--root\",\"/other\",\"mcp\"]}}}\n";
     std::fs::write(
         e.user(".gemini/settings.json")
             .parent()
@@ -267,7 +267,7 @@ fn a_conflicting_entry_is_untouched_unless_forced() {
     let f = e.setup(&["--client", "gemini", "--apply", "--force"]);
     assert_eq!(row(&f, "gemini")["action"], "replace");
     assert_eq!(
-        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["jurygraph"]["command"],
+        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["personajury"]["command"],
         BIN
     );
     assert_eq!(baks(&e.user(".gemini")).len(), 1);
@@ -277,7 +277,7 @@ fn a_conflicting_entry_is_untouched_unless_forced() {
 fn a_different_binary_path_is_stale_and_setup_refreshes_it() {
     let e = Env::new();
     e.setup(&["--client", "gemini", "--apply"]);
-    let d = e.run("/new/place/jurygraph", &["doctor"]);
+    let d = e.run("/new/place/personajury", &["doctor"]);
     let g = d["data"]["clients"]
         .as_array()
         .unwrap()
@@ -286,7 +286,7 @@ fn a_different_binary_path_is_stale_and_setup_refreshes_it() {
         .unwrap();
     assert_eq!(g["state"], "stale");
     let v = e.run(
-        "/new/place/jurygraph",
+        "/new/place/personajury",
         &["setup", "--client", "gemini", "--apply"],
     );
     assert_eq!(
@@ -295,19 +295,19 @@ fn a_different_binary_path_is_stale_and_setup_refreshes_it() {
         "stale is a conflict: plain apply leaves it"
     );
     assert_eq!(
-        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["jurygraph"]["command"],
+        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["personajury"]["command"],
         BIN
     );
     let v = e.run(
-        "/new/place/jurygraph",
+        "/new/place/personajury",
         &["setup", "--client", "gemini", "--apply", "--force"],
     );
     assert_eq!(row(&v, "gemini")["action"], "replace");
     assert_eq!(
-        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["jurygraph"]["command"],
-        "/new/place/jurygraph"
+        read_json(&e.user(".gemini/settings.json"))["mcpServers"]["personajury"]["command"],
+        "/new/place/personajury"
     );
-    let d = e.run("/new/place/jurygraph", &["doctor"]);
+    let d = e.run("/new/place/personajury", &["doctor"]);
     let g = d["data"]["clients"]
         .as_array()
         .unwrap()
@@ -357,7 +357,7 @@ fn toml_and_yaml_are_appended_never_rewritten() {
         after.starts_with(toml),
         "existing text is a byte-for-byte prefix:\n{after}"
     );
-    assert!(after.contains(&format!("[mcp_servers.jurygraph]\ncommand = \"{BIN}\"")));
+    assert!(after.contains(&format!("[mcp_servers.personajury]\ncommand = \"{BIN}\"")));
     assert_eq!(
         row(&e.setup(&["--client", "codex"]), "codex")["state"],
         "aligned"
@@ -368,13 +368,13 @@ fn toml_and_yaml_are_appended_never_rewritten() {
     std::fs::write(e.user(".hermes/config.yaml"), yaml).unwrap();
     e.setup(&["--client", "hermes", "--apply"]);
     let after = std::fs::read_to_string(e.user(".hermes/config.yaml")).unwrap();
-    assert_eq!(after, format!("model: x\nmcp_servers:\n  jurygraph:\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n  fs:\n    command: npx\n    args: [\"-y\"]\nother: 1\n"));
+    assert_eq!(after, format!("model: x\nmcp_servers:\n  personajury:\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n  fs:\n    command: npx\n    args: [\"-y\"]\nother: 1\n"));
     assert_eq!(
         row(&e.setup(&["--client", "hermes"]), "hermes")["state"],
         "aligned"
     );
     // a conflicting text entry is left alone, and --force replaces just that table
-    let conflicting = "mcp_servers:\n  jurygraph:\n    command: \"/x\"\n    args: [\"mcp\"]\n  fs:\n    command: npx\n";
+    let conflicting = "mcp_servers:\n  personajury:\n    command: \"/x\"\n    args: [\"mcp\"]\n  fs:\n    command: npx\n";
     std::fs::write(e.user(".hermes/config.yaml"), conflicting).unwrap();
     let v = e.setup(&["--client", "hermes", "--apply"]);
     assert_eq!(row(&v, "hermes")["state"], "conflict");
@@ -412,7 +412,7 @@ fn project_scope_writes_into_the_current_directory() {
     let v = e.setup(&["--client", "claude", "--scope", "project", "--apply"]);
     assert_eq!(row(&v, "claude")["written"], true);
     assert_eq!(
-        read_json(&e.proj.path().join(".mcp.json"))["mcpServers"]["jurygraph"]["command"],
+        read_json(&e.proj.path().join(".mcp.json"))["mcpServers"]["personajury"]["command"],
         BIN
     );
     assert!(!e.user(".claude.json").exists());
@@ -451,7 +451,7 @@ fn dev_builds_are_never_registered() {
     assert!(!e.user(".gemini").exists());
     let v = e.run_with(
         None,
-        &["setup", "--client", "gemini", "--bin", "/opt/x/jurygraph"],
+        &["setup", "--client", "gemini", "--bin", "/opt/x/personajury"],
     );
     assert_eq!(v["ok"], true);
     let d = e.run_with(None, &["doctor"]);
@@ -460,7 +460,7 @@ fn dev_builds_are_never_registered() {
         .unwrap()
         .iter()
         .any(|l| l["code"] == "dev_build"));
-    let d = e.run_with(None, &["doctor", "--bin", "/opt/x/jurygraph"]);
+    let d = e.run_with(None, &["doctor", "--bin", "/opt/x/personajury"]);
     assert!(d["evidence"]["limitations"]
         .as_array()
         .unwrap()
@@ -485,7 +485,7 @@ fn json_round_trip_keeps_key_order_and_number_text_except_exponent_sign() {
     );
     assert!(
         t.find("\"zz\"").unwrap() < t.find("\"aa\"").unwrap()
-            && t.find("\"aa\"").unwrap() < t.find("jurygraph").unwrap()
+            && t.find("\"aa\"").unwrap() < t.find("personajury").unwrap()
     );
 }
 
@@ -501,7 +501,7 @@ fn a_symlinked_config_stays_a_symlink_and_its_target_is_updated() {
         .unwrap()
         .file_type()
         .is_symlink());
-    assert_eq!(read_json(&real)["mcpServers"]["jurygraph"]["command"], BIN);
+    assert_eq!(read_json(&real)["mcpServers"]["personajury"]["command"], BIN);
     let bak = baks(real.parent().unwrap());
     assert_eq!(bak.len(), 1, "{bak:?}");
     assert_eq!(
@@ -514,7 +514,7 @@ fn a_symlinked_config_stays_a_symlink_and_its_target_is_updated() {
 #[test]
 fn two_backups_in_the_same_second_do_not_collide() {
     let e = Env::new(); // the clock is fixed at 1700000000
-    let orig = "{\"mcpServers\":{\"jurygraph\":{\"command\":\"/a\",\"args\":[]}}}\n";
+    let orig = "{\"mcpServers\":{\"personajury\":{\"command\":\"/a\",\"args\":[]}}}\n";
     std::fs::create_dir_all(e.user(".gemini")).unwrap();
     std::fs::write(e.user(".gemini/settings.json"), orig).unwrap();
     e.setup(&["--client", "gemini", "--apply", "--force"]);
@@ -575,7 +575,7 @@ fn crlf_and_a_missing_final_newline_are_preserved() {
     .unwrap();
     e.setup(&["--client", "codex", "--apply"]);
     let t = std::fs::read_to_string(e.user(".codex/config.toml")).unwrap();
-    assert_eq!(t, format!("model = \"x\"\r\n[mcp_servers.o]\r\ncommand = \"o\"\r\n\r\n[mcp_servers.jurygraph]\r\ncommand = \"{BIN}\"\r\nargs = [\"--root\",\"{ws}\",\"mcp\"]"));
+    assert_eq!(t, format!("model = \"x\"\r\n[mcp_servers.o]\r\ncommand = \"o\"\r\n\r\n[mcp_servers.personajury]\r\ncommand = \"{BIN}\"\r\nargs = [\"--root\",\"{ws}\",\"mcp\"]"));
     assert_eq!(
         row(&e.setup(&["--client", "codex"]), "codex")["state"],
         "aligned"
@@ -587,13 +587,13 @@ fn quoted_yaml_keys_and_hash_inside_quoted_values() {
     let e = Env::new();
     let ws = e.ws_str();
     std::fs::create_dir_all(e.user(".hermes")).unwrap();
-    std::fs::write(e.user(".hermes/config.yaml"), format!("mcp_servers:\n  \"jurygraph\":\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n")).unwrap();
+    std::fs::write(e.user(".hermes/config.yaml"), format!("mcp_servers:\n  \"personajury\":\n    command: \"{BIN}\"\n    args: [\"--root\",\"{ws}\",\"mcp\"]\n")).unwrap();
     assert_eq!(
         row(&e.setup(&["--client", "hermes"]), "hermes")["state"],
         "aligned"
     );
     std::fs::create_dir_all(e.user(".codex")).unwrap();
-    std::fs::write(e.user(".codex/config.toml"), format!("[mcp_servers.jurygraph]\ncommand = \"{BIN}\"\nargs = [\"--root\", \"{ws}\", \"mcp\"] # note # more\n")).unwrap();
+    std::fs::write(e.user(".codex/config.toml"), format!("[mcp_servers.personajury]\ncommand = \"{BIN}\"\nargs = [\"--root\", \"{ws}\", \"mcp\"] # note # more\n")).unwrap();
     assert_eq!(
         row(&e.setup(&["--client", "codex"]), "codex")["state"],
         "aligned"
@@ -602,7 +602,7 @@ fn quoted_yaml_keys_and_hash_inside_quoted_values() {
     let _ = hashed; // a quoted value with " #" is parsed as a string first
     std::fs::write(
         e.user(".codex/config.toml"),
-        "[mcp_servers.jurygraph]\ncommand = \"/p #q/cg\"\nargs = [\"x\"]\n",
+        "[mcp_servers.personajury]\ncommand = \"/p #q/cg\"\nargs = [\"x\"]\n",
     )
     .unwrap();
     let v = e.setup(&["--client", "codex"]);
@@ -634,8 +634,8 @@ fn all_with_project_scope_and_the_opencode_jsonc_conflict() {
 
 // ---------- rules block ----------
 
-const OPEN: &str = "<!-- jurygraph -->";
-const CLOSE: &str = "<!-- /jurygraph -->";
+const OPEN: &str = "<!-- personajury -->";
+const CLOSE: &str = "<!-- /personajury -->";
 
 fn block_of(text: &str) -> &str {
     let a = text.find(OPEN).unwrap();
@@ -646,7 +646,7 @@ fn block_of(text: &str) -> &str {
 #[test]
 fn rules_are_created_in_a_new_file_and_are_aligned_on_a_second_run() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     let r = rowk(&v, "claude", "rules");
     assert_eq!(
@@ -660,10 +660,10 @@ fn rules_are_created_in_a_new_file_and_are_aligned_on_a_second_run() {
     );
     let t = std::fs::read_to_string(e.ws.path().join("CLAUDE.md")).unwrap();
     assert!(
-        t.starts_with("<!-- jurygraph -->\n## JuryGraph\n") && t.ends_with("<!-- /jurygraph -->\n"),
+        t.starts_with("<!-- personajury -->\n## PersonaJury\n") && t.ends_with("<!-- /personajury -->\n"),
         "{t}"
     );
-    assert!(t.contains("`jurygraph_brief`"));
+    assert!(t.contains("`personajury_brief`"));
     assert!(t.contains("running-a-jury"));
     let v2 = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     let r = rowk(&v2, "claude", "rules");
@@ -688,14 +688,14 @@ fn rules_are_created_in_a_new_file_and_are_aligned_on_a_second_run() {
 #[test]
 fn rules_are_appended_after_exactly_one_blank_line_and_crlf_is_kept() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let p = e.ws.path().join("CLAUDE.md");
     std::fs::write(&p, "# Mine\nkeep this").unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     assert_eq!(rowk(&v, "claude", "rules")["action"], "add");
     let t = std::fs::read_to_string(&p).unwrap();
     assert!(
-        t.starts_with("# Mine\nkeep this\n\n<!-- jurygraph -->\n"),
+        t.starts_with("# Mine\nkeep this\n\n<!-- personajury -->\n"),
         "{t}"
     );
     assert_eq!(baks(e.ws.path()).len(), 1);
@@ -704,19 +704,19 @@ fn rules_are_appended_after_exactly_one_blank_line_and_crlf_is_kept() {
     e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     assert!(std::fs::read_to_string(&p)
         .unwrap()
-        .starts_with("# Mine\n\n\n<!-- jurygraph -->\n"));
+        .starts_with("# Mine\n\n\n<!-- personajury -->\n"));
     // one trailing newline: one blank line is added
     std::fs::write(&p, "# Mine\n").unwrap();
     e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     assert!(std::fs::read_to_string(&p)
         .unwrap()
-        .starts_with("# Mine\n\n<!-- jurygraph -->\n"));
+        .starts_with("# Mine\n\n<!-- personajury -->\n"));
     // CRLF
     std::fs::write(&p, "# Mine\r\nline\r\n").unwrap();
     e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     let t = std::fs::read_to_string(&p).unwrap();
     assert!(
-        t.starts_with("# Mine\r\nline\r\n\r\n<!-- jurygraph -->\r\n## JuryGraph\r\n"),
+        t.starts_with("# Mine\r\nline\r\n\r\n<!-- personajury -->\r\n## PersonaJury\r\n"),
         "{t:?}"
     );
     assert!(
@@ -734,11 +734,11 @@ fn rules_are_appended_after_exactly_one_blank_line_and_crlf_is_kept() {
 #[test]
 fn an_older_shipped_block_is_refreshed_without_force() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let p = e.ws.path().join("CLAUDE.md");
     std::fs::write(
         &p,
-        "before\n\n<!-- jurygraph -->\n<!-- /jurygraph -->\nafter\n",
+        "before\n\n<!-- personajury -->\n<!-- /personajury -->\nafter\n",
     )
     .unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
@@ -751,11 +751,11 @@ fn an_older_shipped_block_is_refreshed_without_force() {
         ),
         (Some("stale"), Some("replace"), Some(true))
     );
-    assert_eq!(r["note"], "an older JuryGraph block; refreshed");
+    assert_eq!(r["note"], "an older PersonaJury block; refreshed");
     let t = std::fs::read_to_string(&p).unwrap();
     assert!(
-        t.starts_with("before\n\n<!-- jurygraph -->\n## JuryGraph\n")
-            && t.ends_with("<!-- /jurygraph -->\nafter\n"),
+        t.starts_with("before\n\n<!-- personajury -->\n## PersonaJury\n")
+            && t.ends_with("<!-- /personajury -->\nafter\n"),
         "{t}"
     );
     assert_eq!(baks(e.ws.path()).len(), 1);
@@ -764,9 +764,9 @@ fn an_older_shipped_block_is_refreshed_without_force() {
 #[test]
 fn a_hand_edited_block_is_a_conflict_replaced_only_with_force_and_only_its_span() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let p = e.ws.path().join("CLAUDE.md");
-    let edited = "top\n<!-- jurygraph -->\nmy own words\n<!-- /jurygraph -->\nbottom\n";
+    let edited = "top\n<!-- personajury -->\nmy own words\n<!-- /personajury -->\nbottom\n";
     std::fs::write(&p, edited).unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     let r = rowk(&v, "claude", "rules");
@@ -784,8 +784,8 @@ fn a_hand_edited_block_is_a_conflict_replaced_only_with_force_and_only_its_span(
     assert_eq!(rowk(&v, "claude", "rules")["action"], "replace");
     let t = std::fs::read_to_string(&p).unwrap();
     assert!(
-        t.starts_with("top\n<!-- jurygraph -->\n## JuryGraph\n")
-            && t.ends_with("<!-- /jurygraph -->\nbottom\n"),
+        t.starts_with("top\n<!-- personajury -->\n## PersonaJury\n")
+            && t.ends_with("<!-- /personajury -->\nbottom\n"),
         "{t}"
     );
     assert!(!t.contains("my own words"));
@@ -795,9 +795,9 @@ fn a_hand_edited_block_is_a_conflict_replaced_only_with_force_and_only_its_span(
 #[test]
 fn an_open_marker_without_a_close_is_a_conflict_even_with_force() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let p = e.ws.path().join("CLAUDE.md");
-    let broken = "x\n<!-- jurygraph -->\nno end\n";
+    let broken = "x\n<!-- personajury -->\nno end\n";
     std::fs::write(&p, broken).unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--force", "--no-hook"]);
     let r = rowk(&v, "claude", "rules");
@@ -811,7 +811,7 @@ fn an_open_marker_without_a_close_is_a_conflict_even_with_force() {
 #[test]
 fn rules_rows_are_one_per_file_with_the_clients_joined_and_follow_detection() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let v = e.setup(&["--client", "all"]);
     assert!(
         kinds(&v, "rules").is_empty() && kinds(&v, "hook").is_empty(),
@@ -844,7 +844,7 @@ fn rules_rows_are_one_per_file_with_the_clients_joined_and_follow_detection() {
     assert_eq!(
         rowk(&v, "copilot", "rules")["path"],
         std::path::PathBuf::from(e.ws_str())
-            .join(".github/instructions/jurygraph.instructions.md")
+            .join(".github/instructions/personajury.instructions.md")
             .to_string_lossy()
             .as_ref()
     );
@@ -886,11 +886,11 @@ fn rules_wait_for_a_store_and_never_land_outside_the_workspace() {
         assert!(r["note"]
             .as_str()
             .unwrap()
-            .contains("no JuryGraph store under"));
+            .contains("no PersonaJury store under"));
         assert!(r["note"]
             .as_str()
             .unwrap()
-            .contains("jurygraph persona add"));
+            .contains("personajury persona add"));
         assert!(
             r["path"].as_str().unwrap().ends_with("/CLAUDE.md")
                 && r["path"].as_str().unwrap().starts_with(&e.ws_str())
@@ -898,7 +898,7 @@ fn rules_wait_for_a_store_and_never_land_outside_the_workspace() {
     }
     assert!(!e.ws.path().join("CLAUDE.md").exists() && !e.proj.path().join("CLAUDE.md").exists());
     // with a store the block goes to the workspace root, not the cwd
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--no-hook"]);
     assert_eq!(rowk(&v, "claude", "rules")["written"], true);
     assert!(e.ws.path().join("CLAUDE.md").is_file() && !e.proj.path().join("CLAUDE.md").exists());
@@ -907,7 +907,7 @@ fn rules_wait_for_a_store_and_never_land_outside_the_workspace() {
 #[test]
 fn a_directory_named_like_the_rules_file_is_a_conflict_not_an_error() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     std::fs::create_dir_all(e.ws.path().join("CLAUDE.md")).unwrap();
     let v = e.setup(&["--client", "claude", "--apply", "--force", "--no-hook"]);
     assert_eq!(v["ok"], true, "{v}");
@@ -949,7 +949,7 @@ fn doctor_lists_the_rules_and_hook_rows_of_detected_clients() {
 
 // ---------- the SessionStart hook ----------
 
-const HOOK: &str = "command -v jurygraph >/dev/null 2>&1 || exit 0; jurygraph doctor --brief";
+const HOOK: &str = "command -v personajury >/dev/null 2>&1 || exit 0; personajury doctor --brief";
 
 #[test]
 fn the_hook_is_created_added_next_to_other_hooks_and_aligned_on_rerun() {
@@ -1030,7 +1030,7 @@ fn the_hook_is_created_added_next_to_other_hooks_and_aligned_on_rerun() {
 #[test]
 fn a_different_doctor_hook_is_stale_and_replaced_only_with_force() {
     let e = Env::new();
-    let old = json!({"hooks": {"SessionStart": [{"hooks": [{"type": "command", "command": "jurygraph doctor --brief", "timeout": 3}]}]}});
+    let old = json!({"hooks": {"SessionStart": [{"hooks": [{"type": "command", "command": "personajury doctor --brief", "timeout": 3}]}]}});
     std::fs::create_dir_all(e.user(".claude")).unwrap();
     let path = e.user(".claude/settings.json");
     std::fs::write(&path, serde_json::to_string_pretty(&old).unwrap()).unwrap();
@@ -1082,11 +1082,11 @@ fn the_plugin_hook_file_carries_the_same_command_setup_writes() {
     let h = read_json(&p);
     assert_eq!(
         h["hooks"]["SessionStart"][0]["hooks"][0]["command"],
-        jurygraph::application::setup::HOOK_COMMAND
+        personajury::application::setup::HOOK_COMMAND
     );
     assert_eq!(h["hooks"]["SessionStart"][0]["hooks"][0]["type"], "command");
     assert_eq!(h["hooks"]["SessionStart"][0]["hooks"][0]["timeout"], 10);
-    assert_eq!(jurygraph::application::setup::HOOK_COMMAND, HOOK);
+    assert_eq!(personajury::application::setup::HOOK_COMMAND, HOOK);
     let plugin =
         read_json(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../.claude-plugin/plugin.json"));
     assert!(
@@ -1098,10 +1098,10 @@ fn the_plugin_hook_file_carries_the_same_command_setup_writes() {
 // ---------- doctor --brief ----------
 
 fn brief(e: &Env) -> (String, i32) {
-    let mut c = Command::cargo_bin("jurygraph").unwrap();
+    let mut c = Command::cargo_bin("personajury").unwrap();
     c.env("HOME", e.home.path())
         .env("XDG_CONFIG_HOME", e.xdg.path())
-        .env("JURYGRAPH_BIN", BIN)
+        .env("PERSONAJURY_BIN", BIN)
         .current_dir(e.proj.path());
     let out = c
         .arg("--root")
@@ -1121,23 +1121,23 @@ fn doctor_brief_is_silent_without_a_store_and_one_or_two_lines_with_one() {
     assert_eq!(brief(&e), (String::new(), 0));
     std::fs::create_dir_all(e.user(".gemini")).unwrap();
     assert_eq!(brief(&e), (String::new(), 0), "still no store");
-    jurygraph::store::Store::open(e.ws.path()).unwrap();
+    personajury::store::Store::open(e.ws.path()).unwrap();
     let (out, code) = brief(&e);
     assert_eq!(code, 0);
     let store = std::fs::canonicalize(e.ws.path())
         .unwrap()
-        .join(".jurygraph/store.db");
+        .join(".personajury/store.db");
     let lines: Vec<_> = out.lines().collect();
     assert_eq!(lines.len(), 2, "{out}");
     assert!(
-        lines[0].starts_with("jurygraph: 0 personas, 0 runs (store ")
+        lines[0].starts_with("personajury: 0 personas, 0 runs (store ")
             && lines[0].ends_with("; server: gemini missing"),
         "{out}"
     );
     assert!(lines[0].contains(store.file_name().unwrap().to_str().unwrap()));
     assert_eq!(
         lines[1],
-        "Run `jurygraph setup --apply` (state: gemini missing)."
+        "Run `personajury setup --apply` (state: gemini missing)."
     );
     e.setup(&["--client", "gemini", "--apply", "--no-rules"]);
     let (out, _) = brief(&e);
@@ -1148,7 +1148,7 @@ fn doctor_brief_is_silent_without_a_store_and_one_or_two_lines_with_one() {
     );
     // nothing detected
     let e2 = Env::new();
-    jurygraph::store::Store::open(e2.ws.path()).unwrap();
+    personajury::store::Store::open(e2.ws.path()).unwrap();
     let (out, code) = brief(&e2);
     assert_eq!(code, 0);
     assert!(
@@ -1175,27 +1175,27 @@ fn apply_writes_the_shape_of_each_newer_client() {
     let stdio = json!({"type": "stdio", "command": BIN, "args": args});
     assert_eq!(
         read_json(&e.user(".codeium/windsurf/mcp_config.json")),
-        json!({"mcpServers": {"jurygraph": plain}})
+        json!({"mcpServers": {"personajury": plain}})
     );
     assert_eq!(
         read_json(&e.user(".gemini/antigravity/mcp_config.json")),
-        json!({"mcpServers": {"jurygraph": plain}})
+        json!({"mcpServers": {"personajury": plain}})
     );
     assert_eq!(
         read_json(&e.user(".copilot/mcp-config.json")),
-        json!({"mcpServers": {"jurygraph": {"type": "local", "command": BIN, "args": args, "tools": ["*"]}}})
+        json!({"mcpServers": {"personajury": {"type": "local", "command": BIN, "args": args, "tools": ["*"]}}})
     );
     assert_eq!(
         read_json(&e.user(".qwen/settings.json")),
-        json!({"mcpServers": {"jurygraph": stdio}})
+        json!({"mcpServers": {"personajury": stdio}})
     );
     assert_eq!(
         read_json(&e.proj.path().join(".kiro/settings/mcp.json")),
-        json!({"mcpServers": {"jurygraph": stdio}})
+        json!({"mcpServers": {"personajury": stdio}})
     );
     assert_eq!(
         read_json(&e.proj.path().join(".vscode/mcp.json")),
-        json!({"servers": {"jurygraph": stdio}})
+        json!({"servers": {"personajury": stdio}})
     );
     // aligned on a second look, and another `type` is a conflict
     assert_eq!(
@@ -1214,7 +1214,7 @@ fn apply_writes_the_shape_of_each_newer_client() {
         )["state"],
         "aligned"
     );
-    let other = json!({"mcpServers": {"jurygraph": {"type": "sse", "command": BIN, "args": args}}});
+    let other = json!({"mcpServers": {"personajury": {"type": "sse", "command": BIN, "args": args}}});
     std::fs::write(e.user(".qwen/settings.json"), other.to_string()).unwrap();
     assert_eq!(
         rowk(
@@ -1241,8 +1241,8 @@ fn apply_writes_the_shape_of_each_newer_client() {
 #[test]
 fn doctor_brief_treats_an_empty_store_file_as_no_store_and_hints_force_for_stale_or_conflict() {
     let e = Env::new();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
-    let db = e.ws.path().join(".jurygraph/store.db");
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
+    let db = e.ws.path().join(".personajury/store.db");
     std::fs::write(&db, "").unwrap();
     assert_eq!(brief(&e), (String::new(), 0));
     assert_eq!(
@@ -1251,7 +1251,7 @@ fn doctor_brief_treats_an_empty_store_file_as_no_store_and_hints_force_for_stale
         "the empty file is not migrated"
     );
     std::fs::remove_file(&db).unwrap();
-    jurygraph::store::Store::open(e.ws.path()).unwrap();
+    personajury::store::Store::open(e.ws.path()).unwrap();
     std::fs::create_dir_all(e.user(".codex")).unwrap();
     std::fs::create_dir_all(e.user(".claude")).unwrap();
     let (out, _) = brief(&e);
@@ -1262,13 +1262,13 @@ fn doctor_brief_treats_an_empty_store_file_as_no_store_and_hints_force_for_stale
     );
     assert_eq!(
         lines[1],
-        "Run `jurygraph setup --apply` (state: claude missing, codex missing)."
+        "Run `personajury setup --apply` (state: claude missing, codex missing)."
     );
     // claude registered, codex entry points elsewhere
     e.setup(&["--client", "claude", "--apply", "--no-rules", "--no-hook"]);
     std::fs::write(
         e.user(".codex/config.toml"),
-        "[mcp_servers.jurygraph]\ncommand = \"/x\"\nargs = [\"mcp\"]\n",
+        "[mcp_servers.personajury]\ncommand = \"/x\"\nargs = [\"mcp\"]\n",
     )
     .unwrap();
     let (out, _) = brief(&e);
@@ -1280,7 +1280,7 @@ fn doctor_brief_treats_an_empty_store_file_as_no_store_and_hints_force_for_stale
     );
     assert_eq!(
         lines[1],
-        "Run `jurygraph setup --apply --force` (state: codex conflict)."
+        "Run `personajury setup --apply --force` (state: codex conflict)."
     );
 }
 
@@ -1290,7 +1290,7 @@ fn enable_plugin(e: &Env) {
     std::fs::create_dir_all(e.user(".claude")).unwrap();
     std::fs::write(
         e.user(".claude/settings.json"),
-        r#"{"enabledPlugins":{"jurygraph@jurygraph":true}}"#,
+        r#"{"enabledPlugins":{"personajury@personajury":true}}"#,
     )
     .unwrap();
 }
@@ -1300,7 +1300,7 @@ fn with_the_plugin_enabled_all_leaves_claudes_server_and_hook_to_it_but_writes_t
     let e = Env::new();
     enable_plugin(&e);
     let before = std::fs::read_to_string(e.user(".claude/settings.json")).unwrap();
-    std::fs::create_dir_all(e.ws.path().join(".jurygraph")).unwrap();
+    std::fs::create_dir_all(e.ws.path().join(".personajury")).unwrap();
     let v = e.setup(&["--apply", "--force"]);
     let c = rowk(&v, "claude", "config");
     assert_eq!(
@@ -1312,7 +1312,7 @@ fn with_the_plugin_enabled_all_leaves_claudes_server_and_hook_to_it_but_writes_t
         (Some("plugin"), Some("skip"), Some(false)),
         "{v}"
     );
-    assert!(c["note"].as_str().unwrap().contains("jurygraph@jurygraph"));
+    assert!(c["note"].as_str().unwrap().contains("personajury@personajury"));
     let h = rowk(&v, "claude", "hook");
     assert_eq!(
         (
@@ -1350,7 +1350,7 @@ fn naming_claude_writes_even_with_the_plugin_enabled() {
     let v = e.setup(&["--client", "claude", "--apply"]);
     assert_eq!(rowk(&v, "claude", "config")["written"], true, "{v}");
     assert_eq!(
-        read_json(&e.user(".claude.json"))["mcpServers"]["jurygraph"]["command"],
+        read_json(&e.user(".claude.json"))["mcpServers"]["personajury"]["command"],
         BIN
     );
     assert_eq!(rowk(&v, "claude", "hook")["written"], true, "{v}");
@@ -1362,7 +1362,7 @@ fn a_disabled_or_absent_plugin_changes_nothing() {
     std::fs::create_dir_all(e.user(".claude")).unwrap();
     std::fs::write(
         e.user(".claude/settings.json"),
-        r#"{"enabledPlugins":{"jurygraph@jurygraph":false}}"#,
+        r#"{"enabledPlugins":{"personajury@personajury":false}}"#,
     )
     .unwrap();
     let v = e.setup(&["--apply"]);
@@ -1374,7 +1374,7 @@ fn a_disabled_or_absent_plugin_changes_nothing() {
 fn doctor_brief_counts_the_plugin_as_aligned() {
     let e = Env::new();
     enable_plugin(&e);
-    jurygraph::store::Store::open(e.ws.path()).unwrap();
+    personajury::store::Store::open(e.ws.path()).unwrap();
     let (out, _) = brief(&e);
     assert_eq!(out.lines().count(), 1, "{out}");
     assert!(
@@ -1386,10 +1386,10 @@ fn doctor_brief_counts_the_plugin_as_aligned() {
 // ---------- a bare command that resolves on PATH ----------
 
 fn doctor_with_path(e: &Env, path: &Path) -> Value {
-    let mut c = Command::cargo_bin("jurygraph").unwrap();
+    let mut c = Command::cargo_bin("personajury").unwrap();
     c.env("HOME", e.home.path())
         .env("XDG_CONFIG_HOME", e.xdg.path())
-        .env("JURYGRAPH_BIN", &e.bin_real)
+        .env("PERSONAJURY_BIN", &e.bin_real)
         .env("PATH", path)
         .current_dir(e.proj.path());
     let out = c
@@ -1405,12 +1405,12 @@ fn doctor_with_path(e: &Env, path: &Path) -> Value {
 #[test]
 fn a_bare_command_that_resolves_to_the_registered_binary_is_aligned() {
     let mut e = Env::new();
-    let real = std::fs::canonicalize(assert_cmd::cargo::cargo_bin("jurygraph")).unwrap();
+    let real = std::fs::canonicalize(assert_cmd::cargo::cargo_bin("personajury")).unwrap();
     e.bin_real = real.to_string_lossy().into_owned();
     let bin_dir = tempfile::tempdir().unwrap();
-    std::os::unix::fs::symlink(&real, bin_dir.path().join("jurygraph")).unwrap();
+    std::os::unix::fs::symlink(&real, bin_dir.path().join("personajury")).unwrap();
     std::fs::create_dir_all(e.user(".gemini")).unwrap();
-    let entry = json!({"mcpServers": {"jurygraph": {"command": "jurygraph", "args": ["--root", e.ws_str(), "mcp"]}}});
+    let entry = json!({"mcpServers": {"personajury": {"command": "personajury", "args": ["--root", e.ws_str(), "mcp"]}}});
     std::fs::write(e.user(".gemini/settings.json"), entry.to_string()).unwrap();
     let state = |v: &Value| {
         v["data"]["clients"]
@@ -1424,9 +1424,9 @@ fn a_bare_command_that_resolves_to_the_registered_binary_is_aligned() {
     assert_eq!(state(&doctor_with_path(&e, bin_dir.path())), "aligned");
     // a bare name that resolves to another file, or to nothing, stays stale
     let other = tempfile::tempdir().unwrap();
-    std::fs::write(other.path().join("jurygraph"), "#!/bin/sh\n").unwrap();
+    std::fs::write(other.path().join("personajury"), "#!/bin/sh\n").unwrap();
     std::fs::set_permissions(
-        other.path().join("jurygraph"),
+        other.path().join("personajury"),
         std::os::unix::fs::PermissionsExt::from_mode(0o755),
     )
     .unwrap();

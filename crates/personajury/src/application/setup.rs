@@ -1,12 +1,12 @@
 //! adapted from comparegraph crates/comparegraph/src/application/setup.rs
-//! `setup` and the `doctor` registrations: write the `jurygraph` MCP server entry into agent clients' configs (spec §10).
+//! `setup` and the `doctor` registrations: write the `personajury` MCP server entry into agent clients' configs (spec §10).
 //!
 //! Plan first: a dry run is the default and writes nothing. `--apply` writes additively, with a backup `<file>.bak-<unix-seconds>`
 //! beside any file it changes. JSON configs are parsed and re-serialised (2-space indent, every other key kept, key order kept). TOML and YAML are never parsed-and-rewritten: the entry is appended
-//! (or, for a stale command, one line is replaced) as text, and only when the `jurygraph` entry is absent or ours.
+//! (or, for a stale command, one line is replaced) as text, and only when the `personajury` entry is absent or ours.
 //! With the Claude Code plugin enabled (`enabledPlugins` in `~/.claude/settings.json`), a `--client all` run leaves Claude Code's
 //! server and hook to the plugin (state `plugin`); naming `--client claude` writes anyway.
-//! A `jurygraph` entry that points elsewhere is a `conflict` and stays untouched unless `--force`.
+//! A `personajury` entry that points elsewhere is a `conflict` and stays untouched unless `--force`.
 //!
 //! Verified config shapes (documentation read 2026-10-13):
 //! - Claude Code: `.mcp.json` (project) / `~/.claude.json` (user), `mcpServers.<name> = {command, args}`.
@@ -31,7 +31,7 @@ use super::{AppError, Result};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
-pub const SERVER: &str = "jurygraph";
+pub const SERVER: &str = "personajury";
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Client {
@@ -108,7 +108,7 @@ pub struct Ctx {
     pub xdg: Option<PathBuf>,
     pub project: PathBuf,
     pub bin: String,
-    /// the command came from `--bin` / JURYGRAPH_BIN rather than the running executable
+    /// the command came from `--bin` / PERSONAJURY_BIN rather than the running executable
     pub explicit_bin: bool,
     /// the running executable sits under a `target/` directory (a build tree)
     pub dev_build: bool,
@@ -127,7 +127,7 @@ impl Ctx {
             .map(PathBuf::from)
             .or_else(|| home.as_ref().map(|h| h.join(".config")));
         let explicit = bin.map(str::to_string).or_else(|| {
-            std::env::var("JURYGRAPH_BIN")
+            std::env::var("PERSONAJURY_BIN")
                 .ok()
                 .filter(|b| !b.is_empty())
         });
@@ -140,7 +140,7 @@ impl Ctx {
             Some(b) => absolutise(&b, &cwd),
             None => exe
                 .map(|p| p.to_string_lossy().into_owned())
-                .unwrap_or_else(|| "jurygraph".into()),
+                .unwrap_or_else(|| "personajury".into()),
         };
         let ws = std::fs::canonicalize(root).unwrap_or_else(|_| {
             if root.is_absolute() {
@@ -495,7 +495,7 @@ fn plan_json(c: Client, ctx: &Ctx, path: &Path) -> Plan {
                 forced: new,
                 file_exists: exists,
             },
-            Cmp::Other => Plan::conflict("a `jurygraph` entry points elsewhere", new, exists),
+            Cmp::Other => Plan::conflict("a `personajury` entry points elsewhere", new, exists),
         },
     }
 }
@@ -607,7 +607,7 @@ fn plan_toml(ctx: &Ctx, path: &Path) -> Plan {
     let Some(start) = start else {
         if mentions {
             return Plan::conflict(
-                "a `jurygraph` entry in a form setup does not edit; left untouched",
+                "a `personajury` entry in a form setup does not edit; left untouched",
                 None,
                 exists,
             );
@@ -677,7 +677,7 @@ fn plan_toml(ctx: &Ctx, path: &Path) -> Plan {
         }
         Cmp::Other => {
             let forced = Some(replace_all(&mut lines));
-            Plan::conflict("a `jurygraph` entry points elsewhere", forced, exists)
+            Plan::conflict("a `personajury` entry points elsewhere", forced, exists)
         }
     }
 }
@@ -794,7 +794,7 @@ fn plan_yaml(ctx: &Ctx, path: &Path) -> Plan {
         Cmp::Other => {
             lines.splice(me..me_end, yaml_entry(ctx, child_ind));
             Plan::conflict(
-                "a `jurygraph` entry points elsewhere",
+                "a `personajury` entry points elsewhere",
                 Some(doc.join(&lines)),
                 exists,
             )
@@ -821,26 +821,26 @@ fn plan_for(c: Client, ctx: &Ctx, path: &Path) -> Plan {
 
 // ---------- rules block ----------
 
-const OPEN: &str = "<!-- jurygraph -->";
-const CLOSE: &str = "<!-- /jurygraph -->";
+const OPEN: &str = "<!-- personajury -->";
+const CLOSE: &str = "<!-- /personajury -->";
 /// The block `setup` writes into an agent's instruction file.
-const RULES_BLOCK: &str = "<!-- jurygraph -->
-## JuryGraph
-This directory has a JuryGraph store (`.jurygraph/`): a persona jury run as an engine; no model inside it, the agent plays every persona.
-- The loop: `jurygraph_brief` (one hashed brief per persona) -> one subagent per persona answers its brief -> `jurygraph_verdict` per answer -> `jurygraph_matrix` (scores per stratum, never averaged across strata) -> a person decides each finding with `jurygraph decide`.
+const RULES_BLOCK: &str = "<!-- personajury -->
+## PersonaJury
+This directory has a PersonaJury store (`.personajury/`): a persona jury run as an engine; no model inside it, the agent plays every persona.
+- The loop: `personajury_brief` (one hashed brief per persona) -> one subagent per persona answers its brief -> `personajury_verdict` per answer -> `personajury_matrix` (scores per stratum, never averaged across strata) -> a person decides each finding with `personajury decide`.
 - Load the `running-a-jury` skill before you start a round, and `writing-a-persona` before you write a persona. A verdict cites evidence on every line; the engine refuses one that does not.
-- If a tool is missing, run `jurygraph doctor`; `jurygraph setup --apply` registers the server.
-<!-- /jurygraph -->";
+- If a tool is missing, run `personajury doctor`; `personajury setup --apply` registers the server.
+<!-- /personajury -->";
 /// Every block text ever shipped, the current one first. A block that equals an older entry is `stale` and is refreshed
 /// without `--force`. The last entry is the empty block, the form a user may leave to say "managed, fill me".
-pub const RULES_SHIPPED: &[&str] = &[RULES_BLOCK, "<!-- jurygraph -->\n<!-- /jurygraph -->"];
+pub const RULES_SHIPPED: &[&str] = &[RULES_BLOCK, "<!-- personajury -->\n<!-- /personajury -->"];
 
 /// The project instruction file an agent client reads.
 pub fn rules_file(c: Client) -> &'static str {
     match c {
         Client::Claude => "CLAUDE.md",
         Client::Gemini | Client::Antigravity | Client::Qwen => "GEMINI.md",
-        Client::Copilot => ".github/instructions/jurygraph.instructions.md",
+        Client::Copilot => ".github/instructions/personajury.instructions.md",
         Client::Codex
         | Client::Cursor
         | Client::OpenCode
@@ -900,7 +900,7 @@ fn plan_rules(path: &Path) -> Plan {
     };
     let Some(close_rel) = text[open..].find(CLOSE) else {
         return Plan::conflict(
-            "a `<!-- jurygraph -->` marker without its closing marker",
+            "a `<!-- personajury -->` marker without its closing marker",
             None,
             exists,
         );
@@ -919,13 +919,13 @@ fn plan_rules(path: &Path) -> Plan {
     } else if RULES_SHIPPED.contains(&span.as_str()) {
         Plan {
             state: State::Stale,
-            note: Some("an older JuryGraph block; refreshed".into()),
+            note: Some("an older PersonaJury block; refreshed".into()),
             new: None,
             forced: Some(replaced),
             file_exists: exists,
         }
     } else {
-        Plan::conflict("the JuryGraph block was edited", Some(replaced), exists)
+        Plan::conflict("the PersonaJury block was edited", Some(replaced), exists)
     }
 }
 
@@ -933,12 +933,12 @@ fn plan_rules(path: &Path) -> Plan {
 
 /// The command both the plugin's `hooks/hooks.json` and `setup` register: silent unless a store exists.
 pub const HOOK_COMMAND: &str =
-    "command -v jurygraph >/dev/null 2>&1 || exit 0; jurygraph doctor --brief";
+    "command -v personajury >/dev/null 2>&1 || exit 0; personajury doctor --brief";
 
 fn hook_entry() -> Value {
     json!({ "hooks": [{ "type": "command", "command": HOOK_COMMAND, "timeout": 10 }] })
 }
-/// Claude Code's user settings list `jurygraph@jurygraph` as enabled: the plugin carries the server and the hook.
+/// Claude Code's user settings list `personajury@personajury` as enabled: the plugin carries the server and the hook.
 pub fn plugin_enabled(ctx: &Ctx) -> bool {
     let Some(path) = hook_file(ctx, Scope::User) else {
         return false;
@@ -947,9 +947,9 @@ pub fn plugin_enabled(ctx: &Ctx) -> bool {
         return false;
     };
     serde_json::from_str::<Value>(&text)
-        .is_ok_and(|v| v["enabledPlugins"]["jurygraph@jurygraph"] == true)
+        .is_ok_and(|v| v["enabledPlugins"]["personajury@personajury"] == true)
 }
-const PLUGIN_NOTE: &str = "left to the Claude Code plugin (jurygraph@jurygraph)";
+const PLUGIN_NOTE: &str = "left to the Claude Code plugin (personajury@personajury)";
 fn plugin_row(mut row: Row) -> Row {
     row.state = State::Plugin;
     row.note = Some(PLUGIN_NOTE.into());
@@ -1019,7 +1019,7 @@ fn plan_hook(path: &Path) -> Plan {
                             file_exists: exists,
                         }
                     }
-                    Some(c) if c.contains("jurygraph doctor") && stale.is_none() => {
+                    Some(c) if c.contains("personajury doctor") && stale.is_none() => {
                         stale = Some((i, k))
                     }
                     _ => {}
@@ -1031,7 +1031,7 @@ fn plan_hook(path: &Path) -> Plan {
         root["hooks"]["SessionStart"][i]["hooks"][k]["command"] = json!(HOOK_COMMAND);
         return Plan {
             state: State::Stale,
-            note: Some("a different `jurygraph doctor` hook command".into()),
+            note: Some("a different `personajury doctor` hook command".into()),
             new: None,
             forced: Some(json_text(&root)),
             file_exists: exists,
@@ -1216,8 +1216,8 @@ pub struct Options {
 }
 
 fn unix_seconds() -> u64 {
-    // JURYGRAPH_NOW fixes the clock (tests)
-    if let Some(n) = std::env::var("JURYGRAPH_NOW")
+    // PERSONAJURY_NOW fixes the clock (tests)
+    if let Some(n) = std::env::var("PERSONAJURY_NOW")
         .ok()
         .and_then(|n| n.parse().ok())
     {
@@ -1386,9 +1386,9 @@ pub fn execute(ctx: &Ctx, o: &Options) -> Result<Vec<Row>> {
         for (f, names) in files {
             let path = ws.join(f);
             let row = Row::new(names.join(","), "rules", Scope::Project, path.clone());
-            if !ws.join(".jurygraph").is_dir() {
+            if !ws.join(".personajury").is_dir() {
                 let mut row = row;
-                row.note = Some(format!("no JuryGraph store under {}; run `jurygraph persona add` first, then `setup` again", ctx.workspace));
+                row.note = Some(format!("no PersonaJury store under {}; run `personajury persona add` first, then `setup` again", ctx.workspace));
                 rows.push(row);
                 continue;
             }
@@ -1427,7 +1427,7 @@ pub struct SetupArgs {
     pub no_hook: bool,
 }
 
-/// `jurygraph setup`: a plan by default, `--apply` writes. Returns the envelope's `data`.
+/// `personajury setup`: a plan by default, `--apply` writes. Returns the envelope's `data`.
 pub fn run(root: &Path, a: &SetupArgs) -> Result<Value> {
     let scope = match a.scope.as_str() {
         "user" => Scope::User,

@@ -11,7 +11,7 @@
 | personas | [`../PERSONAS.md`](../PERSONAS.md) | composites, never identifiable real people; generated ones record their material hash |
 | lenses | [`lenses.md`](lenses.md) | a versioned standard; anchors in words, never edited in place; the four shipped and the fixture `site` lens |
 | publishing a result | [`publishing-results.md`](publishing-results.md) | date, declared model, four hashes and the per-stratum table, or it is prose |
-| privacy and vulnerabilities | [`../SECURITY.md`](../SECURITY.md) | the engine sends nothing; attachments stay in `.jurygraph/blobs` |
+| privacy and vulnerabilities | [`../SECURITY.md`](../SECURITY.md) | the engine sends nothing; attachments stay in `.personajury/blobs` |
 | how to use it | [`usage.md`](usage.md), [`commands.md`](commands.md), [`mcp-tools.md`](mcp-tools.md), [`faq.md`](faq.md), [`troubleshooting.md`](troubleshooting.md), [`../README.md`](../README.md) | describe the v0.1 contract in the plan until the engine is built |
 | what comes next | [`roadmap.md`](roadmap.md) | only what the design names; each item says "not built" |
 | how it is tested | [`testing.md`](testing.md) | every refusal is a test seen red first |

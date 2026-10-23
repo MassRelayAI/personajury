@@ -1,4 +1,4 @@
-//! D16: the surfaces' manifests agree. One name, one version (the workspace's), one command (`jurygraph mcp`) across the
+//! D16: the surfaces' manifests agree. One name, one version (the workspace's), one command (`personajury mcp`) across the
 //! plugin manifests, `mcp.json`, `server.json` and the `.mcpb` manifest; the `.mcpb` arguments are run, so their order is
 //! pinned by the binary itself; the bundle script is run on a stand-in binary.
 use serde_json::{json, Value};
@@ -40,7 +40,7 @@ fn every_manifest_carries_the_cargo_version() {
 }
 
 #[test]
-fn every_manifest_names_jurygraph() {
+fn every_manifest_names_personajury() {
     for f in [
         ".claude-plugin/plugin.json",
         ".codex-plugin/plugin.json",
@@ -48,19 +48,19 @@ fn every_manifest_names_jurygraph() {
         "gemini-extension.json",
         "packaging/mcpb/manifest.json",
     ] {
-        assert_eq!(json_of(f)["name"], "jurygraph", "{f}");
+        assert_eq!(json_of(f)["name"], "personajury", "{f}");
     }
-    assert_eq!(json_of(".claude-plugin/marketplace.json")["plugins"][0]["name"], "jurygraph");
+    assert_eq!(json_of(".claude-plugin/marketplace.json")["plugins"][0]["name"], "personajury");
     let name = json_of("server.json")["name"].as_str().unwrap().to_string();
-    assert!(name.ends_with("/jurygraph"), "{name}");
+    assert!(name.ends_with("/personajury"), "{name}");
 }
 
 #[test]
-fn one_command_jurygraph_mcp_across_every_surface() {
-    let want = json!({"command": "jurygraph", "args": ["mcp"]});
-    assert_eq!(json_of("mcp.json")["mcpServers"]["jurygraph"], want);
-    assert_eq!(json_of(".claude-plugin/plugin.json")["mcpServers"]["jurygraph"], want);
-    assert_eq!(json_of("gemini-extension.json")["mcpServers"]["jurygraph"], want);
+fn one_command_personajury_mcp_across_every_surface() {
+    let want = json!({"command": "personajury", "args": ["mcp"]});
+    assert_eq!(json_of("mcp.json")["mcpServers"]["personajury"], want);
+    assert_eq!(json_of(".claude-plugin/plugin.json")["mcpServers"]["personajury"], want);
+    assert_eq!(json_of("gemini-extension.json")["mcpServers"]["personajury"], want);
     // Codex and Cursor point at the one file; the file is `mcp.json`, never `.mcp.json` (Claude Code would load that one)
     assert_eq!(json_of(".codex-plugin/plugin.json")["mcpServers"], "./mcp.json");
     assert_eq!(json_of(".cursor-plugin/plugin.json")["mcpServers"], "mcp.json");
@@ -79,7 +79,7 @@ fn the_registry_entry_lists_one_mcpb_package_per_bundle() {
         let id = p["identifier"].as_str().unwrap();
         assert_eq!(
             id,
-            format!("https://github.com/massrelay-ai/jurygraph/releases/download/v{v}/jurygraph-{plat}.mcpb")
+            format!("https://github.com/massrelay-ai/personajury/releases/download/v{v}/personajury-{plat}.mcpb")
         );
         assert!(id.contains("mcp"), "the registry needs `mcp` in the URL");
         let sha = p["fileSha256"].as_str().unwrap();
@@ -92,8 +92,8 @@ fn the_mcpb_manifest_has_the_shape_and_its_arguments_run() {
     let m = json_of("packaging/mcpb/manifest.json");
     assert_eq!(m["manifest_version"], "0.4");
     assert_eq!(m["server"]["type"], "binary");
-    assert_eq!(m["server"]["entry_point"], "bin/jurygraph");
-    assert_eq!(m["server"]["mcp_config"]["command"], "${__dirname}/bin/jurygraph");
+    assert_eq!(m["server"]["entry_point"], "bin/personajury");
+    assert_eq!(m["server"]["mcp_config"]["command"], "${__dirname}/bin/personajury");
     assert_eq!(m["user_config"]["root"]["type"], "directory");
     assert_eq!(m["user_config"]["root"]["required"], true);
     let args: Vec<String> = m["server"]["mcp_config"]["args"]
@@ -106,7 +106,7 @@ fn the_mcpb_manifest_has_the_shape_and_its_arguments_run() {
     // run them: clap's global --root precedes the verb, and the server answers an initialize
     let ws = tempfile::tempdir().unwrap();
     let args: Vec<String> = args.iter().map(|a| a.replace("${user_config.root}", ws.path().to_str().unwrap())).collect();
-    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("jurygraph"))
+    let mut ch = Command::new(assert_cmd::cargo::cargo_bin("personajury"))
         .args(&args)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -118,16 +118,16 @@ fn the_mcpb_manifest_has_the_shape_and_its_arguments_run() {
     drop(stdin);
     let first = BufReader::new(ch.stdout.take().unwrap()).lines().next().unwrap().unwrap();
     let r: Value = serde_json::from_str(&first).unwrap();
-    assert_eq!(r["result"]["serverInfo"]["name"], "jurygraph", "{r}");
+    assert_eq!(r["result"]["serverInfo"]["name"], "personajury", "{r}");
     ch.wait().unwrap();
 }
 
 #[test]
 fn the_bundle_script_zips_the_manifest_for_the_platform_and_the_binary() {
     let work = tempfile::tempdir().unwrap();
-    let fake = work.path().join("jurygraph-fake");
+    let fake = work.path().join("personajury-fake");
     std::fs::write(&fake, b"not a real binary").unwrap();
-    for (plat, os, exe) in [("linux-x64", "linux", "jurygraph"), ("win32-x64", "win32", "jurygraph.exe")] {
+    for (plat, os, exe) in [("linux-x64", "linux", "personajury"), ("win32-x64", "win32", "personajury.exe")] {
         let out = Command::new("bash")
             .arg(repo().join("scripts/build-mcpb.sh"))
             .args([plat, fake.to_str().unwrap(), work.path().join("dist").to_str().unwrap()])
@@ -136,7 +136,7 @@ fn the_bundle_script_zips_the_manifest_for_the_platform_and_the_binary() {
         assert!(out.status.success(), "{}", String::from_utf8_lossy(&out.stderr));
         let sha = String::from_utf8(out.stdout).unwrap().trim().to_string();
         assert_eq!(sha.len(), 64, "the script prints the sha256: {sha:?}");
-        let bundle = work.path().join(format!("dist/jurygraph-{plat}.mcpb"));
+        let bundle = work.path().join(format!("dist/personajury-{plat}.mcpb"));
         assert!(bundle.is_file());
         let listed = Command::new("unzip").args(["-Z1", bundle.to_str().unwrap()]).output().unwrap();
         let names = String::from_utf8(listed.stdout).unwrap();
@@ -145,7 +145,7 @@ fn the_bundle_script_zips_the_manifest_for_the_platform_and_the_binary() {
         let m: Value = serde_json::from_slice(&m.stdout).unwrap();
         assert_eq!(m["compatibility"]["platforms"], json!([os]), "{m}");
         assert_eq!(m["server"]["mcp_config"]["command"], format!("${{__dirname}}/bin/{exe}"), "{m}");
-        let sums = std::fs::read_to_string(work.path().join(format!("dist/jurygraph-{plat}.mcpb.sha256"))).unwrap();
+        let sums = std::fs::read_to_string(work.path().join(format!("dist/personajury-{plat}.mcpb.sha256"))).unwrap();
         assert!(sums.starts_with(&sha), "{sums}");
     }
     let bad = Command::new("bash").arg(repo().join("scripts/build-mcpb.sh")).args(["plan9", fake.to_str().unwrap()]).output().unwrap();

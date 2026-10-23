@@ -37,7 +37,7 @@ pub fn list(root: &Path) -> Result<Value> {
 /// The most dimensions a generated lens asks for: a lens a persona can hold in one read.
 pub const MAX_GENERATED_DIMENSIONS: usize = 12;
 
-/// Hash the material and write `.jurygraph/generate/lens-<hash>.md`: the brief that asks the agent to say what the
+/// Hash the material and write `.personajury/generate/lens-<hash>.md`: the brief that asks the agent to say what the
 /// material calls good, then to draft a lens of `dimensions` dimensions in the exact TOML shape, with anchors in words
 /// (D14). The engine calls no model; `lens add` validates what the agent writes, and `standard` records the material.
 pub fn generate(root: &Path, from: &Path, dimensions: usize) -> Result<Value> {
@@ -48,7 +48,7 @@ pub fn generate(root: &Path, from: &Path, dimensions: usize) -> Result<Value> {
     }
     let (hash, sources) = super::persona::material_of(root, from)?;
     let mut t = String::new();
-    t.push_str("jurygraph-lens-generate 1\n\n");
+    t.push_str("personajury-lens-generate 1\n\n");
     t.push_str(&format!(
         "# Write a lens of {dimensions} dimension{} from this material\n\n",
         if dimensions == 1 { "" } else { "s" }
@@ -88,13 +88,13 @@ sentence must be something a persona can tell apart from the next.\n\
 `told` (text the brief supplied), `recalled` (memory). Drop a class the material gives no way to check.\n",
     );
     t.push_str(
-        "\nThen add the file with:\n\n`jurygraph lens add --file <file>`\n\nThe engine refuses a lens that is not in this shape.\n",
+        "\nThen add the file with:\n\n`personajury lens add --file <file>`\n\nThe engine refuses a lens that is not in this shape.\n",
     );
-    let dir = root.join(".jurygraph").join("generate");
+    let dir = root.join(".personajury").join("generate");
     std::fs::create_dir_all(&dir).map_err(|e| AppError::Io(dir.clone(), e))?;
     let path = dir.join(format!("lens-{hash}.md"));
     std::fs::write(&path, t.as_bytes()).map_err(|e| AppError::Io(path.clone(), e))?;
-    let rel = format!(".jurygraph/generate/lens-{hash}.md");
+    let rel = format!(".personajury/generate/lens-{hash}.md");
     let store = Store::open(root)?;
     store.insert_material(&hash, &sources, &rel)?;
     Ok(json!({

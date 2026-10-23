@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "jurygraph",
+    name = "personajury",
     version,
     about = "A persona jury as an engine: evidence on every line, strata never averaged. The engine never calls a model."
 )]
@@ -79,7 +79,7 @@ pub enum Cmd {
         /// compact (attachments by path) or full (text attachments inline); default: the rule's, else compact
         #[arg(long)]
         detail: Option<String>,
-        /// take panel, lenses, spend and detail from this rule of jurygraph.toml; any value you change needs --reason
+        /// take panel, lenses, spend and detail from this rule of personajury.toml; any value you change needs --reason
         #[arg(long)]
         rule: Option<String>,
         /// the draw's seed as 16 hex digits (default: from the subject's name and the panel's)
@@ -161,7 +161,7 @@ pub enum Cmd {
         /// with --latest: only this subject
         #[arg(long)]
         subject: Option<String>,
-        /// the rule class of jurygraph.toml this change falls under (its quorum is the current level)
+        /// the rule class of personajury.toml this change falls under (its quorum is the current level)
         #[arg(long)]
         rule: Option<String>,
         /// a file written by `calibrate --out`: `calibrated: false` turns apply into advise (`uncalibrated`)
@@ -186,7 +186,7 @@ pub enum Cmd {
         /// the same summary as markdown, with the decisions per finding, the run ids and brief hashes, and the date
         #[arg(long)]
         md: Option<PathBuf>,
-        /// write the markdown to <report_dir>/<date>-<subject>.md (refused when jurygraph.toml has no report_dir)
+        /// write the markdown to <report_dir>/<date>-<subject>.md (refused when personajury.toml has no report_dir)
         #[arg(long)]
         save: bool,
         /// the text's width in characters (30 to 200, default 80)
@@ -211,7 +211,7 @@ pub enum Cmd {
         #[arg(long)]
         by_human: Option<String>,
     },
-    /// Classify a diff against jurygraph.toml: none | low | high | human, and the spend
+    /// Classify a diff against personajury.toml: none | low | high | human, and the spend
     ShouldRun {
         #[arg(long)]
         diff: Option<PathBuf>,

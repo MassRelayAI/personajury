@@ -1,4 +1,4 @@
-# JuryGraph summary: lantern-site
+# PersonaJury summary: lantern-site
 
 Date: <run date>
 Runs: 1, 2 (critical, compare)
@@ -62,19 +62,19 @@ Medians as primary·secondary·bystander; a dash is a stratum nobody judged.
 
 | run | persona | lens | brief sha256 |
 |---|---|---|---|
-| 1 | builder-ana | critical | 97a5922908a2be19e20087bda066c1d5c0c16f0ee08c2d1df59ff6676aeed82f |
-| 1 | builder-mei | critical | 00aaac437738a9e91efd2225636e8915d5e08b6a7c6fca9aee5889ebe08b6cac |
-| 1 | builder-ravi | critical | e582793bd11d363d24751040a9f8b57202fd44f8ede5f7cee0350992e7b05887 |
-| 1 | newcomer-sofia | critical | b38448399d64124c1c944c62b5d7f48599b94ea606ae3f97986c2401dbe8e095 |
-| 1 | company-george | critical | f9f94736f3322e4dafcf35c781b3337acfea54a91bc7e53413f974c52cc3b2a2 |
-| 1 | company-hanna | critical | 54c35df9b332813b5212e7d7d4eeef1dc228f43fb6664d851a52783262bf24a0 |
-| 1 | investor-claire | critical | 49b4acacf48d26f67902f97dc352d6c350e5d4a17aaf9efa784561cbb0c3b5a2 |
-| 2 | builder-ana | compare | 361731fd02c65b61a78c9d8ad7a746b999c8d396db92319086745d5f1e40873b |
-| 2 | builder-mei | compare | 4a3ac54e0c26c7872d2f90070ad6cc321bd5a45668eb8ed5f26709f12ae93aaf |
-| 2 | builder-ravi | compare | 963303ffe693d89e7532dd5ba87bc6706fbfeaecec7abfeb06e7563cb973fe73 |
-| 2 | newcomer-sofia | compare | b28d899c3f562cdc6e6af4c9bc0d3bdc571c9972c7cde01248cedd4a6eb38875 |
-| 2 | company-george | compare | 9799bf69c461b207e6796f254993bafb278ac63f27feaefa43828a71cf7782b5 |
-| 2 | company-hanna | compare | 57f26c9cb76ee002a823592e41d1f1da6019fdba5a431001bda53f2d5f5d9bcd |
-| 2 | investor-claire | compare | 258fdf33630da36764b98da9c78b1108f173ecf862baa5cf0f3b5874e25785ad |
+| 1 | builder-ana | critical | 0934ec1ce85a36b8c400e70b36c71cac75197a1a3c8458d1ea67e0b95407aa46 |
+| 1 | builder-mei | critical | 617b30b38611f4ea7cd46ff91be9288d446815b3ec2848937ea219265ab1bc13 |
+| 1 | builder-ravi | critical | 1ecf98ab467e7c06dbdbca474edf113c3dc6ac589d01390812d2778a0d2fb08f |
+| 1 | newcomer-sofia | critical | 90f9439eebd8b5822d2efad3422005e4102a3805851ebfd84deaace35415a252 |
+| 1 | company-george | critical | 0c165412fd37153becf8d3d0fb39ecd6894878fa69090f88ed1977f65c221ab0 |
+| 1 | company-hanna | critical | 2ba2c2d777ed4698b75051455594a5902c03a4b7a1319de38573aa442d5d6e0c |
+| 1 | investor-claire | critical | e96836b12526328e766aea94bb6e7353f31883c7c14f768924516877ae8e027a |
+| 2 | builder-ana | compare | efa18262fd1c8ce63980594eb514583182cebcdfa4b35f761954d54f0510ccad |
+| 2 | builder-mei | compare | cc866dcd91d564fcfbf93455c62e2476d27e7a9f6096f31745d00aa9a10b663f |
+| 2 | builder-ravi | compare | 53c815f89096c206419120b3854d1133f76d2d947a89aa9c4b9486bdb8e2ce29 |
+| 2 | newcomer-sofia | compare | e2d0beee213c88f9d7737fb6e19040ff7931a89b11678dc4105eaa09c85ad608 |
+| 2 | company-george | compare | 9163bc6a4abdcfe2a043ff3675616da6848de6f5770ee9f99f6ef27152fec339 |
+| 2 | company-hanna | compare | 9f60c2938b38c6293bbbadea121a1138a622e4eb012ee97f66ed949ff8779d3b |
+| 2 | investor-claire | compare | f4cada25998c80b387f5ff5df3dd59a61279f52ca9a273697ed6f405c5705eb2 |
 
 Next: run the high quorum with these reasons in hand before applying anything.

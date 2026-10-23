@@ -2,7 +2,7 @@
 //! anything unknown, missing or lowered answers `advise` (or worse). Each row builds its own store and names the
 //! answer and the reason code it must carry. Seen red first.
 mod judging_support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use judging_support::*;
 use serde_json::{json, Value};
 use std::path::Path;
@@ -14,7 +14,7 @@ const HIGH: &str = "[[rule]]\nclass = \"public-surface\"\npaths = [\"sources/sit
 const HUMAN: &str = "[[rule]]\nclass = \"money\"\npaths = [\"sources/site/**\"]\nquorum = \"human\"\n";
 
 fn toml(ws: &Ws, body: &str) {
-    std::fs::write(ws.root().join("jurygraph.toml"), body).unwrap();
+    std::fs::write(ws.root().join("personajury.toml"), body).unwrap();
 }
 /// Record the rule a run was briefed under and its effective quorum, as `brief --rule` does.
 fn under(ws: &Ws, run: i64, rule: &str, quorum: &str) {
@@ -156,7 +156,7 @@ fn cases() -> Vec<Case> {
         Case { name: "I1 the subject moved since the run", answer: "advise", code: "stale_run", setup: || {
             let (ws, r) = base(LOW, "low");
             clean(&ws, r);
-            ws.subject("site", jurygraph::domain::SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
+            ws.subject("site", personajury::domain::SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
             (ws, vec![r.to_string()])
         }},
         Case { name: "I1 a later round supersedes the run", answer: "advise", code: "stale_run", setup: || {

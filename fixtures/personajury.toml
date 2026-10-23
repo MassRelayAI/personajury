@@ -1,4 +1,4 @@
-# Trigger rules for the fixture project (report §10). `jurygraph should-run` reads them. Rules are data: every project
+# Trigger rules for the fixture project (report §10). `personajury should-run` reads them. Rules are data: every project
 # writes its own.
 
 # The project's own estimate of what one persona's brief costs the agent in tokens. It is not the engine's measurement;

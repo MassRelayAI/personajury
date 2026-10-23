@@ -2,7 +2,7 @@
  "title": "A real docs jury, round 1 and round 2",
  "subject": "CompareGraph's README and docs",
  "source": "https://github.com/massrelay-ai/comparegraph/blob/main/docs/reports/2026-10-24-readme-jury.md",
- "note": "Copied by hand from the report's tables (medians per stratum, primary / secondary / bystander) and its verdict line (blockers). Seven composite personas, JuryGraph v0.2.",
+ "note": "Copied by hand from the report's tables (medians per stratum, primary / secondary / bystander) and its verdict line (blockers). Seven composite personas, PersonaJury v0.2.",
  "scale": [1, 5],
  "strata": [
   { "stake": "primary", "personas": 4 },

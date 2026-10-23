@@ -1,4 +1,4 @@
-# JuryGraph brand
+# PersonaJury brand
 
 The mark is a verdict check drawn as a graph: two nodes joined by two edges, with the long edge ending in a ring,
 the evidence the verdict cites. It was chosen by a persona jury, 7 of 7 in round 2 (`../jury/matrix-r2.md`).
@@ -9,7 +9,7 @@ the evidence the verdict cites. It was chosen by a persona jury, 7 of 7 in round
 |---|---|
 | `mark.svg` | square mark on light backgrounds |
 | `mark-dark.svg` | square mark on dark backgrounds |
-| `lockup.svg` / `lockup-dark.svg` | mark + outlined wordmark, 269 x 64, on light / dark |
+| `lockup.svg` / `lockup-dark.svg` | mark + outlined wordmark, 305 x 64, on light / dark |
 | `favicon.svg` | favicon; switches to the dark colours under `prefers-color-scheme: dark` |
 | `favicon-16.png`, `favicon-32.png` | raster favicons, transparent corners |
 | `social-preview.svg` / `.png` | GitHub repository card, 1280 x 640 |
@@ -48,5 +48,5 @@ mark). In the lockup, the gap between the tile and the wordmark is fixed at 16 u
 
 ## Wordmark
 
-"JuryGraph" is one word in camel case: "Jury" in Noto Sans Bold, "Graph" in Noto Sans Regular, outlined to paths
-(see `NOTICE.md`). Elsewhere, in running text, write JuryGraph in the surrounding typeface without styling.
+"PersonaJury" is one word in camel case: "Persona" in Noto Sans Bold, "Jury" in Noto Sans Regular, outlined to paths
+(see `NOTICE.md`). Elsewhere, in running text, write PersonaJury in the surrounding typeface without styling.

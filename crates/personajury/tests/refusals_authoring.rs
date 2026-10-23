@@ -12,7 +12,7 @@ fn fx(rel: &str) -> String {
         .to_string()
 }
 fn jg(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph")
+    let out = Command::cargo_bin("personajury")
         .unwrap()
         .arg("--root")
         .arg(ws)
@@ -78,7 +78,7 @@ fn brief_without_stake_refused() {
         .unwrap()
         .contains("company-george"));
     // nothing was written: no run folder
-    assert!(!ws.path().join(".jurygraph/runs").exists());
+    assert!(!ws.path().join(".personajury/runs").exists());
     // the same call with the stake given passes
     let ok = brief(
         ws.path(),

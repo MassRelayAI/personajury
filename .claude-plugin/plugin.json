@@ -1,16 +1,20 @@
 {
-  "name": "jurygraph",
-  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum, rounds that diff. No LLM inside the engine. Needs the jurygraph binary on PATH (the install script in the README).",
-  "version": "0.1.0",
+  "name": "personajury",
+  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum, rounds that diff. No LLM inside the engine. Needs the personajury binary on PATH (the install script in the README).",
+  "version": "0.5.0",
   "author": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"
   },
-  "homepage": "https://github.com/massrelay-ai/jurygraph",
-  "repository": "https://github.com/massrelay-ai/jurygraph",
+  "homepage": "https://github.com/massrelay-ai/personajury",
+  "repository": "https://github.com/massrelay-ai/personajury",
   "license": "Apache-2.0",
   "keywords": [
     "persona-jury",
+    "synthetic-users",
+    "ai-personas",
+    "persona-testing",
+    "ux-research",
     "design-review",
     "rubric",
     "evidence",
@@ -18,8 +22,8 @@
     "skills"
   ],
   "mcpServers": {
-    "jurygraph": {
-      "command": "jurygraph",
+    "personajury": {
+      "command": "personajury",
       "args": [
         "mcp"
       ]

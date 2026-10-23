@@ -1,14 +1,14 @@
 //! doctor: the report without a store, and the counts with one. Temp HOME only.
-use jurygraph::domain::*;
-use jurygraph::store::Store;
+use personajury::domain::*;
+use personajury::store::Store;
 use serde_json::Value;
 
 fn doctor(ws: &std::path::Path, home: &std::path::Path) -> Value {
-    let out = assert_cmd::Command::cargo_bin("jurygraph")
+    let out = assert_cmd::Command::cargo_bin("personajury")
         .unwrap()
         .env("HOME", home)
         .env("XDG_CONFIG_HOME", home.join(".config"))
-        .env("JURYGRAPH_BIN", "/opt/jg/bin/jurygraph")
+        .env("PERSONAJURY_BIN", "/opt/jg/bin/personajury")
         .arg("--root")
         .arg(ws)
         .arg("doctor")
@@ -33,7 +33,7 @@ fn doctor_without_store() {
     );
     assert!(d["clients"].is_array());
     assert!(
-        !ws.path().join(".jurygraph").exists(),
+        !ws.path().join(".personajury").exists(),
         "doctor must not create a store"
     );
 }
@@ -63,7 +63,7 @@ fn doctor_counts() {
     assert!(d["store"]
         .as_str()
         .unwrap()
-        .ends_with(".jurygraph/store.db"));
+        .ends_with(".personajury/store.db"));
     assert_eq!(d["schema_version"], 4);
     let c = &d["counts"];
     assert_eq!(

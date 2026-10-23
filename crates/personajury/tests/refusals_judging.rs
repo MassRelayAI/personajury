@@ -1,7 +1,7 @@
 //! The integration refusals of the plan's table that Task 5 owns (R1-R9, R11-R13): each asserts `error.code`.
 #[path = "judging_support/mod.rs"]
 mod support;
-use jurygraph::domain::Stake;
+use personajury::domain::Stake;
 use serde_json::{json, Value};
 use support::*;
 
@@ -33,7 +33,7 @@ fn verdict_citation_into_a_text_file_checks_the_line() {
     let ws = Ws::new();
     ws.subject(
         "doc",
-        jurygraph::domain::SubjectKind::Document,
+        personajury::domain::SubjectKind::Document,
         false,
         &[
             ("page.json", br#"{"nodes":[{"id":"n1"}]}"#),
@@ -54,7 +54,7 @@ fn i6_only_line_locators_of_a_text_file_are_checked_and_nul_bytes_are_not_text()
     let ws = Ws::new();
     ws.subject(
         "doc",
-        jurygraph::domain::SubjectKind::Document,
+        personajury::domain::SubjectKind::Document,
         false,
         &[
             ("page.json", br#"{"nodes":[{"id":"n1"}]}"#),
@@ -370,7 +370,7 @@ fn verdict_evidence_not_allowed() {
 #[test]
 fn should_run_refuses_human_under_persona() {
     let d = tempfile::tempdir().unwrap();
-    let bad = fixtures().join("jurygraph-bad.toml");
+    let bad = fixtures().join("personajury-bad.toml");
     let r = cli_in(
         d.path(),
         &[
@@ -382,7 +382,7 @@ fn should_run_refuses_human_under_persona() {
         ],
     );
     assert_eq!(code(&r), "human_class_under_persona_quorum");
-    assert!(!d.path().join(".jurygraph").exists());
+    assert!(!d.path().join(".personajury").exists());
 }
 
 #[test]

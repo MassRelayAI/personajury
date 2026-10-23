@@ -2,7 +2,7 @@
 //! Important finding, built from the reviewer's reproductions, and one per testable Minor. Each was seen red first.
 #[path = "judging_support/mod.rs"]
 mod support;
-use jurygraph::domain::{Stake, SubjectKind};
+use personajury::domain::{Stake, SubjectKind};
 use serde_json::{json, Value};
 use std::path::Path;
 use support::*;
@@ -385,14 +385,14 @@ fn i6_ids_and_names_must_be_slugs() {
 fn i6_brief_checks_the_id_before_the_path_and_leaves_no_run() {
     let ws = Ws::new();
     // a persona stored with an id that escapes, as an older binary or a hand edit could leave it
-    let evil = jurygraph::domain::Persona {
+    let evil = personajury::domain::Persona {
         id: "../../ESCAPED".into(),
         version: 0,
         name: "e".into(),
         tags: vec!["t".into()],
         stake_rules: "s".into(),
         profile_json: "{}".into(),
-        origin: jurygraph::domain::Origin::Hand,
+        origin: personajury::domain::Origin::Hand,
         hash: "h".into(),
     };
     ws.store.insert_persona(&evil).unwrap();
@@ -417,7 +417,7 @@ fn i6_brief_checks_the_id_before_the_path_and_leaves_no_run() {
 }
 
 fn should_run(ws: &Ws, cfg: &str, args: &[&str]) -> Value {
-    let p = ws.root().join("jurygraph.toml");
+    let p = ws.root().join("personajury.toml");
     std::fs::write(&p, cfg).unwrap();
     let mut a = vec!["should-run", "--config", p.to_str().unwrap()];
     a.extend(args);
@@ -600,14 +600,14 @@ fn brief(w: &Path, extra: &[&str]) -> Value {
 fn brief_write_failure_leaves_no_orphan_run() {
     let (_d, w) = cli_ws();
     std::fs::write(
-        w.join(".jurygraph/runs"),
+        w.join(".personajury/runs"),
         "a file where the runs folder goes",
     )
     .unwrap();
     let r = brief(&w, &[]);
     assert_eq!(r["ok"], false, "{r}");
     assert_eq!(cli_in(&w, &["check"])["data"]["runs"], 0, "no orphan run");
-    std::fs::remove_file(w.join(".jurygraph/runs")).unwrap();
+    std::fs::remove_file(w.join(".personajury/runs")).unwrap();
     let r = brief(&w, &[]);
     assert_eq!(r["ok"], true, "{r}");
     assert_eq!(r["data"]["run"], 1);

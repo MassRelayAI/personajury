@@ -1,5 +1,5 @@
-//! docs/assets/jury-graph.svg is the graph of the recorded fixture jury, and a fresh render must equal it byte for
-//! byte (like `readme-assets --check`). `JURYGRAPH_ASSET_REGEN=1 cargo test -p jurygraph --test graph_asset`
+//! docs/assets/personajury-graph.svg is the graph of the recorded fixture jury, and a fresh render must equal it byte for
+//! byte (like `readme-assets --check`). `PERSONAJURY_ASSET_REGEN=1 cargo test -p personajury --test graph_asset`
 //! rewrites the file from this render. The workspace is built the way tests/fixture_replay.rs builds it.
 use assert_cmd::Command;
 use serde_json::Value;
@@ -12,7 +12,7 @@ fn repo() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 fn j(ws: &Path, args: &[&str]) -> Value {
-    let out = Command::cargo_bin("jurygraph").unwrap().arg("--root").arg(ws).args(args).output().unwrap();
+    let out = Command::cargo_bin("personajury").unwrap().arg("--root").arg(ws).args(args).output().unwrap();
     let v: Value = serde_json::from_slice(&out.stdout)
         .unwrap_or_else(|e| panic!("{args:?}: not an envelope ({e}): {}", String::from_utf8_lossy(&out.stdout)));
     assert_eq!(v["ok"], true, "{args:?} refused: {}", v["error"]);
@@ -54,7 +54,7 @@ fn jury(ws: &Path) -> (i64, i64) {
         j(ws, &["verdict", "--run", &run.to_string(), "--file", f.to_str().unwrap()]);
     }
     // the recorded decisions, found by persona, dimension, option and text as the replay does
-    let out = Command::cargo_bin("jurygraph").unwrap().arg("--root").arg(ws).arg("check").output().unwrap();
+    let out = Command::cargo_bin("personajury").unwrap().arg("--root").arg(ws).arg("check").output().unwrap();
     let c: Value = serde_json::from_slice(&out.stdout).unwrap();
     let unresolved = c["data"]["unresolved"].as_array().unwrap().clone();
     let decisions = std::fs::read_to_string(repo().join("fixtures/run/decisions.jsonl")).unwrap();
@@ -77,12 +77,12 @@ fn the_committed_graph_is_a_fresh_render_of_the_fixture_jury() {
     let (a, b) = jury(ws.path());
     let v = j(ws.path(), &["graph", &a.to_string(), &b.to_string(), "--svg"]);
     let fresh = v["data"]["svg"].as_str().unwrap();
-    let path = repo().join("docs/assets/jury-graph.svg");
-    if std::env::var_os("JURYGRAPH_ASSET_REGEN").is_some() {
+    let path = repo().join("docs/assets/personajury-graph.svg");
+    if std::env::var_os("PERSONAJURY_ASSET_REGEN").is_some() {
         std::fs::write(&path, fresh).unwrap();
     }
     let committed = std::fs::read_to_string(&path).unwrap_or_default();
-    assert_eq!(fresh, committed, "docs/assets/jury-graph.svg differs from a fresh render; regenerate with JURYGRAPH_ASSET_REGEN=1");
+    assert_eq!(fresh, committed, "docs/assets/personajury-graph.svg differs from a fresh render; regenerate with PERSONAJURY_ASSET_REGEN=1");
     // the numbers on the picture are the matrix's
     assert!(fresh.contains("7 personas (primary 4, secondary 2, bystander 1)"));
 }

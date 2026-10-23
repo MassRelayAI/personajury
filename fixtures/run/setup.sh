@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The fixture jury, setup half: builds a workspace and composes the 14 briefs (7 personas x critical, compare).
-# Usage: fixtures/run/setup.sh <jurygraph binary> <workspace> <repo root>. tests/fixture_replay.rs does the same in Rust.
+# Usage: fixtures/run/setup.sh <personajury binary> <workspace> <repo root>. tests/fixture_replay.rs does the same in Rust.
 set -euo pipefail
 J="$1"; W="$2"; R="$3"
 j() { "$J" --root "$W" "$@"; }

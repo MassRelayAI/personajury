@@ -176,7 +176,7 @@ fn gather(root: &Path, runs: &[i64]) -> Result<(Facts, Vec<RunRow>)> {
 }
 
 fn report_dir(root: &Path) -> Result<Option<String>> {
-    match std::fs::read_to_string(root.join("jurygraph.toml")) {
+    match std::fs::read_to_string(root.join("personajury.toml")) {
         Ok(t) => Ok(trigger::parse_config(&t)?.report_dir.filter(|d| !d.trim().is_empty())),
         Err(_) => Ok(None),
     }

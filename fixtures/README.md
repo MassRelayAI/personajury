@@ -14,7 +14,7 @@ editing the key.
 | `lenses/site.toml` | the detector's `site` lens: the six criteria of a hand-scored jury table the maintainer keeps privately, on 1–10, anchors at 1, 4, 7, 10; loaded with `lens add`, never seeded |
 | `material/usecases.csv` | twelve invented rows (role, job, trigger, data sensitivity, clearance note) for Lantern Notes: the example material for `persona generate --from fixtures/material/usecases.csv --count 5` |
 | `lenses/consulting-deck.toml`, `investor-pitch.toml`, `financial-model.toml` | three generic example lenses, four dimensions each; loaded with `lens add`, never seeded |
-| `jurygraph.toml` | the trigger rules of the fixture project; `jurygraph-bad.toml` is refused on purpose (`money` under `low`) |
+| `personajury.toml` | the trigger rules of the fixture project; `personajury-bad.toml` is refused on purpose (`money` under `low`) |
 
 Walk convention: every id is unique within a file; a link's `name` carries its target in parentheses, e.g.
 `Sign up free (#)`, because the walk has no field for a link's destination.

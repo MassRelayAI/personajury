@@ -435,7 +435,7 @@ fn table(f: &Facts, width: usize) -> Vec<String> {
 pub fn text(f: &Facts, width: usize) -> String {
     let mut out: Vec<String> = Vec::new();
     let runs: Vec<String> = f.runs.iter().map(|r| r.to_string()).collect();
-    out.extend(wrap(&format!("JuryGraph summary: {}, runs {} ({})", f.subject, runs.join(" "), f.lenses.join(", ")), width));
+    out.extend(wrap(&format!("PersonaJury summary: {}, runs {} ({})", f.subject, runs.join(" "), f.lenses.join(", ")), width));
     out.push(String::new());
     for s in sentences(f) {
         out.extend(wrap(&s, width));
@@ -479,7 +479,7 @@ pub fn html(f: &Facts, svg: &str) -> String {
     let runs: Vec<String> = f.runs.iter().map(|r| r.to_string()).collect();
     let _ = write!(
         o,
-        "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>JuryGraph summary: {}</title>\n<style>{CSS}</style></head><body><main>\n",
+        "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<title>PersonaJury summary: {}</title>\n<style>{CSS}</style></head><body><main>\n",
         esc(&f.subject)
     );
     let _ = writeln!(o, "<h1>{}</h1>\n<p class=\"muted\">runs {} · lenses {}</p>", esc(&f.subject), runs.join(", "), esc(&f.lenses.join(", ")));
@@ -548,7 +548,7 @@ fn md_cell(s: &str) -> String {
 pub fn markdown(f: &Facts) -> String {
     let mut o = String::new();
     let runs: Vec<String> = f.runs.iter().map(|r| r.to_string()).collect();
-    let _ = writeln!(o, "# JuryGraph summary: {}\n", f.subject);
+    let _ = writeln!(o, "# PersonaJury summary: {}\n", f.subject);
     let _ = writeln!(o, "Date: {}\nRuns: {} ({})\n", f.date, runs.join(", "), f.lenses.join(", "));
     for s in sentences(f) {
         let _ = writeln!(o, "{s}\n");

@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 902" width="1200" height="902" role="img" aria-labelledby="t d">
-<title id="t">The jury graph of lantern-site</title><desc id="d">The jury graph of lantern-site: 7 personas (primary 4, secondary 2, bystander 1), scoring 6 dimensions across 2 lenses, and 26 findings: 0 open, 0 fixed, 11 dismissed, 15 row. Edges from a persona to a dimension are coloured by the score from 1 to 5; edges to a finding are coloured by its decision. Each dimension shows a median badge per stratum, never one number across strata.</desc>
+<title id="t">PersonaJury · lantern-site</title><desc id="d">PersonaJury · lantern-site: 7 personas (primary 4, secondary 2, bystander 1), scoring 6 dimensions across 2 lenses, and 26 findings: 0 open, 0 fixed, 11 dismissed, 15 row. Edges from a persona to a dimension are coloured by the score from 1 to 5; edges to a finding are coloured by its decision. Each dimension shows a median badge per stratum, never one number across strata.</desc>
 <rect width="100%" height="100%" fill="#ffffff"/>
 <rect x="1" y="1" width="1198" height="900" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
 <g font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" fill="#1f2328">
-<text x="30" y="40" font-size="18" font-weight="700">The jury graph of lantern-site</text>
+<text x="30" y="40" font-size="18" font-weight="700">PersonaJury · lantern-site</text>
 <text x="30" y="62" font-size="13" fill="#57606a">Personas by stake, the dimensions they scored, the blockers they raised. Edge colour is the score; badges are medians per stratum, never one number.</text>
 <text x="1170" y="40" font-size="13" text-anchor="end" fill="#57606a">runs 1, 2</text>
 <rect x="30" y="92" width="81" height="26" rx="13" fill="#ddf4ff" stroke="#57606a" stroke-width="1"/>
@@ -175,32 +175,32 @@
 <path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@cmp:acme-pricing" data-score="5" d="M202 314C484 314 484 186 767 186" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@cmp:acme-pricing 5</title></path>
 <path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M202 314C484 314 484 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@cmp:acme-pricing 5</title></path>
 <path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@cmp:acme-pricing" data-score="4" d="M202 314C484 314 484 494 767 494" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@cmp:acme-pricing 4</title></path>
-<path class="edge-finding" data-finding="aff7385a695481f6" data-status="row" d="M202 170C584 170 584 162 966 162" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised aff738 (row)</title></path>
-<path class="edge-finding" data-finding="19562295ec1a299a" data-status="dismissed" d="M202 170C584 170 584 190 966 190" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised 195622 (dismissed)</title></path>
-<path class="edge-finding" data-finding="4b9da73a72e25706" data-status="row" d="M202 170C584 170 584 218 966 218" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 4b9da7 (row)</title></path>
+<path class="edge-finding" data-finding="9ced85081f3ee8f0" data-status="row" d="M202 170C584 170 584 162 966 162" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 9ced85 (row)</title></path>
+<path class="edge-finding" data-finding="849030d81f357d22" data-status="dismissed" d="M202 170C584 170 584 190 966 190" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised 849030 (dismissed)</title></path>
+<path class="edge-finding" data-finding="cd4d637bb4fbc2fe" data-status="row" d="M202 170C584 170 584 218 966 218" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised cd4d63 (row)</title></path>
 <path class="edge-finding" data-finding="051bb4d15cefb1d7" data-status="row" d="M202 170C584 170 584 246 966 246" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 051bb4 (row)</title></path>
 <path class="edge-finding" data-finding="ca95b24ed2259c2a" data-status="dismissed" d="M202 170C584 170 584 274 966 274" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised ca95b2 (dismissed)</title></path>
-<path class="edge-finding" data-finding="619097c67d18ab47" data-status="row" d="M202 170C584 170 584 302 966 302" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 619097 (row)</title></path>
-<path class="edge-finding" data-finding="4236b149d7203688" data-status="dismissed" d="M202 170C584 170 584 330 966 330" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised 4236b1 (dismissed)</title></path>
-<path class="edge-finding" data-finding="fda517435bb8c69b" data-status="row" d="M202 218C584 218 584 358 966 358" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised fda517 (row)</title></path>
-<path class="edge-finding" data-finding="496f8c2c4fd3b1d1" data-status="row" d="M202 218C584 218 584 386 966 386" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised 496f8c (row)</title></path>
-<path class="edge-finding" data-finding="7d178d91dc9d569a" data-status="row" d="M202 266C584 266 584 414 966 414" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised 7d178d (row)</title></path>
-<path class="edge-finding" data-finding="fa35b9e087a38665" data-status="row" d="M202 266C584 266 584 442 966 442" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised fa35b9 (row)</title></path>
-<path class="edge-finding" data-finding="47fe71608df18c91" data-status="row" d="M202 314C584 314 584 470 966 470" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised 47fe71 (row)</title></path>
-<path class="edge-finding" data-finding="6c73e4e7df4702e2" data-status="row" d="M202 314C584 314 584 498 966 498" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised 6c73e4 (row)</title></path>
+<path class="edge-finding" data-finding="1b9a50ed703966f1" data-status="row" d="M202 170C584 170 584 302 966 302" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 1b9a50 (row)</title></path>
+<path class="edge-finding" data-finding="e202b40464a26729" data-status="dismissed" d="M202 170C584 170 584 330 966 330" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised e202b4 (dismissed)</title></path>
+<path class="edge-finding" data-finding="19162d37e60c7a7f" data-status="row" d="M202 218C584 218 584 358 966 358" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised 19162d (row)</title></path>
+<path class="edge-finding" data-finding="0204e4d363a9814d" data-status="row" d="M202 218C584 218 584 386 966 386" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised 0204e4 (row)</title></path>
+<path class="edge-finding" data-finding="c91ecd119fcb8cc9" data-status="row" d="M202 266C584 266 584 414 966 414" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised c91ecd (row)</title></path>
+<path class="edge-finding" data-finding="04005600d9a6da4e" data-status="row" d="M202 266C584 266 584 442 966 442" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised 040056 (row)</title></path>
+<path class="edge-finding" data-finding="9ecb56a830096086" data-status="row" d="M202 314C584 314 584 470 966 470" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised 9ecb56 (row)</title></path>
+<path class="edge-finding" data-finding="0ce774e2306a420e" data-status="row" d="M202 314C584 314 584 498 966 498" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised 0ce774 (row)</title></path>
 <path class="edge-finding" data-finding="feb89036a3bd1f6d" data-status="dismissed" d="M202 314C584 314 584 526 966 526" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>newcomer-sofia raised feb890 (dismissed)</title></path>
-<path class="edge-finding" data-finding="98a75f23451a5e0f" data-status="dismissed" d="M202 314C584 314 584 554 966 554" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>newcomer-sofia raised 98a75f (dismissed)</title></path>
+<path class="edge-finding" data-finding="ef922ebeba7b7070" data-status="dismissed" d="M202 314C584 314 584 554 966 554" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>newcomer-sofia raised ef922e (dismissed)</title></path>
 <path class="edge-finding" data-finding="e718c8affa406944" data-status="dismissed" d="M380 436C673 436 673 582 966 582" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-george raised e718c8 (dismissed)</title></path>
-<path class="edge-finding" data-finding="372d36d61b1247c2" data-status="dismissed" d="M380 436C673 436 673 610 966 610" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-george raised 372d36 (dismissed)</title></path>
+<path class="edge-finding" data-finding="c1fbe0d218909dce" data-status="dismissed" d="M380 436C673 436 673 610 966 610" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-george raised c1fbe0 (dismissed)</title></path>
 <path class="edge-finding" data-finding="84ceb4f8ad2df09e" data-status="row" d="M380 484C673 484 673 638 966 638" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised 84ceb4 (row)</title></path>
 <path class="edge-finding" data-finding="fedd77fa7f54299f" data-status="row" d="M380 484C673 484 673 666 966 666" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised fedd77 (row)</title></path>
 <path class="edge-finding" data-finding="167c541d5fc6c38f" data-status="dismissed" d="M380 484C673 484 673 694 966 694" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-hanna raised 167c54 (dismissed)</title></path>
-<path class="edge-finding" data-finding="2a462f2ed174e3c9" data-status="row" d="M380 484C673 484 673 722 966 722" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised 2a462f (row)</title></path>
-<path class="edge-finding" data-finding="9a628f3c63b9b127" data-status="dismissed" d="M380 484C673 484 673 750 966 750" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-hanna raised 9a628f (dismissed)</title></path>
-<path class="edge-finding" data-finding="b1531ec66b265a86" data-status="row" d="M558 606C762 606 762 778 966 778" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised b1531e (row)</title></path>
-<path class="edge-finding" data-finding="6650a27169b08031" data-status="row" d="M558 606C762 606 762 806 966 806" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised 6650a2 (row)</title></path>
+<path class="edge-finding" data-finding="baa52a2208135d7b" data-status="row" d="M380 484C673 484 673 722 966 722" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised baa52a (row)</title></path>
+<path class="edge-finding" data-finding="9ef60b9d74494c4a" data-status="dismissed" d="M380 484C673 484 673 750 966 750" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-hanna raised 9ef60b (dismissed)</title></path>
+<path class="edge-finding" data-finding="49d519195b7c8e96" data-status="row" d="M558 606C762 606 762 778 966 778" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised 49d519 (row)</title></path>
+<path class="edge-finding" data-finding="f397cae88dd91143" data-status="row" d="M558 606C762 606 762 806 966 806" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised f397ca (row)</title></path>
 <path class="edge-finding" data-finding="0e98e49bdb8aec31" data-status="dismissed" d="M558 606C762 606 762 834 966 834" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>investor-claire raised 0e98e4 (dismissed)</title></path>
-<path class="edge-finding" data-finding="82596268180c12a4" data-status="dismissed" d="M558 606C762 606 762 862 966 862" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>investor-claire raised 825962 (dismissed)</title></path>
+<path class="edge-finding" data-finding="fa7ba761b73e1a4d" data-status="dismissed" d="M558 606C762 606 762 862 966 862" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>investor-claire raised fa7ba7 (dismissed)</title></path>
 <g>
 <title>Ana Costa (builder-ana, primary)</title>
 <rect class="persona" data-persona="builder-ana" x="30" y="150" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
@@ -489,21 +489,21 @@
 <text x="927" y="594" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
 </g>
 <g>
-<title>aff738 (row) builder-ana on blocks: Team shows Contact us instead of a price, and a price I cannot see is one I cannot afford.</title>
-<rect class="finding" data-finding="aff7385a695481f6" data-status="row" x="966" y="150" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="166" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">aff738</text>
+<title>9ced85 (row) builder-ana on blocks: Team shows Contact us instead of a price, and a price I cannot see is one I cannot afford.</title>
+<rect class="finding" data-finding="9ced85081f3ee8f0" data-status="row" x="966" y="150" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="166" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">9ced85</text>
 <text x="1012" y="166" font-size="10">Team shows Contact us i…</text>
 </g>
 <g>
-<title>195622 (dismissed) builder-ana on blocks: Studio, the only plan that lists export, ends in Talk to sales and not a way to try it.</title>
-<rect class="finding" data-finding="19562295ec1a299a" data-status="dismissed" x="966" y="178" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="194" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">195622</text>
+<title>849030 (dismissed) builder-ana on blocks: Studio, the only plan that lists export, ends in Talk to sales and not a way to try it.</title>
+<rect class="finding" data-finding="849030d81f357d22" data-status="dismissed" x="966" y="178" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="194" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">849030</text>
 <text x="1012" y="194" font-size="10">Studio, the only plan t…</text>
 </g>
 <g>
-<title>4b9da7 (row) builder-ana on blocks: The Sign up free button on Solo points nowhere (#).</title>
-<rect class="finding" data-finding="4b9da73a72e25706" data-status="row" x="966" y="206" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="222" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">4b9da7</text>
+<title>cd4d63 (row) builder-ana on blocks: The Sign up free button on Solo points nowhere (#).</title>
+<rect class="finding" data-finding="cd4d637bb4fbc2fe" data-status="row" x="966" y="206" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="222" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">cd4d63</text>
 <text x="1012" y="222" font-size="10">The Sign up free button…</text>
 </g>
 <g>
@@ -519,51 +519,51 @@
 <text x="1012" y="278" font-size="10">No price anywhere on th…</text>
 </g>
 <g>
-<title>619097 (row) builder-ana on clarity@home.walk.json: Home headline does not say what the product is.</title>
-<rect class="finding" data-finding="619097c67d18ab47" data-status="row" x="966" y="290" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="306" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">619097</text>
+<title>1b9a50 (row) builder-ana on clarity@home.walk.json: Home headline does not say what the product is.</title>
+<rect class="finding" data-finding="1b9a50ed703966f1" data-status="row" x="966" y="290" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="306" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">1b9a50</text>
 <text x="1012" y="306" font-size="10">Home headline does not…</text>
 </g>
 <g>
-<title>4236b1 (dismissed) builder-ana on price@home.walk.json: No price anywhere on the home page.</title>
-<rect class="finding" data-finding="4236b149d7203688" data-status="dismissed" x="966" y="318" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="334" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">4236b1</text>
+<title>e202b4 (dismissed) builder-ana on price@home.walk.json: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="e202b40464a26729" data-status="dismissed" x="966" y="318" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="334" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">e202b4</text>
 <text x="1012" y="334" font-size="10">No price anywhere on th…</text>
 </g>
 <g>
-<title>fda517 (row) builder-mei on blocks: The main Get started button is white text on pale blue and is hard to read, so I would not trust it on a projector.</title>
-<rect class="finding" data-finding="fda517435bb8c69b" data-status="row" x="966" y="346" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="362" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">fda517</text>
+<title>19162d (row) builder-mei on blocks: The main Get started button is white text on pale blue and is hard to read, so I would not trust it on a projector.</title>
+<rect class="finding" data-finding="19162d37e60c7a7f" data-status="row" x="966" y="346" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="362" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">19162d</text>
 <text x="1012" y="362" font-size="10">The main Get started bu…</text>
 </g>
 <g>
-<title>496f8c (row) builder-mei on blocks: The Sign up free button on pricing points to just # so it goes nowhere.</title>
-<rect class="finding" data-finding="496f8c2c4fd3b1d1" data-status="row" x="966" y="374" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="390" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">496f8c</text>
+<title>0204e4 (row) builder-mei on blocks: The Sign up free button on pricing points to just # so it goes nowhere.</title>
+<rect class="finding" data-finding="0204e4d363a9814d" data-status="row" x="966" y="374" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="390" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">0204e4</text>
 <text x="1012" y="390" font-size="10">The Sign up free button…</text>
 </g>
 <g>
-<title>7d178d (row) builder-ravi on blocks: The 'Sign up free' link points to '#' so the one path to try the tool is a dead end.</title>
-<rect class="finding" data-finding="7d178d91dc9d569a" data-status="row" x="966" y="402" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="418" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">7d178d</text>
+<title>c91ecd (row) builder-ravi on blocks: The 'Sign up free' link points to '#' so the one path to try the tool is a dead end.</title>
+<rect class="finding" data-finding="c91ecd119fcb8cc9" data-status="row" x="966" y="402" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="418" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">c91ecd</text>
 <text x="1012" y="418" font-size="10">The 'Sign up free' link…</text>
 </g>
 <g>
-<title>fa35b9 (row) builder-ravi on blocks: The 'Get started' button on the home page is pale with white text and sends me to pricing instead of a sign-up.</title>
-<rect class="finding" data-finding="fa35b9e087a38665" data-status="row" x="966" y="430" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="446" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">fa35b9</text>
+<title>040056 (row) builder-ravi on blocks: The 'Get started' button on the home page is pale with white text and sends me to pricing instead of a sign-up.</title>
+<rect class="finding" data-finding="04005600d9a6da4e" data-status="row" x="966" y="430" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="446" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">040056</text>
 <text x="1012" y="446" font-size="10">The 'Get started' butto…</text>
 </g>
 <g>
-<title>47fe71 (row) newcomer-sofia on blocks: The headline 'Orchestrate asynchronous knowledge synergies across your team's cognitive workflows' has words I cannot paraphrase, so I stop reading and go back to the chat saying 'no idea'.</title>
-<rect class="finding" data-finding="47fe71608df18c91" data-status="row" x="966" y="458" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="474" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">47fe71</text>
+<title>9ecb56 (row) newcomer-sofia on blocks: The headline 'Orchestrate asynchronous knowledge synergies across your team's cognitive workflows' has words I cannot paraphrase, so I stop reading and go back to the chat saying 'no idea'.</title>
+<rect class="finding" data-finding="9ecb56a830096086" data-status="row" x="966" y="458" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="474" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">9ecb56</text>
 <text x="1012" y="474" font-size="10">The headline 'Orchestra…</text>
 </g>
 <g>
-<title>6c73e4 (row) newcomer-sofia on blocks: The line under it ('AI-native collaborative substrate that operationalizes tacit insight') is just as unreadable, so there is no second chance.</title>
-<rect class="finding" data-finding="6c73e4e7df4702e2" data-status="row" x="966" y="486" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="502" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">6c73e4</text>
+<title>0ce774 (row) newcomer-sofia on blocks: The line under it ('AI-native collaborative substrate that operationalizes tacit insight') is just as unreadable, so there is no second chance.</title>
+<rect class="finding" data-finding="0ce774e2306a420e" data-status="row" x="966" y="486" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="502" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">0ce774</text>
 <text x="1012" y="502" font-size="10">The line under it ('AI-…</text>
 </g>
 <g>
@@ -573,9 +573,9 @@
 <text x="1012" y="530" font-size="10">No price or free mentio…</text>
 </g>
 <g>
-<title>98a75f (dismissed) newcomer-sofia on price@home.walk.json: No price is stated in the home walk.</title>
-<rect class="finding" data-finding="98a75f23451a5e0f" data-status="dismissed" x="966" y="542" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="558" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">98a75f</text>
+<title>ef922e (dismissed) newcomer-sofia on price@home.walk.json: No price is stated in the home walk.</title>
+<rect class="finding" data-finding="ef922ebeba7b7070" data-status="dismissed" x="966" y="542" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="558" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">ef922e</text>
 <text x="1012" y="558" font-size="10">No price is stated in t…</text>
 </g>
 <g>
@@ -585,9 +585,9 @@
 <text x="1012" y="586" font-size="10">No price anywhere on th…</text>
 </g>
 <g>
-<title>372d36 (dismissed) company-george on price@home.walk.json: No price anywhere on the home page.</title>
-<rect class="finding" data-finding="372d36d61b1247c2" data-status="dismissed" x="966" y="598" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="614" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">372d36</text>
+<title>c1fbe0 (dismissed) company-george on price@home.walk.json: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="c1fbe0d218909dce" data-status="dismissed" x="966" y="598" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="614" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">c1fbe0</text>
 <text x="1012" y="614" font-size="10">No price anywhere on th…</text>
 </g>
 <g>
@@ -609,27 +609,27 @@
 <text x="1012" y="698" font-size="10">No price shown.</text>
 </g>
 <g>
-<title>2a462f (row) company-hanna on clarity@home.walk.json: Does not say what the product is.</title>
-<rect class="finding" data-finding="2a462f2ed174e3c9" data-status="row" x="966" y="710" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="726" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">2a462f</text>
+<title>baa52a (row) company-hanna on clarity@home.walk.json: Does not say what the product is.</title>
+<rect class="finding" data-finding="baa52a2208135d7b" data-status="row" x="966" y="710" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="726" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">baa52a</text>
 <text x="1012" y="726" font-size="10">Does not say what the p…</text>
 </g>
 <g>
-<title>9a628f (dismissed) company-hanna on price@home.walk.json: No price shown.</title>
-<rect class="finding" data-finding="9a628f3c63b9b127" data-status="dismissed" x="966" y="738" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="754" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">9a628f</text>
+<title>9ef60b (dismissed) company-hanna on price@home.walk.json: No price shown.</title>
+<rect class="finding" data-finding="9ef60b9d74494c4a" data-status="dismissed" x="966" y="738" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="754" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">9ef60b</text>
 <text x="1012" y="754" font-size="10">No price shown.</text>
 </g>
 <g>
-<title>b1531e (row) investor-claire on blocks: The hero headline and subline say nothing concrete, so a stranger cannot tell what the product is.</title>
-<rect class="finding" data-finding="b1531ec66b265a86" data-status="row" x="966" y="766" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="782" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">b1531e</text>
+<title>49d519 (row) investor-claire on blocks: The hero headline and subline say nothing concrete, so a stranger cannot tell what the product is.</title>
+<rect class="finding" data-finding="49d519195b7c8e96" data-status="row" x="966" y="766" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="782" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">49d519</text>
 <text x="1012" y="782" font-size="10">The hero headline and s…</text>
 </g>
 <g>
-<title>6650a2 (row) investor-claire on blocks: The middle Team plan says only Contact us, so the price is hidden where the mid-market would land.</title>
-<rect class="finding" data-finding="6650a27169b08031" data-status="row" x="966" y="794" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
-<text x="974" y="810" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">6650a2</text>
+<title>f397ca (row) investor-claire on blocks: The middle Team plan says only Contact us, so the price is hidden where the mid-market would land.</title>
+<rect class="finding" data-finding="f397cae88dd91143" data-status="row" x="966" y="794" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="810" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">f397ca</text>
 <text x="1012" y="810" font-size="10">The middle Team plan sa…</text>
 </g>
 <g>
@@ -639,9 +639,9 @@
 <text x="1012" y="838" font-size="10">No price anywhere on th…</text>
 </g>
 <g>
-<title>825962 (dismissed) investor-claire on price@home.walk.json: No price node on the home walk.</title>
-<rect class="finding" data-finding="82596268180c12a4" data-status="dismissed" x="966" y="850" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
-<text x="974" y="866" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">825962</text>
+<title>fa7ba7 (dismissed) investor-claire on price@home.walk.json: No price node on the home walk.</title>
+<rect class="finding" data-finding="fa7ba761b73e1a4d" data-status="dismissed" x="966" y="850" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="866" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">fa7ba7</text>
 <text x="1012" y="866" font-size="10">No price node on the ho…</text>
 </g>
 <g font-size="12" fill="#57606a">

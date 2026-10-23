@@ -31,21 +31,21 @@ between rounds. A panel is 12 seats or fewer unless you pass `--allow-large`.
 
 ## Add it
 ```
-jurygraph persona add --file personas/builder-ana.json
-jurygraph persona list
-jurygraph panel add fixture --query "3 builder, 2 company, 2 others"
-jurygraph panel resolve fixture
+personajury persona add --file personas/builder-ana.json
+personajury persona list
+personajury panel add fixture --query "3 builder, 2 company, 2 others"
+personajury panel resolve fixture
 ```
 
 ## Generate from material
 ```
-jurygraph persona generate --from docs/icp.md --count 7
+personajury persona generate --from docs/icp.md --count 7
 ```
 This writes a **brief addressed to you**: it asks you, the agent, to write N personas from the material in the fixed JSON.
-JuryGraph calls no model. Write the files yourself, then add each one with the material's hash, so the origin is recorded
+PersonaJury calls no model. Write the files yourself, then add each one with the material's hash, so the origin is recorded
 and the same material regenerates the same panel:
 ```
-jurygraph persona add --file personas/new-one.json --generated-from <hash from the brief>
+personajury persona add --file personas/new-one.json --generated-from <hash from the brief>
 ```
 The brief works in two steps. First list the roles, sectors and objections the material names or implies (who it speaks
 to, who pays, who is turned away, what each pushes back on), and hand that `roles` list to the caller; mark which role uses,
@@ -55,6 +55,14 @@ may combine two roles.
 
 Write from the material, not from habit: take the roles, sectors and objections it names. Spread the tags across the
 strata you will need. Personas are composites, never identifiable real people: no real names, no scraped profiles, no customer list turned into a person (`PERSONAS.md`).
+
+## Your own juror, a devil's advocate, real people
+- **Yourself:** enter a real human verdict with `verdict --by-human "NAME, CREDENTIAL"`; do not simulate yourself.
+- **Someone you know:** describe the traits as a composite, with no name and nothing a colleague would recognise.
+- **An always-negative critic:** `"tags": ["critic"]`, seated as a bystander (`1 critic=bystander`); read its blockers, not its scores.
+- **A real named or famous person:** no. Write the archetype ("a contrarian tech CEO who decides in seconds and mocks jargon"); `PERSONAS.md` allows composites only.
+
+Two cautions: a flattering self-persona biases upward, and a constant critic never scores high. Worked example: `docs/playbooks/your-own-jurors.md`.
 
 ## Stake is not in the persona
 A persona has `stake_rules` in words as guidance, but the stake itself belongs to the audience: the panel's term

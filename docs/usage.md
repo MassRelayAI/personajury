@@ -5,8 +5,9 @@ PersonaJury runs a persona jury as an engine. It never calls a model: your agent
 flags are in [`commands.md`](commands.md). Behaviour described here is the v0.1 contract in the plan.
 
 ## The loop
-1. **Set up once.** `personajury setup --apply` registers the MCP server with the agents it finds (without `--apply` it prints
-   a plan). `personajury doctor` reports the store and each registration. The store is `.personajury/store.db` under `--root`
+1. **Set up once.** Install the binary ([README](../README.md#install)), then `personajury setup --apply` registers the MCP
+   server with the agents it finds (without `--apply` it prints a plan; [what it writes](../README.md#what-setup-writes),
+   [how to remove it](../README.md#remove-it)). In Claude Code the plugin does this instead. `personajury doctor` reports the store and each registration. The store is `.personajury/store.db` under `--root`
    (default `.`).
 2. **Personas and a panel.** `personajury persona add --file p.json` per persona, or `personajury persona generate --from
    material.md` to write a brief that asks your agent to write them. `personajury panel add NAME --query "3 builder, 2 company,
@@ -107,10 +108,10 @@ it. Colour and layout reach the jury only through screenshots.
 ## Where it runs
 - **Claude Code, Codex, Cursor, Gemini CLI and the rest:** `personajury setup --apply`, or the plugin of your harness. Where the
   harness has subagents, one per brief is a strong jury.
-- **Claude Desktop:** drop the `.mcpb` bundle for your platform (from the release page) on the app and pick the project folder
-  that holds `.personajury/`. Desktop has no subagents, so one context plays every juror: brief with `--independence sequential`.
+- **Claude Desktop:** drop a `.mcpb` bundle on the app and pick the project folder that holds `.personajury/`. The release does
+  not carry the bundles yet (they are opt-in in `release.yml`), so build one as below. Desktop has no subagents, so one context plays every juror: brief with `--independence sequential`.
   Those runs advise and never apply. This route is unverified against Claude Desktop until a maintainer installs one by hand.
-  Build a bundle yourself with `scripts/build-mcpb.sh <platform> <binary>`.
+  Build a bundle with `scripts/build-mcpb.sh <platform> <binary>`.
 - **The chat route (claude.ai, ChatGPT, any chat window):** no server, files only. Run `personajury brief` in a terminal, paste one
   brief file per chat (one chat per brief keeps the jurors independent), have the chat answer with the verdict JSON, save it and run
   `personajury verdict --run N --file v.json`. Many briefs in one chat is `--independence sequential`.

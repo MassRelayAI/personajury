@@ -3,6 +3,11 @@
 PersonaJury keeps the jury; your agent runs it. The engine never calls a model: it writes a brief per persona, your agent's
 subagents answer in JSON, and the engine refuses any answer without evidence and reports scores per stratum.
 
+Before you start: install the binary ([README, Install](../README.md#install)). The words (persona, stake, lens, brief,
+verdict) are explained in [README, Words used here](../README.md#words-used-here). To see a finished jury before running your
+own, replay the recorded one ([README, Try it](../README.md#try-it)). Every command prints one JSON envelope; add `--pretty`
+to read it, and `personajury summary RUN --html jury.html` writes a page you open in a browser.
+
 ```bash
 # 0. a workspace (any folder) and the four shipped lenses, seeded on first write: critical, taste, compare, recall
 cd my-project

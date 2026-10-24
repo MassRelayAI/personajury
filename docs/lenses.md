@@ -1,7 +1,7 @@
 # Lenses
 
 A lens is a **versioned standard**: the dimensions a jury judges a subject on, with the meaning of the scores written in
-words. It is data (TOML), loaded with `personajury lens add --file lens.toml` and listed with `personajury lens list`. The shipped
+words. It is data (TOML), loaded with `jurypersona lens add --file lens.toml` and listed with `jurypersona lens list`. The shipped
 lenses are in `lenses/`.
 
 ## Shape
@@ -38,7 +38,7 @@ across changed anchors says nothing about the subject. To use a changed lens, bu
   (`seen_compare_without_comparator`).
 - **`asks_pick`**: the lens requires a forced choice. The verdict's `pick` names one option (an attachment label of the
   subject, or `cmp:<name>` for a comparator in the run) with a reason; `pick_missing`, `pick_unknown_option` and
-  `pick_without_reason` refuse an incomplete one. `personajury pick RUN` reads them back per stratum. A persona "picks one and
+  `pick_without_reason` refuse an incomplete one. `jurypersona pick RUN` reads them back per stratum. A persona "picks one and
   scores all" by writing one line per (dimension, `about`) for the options.
 - **`evidence`**: the evidence classes a line under this lens may carry. `recall` allows only `recalled`; a line with another
   class is refused (`evidence_not_allowed`).
@@ -57,7 +57,7 @@ All four are 1 to 5 and are present in every new store.
 
 ## A fixture lens: `site`
 `fixtures/lenses/site.toml` is a 1 to 10 `site` lens, kept as fixture data to show a different scale. It is **not seeded**:
-load it yourself with `personajury lens add --file fixtures/lenses/site.toml`. It exists for the held-out check on the fixture
+load it yourself with `jurypersona lens add --file fixtures/lenses/site.toml`. It exists for the held-out check on the fixture
 site and for tests, not as a fifth shipped lens.
 
 ## Proposing a lens
@@ -67,7 +67,7 @@ good from bad (`GOVERNANCE.md`). A contributed lens has anchors in words at ever
 is declined.
 
 ## Drafting a lens from material
-`personajury lens generate --from PATH [--dimensions N]` writes the brief that asks your agent to draft a lens from a standard, a
+`jurypersona lens generate --from PATH [--dimensions N]` writes the brief that asks your agent to draft a lens from a standard, a
 handbook or examples, with `standard = "material:<hash>"`; `lens add` validates what it writes. Three generic examples ship as
 fixture data: `fixtures/lenses/consulting-deck.toml`, `investor-pitch.toml` and `financial-model.toml` (four dimensions each).
 A lens's `standard` is shown in every brief and in the matrix header; an anchor set claimed as a named standard should carry the

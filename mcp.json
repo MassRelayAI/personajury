@@ -1,7 +1,7 @@
 {
   "mcpServers": {
-    "personajury": {
-      "command": "personajury",
+    "jurypersona": {
+      "command": "jurypersona",
       "args": ["mcp"]
     }
   }

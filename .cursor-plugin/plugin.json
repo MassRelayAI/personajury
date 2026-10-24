@@ -1,14 +1,14 @@
 {
-  "name": "personajury",
-  "displayName": "PersonaJury",
-  "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the personajury binary on PATH.",
-  "version": "0.5.0",
+  "name": "jurypersona",
+  "displayName": "JuryPersona",
+  "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the jurypersona binary on PATH.",
+  "version": "0.5.1",
   "author": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"
   },
-  "homepage": "https://github.com/massrelay-ai/personajury",
-  "repository": "https://github.com/massrelay-ai/personajury",
+  "homepage": "https://github.com/massrelay-ai/jurypersona",
+  "repository": "https://github.com/massrelay-ai/jurypersona",
   "license": "Apache-2.0",
   "keywords": ["persona-jury", "synthetic-users", "ai-personas", "persona-testing", "ux-research", "mcp", "skills"],
   "skills": "./skills/",

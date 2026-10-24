@@ -1,4 +1,4 @@
-# PersonaJury brand
+# JuryPersona brand
 
 The mark is a verdict check drawn as a graph: two nodes joined by two edges, with the long edge ending in a ring,
 the evidence the verdict cites. It was chosen by a persona jury, 7 of 7 in round 2 (`../jury/matrix-r2.md`).
@@ -48,5 +48,5 @@ mark). In the lockup, the gap between the tile and the wordmark is fixed at 16 u
 
 ## Wordmark
 
-"PersonaJury" is one word in camel case: "Persona" in Noto Sans Bold, "Jury" in Noto Sans Regular, outlined to paths
-(see `NOTICE.md`). Elsewhere, in running text, write PersonaJury in the surrounding typeface without styling.
+"JuryPersona" is one word in camel case: "Jury" in Noto Sans Bold, "Persona" in Noto Sans Regular, outlined to paths
+(see `NOTICE.md`). Elsewhere, in running text, write JuryPersona in the surrounding typeface without styling.

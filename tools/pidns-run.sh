@@ -11,7 +11,7 @@
 # Why: a test that shells out to /usr/bin/kill with a negative 7-digit pid is parsed by procps as -1 and kills every process
 # of the user. The code rules stop the spelling; this script confines whatever slips through.
 set -u
-if [ "${PERSONAJURY_NO_PIDNS:-}" = 1 ]; then exec "$@"; fi
+if [ "${JURYPERSONA_NO_PIDNS:-}" = 1 ]; then exec "$@"; fi
 if unshare -Urpf --mount-proc --kill-child true 2>/dev/null; then
   exec unshare -Urpf --mount-proc --kill-child "$@"
 fi

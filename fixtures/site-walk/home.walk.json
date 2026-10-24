@@ -33,7 +33,7 @@
       ] }
     ] },
     { "id": "footer", "role": "contentinfo", "name": "", "children": [
-      { "id": "footer-text", "role": "paragraph", "name": "Lantern Notes is a made-up product used to test PersonaJury. Nothing here can be bought." }
+      { "id": "footer-text", "role": "paragraph", "name": "Lantern Notes is a made-up product used to test JuryPersona. Nothing here can be bought." }
     ] }
   ]
 }

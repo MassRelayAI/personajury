@@ -1,21 +1,21 @@
 {
-  "name": "personajury",
-  "version": "0.5.0",
-  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum. No LLM inside the engine. Needs the personajury binary on PATH.",
+  "name": "jurypersona",
+  "version": "0.5.1",
+  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum. No LLM inside the engine. Needs the jurypersona binary on PATH.",
   "author": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"
   },
-  "homepage": "https://github.com/massrelay-ai/personajury",
-  "repository": "https://github.com/massrelay-ai/personajury",
+  "homepage": "https://github.com/massrelay-ai/jurypersona",
+  "repository": "https://github.com/massrelay-ai/jurypersona",
   "license": "Apache-2.0",
   "keywords": ["persona-jury", "synthetic-users", "ai-personas", "persona-testing", "ux-research", "mcp", "skills"],
   "skills": "./skills/",
   "mcpServers": "./mcp.json",
   "interface": {
-    "displayName": "PersonaJury",
+    "displayName": "JuryPersona",
     "shortDescription": "A persona jury as an engine: evidence on every line, scores per stratum",
-    "longDescription": "Use PersonaJury to judge a page, diff, design or document with personas that your own agent runs: write the briefs, ingest the verdicts, refuse any verdict without evidence, and read the scores per stratum, never averaged.",
+    "longDescription": "Use JuryPersona to judge a page, diff, design or document with personas that your own agent runs: write the briefs, ingest the verdicts, refuse any verdict without evidence, and read the scores per stratum, never averaged.",
     "developerName": "Nicholas Andrea Sujitno",
     "category": "Developer Tools",
     "capabilities": ["Interactive", "Read", "Write"],
@@ -23,7 +23,7 @@
       "Run a jury on this page with three personas.",
       "Help me write personas from this customer document."
     ],
-    "websiteURL": "https://github.com/massrelay-ai/personajury",
+    "websiteURL": "https://github.com/massrelay-ai/jurypersona",
     "screenshots": []
   }
 }

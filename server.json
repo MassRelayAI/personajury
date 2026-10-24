@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.massrelay-ai/personajury",
-  "title": "PersonaJury",
+  "name": "io.github.massrelay-ai/jurypersona",
+  "title": "JuryPersona",
   "description": "A persona jury as an engine: briefs, verdicts refused without evidence, scores per stratum, rounds that diff. Local; never calls a model.",
-  "websiteUrl": "https://github.com/massrelay-ai/personajury",
+  "websiteUrl": "https://github.com/massrelay-ai/jurypersona",
   "repository": {
-    "url": "https://github.com/massrelay-ai/personajury",
+    "url": "https://github.com/massrelay-ai/jurypersona",
     "source": "github"
   },
-  "version": "0.5.0",
+  "version": "0.5.1",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.5.0/personajury-linux-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurypersona/releases/download/v0.5.1/jurypersona-linux-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -20,7 +20,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.5.0/personajury-darwin-arm64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurypersona/releases/download/v0.5.1/jurypersona-darwin-arm64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -28,7 +28,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.5.0/personajury-darwin-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurypersona/releases/download/v0.5.1/jurypersona-darwin-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -36,7 +36,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.5.0/personajury-win32-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/jurypersona/releases/download/v0.5.1/jurypersona-win32-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"

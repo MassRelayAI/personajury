@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Build one .mcpb bundle for Claude Desktop: the manifest (with this platform) and the personajury binary, zipped.
+# Build one .mcpb bundle for Claude Desktop: the manifest (with this platform) and the jurypersona binary, zipped.
 # Usage: scripts/build-mcpb.sh <platform> <binary> [out-dir]     platform: linux-x64 | darwin-arm64 | darwin-x64 | win32-x64
-# Writes <out-dir>/personajury-<platform>.mcpb and its .sha256 (default out-dir: dist), prints the sha256. No network.
+# Writes <out-dir>/jurypersona-<platform>.mcpb and its .sha256 (default out-dir: dist), prints the sha256. No network.
 set -euo pipefail
 platform=${1:?platform (linux-x64 | darwin-arm64 | darwin-x64 | win32-x64)}
-binary=${2:?path of the personajury binary built for that platform}
+binary=${2:?path of the jurypersona binary built for that platform}
 out=${3:-dist}
 here=$(cd "$(dirname "$0")/.." && pwd)
 case "$platform" in
-  linux-x64) os=linux; exe=personajury ;;
-  darwin-arm64 | darwin-x64) os=darwin; exe=personajury ;;
-  win32-x64) os=win32; exe=personajury.exe ;;
+  linux-x64) os=linux; exe=jurypersona ;;
+  darwin-arm64 | darwin-x64) os=darwin; exe=jurypersona ;;
+  win32-x64) os=win32; exe=jurypersona.exe ;;
   *) echo "unknown platform: $platform" >&2; exit 2 ;;
 esac
 [ -f "$binary" ] || { echo "no such binary: $binary" >&2; exit 2; }
@@ -18,10 +18,10 @@ stage=$(mktemp -d)
 trap 'rm -rf "$stage"' EXIT
 mkdir -p "$stage/bin" "$out"
 # the manifest names this platform; on Windows the binary carries its .exe
-sed -e "s#\"PLATFORM\"#\"$os\"#" -e "s#bin/personajury#bin/$exe#g" "$here/packaging/mcpb/manifest.json" > "$stage/manifest.json"
+sed -e "s#\"PLATFORM\"#\"$os\"#" -e "s#bin/jurypersona#bin/$exe#g" "$here/packaging/mcpb/manifest.json" > "$stage/manifest.json"
 cp "$binary" "$stage/bin/$exe"
 chmod +x "$stage/bin/$exe"
-bundle="$(cd "$out" && pwd)/personajury-$platform.mcpb"
+bundle="$(cd "$out" && pwd)/jurypersona-$platform.mcpb"
 rm -f "$bundle"
 # -X drops extra file attributes, so the same inputs zip to the same layout
 (cd "$stage" && zip -q -X -r "$bundle" manifest.json bin)

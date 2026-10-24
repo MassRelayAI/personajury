@@ -24,10 +24,10 @@ The fixed JSON and the stake rules are in `skills/writing-a-persona/SKILL.md`; `
 Make each persona distinct: if two of them could swap lines, rewrite one.
 
 ## Generated personas record their material
-`personajury persona generate --from <material>` writes a brief that asks your agent to write the personas; the engine calls no
+`jurypersona persona generate --from <material>` writes a brief that asks your agent to write the personas; the engine calls no
 model. The brief carries the hash of the material. Add each file with it:
 ```
-personajury persona add --file personas/new-one.json --generated-from <hash from the brief>
+jurypersona persona add --file personas/new-one.json --generated-from <hash from the brief>
 ```
 The hash records which material a persona came from, so the same material can be checked against the same panel later. It
 does not make the material shareable. Only generate from material you are entitled to share. If you publish a set, say what

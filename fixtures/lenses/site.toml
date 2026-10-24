@@ -1,6 +1,6 @@
 # The site lens of the held-out detector (D6, Fable read B1): the six criteria of a hand-scored jury table the maintainer keeps privately on a 1–10 scale, anchors in
 # words at 1, 4, 7, 10 (step 3), so six dimensions can be ranked. Fixture data: not seeded into stores; the detector's
-# run loads it with `personajury lens add --file fixtures/lenses/site.toml`.
+# run loads it with `jurypersona lens add --file fixtures/lenses/site.toml`.
 name = "site"
 version = 1
 scale = [1, 10]

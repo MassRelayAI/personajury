@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-message: "If you use PersonaJury, please cite it as below."
-title: PersonaJury
-version: 0.5.0
+message: "If you use JuryPersona, please cite it as below."
+title: JuryPersona
+version: 0.5.1
 license: Apache-2.0
-repository-code: "https://github.com/massrelay-ai/personajury"
+repository-code: "https://github.com/massrelay-ai/jurypersona"
 abstract: >-
   A persona jury as an engine: a Rust CLI and MCP server that stores personas, panels, lenses, subjects and comparators,
   composes deterministic briefs, ingests the verdicts an agent's subagents write, refuses verdicts without evidence, and

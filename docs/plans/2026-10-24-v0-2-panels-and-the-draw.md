@@ -1,10 +1,10 @@
-# PersonaJury v0.2 — panels and the draw — Implementation Plan (as built)
+# JuryPersona v0.2 — panels and the draw — Implementation Plan (as built)
 
 > **As built.** This plan was written after the work, from the code, the tests and the review that followed. It records what was
 > built, not what was intended. The decisions of record are D9 and D10 in [`../decisions.md`](../decisions.md); where this plan and
 > a decision differ, the decision wins. Measured result: [`../reports/2026-10-24-v0-2-measured.md`](../reports/2026-10-24-v0-2-measured.md).
 
-**Goal:** A rule picks the panel. `brief --rule <class>` takes panel, lenses, spend and detail from `personajury.toml`; a seeded draw
+**Goal:** A rule picks the panel. `brief --rule <class>` takes panel, lenses, spend and detail from `jurypersona.toml`; a seeded draw
 decides which personas sit when the pool is larger than the seats; the agent may override any of it with a stated reason; a brief above
 12 seats needs `--allow-large`, above 1000 is always refused. v0.1 briefs stay byte-identical.
 

@@ -39,6 +39,6 @@
 
 <line x1="180" y1="104" x2="180" y2="370" stroke="#57606a" stroke-width="1.2"/>
 <text x="525" y="402" font-size="14" font-weight="700" text-anchor="middle">Two knobs: how many, and how much each carries.</text>
-<text x="525" y="424" font-size="12" text-anchor="middle" fill="#57606a">Bytes are measured on the fixture (critical lens, linear scale). The token figure is 15,000 per brief from fixtures/personajury.toml, an estimate.</text>
+<text x="525" y="424" font-size="12" text-anchor="middle" fill="#57606a">Bytes are measured on the fixture (critical lens, linear scale). The token figure is 15,000 per brief from fixtures/jurypersona.toml, an estimate.</text>
 </g>
 </svg>

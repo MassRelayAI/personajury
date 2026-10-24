@@ -1,17 +1,17 @@
 #!/bin/sh
-# The GitHub Action's one step (D22): classify the pull request's diff against personajury.toml and, when a committed store
+# The GitHub Action's one step (D22): classify the pull request's diff against jurypersona.toml and, when a committed store
 # is given, run `check` and `apply-check`. No model, no network, no secret: it reads the diff and the store.
 # Environment (action.yml sets these; tests set them to a local binary):
-#   JG_BIN       the binary (default: personajury on PATH)
-#   JG_CONFIG    the rules file (default personajury.toml)
+#   JG_BIN       the binary (default: jurypersona on PATH)
+#   JG_CONFIG    the rules file (default jurypersona.toml)
 #   JG_BASE      the base to diff against (default: origin/$GITHUB_BASE_REF on a pull request, else HEAD~1)
-#   JG_STORE     a project root holding a committed .personajury (optional)
+#   JG_STORE     a project root holding a committed .jurypersona (optional)
 #   JG_FAIL_ON   comma list of answers that fail the job: human, escalate, advise, unavailable
 #                (default human,escalate,unavailable); a failing `check` always fails it
 # Fails closed (D13): a missing binary, an error from should-run, check or apply-check, or output that is not JSON makes the
 # answer `unavailable`, which fails the job unless JG_FAIL_ON is set without `unavailable`.
 # With a store, `apply-check --latest` judges every subject that has runs and answers the worst; when should-run matched
-# exactly one rule its class is passed as --rule (the store's root must hold the same personajury.toml).
+# exactly one rule its class is passed as --rule (the store's root must hold the same jurypersona.toml).
 # Writes job outputs to $GITHUB_OUTPUT (quorum, spend, effort, answer, check) and a table to $GITHUB_STEP_SUMMARY. Needs jq.
 
 # Markdown-escape one line for the step summary: file names come from the pull request (a fork's names included).
@@ -25,8 +25,8 @@ envelope_ok() {
 
 main() {
   set -u
-  bin="${JG_BIN:-personajury}"
-  config="${JG_CONFIG:-personajury.toml}"
+  bin="${JG_BIN:-jurypersona}"
+  config="${JG_CONFIG:-jurypersona.toml}"
   store="${JG_STORE:-}"
   fail_on="${JG_FAIL_ON:-human,escalate,unavailable}"
   out="${GITHUB_OUTPUT:-/dev/null}"
@@ -46,19 +46,19 @@ main() {
   unavailable() {
     answer=unavailable
     why="${why:+$why; }$1"
-    echo "personajury action: $1" >&2
+    echo "jurypersona action: $1" >&2
   }
 
   if ! command -v jq >/dev/null 2>&1; then
     unavailable "jq is needed to read the engine's answers"
   elif ! command -v "$bin" >/dev/null 2>&1; then
-    unavailable "no personajury binary at $bin"
+    unavailable "no jurypersona binary at $bin"
   else
     base="${JG_BASE:-}"
     if [ -z "$base" ]; then
       if [ -n "${GITHUB_BASE_REF:-}" ]; then base="origin/$GITHUB_BASE_REF"; else base="HEAD~1"; fi
     fi
-    diff="$tmp/personajury.diff"
+    diff="$tmp/jurypersona.diff"
     if ! git diff "$base...HEAD" > "$diff"; then
       unavailable "git diff $base...HEAD failed (fetch-depth: 0 on checkout?)"
     else
@@ -109,7 +109,7 @@ main() {
   } >> "$out"
 
   {
-    echo "### PersonaJury"
+    echo "### JuryPersona"
     echo
     echo "| | |"
     echo "|---|---|"
@@ -137,10 +137,10 @@ main() {
   } >> "$summary"
 
   rc=0
-  if [ "$check" = failed ]; then echo "personajury action: check failed: findings with no decision, or a fix that did not land" >&2; rc=1; fi
+  if [ "$check" = failed ]; then echo "jurypersona action: check failed: findings with no decision, or a fix that did not land" >&2; rc=1; fi
   for a in $(echo "$fail_on" | tr ',' ' '); do
     if [ "$a" = "$answer" ] || { [ "$a" = human ] && [ "$quorum" = human ]; }; then
-      echo "personajury action: failing on $a (fail-on: $fail_on)" >&2; rc=1
+      echo "jurypersona action: failing on $a (fail-on: $fail_on)" >&2; rc=1
     fi
   done
   exit "$rc"

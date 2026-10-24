@@ -21,7 +21,7 @@ body:
     id: version
     attributes:
       label: Version
-      description: Output of `personajury --version`.
+      description: Output of `jurypersona --version`.
     validations:
       required: true
   - type: input

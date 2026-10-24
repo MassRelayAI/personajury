@@ -1,21 +1,21 @@
-name: PersonaJury
-description: Classify a pull request against personajury.toml and, with a committed store, run check and apply-check. No model and no secret.
+name: JuryPersona
+description: Classify a pull request against jurypersona.toml and, with a committed store, run check and apply-check. No model and no secret.
 branding:
   icon: users
   color: blue
 inputs:
   config:
     description: The rules file
-    default: personajury.toml
+    default: jurypersona.toml
   base:
     description: The commit to diff against (default the pull request base)
     default: ""
   store:
-    description: A project root that holds a committed .personajury; when set, check and apply-check run on its latest runs
+    description: A project root that holds a committed .jurypersona; when set, check and apply-check run on its latest runs
     default: ""
   version:
     description: The release to install (default this Action's own release; `latest` follows the newest release)
-    default: v0.5.0
+    default: v0.5.1
   fail-on:
     description: "Comma list of answers that fail the job: human, escalate, advise, unavailable (an error, a missing binary or output that is not JSON). A failing check always fails it."
     default: human,escalate,unavailable
@@ -41,11 +41,11 @@ runs:
     - name: Install the released binary (checksum verified)
       shell: sh
       env:
-        PERSONAJURY_VERSION: ${{ inputs.version }}
-        PERSONAJURY_INSTALL_DIR: ${{ runner.temp }}/personajury-bin
+        JURYPERSONA_VERSION: ${{ inputs.version }}
+        JURYPERSONA_INSTALL_DIR: ${{ runner.temp }}/jurypersona-bin
       run: |
         sh "$GITHUB_ACTION_PATH/scripts/install.sh"
-        echo "$PERSONAJURY_INSTALL_DIR" >> "$GITHUB_PATH"
+        echo "$JURYPERSONA_INSTALL_DIR" >> "$GITHUB_PATH"
     - name: Classify the diff, check the store
       id: run
       shell: sh
@@ -54,6 +54,6 @@ runs:
         JG_BASE: ${{ inputs.base }}
         JG_STORE: ${{ inputs.store }}
         JG_FAIL_ON: ${{ inputs.fail-on }}
-        PATH_ADD: ${{ runner.temp }}/personajury-bin
+        PATH_ADD: ${{ runner.temp }}/jurypersona-bin
       run: |
         PATH="$PATH_ADD:$PATH" sh "$GITHUB_ACTION_PATH/scripts/action-run.sh"

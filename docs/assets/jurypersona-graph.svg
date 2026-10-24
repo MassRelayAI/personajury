@@ -1,0 +1,672 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 902" width="1200" height="902" role="img" aria-labelledby="t d">
+<title id="t">JuryPersona · lantern-site</title><desc id="d">JuryPersona · lantern-site: 7 personas (primary 4, secondary 2, bystander 1), scoring 6 dimensions across 2 lenses, and 26 findings: 0 open, 0 fixed, 11 dismissed, 15 row. Edges from a persona to a dimension are coloured by the score from 1 to 5; edges to a finding are coloured by its decision. Each dimension shows a median badge per stratum, never one number across strata.</desc>
+<rect width="100%" height="100%" fill="#ffffff"/>
+<rect x="1" y="1" width="1198" height="900" rx="10" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<g font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" fill="#1f2328">
+<text x="30" y="40" font-size="18" font-weight="700">JuryPersona · lantern-site</text>
+<text x="30" y="62" font-size="13" fill="#57606a">Personas by stake, the dimensions they scored, the blockers they raised. Edge colour is the score; badges are medians per stratum, never one number.</text>
+<text x="1170" y="40" font-size="13" text-anchor="end" fill="#57606a">runs 1, 2</text>
+<rect x="30" y="92" width="81" height="26" rx="13" fill="#ddf4ff" stroke="#57606a" stroke-width="1"/>
+<text x="42" y="110" font-size="14" font-weight="700">primary</text>
+<text x="30" y="136" font-size="12" fill="#57606a">would use it · 4</text>
+<rect x="208" y="358" width="98" height="26" rx="13" fill="#fff8c5" stroke="#57606a" stroke-width="1"/>
+<text x="220" y="376" font-size="14" font-weight="700">secondary</text>
+<text x="208" y="402" font-size="12" fill="#57606a">approves it · 2</text>
+<rect x="386" y="528" width="98" height="26" rx="13" fill="#dafbe1" stroke="#57606a" stroke-width="1"/>
+<text x="398" y="546" font-size="14" font-weight="700">bystander</text>
+<text x="386" y="572" font-size="12" fill="#57606a">passes by · 1</text>
+<text x="603" y="110" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0550ae">critical</text>
+<line x1="603" y1="118" x2="741" y2="118" stroke="#57606a" stroke-width="1.2"/>
+<text x="686" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>primary</title>P</text>
+<text x="706" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>secondary</title>S</text>
+<text x="726" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>bystander</title>B</text>
+<text x="757" y="110" font-size="13" font-weight="700" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#0550ae">compare</text>
+<line x1="757" y1="118" x2="942" y2="118" stroke="#57606a" stroke-width="1.2"/>
+<text x="887" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>primary</title>P</text>
+<text x="907" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>secondary</title>S</text>
+<text x="927" y="108" font-size="9" text-anchor="middle" fill="#57606a"><title>bystander</title>B</text>
+<text x="966" y="110" font-size="14" font-weight="700">findings</text>
+<line x1="966" y1="118" x2="1170" y2="118" stroke="#57606a" stroke-width="1.2"/>
+<text x="966" y="138" font-size="12" fill="#57606a">26 blockers raised</text>
+<path class="edge-score" data-persona="builder-ana" data-node="critical:works" data-score="2" d="M202 170C402 170 402 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored critical:works 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="critical:blocks" data-score="2" d="M202 170C402 170 402 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="critical:missing" data-score="2" d="M202 170C402 170 402 229 603 229" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored critical:missing 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="critical:works" data-score="3" d="M202 218C402 218 402 161 603 161" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored critical:works 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="critical:blocks" data-score="2" d="M202 218C402 218 402 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="critical:missing" data-score="3" d="M202 218C402 218 402 229 603 229" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored critical:missing 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="critical:works" data-score="2" d="M202 266C402 266 402 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored critical:works 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="critical:blocks" data-score="2" d="M202 266C402 266 402 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="critical:missing" data-score="2" d="M202 266C402 266 402 229 603 229" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored critical:missing 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="critical:works" data-score="2" d="M380 436C491 436 491 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored critical:works 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="critical:blocks" data-score="2" d="M380 436C491 436 491 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="critical:missing" data-score="2" d="M380 436C491 436 491 229 603 229" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored critical:missing 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="critical:works" data-score="2" d="M380 484C491 484 491 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored critical:works 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="critical:blocks" data-score="2" d="M380 484C491 484 491 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="critical:missing" data-score="2" d="M380 484C491 484 491 229 603 229" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored critical:missing 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="critical:works" data-score="2" d="M558 606C580 606 580 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored critical:works 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="critical:blocks" data-score="2" d="M558 606C580 606 580 195 603 195" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored critical:blocks 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="critical:missing" data-score="2" d="M558 606C580 606 580 229 603 229" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored critical:missing 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="critical:works" data-score="2" d="M202 314C402 314 402 161 603 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored critical:works 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="critical:blocks" data-score="1" d="M202 314C402 314 402 195 603 195" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored critical:blocks 1</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="critical:missing" data-score="3" d="M202 314C402 314 402 229 603 229" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored critical:missing 3</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity" data-score="2" d="M202 170C479 170 479 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price" data-score="2" d="M202 170C479 170 479 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:price 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust" data-score="2" d="M202 170C479 170 479 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity@cmp:acme-pricing" data-score="4" d="M202 170C484 170 484 186 767 186" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-ana scored compare:clarity@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M202 170C484 170 484 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>builder-ana scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust@cmp:acme-pricing" data-score="3" d="M202 170C484 170 484 494 767 494" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ana scored compare:trust@cmp:acme-pricing 3</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity@home.png" data-score="1" d="M202 170C484 170 484 210 767 210" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:clarity@home.png 1</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price@home.png" data-score="1" d="M202 170C484 170 484 364 767 364" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:price@home.png 1</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust@home.png" data-score="2" d="M202 170C484 170 484 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity@home.walk.json" data-score="1" d="M202 170C484 170 484 234 767 234" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:clarity@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price@home.walk.json" data-score="1" d="M202 170C484 170 484 388 767 388" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:price@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust@home.walk.json" data-score="2" d="M202 170C484 170 484 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity@pricing.png" data-score="3" d="M202 170C484 170 484 258 767 258" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ana scored compare:clarity@pricing.png 3</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price@pricing.png" data-score="2" d="M202 170C484 170 484 412 767 412" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:price@pricing.png 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust@pricing.png" data-score="2" d="M202 170C484 170 484 566 767 566" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:trust@pricing.png 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:clarity@pricing.walk.json" data-score="3" d="M202 170C484 170 484 282 767 282" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ana scored compare:clarity@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:price@pricing.walk.json" data-score="2" d="M202 170C484 170 484 436 767 436" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:price@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-ana" data-node="compare:trust@pricing.walk.json" data-score="2" d="M202 170C484 170 484 590 767 590" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ana scored compare:trust@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity" data-score="2" d="M202 218C479 218 479 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price" data-score="3" d="M202 218C479 218 479 315 757 315" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:price 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust" data-score="2" d="M202 218C479 218 479 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity@cmp:acme-pricing" data-score="4" d="M202 218C484 218 484 186 767 186" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:clarity@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M202 218C484 218 484 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>builder-mei scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust@cmp:acme-pricing" data-score="4" d="M202 218C484 218 484 494 767 494" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:trust@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity@home.png" data-score="2" d="M202 218C484 218 484 210 767 210" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:clarity@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price@home.png" data-score="2" d="M202 218C484 218 484 364 767 364" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:price@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust@home.png" data-score="2" d="M202 218C484 218 484 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity@home.walk.json" data-score="2" d="M202 218C484 218 484 234 767 234" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:clarity@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price@home.walk.json" data-score="2" d="M202 218C484 218 484 388 767 388" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-mei scored compare:price@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust@home.walk.json" data-score="3" d="M202 218C484 218 484 542 767 542" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:trust@home.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity@pricing.png" data-score="4" d="M202 218C484 218 484 258 767 258" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:clarity@pricing.png 4</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price@pricing.png" data-score="3" d="M202 218C484 218 484 412 767 412" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:price@pricing.png 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust@pricing.png" data-score="3" d="M202 218C484 218 484 566 767 566" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:trust@pricing.png 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:clarity@pricing.walk.json" data-score="4" d="M202 218C484 218 484 282 767 282" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:clarity@pricing.walk.json 4</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:price@pricing.walk.json" data-score="3" d="M202 218C484 218 484 436 767 436" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:price@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-mei" data-node="compare:trust@pricing.walk.json" data-score="3" d="M202 218C484 218 484 590 767 590" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-mei scored compare:trust@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity" data-score="2" d="M202 266C479 266 479 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity@cmp:acme-pricing" data-score="4" d="M202 266C484 266 484 186 767 186" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price" data-score="2" d="M202 266C479 266 479 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:price 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust" data-score="2" d="M202 266C479 266 479 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity@home.png" data-score="2" d="M202 266C484 266 484 210 767 210" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity@home.walk.json" data-score="3" d="M202 266C484 266 484 234 767 234" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity@home.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity@pricing.png" data-score="3" d="M202 266C484 266 484 258 767 258" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity@pricing.png 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:clarity@pricing.walk.json" data-score="3" d="M202 266C484 266 484 282 767 282" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:clarity@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price@home.png" data-score="2" d="M202 266C484 266 484 364 767 364" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:price@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price@home.walk.json" data-score="2" d="M202 266C484 266 484 388 767 388" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:price@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price@pricing.png" data-score="3" d="M202 266C484 266 484 412 767 412" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:price@pricing.png 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price@pricing.walk.json" data-score="3" d="M202 266C484 266 484 436 767 436" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:price@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:price@cmp:acme-pricing" data-score="4" d="M202 266C484 266 484 340 767 340" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:price@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust@home.png" data-score="2" d="M202 266C484 266 484 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust@home.walk.json" data-score="2" d="M202 266C484 266 484 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust@pricing.png" data-score="2" d="M202 266C484 266 484 566 767 566" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:trust@pricing.png 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust@pricing.walk.json" data-score="2" d="M202 266C484 266 484 590 767 590" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>builder-ravi scored compare:trust@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="builder-ravi" data-node="compare:trust@cmp:acme-pricing" data-score="3" d="M202 266C484 266 484 494 767 494" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>builder-ravi scored compare:trust@cmp:acme-pricing 3</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity" data-score="2" d="M380 436C568 436 568 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price" data-score="2" d="M380 436C568 436 568 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:price 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust" data-score="2" d="M380 436C568 436 568 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity@cmp:acme-pricing" data-score="4" d="M380 436C573 436 573 186 767 186" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>company-george scored compare:clarity@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M380 436C573 436 573 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>company-george scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust@cmp:acme-pricing" data-score="3" d="M380 436C573 436 573 494 767 494" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-george scored compare:trust@cmp:acme-pricing 3</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity@home.png" data-score="2" d="M380 436C573 436 573 210 767 210" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:clarity@home.png 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price@home.png" data-score="1" d="M380 436C573 436 573 364 767 364" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:price@home.png 1</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust@home.png" data-score="2" d="M380 436C573 436 573 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity@home.walk.json" data-score="2" d="M380 436C573 436 573 234 767 234" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:clarity@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price@home.walk.json" data-score="1" d="M380 436C573 436 573 388 767 388" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:price@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust@home.walk.json" data-score="2" d="M380 436C573 436 573 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity@pricing.png" data-score="2" d="M380 436C573 436 573 258 767 258" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:clarity@pricing.png 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price@pricing.png" data-score="3" d="M380 436C573 436 573 412 767 412" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-george scored compare:price@pricing.png 3</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust@pricing.png" data-score="2" d="M380 436C573 436 573 566 767 566" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:trust@pricing.png 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:clarity@pricing.walk.json" data-score="2" d="M380 436C573 436 573 282 767 282" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:clarity@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:price@pricing.walk.json" data-score="3" d="M380 436C573 436 573 436 767 436" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-george scored compare:price@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="company-george" data-node="compare:trust@pricing.walk.json" data-score="2" d="M380 436C573 436 573 590 767 590" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-george scored compare:trust@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity" data-score="1" d="M380 484C568 484 568 161 757 161" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:clarity 1</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity@cmp:acme-pricing" data-score="5" d="M380 484C573 484 573 186 767 186" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>company-hanna scored compare:clarity@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price" data-score="2" d="M380 484C568 484 568 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:price 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust" data-score="2" d="M380 484C568 484 568 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M380 484C573 484 573 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>company-hanna scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust@cmp:acme-pricing" data-score="3" d="M380 484C573 484 573 494 767 494" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-hanna scored compare:trust@cmp:acme-pricing 3</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity@home.png" data-score="1" d="M380 484C573 484 573 210 767 210" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:clarity@home.png 1</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price@home.png" data-score="1" d="M380 484C573 484 573 364 767 364" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:price@home.png 1</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust@home.png" data-score="2" d="M380 484C573 484 573 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity@home.walk.json" data-score="1" d="M380 484C573 484 573 234 767 234" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:clarity@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price@home.walk.json" data-score="1" d="M380 484C573 484 573 388 767 388" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:price@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust@home.walk.json" data-score="2" d="M380 484C573 484 573 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity@pricing.png" data-score="3" d="M380 484C573 484 573 258 767 258" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-hanna scored compare:clarity@pricing.png 3</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price@pricing.png" data-score="2" d="M380 484C573 484 573 412 767 412" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:price@pricing.png 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust@pricing.png" data-score="2" d="M380 484C573 484 573 566 767 566" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:trust@pricing.png 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:clarity@pricing.walk.json" data-score="3" d="M380 484C573 484 573 282 767 282" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>company-hanna scored compare:clarity@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:price@pricing.walk.json" data-score="2" d="M380 484C573 484 573 436 767 436" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:price@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="company-hanna" data-node="compare:trust@pricing.walk.json" data-score="2" d="M380 484C573 484 573 590 767 590" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>company-hanna scored compare:trust@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity" data-score="2" d="M558 606C657 606 657 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price" data-score="2" d="M558 606C657 606 657 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:price 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust" data-score="2" d="M558 606C657 606 657 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity@home.png" data-score="2" d="M558 606C662 606 662 210 767 210" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:clarity@home.png 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price@home.png" data-score="1" d="M558 606C662 606 662 364 767 364" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:price@home.png 1</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust@home.png" data-score="2" d="M558 606C662 606 662 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity@home.walk.json" data-score="2" d="M558 606C662 606 662 234 767 234" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:clarity@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price@home.walk.json" data-score="1" d="M558 606C662 606 662 388 767 388" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:price@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust@home.walk.json" data-score="2" d="M558 606C662 606 662 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>investor-claire scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity@pricing.png" data-score="3" d="M558 606C662 606 662 258 767 258" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:clarity@pricing.png 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price@pricing.png" data-score="3" d="M558 606C662 606 662 412 767 412" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:price@pricing.png 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust@pricing.png" data-score="3" d="M558 606C662 606 662 566 767 566" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:trust@pricing.png 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity@pricing.walk.json" data-score="3" d="M558 606C662 606 662 282 767 282" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:clarity@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price@pricing.walk.json" data-score="3" d="M558 606C662 606 662 436 767 436" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:price@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust@pricing.walk.json" data-score="3" d="M558 606C662 606 662 590 767 590" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:trust@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:clarity@cmp:acme-pricing" data-score="4" d="M558 606C662 606 662 186 767 186" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:clarity@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M558 606C662 606 662 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>investor-claire scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="investor-claire" data-node="compare:trust@cmp:acme-pricing" data-score="4" d="M558 606C662 606 662 494 767 494" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>investor-claire scored compare:trust@cmp:acme-pricing 4</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity" data-score="2" d="M202 314C479 314 479 161 757 161" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price" data-score="2" d="M202 314C479 314 479 315 757 315" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust" data-score="2" d="M202 314C479 314 479 469 757 469" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@home.png" data-score="2" d="M202 314C484 314 484 210 767 210" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@home.png 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@home.png" data-score="1" d="M202 314C484 314 484 364 767 364" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@home.png 1</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@home.png" data-score="2" d="M202 314C484 314 484 518 767 518" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@home.png 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@home.walk.json" data-score="2" d="M202 314C484 314 484 234 767 234" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@home.walk.json" data-score="1" d="M202 314C484 314 484 388 767 388" fill="none" stroke="#b4d3ee" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@home.walk.json 1</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@home.walk.json" data-score="2" d="M202 314C484 314 484 542 767 542" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@home.walk.json 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@pricing.png" data-score="4" d="M202 314C484 314 484 258 767 258" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@pricing.png 4</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@pricing.png" data-score="3" d="M202 314C484 314 484 412 767 412" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@pricing.png 3</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@pricing.png" data-score="2" d="M202 314C484 314 484 566 767 566" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@pricing.png 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@pricing.walk.json" data-score="4" d="M202 314C484 314 484 282 767 282" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@pricing.walk.json 4</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@pricing.walk.json" data-score="3" d="M202 314C484 314 484 436 767 436" fill="none" stroke="#4f9fe3" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@pricing.walk.json 3</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@pricing.walk.json" data-score="2" d="M202 314C484 314 484 590 767 590" fill="none" stroke="#86bbe9" stroke-width="1" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@pricing.walk.json 2</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:clarity@cmp:acme-pricing" data-score="5" d="M202 314C484 314 484 186 767 186" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>newcomer-sofia scored compare:clarity@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:price@cmp:acme-pricing" data-score="5" d="M202 314C484 314 484 340 767 340" fill="none" stroke="#0550ae" stroke-width="3" stroke-opacity="0.8"><title>newcomer-sofia scored compare:price@cmp:acme-pricing 5</title></path>
+<path class="edge-score" data-persona="newcomer-sofia" data-node="compare:trust@cmp:acme-pricing" data-score="4" d="M202 314C484 314 484 494 767 494" fill="none" stroke="#1f78d1" stroke-width="2" stroke-opacity="0.8"><title>newcomer-sofia scored compare:trust@cmp:acme-pricing 4</title></path>
+<path class="edge-finding" data-finding="510b7839f1dec359" data-status="row" d="M202 170C584 170 584 162 966 162" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 510b78 (row)</title></path>
+<path class="edge-finding" data-finding="999a77abb7348612" data-status="dismissed" d="M202 170C584 170 584 190 966 190" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised 999a77 (dismissed)</title></path>
+<path class="edge-finding" data-finding="3a92c7d727912314" data-status="row" d="M202 170C584 170 584 218 966 218" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 3a92c7 (row)</title></path>
+<path class="edge-finding" data-finding="051bb4d15cefb1d7" data-status="row" d="M202 170C584 170 584 246 966 246" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised 051bb4 (row)</title></path>
+<path class="edge-finding" data-finding="ca95b24ed2259c2a" data-status="dismissed" d="M202 170C584 170 584 274 966 274" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised ca95b2 (dismissed)</title></path>
+<path class="edge-finding" data-finding="be04353a7b1cd73f" data-status="row" d="M202 170C584 170 584 302 966 302" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ana raised be0435 (row)</title></path>
+<path class="edge-finding" data-finding="5c8569ee5f152bce" data-status="dismissed" d="M202 170C584 170 584 330 966 330" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>builder-ana raised 5c8569 (dismissed)</title></path>
+<path class="edge-finding" data-finding="2b0c99085b60a693" data-status="row" d="M202 218C584 218 584 358 966 358" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised 2b0c99 (row)</title></path>
+<path class="edge-finding" data-finding="747c39d16777350a" data-status="row" d="M202 218C584 218 584 386 966 386" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-mei raised 747c39 (row)</title></path>
+<path class="edge-finding" data-finding="779c6119ce27f683" data-status="row" d="M202 266C584 266 584 414 966 414" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised 779c61 (row)</title></path>
+<path class="edge-finding" data-finding="ca861c876a90ce76" data-status="row" d="M202 266C584 266 584 442 966 442" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>builder-ravi raised ca861c (row)</title></path>
+<path class="edge-finding" data-finding="6512458f1b4388ca" data-status="row" d="M202 314C584 314 584 470 966 470" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised 651245 (row)</title></path>
+<path class="edge-finding" data-finding="e607d59eeeae52c7" data-status="row" d="M202 314C584 314 584 498 966 498" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>newcomer-sofia raised e607d5 (row)</title></path>
+<path class="edge-finding" data-finding="feb89036a3bd1f6d" data-status="dismissed" d="M202 314C584 314 584 526 966 526" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>newcomer-sofia raised feb890 (dismissed)</title></path>
+<path class="edge-finding" data-finding="94855e0e6ea2121c" data-status="dismissed" d="M202 314C584 314 584 554 966 554" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>newcomer-sofia raised 94855e (dismissed)</title></path>
+<path class="edge-finding" data-finding="e718c8affa406944" data-status="dismissed" d="M380 436C673 436 673 582 966 582" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-george raised e718c8 (dismissed)</title></path>
+<path class="edge-finding" data-finding="740bff4f196cb43f" data-status="dismissed" d="M380 436C673 436 673 610 966 610" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-george raised 740bff (dismissed)</title></path>
+<path class="edge-finding" data-finding="84ceb4f8ad2df09e" data-status="row" d="M380 484C673 484 673 638 966 638" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised 84ceb4 (row)</title></path>
+<path class="edge-finding" data-finding="fedd77fa7f54299f" data-status="row" d="M380 484C673 484 673 666 966 666" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised fedd77 (row)</title></path>
+<path class="edge-finding" data-finding="167c541d5fc6c38f" data-status="dismissed" d="M380 484C673 484 673 694 966 694" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-hanna raised 167c54 (dismissed)</title></path>
+<path class="edge-finding" data-finding="afe1f6fc30c43cb7" data-status="row" d="M380 484C673 484 673 722 966 722" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>company-hanna raised afe1f6 (row)</title></path>
+<path class="edge-finding" data-finding="4c496971aafdf2d2" data-status="dismissed" d="M380 484C673 484 673 750 966 750" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>company-hanna raised 4c4969 (dismissed)</title></path>
+<path class="edge-finding" data-finding="3ee5a70436d09639" data-status="row" d="M558 606C762 606 762 778 966 778" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised 3ee5a7 (row)</title></path>
+<path class="edge-finding" data-finding="796dab3840f9494a" data-status="row" d="M558 606C762 606 762 806 966 806" fill="none" stroke="#0969da" stroke-width="1.6" stroke-opacity="0.85"><title>investor-claire raised 796dab (row)</title></path>
+<path class="edge-finding" data-finding="0e98e49bdb8aec31" data-status="dismissed" d="M558 606C762 606 762 834 966 834" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>investor-claire raised 0e98e4 (dismissed)</title></path>
+<path class="edge-finding" data-finding="bca3d16ff71b9c26" data-status="dismissed" d="M558 606C762 606 762 862 966 862" fill="none" stroke="#8c959f" stroke-width="1.6" stroke-dasharray="4 3" stroke-opacity="0.85"><title>investor-claire raised bca3d1 (dismissed)</title></path>
+<g>
+<title>Ana Costa (builder-ana, primary)</title>
+<rect class="persona" data-persona="builder-ana" x="30" y="150" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="40" y="167" font-size="12" font-weight="700">Ana Costa</text>
+<text x="40" y="181" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">builder-ana</text>
+<rect x="145" y="171" width="49" height="13" rx="6.5" fill="#ddf4ff" stroke="#57606a" stroke-width="0.8"/>
+<text x="170" y="181" font-size="9" text-anchor="middle">primary</text>
+</g>
+<g>
+<title>Mei Lin Tan (builder-mei, primary)</title>
+<rect class="persona" data-persona="builder-mei" x="30" y="198" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="40" y="215" font-size="12" font-weight="700">Mei Lin Tan</text>
+<text x="40" y="229" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">builder-mei</text>
+<rect x="145" y="219" width="49" height="13" rx="6.5" fill="#ddf4ff" stroke="#57606a" stroke-width="0.8"/>
+<text x="170" y="229" font-size="9" text-anchor="middle">primary</text>
+</g>
+<g>
+<title>Ravi Menon (builder-ravi, primary)</title>
+<rect class="persona" data-persona="builder-ravi" x="30" y="246" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="40" y="263" font-size="12" font-weight="700">Ravi Menon</text>
+<text x="40" y="277" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">builder-ravi</text>
+<rect x="145" y="267" width="49" height="13" rx="6.5" fill="#ddf4ff" stroke="#57606a" stroke-width="0.8"/>
+<text x="170" y="277" font-size="9" text-anchor="middle">primary</text>
+</g>
+<g>
+<title>Sofia Alvarez (newcomer-sofia, primary)</title>
+<rect class="persona" data-persona="newcomer-sofia" x="30" y="294" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="40" y="311" font-size="12" font-weight="700">Sofia Alvarez</text>
+<text x="40" y="325" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">newcomer-sofia</text>
+<rect x="145" y="315" width="49" height="13" rx="6.5" fill="#ddf4ff" stroke="#57606a" stroke-width="0.8"/>
+<text x="170" y="325" font-size="9" text-anchor="middle">primary</text>
+</g>
+<g>
+<title>George Adeyemi (company-george, secondary)</title>
+<rect class="persona" data-persona="company-george" x="208" y="416" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="218" y="433" font-size="12" font-weight="700">George Adeyemi</text>
+<text x="218" y="447" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">company-george</text>
+<rect x="313" y="437" width="59" height="13" rx="6.5" fill="#fff8c5" stroke="#57606a" stroke-width="0.8"/>
+<text x="343" y="447" font-size="9" text-anchor="middle">secondary</text>
+</g>
+<g>
+<title>Hanna Weber (company-hanna, secondary)</title>
+<rect class="persona" data-persona="company-hanna" x="208" y="464" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="218" y="481" font-size="12" font-weight="700">Hanna Weber</text>
+<text x="218" y="495" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">company-hanna</text>
+<rect x="313" y="485" width="59" height="13" rx="6.5" fill="#fff8c5" stroke="#57606a" stroke-width="0.8"/>
+<text x="343" y="495" font-size="9" text-anchor="middle">secondary</text>
+</g>
+<g>
+<title>Claire Dubois (investor-claire, bystander)</title>
+<rect class="persona" data-persona="investor-claire" x="386" y="586" width="172" height="40" rx="7" fill="#ffffff" stroke="#d0d7de" stroke-width="1.2"/>
+<text x="396" y="603" font-size="12" font-weight="700">Claire Dubois</text>
+<text x="396" y="617" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">investor-claire</text>
+<rect x="491" y="607" width="59" height="13" rx="6.5" fill="#dafbe1" stroke="#57606a" stroke-width="0.8"/>
+<text x="521" y="617" font-size="9" text-anchor="middle">bystander</text>
+</g>
+<g>
+<title>critical:works</title>
+<rect class="node" data-node="critical:works" x="603" y="150" width="138" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="611" y="165" font-size="11" font-weight="700">works</text>
+<rect class="badge" data-node="critical:works" data-stratum="primary" data-median="2" x="677" y="154" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="686" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:works" data-stratum="secondary" data-median="2" x="697" y="154" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="706" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:works" data-stratum="bystander" data-median="2" x="717" y="154" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="726" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>critical:blocks</title>
+<rect class="node" data-node="critical:blocks" x="603" y="184" width="138" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="611" y="199" font-size="11" font-weight="700">blocks</text>
+<rect class="badge" data-node="critical:blocks" data-stratum="primary" data-median="2" x="677" y="188" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="686" y="199" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:blocks" data-stratum="secondary" data-median="2" x="697" y="188" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="706" y="199" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:blocks" data-stratum="bystander" data-median="2" x="717" y="188" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="726" y="199" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>critical:missing</title>
+<rect class="node" data-node="critical:missing" x="603" y="218" width="138" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="611" y="233" font-size="11" font-weight="700">missing</text>
+<rect class="badge" data-node="critical:missing" data-stratum="primary" data-median="2" x="677" y="222" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="686" y="233" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:missing" data-stratum="secondary" data-median="2" x="697" y="222" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="706" y="233" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="critical:missing" data-stratum="bystander" data-median="2" x="717" y="222" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="726" y="233" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:clarity</title>
+<rect class="node" data-node="compare:clarity" x="757" y="150" width="185" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="765" y="165" font-size="11" font-weight="700">clarity</text>
+<rect class="badge" data-node="compare:clarity" data-stratum="primary" data-median="2" x="878" y="154" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:clarity" data-stratum="secondary" data-median="1" x="898" y="154" width="18" height="14" rx="4" fill="#b4d3ee"><title>secondary median 1 of 2</title></rect>
+<text x="907" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:clarity" data-stratum="bystander" data-median="2" x="918" y="154" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="165" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:clarity@cmp:acme-pricing</title>
+<rect class="node" data-node="compare:clarity@cmp:acme-pricing" x="767" y="176" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="190" font-size="10" fill="#57606a">cmp:acme-pricing</text>
+<rect class="badge" data-node="compare:clarity@cmp:acme-pricing" data-stratum="primary" data-median="4" x="878" y="179" width="18" height="14" rx="4" fill="#1f78d1"><title>primary median 4 of 4</title></rect>
+<text x="887" y="190" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect class="badge" data-node="compare:clarity@cmp:acme-pricing" data-stratum="secondary" data-median="4" x="898" y="179" width="18" height="14" rx="4" fill="#1f78d1"><title>secondary median 4 of 2</title></rect>
+<text x="907" y="190" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+<rect class="badge" data-node="compare:clarity@cmp:acme-pricing" data-stratum="bystander" data-median="4" x="918" y="179" width="18" height="14" rx="4" fill="#1f78d1"><title>bystander median 4 of 1</title></rect>
+<text x="927" y="190" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+</g>
+<g>
+<title>compare:clarity@home.png</title>
+<rect class="node" data-node="compare:clarity@home.png" x="767" y="200" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="214" font-size="10" fill="#57606a">home.png</text>
+<rect class="badge" data-node="compare:clarity@home.png" data-stratum="primary" data-median="2" x="878" y="203" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="214" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:clarity@home.png" data-stratum="secondary" data-median="1" x="898" y="203" width="18" height="14" rx="4" fill="#b4d3ee"><title>secondary median 1 of 2</title></rect>
+<text x="907" y="214" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:clarity@home.png" data-stratum="bystander" data-median="2" x="918" y="203" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="214" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:clarity@home.walk.json</title>
+<rect class="node" data-node="compare:clarity@home.walk.json" x="767" y="224" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="238" font-size="10" fill="#57606a">home.walk.json</text>
+<rect class="badge" data-node="compare:clarity@home.walk.json" data-stratum="primary" data-median="2" x="878" y="227" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="238" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:clarity@home.walk.json" data-stratum="secondary" data-median="1" x="898" y="227" width="18" height="14" rx="4" fill="#b4d3ee"><title>secondary median 1 of 2</title></rect>
+<text x="907" y="238" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:clarity@home.walk.json" data-stratum="bystander" data-median="2" x="918" y="227" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="238" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:clarity@pricing.png</title>
+<rect class="node" data-node="compare:clarity@pricing.png" x="767" y="248" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="262" font-size="10" fill="#57606a">pricing.png</text>
+<rect class="badge" data-node="compare:clarity@pricing.png" data-stratum="primary" data-median="3" x="878" y="251" width="18" height="14" rx="4" fill="#4f9fe3"><title>primary median 3 of 4</title></rect>
+<text x="887" y="262" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:clarity@pricing.png" data-stratum="secondary" data-median="2" x="898" y="251" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="262" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:clarity@pricing.png" data-stratum="bystander" data-median="3" x="918" y="251" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="262" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>compare:clarity@pricing.walk.json</title>
+<rect class="node" data-node="compare:clarity@pricing.walk.json" x="767" y="272" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="286" font-size="10" fill="#57606a">pricing.walk.json</text>
+<rect class="badge" data-node="compare:clarity@pricing.walk.json" data-stratum="primary" data-median="3" x="878" y="275" width="18" height="14" rx="4" fill="#4f9fe3"><title>primary median 3 of 4</title></rect>
+<text x="887" y="286" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:clarity@pricing.walk.json" data-stratum="secondary" data-median="2" x="898" y="275" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="286" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:clarity@pricing.walk.json" data-stratum="bystander" data-median="3" x="918" y="275" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="286" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>compare:price</title>
+<rect class="node" data-node="compare:price" x="757" y="304" width="185" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="765" y="319" font-size="11" font-weight="700">price</text>
+<rect class="badge" data-node="compare:price" data-stratum="primary" data-median="2" x="878" y="308" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="319" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:price" data-stratum="secondary" data-median="2" x="898" y="308" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="319" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:price" data-stratum="bystander" data-median="2" x="918" y="308" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="319" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:price@cmp:acme-pricing</title>
+<rect class="node" data-node="compare:price@cmp:acme-pricing" x="767" y="330" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="344" font-size="10" fill="#57606a">cmp:acme-pricing</text>
+<rect class="badge" data-node="compare:price@cmp:acme-pricing" data-stratum="primary" data-median="5" x="878" y="333" width="18" height="14" rx="4" fill="#0550ae"><title>primary median 5 of 4</title></rect>
+<text x="887" y="344" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect class="badge" data-node="compare:price@cmp:acme-pricing" data-stratum="secondary" data-median="5" x="898" y="333" width="18" height="14" rx="4" fill="#0550ae"><title>secondary median 5 of 2</title></rect>
+<text x="907" y="344" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+<rect class="badge" data-node="compare:price@cmp:acme-pricing" data-stratum="bystander" data-median="5" x="918" y="333" width="18" height="14" rx="4" fill="#0550ae"><title>bystander median 5 of 1</title></rect>
+<text x="927" y="344" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">5</text>
+</g>
+<g>
+<title>compare:price@home.png</title>
+<rect class="node" data-node="compare:price@home.png" x="767" y="354" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="368" font-size="10" fill="#57606a">home.png</text>
+<rect class="badge" data-node="compare:price@home.png" data-stratum="primary" data-median="1" x="878" y="357" width="18" height="14" rx="4" fill="#b4d3ee"><title>primary median 1 of 4</title></rect>
+<text x="887" y="368" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:price@home.png" data-stratum="secondary" data-median="1" x="898" y="357" width="18" height="14" rx="4" fill="#b4d3ee"><title>secondary median 1 of 2</title></rect>
+<text x="907" y="368" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:price@home.png" data-stratum="bystander" data-median="1" x="918" y="357" width="18" height="14" rx="4" fill="#b4d3ee"><title>bystander median 1 of 1</title></rect>
+<text x="927" y="368" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+</g>
+<g>
+<title>compare:price@home.walk.json</title>
+<rect class="node" data-node="compare:price@home.walk.json" x="767" y="378" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="392" font-size="10" fill="#57606a">home.walk.json</text>
+<rect class="badge" data-node="compare:price@home.walk.json" data-stratum="primary" data-median="1" x="878" y="381" width="18" height="14" rx="4" fill="#b4d3ee"><title>primary median 1 of 4</title></rect>
+<text x="887" y="392" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:price@home.walk.json" data-stratum="secondary" data-median="1" x="898" y="381" width="18" height="14" rx="4" fill="#b4d3ee"><title>secondary median 1 of 2</title></rect>
+<text x="907" y="392" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+<rect class="badge" data-node="compare:price@home.walk.json" data-stratum="bystander" data-median="1" x="918" y="381" width="18" height="14" rx="4" fill="#b4d3ee"><title>bystander median 1 of 1</title></rect>
+<text x="927" y="392" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">1</text>
+</g>
+<g>
+<title>compare:price@pricing.png</title>
+<rect class="node" data-node="compare:price@pricing.png" x="767" y="402" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="416" font-size="10" fill="#57606a">pricing.png</text>
+<rect class="badge" data-node="compare:price@pricing.png" data-stratum="primary" data-median="3" x="878" y="405" width="18" height="14" rx="4" fill="#4f9fe3"><title>primary median 3 of 4</title></rect>
+<text x="887" y="416" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:price@pricing.png" data-stratum="secondary" data-median="2" x="898" y="405" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="416" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:price@pricing.png" data-stratum="bystander" data-median="3" x="918" y="405" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="416" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>compare:price@pricing.walk.json</title>
+<rect class="node" data-node="compare:price@pricing.walk.json" x="767" y="426" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="440" font-size="10" fill="#57606a">pricing.walk.json</text>
+<rect class="badge" data-node="compare:price@pricing.walk.json" data-stratum="primary" data-median="3" x="878" y="429" width="18" height="14" rx="4" fill="#4f9fe3"><title>primary median 3 of 4</title></rect>
+<text x="887" y="440" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:price@pricing.walk.json" data-stratum="secondary" data-median="2" x="898" y="429" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="440" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:price@pricing.walk.json" data-stratum="bystander" data-median="3" x="918" y="429" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="440" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>compare:trust</title>
+<rect class="node" data-node="compare:trust" x="757" y="458" width="185" height="22" rx="5" fill="#ffffff" stroke="#d0d7de" stroke-width="1"/>
+<text x="765" y="473" font-size="11" font-weight="700">trust</text>
+<rect class="badge" data-node="compare:trust" data-stratum="primary" data-median="2" x="878" y="462" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="473" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust" data-stratum="secondary" data-median="2" x="898" y="462" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="473" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust" data-stratum="bystander" data-median="2" x="918" y="462" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="473" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:trust@cmp:acme-pricing</title>
+<rect class="node" data-node="compare:trust@cmp:acme-pricing" x="767" y="484" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="498" font-size="10" fill="#57606a">cmp:acme-pricing</text>
+<rect class="badge" data-node="compare:trust@cmp:acme-pricing" data-stratum="primary" data-median="3" x="878" y="487" width="18" height="14" rx="4" fill="#4f9fe3"><title>primary median 3 of 4</title></rect>
+<text x="887" y="498" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:trust@cmp:acme-pricing" data-stratum="secondary" data-median="3" x="898" y="487" width="18" height="14" rx="4" fill="#4f9fe3"><title>secondary median 3 of 2</title></rect>
+<text x="907" y="498" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+<rect class="badge" data-node="compare:trust@cmp:acme-pricing" data-stratum="bystander" data-median="4" x="918" y="487" width="18" height="14" rx="4" fill="#1f78d1"><title>bystander median 4 of 1</title></rect>
+<text x="927" y="498" font-size="10" font-weight="700" text-anchor="middle" fill="#ffffff">4</text>
+</g>
+<g>
+<title>compare:trust@home.png</title>
+<rect class="node" data-node="compare:trust@home.png" x="767" y="508" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="522" font-size="10" fill="#57606a">home.png</text>
+<rect class="badge" data-node="compare:trust@home.png" data-stratum="primary" data-median="2" x="878" y="511" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="522" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@home.png" data-stratum="secondary" data-median="2" x="898" y="511" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="522" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@home.png" data-stratum="bystander" data-median="2" x="918" y="511" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="522" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:trust@home.walk.json</title>
+<rect class="node" data-node="compare:trust@home.walk.json" x="767" y="532" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="546" font-size="10" fill="#57606a">home.walk.json</text>
+<rect class="badge" data-node="compare:trust@home.walk.json" data-stratum="primary" data-median="2" x="878" y="535" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="546" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@home.walk.json" data-stratum="secondary" data-median="2" x="898" y="535" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="546" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@home.walk.json" data-stratum="bystander" data-median="2" x="918" y="535" width="18" height="14" rx="4" fill="#86bbe9"><title>bystander median 2 of 1</title></rect>
+<text x="927" y="546" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+</g>
+<g>
+<title>compare:trust@pricing.png</title>
+<rect class="node" data-node="compare:trust@pricing.png" x="767" y="556" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="570" font-size="10" fill="#57606a">pricing.png</text>
+<rect class="badge" data-node="compare:trust@pricing.png" data-stratum="primary" data-median="2" x="878" y="559" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="570" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@pricing.png" data-stratum="secondary" data-median="2" x="898" y="559" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="570" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@pricing.png" data-stratum="bystander" data-median="3" x="918" y="559" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="570" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>compare:trust@pricing.walk.json</title>
+<rect class="node" data-node="compare:trust@pricing.walk.json" x="767" y="580" width="175" height="20" rx="5" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+<text x="775" y="594" font-size="10" fill="#57606a">pricing.walk.json</text>
+<rect class="badge" data-node="compare:trust@pricing.walk.json" data-stratum="primary" data-median="2" x="878" y="583" width="18" height="14" rx="4" fill="#86bbe9"><title>primary median 2 of 4</title></rect>
+<text x="887" y="594" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@pricing.walk.json" data-stratum="secondary" data-median="2" x="898" y="583" width="18" height="14" rx="4" fill="#86bbe9"><title>secondary median 2 of 2</title></rect>
+<text x="907" y="594" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">2</text>
+<rect class="badge" data-node="compare:trust@pricing.walk.json" data-stratum="bystander" data-median="3" x="918" y="583" width="18" height="14" rx="4" fill="#4f9fe3"><title>bystander median 3 of 1</title></rect>
+<text x="927" y="594" font-size="10" font-weight="700" text-anchor="middle" fill="#1f2328">3</text>
+</g>
+<g>
+<title>510b78 (row) builder-ana on blocks: Team shows Contact us instead of a price, and a price I cannot see is one I cannot afford.</title>
+<rect class="finding" data-finding="510b7839f1dec359" data-status="row" x="966" y="150" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="166" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">510b78</text>
+<text x="1012" y="166" font-size="10">Team shows Contact us i…</text>
+</g>
+<g>
+<title>999a77 (dismissed) builder-ana on blocks: Studio, the only plan that lists export, ends in Talk to sales and not a way to try it.</title>
+<rect class="finding" data-finding="999a77abb7348612" data-status="dismissed" x="966" y="178" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="194" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">999a77</text>
+<text x="1012" y="194" font-size="10">Studio, the only plan t…</text>
+</g>
+<g>
+<title>3a92c7 (row) builder-ana on blocks: The Sign up free button on Solo points nowhere (#).</title>
+<rect class="finding" data-finding="3a92c7d727912314" data-status="row" x="966" y="206" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="222" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">3a92c7</text>
+<text x="1012" y="222" font-size="10">The Sign up free button…</text>
+</g>
+<g>
+<title>051bb4 (row) builder-ana on clarity@home.png: Home headline does not say what the product is.</title>
+<rect class="finding" data-finding="051bb4d15cefb1d7" data-status="row" x="966" y="234" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="250" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">051bb4</text>
+<text x="1012" y="250" font-size="10">Home headline does not…</text>
+</g>
+<g>
+<title>ca95b2 (dismissed) builder-ana on price@home.png: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="ca95b24ed2259c2a" data-status="dismissed" x="966" y="262" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="278" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">ca95b2</text>
+<text x="1012" y="278" font-size="10">No price anywhere on th…</text>
+</g>
+<g>
+<title>be0435 (row) builder-ana on clarity@home.walk.json: Home headline does not say what the product is.</title>
+<rect class="finding" data-finding="be04353a7b1cd73f" data-status="row" x="966" y="290" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="306" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">be0435</text>
+<text x="1012" y="306" font-size="10">Home headline does not…</text>
+</g>
+<g>
+<title>5c8569 (dismissed) builder-ana on price@home.walk.json: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="5c8569ee5f152bce" data-status="dismissed" x="966" y="318" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="334" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">5c8569</text>
+<text x="1012" y="334" font-size="10">No price anywhere on th…</text>
+</g>
+<g>
+<title>2b0c99 (row) builder-mei on blocks: The main Get started button is white text on pale blue and is hard to read, so I would not trust it on a projector.</title>
+<rect class="finding" data-finding="2b0c99085b60a693" data-status="row" x="966" y="346" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="362" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">2b0c99</text>
+<text x="1012" y="362" font-size="10">The main Get started bu…</text>
+</g>
+<g>
+<title>747c39 (row) builder-mei on blocks: The Sign up free button on pricing points to just # so it goes nowhere.</title>
+<rect class="finding" data-finding="747c39d16777350a" data-status="row" x="966" y="374" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="390" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">747c39</text>
+<text x="1012" y="390" font-size="10">The Sign up free button…</text>
+</g>
+<g>
+<title>779c61 (row) builder-ravi on blocks: The 'Sign up free' link points to '#' so the one path to try the tool is a dead end.</title>
+<rect class="finding" data-finding="779c6119ce27f683" data-status="row" x="966" y="402" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="418" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">779c61</text>
+<text x="1012" y="418" font-size="10">The 'Sign up free' link…</text>
+</g>
+<g>
+<title>ca861c (row) builder-ravi on blocks: The 'Get started' button on the home page is pale with white text and sends me to pricing instead of a sign-up.</title>
+<rect class="finding" data-finding="ca861c876a90ce76" data-status="row" x="966" y="430" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="446" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">ca861c</text>
+<text x="1012" y="446" font-size="10">The 'Get started' butto…</text>
+</g>
+<g>
+<title>651245 (row) newcomer-sofia on blocks: The headline 'Orchestrate asynchronous knowledge synergies across your team's cognitive workflows' has words I cannot paraphrase, so I stop reading and go back to the chat saying 'no idea'.</title>
+<rect class="finding" data-finding="6512458f1b4388ca" data-status="row" x="966" y="458" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="474" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">651245</text>
+<text x="1012" y="474" font-size="10">The headline 'Orchestra…</text>
+</g>
+<g>
+<title>e607d5 (row) newcomer-sofia on blocks: The line under it ('AI-native collaborative substrate that operationalizes tacit insight') is just as unreadable, so there is no second chance.</title>
+<rect class="finding" data-finding="e607d59eeeae52c7" data-status="row" x="966" y="486" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="502" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">e607d5</text>
+<text x="1012" y="502" font-size="10">The line under it ('AI-…</text>
+</g>
+<g>
+<title>feb890 (dismissed) newcomer-sofia on price@home.png: No price or free mention anywhere on the home page.</title>
+<rect class="finding" data-finding="feb89036a3bd1f6d" data-status="dismissed" x="966" y="514" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="530" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">feb890</text>
+<text x="1012" y="530" font-size="10">No price or free mentio…</text>
+</g>
+<g>
+<title>94855e (dismissed) newcomer-sofia on price@home.walk.json: No price is stated in the home walk.</title>
+<rect class="finding" data-finding="94855e0e6ea2121c" data-status="dismissed" x="966" y="542" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="558" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">94855e</text>
+<text x="1012" y="558" font-size="10">No price is stated in t…</text>
+</g>
+<g>
+<title>e718c8 (dismissed) company-george on price@home.png: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="e718c8affa406944" data-status="dismissed" x="966" y="570" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="586" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">e718c8</text>
+<text x="1012" y="586" font-size="10">No price anywhere on th…</text>
+</g>
+<g>
+<title>740bff (dismissed) company-george on price@home.walk.json: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="740bff4f196cb43f" data-status="dismissed" x="966" y="598" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="614" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">740bff</text>
+<text x="1012" y="614" font-size="10">No price anywhere on th…</text>
+</g>
+<g>
+<title>84ceb4 (row) company-hanna on clarity: Lantern's headline and subtext are jargon and do not say what the product is.</title>
+<rect class="finding" data-finding="84ceb4f8ad2df09e" data-status="row" x="966" y="626" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="642" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">84ceb4</text>
+<text x="1012" y="642" font-size="10">Lantern's headline and…</text>
+</g>
+<g>
+<title>fedd77 (row) company-hanna on clarity@home.png: Does not say what the product is.</title>
+<rect class="finding" data-finding="fedd77fa7f54299f" data-status="row" x="966" y="654" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="670" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">fedd77</text>
+<text x="1012" y="670" font-size="10">Does not say what the p…</text>
+</g>
+<g>
+<title>167c54 (dismissed) company-hanna on price@home.png: No price shown.</title>
+<rect class="finding" data-finding="167c541d5fc6c38f" data-status="dismissed" x="966" y="682" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="698" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">167c54</text>
+<text x="1012" y="698" font-size="10">No price shown.</text>
+</g>
+<g>
+<title>afe1f6 (row) company-hanna on clarity@home.walk.json: Does not say what the product is.</title>
+<rect class="finding" data-finding="afe1f6fc30c43cb7" data-status="row" x="966" y="710" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="726" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">afe1f6</text>
+<text x="1012" y="726" font-size="10">Does not say what the p…</text>
+</g>
+<g>
+<title>4c4969 (dismissed) company-hanna on price@home.walk.json: No price shown.</title>
+<rect class="finding" data-finding="4c496971aafdf2d2" data-status="dismissed" x="966" y="738" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="754" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">4c4969</text>
+<text x="1012" y="754" font-size="10">No price shown.</text>
+</g>
+<g>
+<title>3ee5a7 (row) investor-claire on blocks: The hero headline and subline say nothing concrete, so a stranger cannot tell what the product is.</title>
+<rect class="finding" data-finding="3ee5a70436d09639" data-status="row" x="966" y="766" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="782" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">3ee5a7</text>
+<text x="1012" y="782" font-size="10">The hero headline and s…</text>
+</g>
+<g>
+<title>796dab (row) investor-claire on blocks: The middle Team plan says only Contact us, so the price is hidden where the mid-market would land.</title>
+<rect class="finding" data-finding="796dab3840f9494a" data-status="row" x="966" y="794" width="204" height="24" rx="5" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="974" y="810" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">796dab</text>
+<text x="1012" y="810" font-size="10">The middle Team plan sa…</text>
+</g>
+<g>
+<title>0e98e4 (dismissed) investor-claire on price@home.png: No price anywhere on the home page.</title>
+<rect class="finding" data-finding="0e98e49bdb8aec31" data-status="dismissed" x="966" y="822" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="838" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">0e98e4</text>
+<text x="1012" y="838" font-size="10">No price anywhere on th…</text>
+</g>
+<g>
+<title>bca3d1 (dismissed) investor-claire on price@home.walk.json: No price node on the home walk.</title>
+<rect class="finding" data-finding="bca3d16ff71b9c26" data-status="dismissed" x="966" y="850" width="204" height="24" rx="5" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="974" y="866" font-size="9" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" fill="#57606a">bca3d1</text>
+<text x="1012" y="866" font-size="10">No price node on the ho…</text>
+</g>
+<g font-size="12" fill="#57606a">
+<text x="30" y="666" font-size="13" font-weight="700" fill="#1f2328">Reading the graph</text>
+<rect x="30" y="684" width="30" height="18" rx="3" fill="#b4d3ee"/>
+<text x="45" y="698" text-anchor="middle" fill="#1f2328">1</text>
+<rect x="62" y="684" width="30" height="18" rx="3" fill="#86bbe9"/>
+<text x="77" y="698" text-anchor="middle" fill="#1f2328">2</text>
+<rect x="94" y="684" width="30" height="18" rx="3" fill="#4f9fe3"/>
+<text x="109" y="698" text-anchor="middle" fill="#1f2328">3</text>
+<rect x="126" y="684" width="30" height="18" rx="3" fill="#1f78d1"/>
+<text x="141" y="698" text-anchor="middle" fill="#ffffff">4</text>
+<rect x="158" y="684" width="30" height="18" rx="3" fill="#0550ae"/>
+<text x="173" y="698" text-anchor="middle" fill="#ffffff">5</text>
+<text x="198" y="698">score: the colour and weight of an edge</text>
+<text x="30" y="724">Badges P S B: the median of the primary, secondary</text>
+<text x="30" y="742">and bystander personas. Never one number across them.</text>
+<rect x="30" y="762" width="22" height="14" rx="3" fill="#ffebe9" stroke="#cf222e" stroke-width="1.2"/>
+<text x="58" y="773">open</text>
+<rect x="104" y="762" width="22" height="14" rx="3" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
+<text x="132" y="773">fixed</text>
+<rect x="185" y="762" width="22" height="14" rx="3" fill="#f6f8fa" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="213" y="773">dismissed</text>
+<rect x="294" y="762" width="22" height="14" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="322" y="773">row</text>
+</g>
+</g>
+</svg>

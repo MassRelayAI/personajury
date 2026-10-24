@@ -20,7 +20,7 @@ and must be labelled as such:
 5. the **independence** of the run (`independence:` in the matrix header, `independent` or `sequential`): a sequential run was
    judged by one context that read every brief, and it is weaker evidence than one context per brief;
 6. the **per-stratum table**: primary, secondary and bystander side by side, with every score, median, min and max, from
-   `personajury matrix RUN --table`.
+   `jurypersona matrix RUN --table`.
 
 **Do not publish an average across strata.** The engine refuses to produce one (`strata_average_refused`); do not compute one
 by hand, and do not quote a single "score" for a subject. The median is the lower middle value of a stratum, an integer; there

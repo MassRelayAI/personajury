@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "command -v personajury >/dev/null 2>&1 || exit 0; personajury doctor --brief",
+            "command": "command -v jurypersona >/dev/null 2>&1 || exit 0; jurypersona doctor --brief",
             "timeout": 10
           }
         ]

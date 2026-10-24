@@ -9,7 +9,7 @@ answer, and one of them is no.
 Write your own verdict as a person and ingest it with `--by-human`:
 
 ```bash
-personajury verdict --run 1 --file my-verdict.json --by-human "Your Name, product owner"
+jurypersona verdict --run 1 --file my-verdict.json --by-human "Your Name, product owner"
 ```
 
 A person's batch is labelled as human, and a blocker in it escalates `apply-check` until you record
@@ -23,7 +23,7 @@ colleague would recognise. Two such personas that could swap lines are one perso
 Give the persona the tag `critic` (`"tags": ["critic"]`) and seat it as a bystander:
 
 ```bash
-personajury panel add with-critic --query "3 builder=primary, 2 company=secondary, 1 critic=bystander"
+jurypersona panel add with-critic --query "3 builder=primary, 2 company=secondary, 1 critic=bystander"
 ```
 
 Read the critic's **blockers**, not its scores. A critic is useful for the point it raises that the others missed; as a

@@ -23,7 +23,7 @@ status: measured        # measured | decided | stale | superseded
 | date | report | verdict in one line | status |
 |---|---|---|---|
 | 2026-10-24 | [The README jury](2026-10-24-the-readme-jury.md) | 10 composite personas, 4 lenses, 2 rounds: 32 findings in round 1 (27 fixed); critical blockers 22 → 9 and docs 5 → 3, landed; compare not landed (per-screenshot price notes, an open question); picks for this README 4 of 10 → 7 of 10 | decided |
-| 2026-10-24 | [The name, picked by a persona jury](2026-10-24-the-name-picked-by-a-persona-jury.md) | PersonaJury, 8 of 8 forced picks over seven other names | decided |
+| 2026-10-24 | [The name, picked by a persona jury](2026-10-24-the-name-picked-by-a-persona-jury.md) | JuryPersona, 8 of 8 forced picks over seven other names | decided |
 | 2026-10-24 | [v0.2 measured: panels, the draw and overrides](2026-10-24-v0-2-measured.md) | 292 tests green after a review that found 6 Important findings, all fixed; the ceiling of 12 is still a guess | measured |
 | 2026-10-24 | [v0.3 measured: the jury graph, waves and usage](2026-10-24-v0-3-measured.md) | 332 tests green; the graph is byte-identical and goes red when one score moves; 3 Important findings fixed | measured |
 | 2026-10-24 | [v0.4 measured: the apply check](2026-10-24-v0-4-measured.md) | 409 tests green; the review found 5 Critical cases where apply-check said apply, all fixed; the .mcpb bundle is unverified | measured |

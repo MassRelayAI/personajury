@@ -2,7 +2,7 @@
 
 # Make docs a newcomer can follow
 
-A true story. CompareGraph is PersonaJury's sibling project. Before its README went out, seven personas read it, the team
+A true story. CompareGraph is JuryPersona's sibling project. Before its README went out, seven personas read it, the team
 fixed what they found, and the same seven read it again. Every number here comes from
 [the public report](https://github.com/massrelay-ai/comparegraph/blob/main/docs/reports/2026-10-24-readme-jury.md).
 

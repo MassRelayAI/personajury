@@ -1,5 +1,5 @@
 # The consulting-deck lens: does a deck carry a client from the question to a decision. Anchors in words, 1 / 3 / 5.
-# Fixture data, not seeded: load it with `personajury lens add --file fixtures/lenses/consulting-deck.toml`. Attach the
+# Fixture data, not seeded: load it with `jurypersona lens add --file fixtures/lenses/consulting-deck.toml`. Attach the
 # deck as files (a PDF export, one PNG per slide, the speaker notes); the jury reads the slides, it does not check the data.
 name = "consulting-deck"
 version = 1

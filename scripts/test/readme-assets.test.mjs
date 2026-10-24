@@ -71,7 +71,7 @@ test('strata.json and matrix.json derive from fixtures/run/matrix.json: one move
 
 test('spend.json carries the command and the measured bytes of the fixture run report (34,934 at spend 7 compact)', () => {
   const d = JSON.parse(readFileSync(json('spend'), 'utf8'));
-  assert.match(d.command, /personajury brief/);
+  assert.match(d.command, /jurypersona brief/);
   assert.equal(d.rows.find((r) => r.spend === 7 && r.detail === 'compact').bytes, 34934);
 });
 

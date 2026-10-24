@@ -1,7 +1,7 @@
 # The financial-model lens: can a reader follow and trust the model. Anchors in words, 1 / 3 / 5.
 # It judges readability and credibility, never arithmetic: a jury does not check that the formulas are right, and a
 # score here is no audit. Test the numbers with formulas and a person who signs for them.
-# Fixture data, not seeded: load it with `personajury lens add --file fixtures/lenses/financial-model.toml`. Attach the
+# Fixture data, not seeded: load it with `jurypersona lens add --file fixtures/lenses/financial-model.toml`. Attach the
 # model as files (a CSV or PDF export per sheet, a screenshot of the summary).
 name = "financial-model"
 version = 1

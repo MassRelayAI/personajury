@@ -7,6 +7,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-24
+### Renamed
+- Renamed from PersonaJury, at the maintainer's decision (D27): the crate, package and binary `jurypersona`, `jurypersona.toml`, the store
+  directory `.jurypersona/`, the MCP tools `jurypersona_*`, the environment variables `JURYPERSONA_*`, the repository
+  `massrelay-ai/jurypersona`, the release assets `jurypersona-<target>`, the plugin and marketplace `jurypersona`
+  (`/plugin install jurypersona@jurypersona`), the registry name `io.github.massrelay-ai/jurypersona`. The graph SVG is
+  `docs/assets/jurypersona-graph.svg`, titled "JuryPersona · <subject>". No compatibility shims: v0.5.0 was not adopted by anyone;
+  reinstall the plugin and rename `.personajury/` to `.jurypersona/` by hand if you kept a store.
+
 ## [0.5.0] - unreleased
 Nothing was ever released: this one entry holds the whole history, newest work first, and the sub-headings keep the versions the
 work was built in (0.5, 0.4, 0.3, 0.2, 0.1).
@@ -29,14 +38,14 @@ work was built in (0.5, 0.4, 0.3, 0.2, 0.1).
 - CSV locators refuse lowercase and `RC1`; a quote inside an unquoted field is literal.
 
 ### Added (v0.5, D20 to D24)
-- `personajury calibrate JURY_RUN HUMAN_RUN [--out F]` and `apply-check --calibration F`: the jury's rank order against a human run, per
+- `jurypersona calibrate JURY_RUN HUMAN_RUN [--out F]` and `apply-check --calibration F`: the jury's rank order against a human run, per
   stratum, never pooled; an uncalibrated jury advises (`uncalibrated`) (D20). `apply-check --latest` judges the subject of the newest run.
 - CSV cell locators `<label>#R<row>C<col>` on `.csv` text attachments, with an RFC 4180 reader in `domain/csv.rs` (D21).
 - `action.yml`, a composite GitHub Action (`scripts/action-run.sh`, `docs/ci.md`): `should-run` on the PR diff, `check` and `apply-check`
   with a committed store, outputs `quorum`, `spend`, `effort`, `answer`, `check`, `fail-on`, unmatched paths in plain words (D22).
 - `docs/agent-sdk.md` and `examples/agent-sdk/run_jury.py`: the Claude Agent SDK recipe, one context per brief (D23).
-- `personajury summary RUN... [--html F] [--md F] [--save] [--width N]` and the MCP tool `personajury_summary` (eight tools): sentences, the numbers
-  "for checking", then Next; no bars; `report_dir` in `personajury.toml` (D24). Golden files `fixtures/run/summary.txt` and `summary.md`.
+- `jurypersona summary RUN... [--html F] [--md F] [--save] [--width N]` and the MCP tool `jurypersona_summary` (eight tools): sentences, the numbers
+  "for checking", then Next; no bars; `report_dir` in `jurypersona.toml` (D24). Golden files `fixtures/run/summary.txt` and `summary.md`.
 - `fixtures/lenses/tradeoffs.toml` and `docs/playbooks/a-technical-decision.md`.
 - Docs: "Display is free, the verdict is not", "What goes to a jury", "Where results live"; a three-question rule in the skill.
 
@@ -44,15 +53,15 @@ work was built in (0.5, 0.4, 0.3, 0.2, 0.1).
 The sections below were built as 0.4, 0.3, 0.2 and 0.1 and ship together in 0.5.0.
 
 ### Added (v0.4, D13 to D19)
-- `personajury apply-check RUN... [--rule CLASS]` and the MCP tool `personajury_apply_check` (seven tools): `apply | escalate | human |
+- `jurypersona apply-check RUN... [--rule CLASS]` and the MCP tool `jurypersona_apply_check` (seven tools): `apply | escalate | human |
   advise` with the reasons as data (D13). `matrix` answers `splits`, the cells on which two strata's `anchor_met` ranges do not overlap.
-- `personajury lens generate --from PATH [--dimensions N]`: the brief that asks an agent to draft a lens from a standard (D14).
+- `jurypersona lens generate --from PATH [--dimensions N]`: the brief that asks an agent to draft a lens from a standard (D14).
   Three example lenses ship as fixture data (consulting deck, investor pitch, financial model).
 - A model per panel term (`3 builder=primary@claude-sonnet-5-5`), stated in every brief of that run; `matrix` answers `models` and
   `models_distinct` (D15).
 - `.mcpb` bundles for Claude Desktop (`packaging/mcpb`, `scripts/build-mcpb.sh`), `mcp.json` for Codex and Cursor, `mcpServers` in the
   Gemini extension, `packages` in `server.json`, a `publish-registry` release job, `tests/manifests.rs` and a no-listener guard (D16).
-- Effort: `effort = "low|medium|high|max"` in `personajury.toml` and `brief --effort`, `budget_tokens`, `over_budget`, `trimmed`; `doctor`
+- Effort: `effort = "low|medium|high|max"` in `jurypersona.toml` and `brief --effort`, `budget_tokens`, `over_budget`, `trimmed`; `doctor`
   shows the effort and the tokens reported over 7 days (D17).
 - `brief --independence independent|sequential`, shown by `matrix`, `delta` and `apply-check` (D18).
 - Experts: a persona `credential`, a lens `standard` in the matrix header, `verdict --by-human "<name, credential>"` (D19).
@@ -75,9 +84,9 @@ The sections below were built as 0.4, 0.3, 0.2 and 0.1 and ship together in 0.5.
 - Calibration (`calibrate`), CSV cell locators, the GitHub Action, the Agent SDK recipe, the marketplace listings.
 
 ### Added (v0.3, D11 and D12)
-- `personajury graph RUN... --svg [--out F]` and the MCP tool `personajury_graph`: the jury as one deterministic SVG (personas
+- `jurypersona graph RUN... --svg [--out F]` and the MCP tool `jurypersona_graph`: the jury as one deterministic SVG (personas
   in three stratum columns, the dimensions they scored with a median badge per stratum, the findings coloured by decision;
-  several runs draw each finding's life). `docs/assets/personajury-graph.svg`, checked against a fresh render by a test.
+  several runs draw each finding's life). `docs/assets/jurypersona-graph.svg`, checked against a fresh render by a test.
 - `check --history` lists each finding's life across runs (`data.lives`).
 - `brief` answers `waves` (`--wave N`, default 30).
 - A verdict may report `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed); `matrix` and `doctor` show
@@ -87,13 +96,13 @@ The sections below were built as 0.4, 0.3, 0.2 and 0.1 and ship together in 0.5.
 
 ### Changed (v0.3)
 - A brief above 12 seats needs `--reason` with or without a rule and records `override_json` with `rule: null`.
-- `brief` refuses a malformed `personajury.toml` it reads (`invalid_config`).
+- `brief` refuses a malformed `jurypersona.toml` it reads (`invalid_config`).
 
 ### Added (v0.2, D9 and D10)
 - A stake per panel term (`3 builder=primary`) and a seeded draw: where a term's pool is bigger than its seats, the seats are
   drawn from the subject's name and the panel's, so round 2 of a subject keeps its bystanders and `delta` can land.
   `brief --draw HEX`, `panel resolve --subject S`; `run.draw_seed` records the seed.
-- `brief --rule CLASS`: panel, lenses, spend and detail from `personajury.toml`, one run per lens. A `low` or `high` rule
+- `brief --rule CLASS`: panel, lenses, spend and detail from `jurypersona.toml`, one run per lens. A `low` or `high` rule
   must name a `panel` (`rule_without_panel`) and lenses.
 - Agent overrides on top of a rule (`--panel`, `--query`, `--spend`, `--lens`, `--detail`), each needing `--reason`
   (`override_without_reason`), recorded in `run.override_json` and shown by `matrix` (JSON `override`, a table header).
@@ -115,14 +124,14 @@ The sections below were built as 0.4, 0.3, 0.2 and 0.1 and ship together in 0.5.
 
 ### Added (v0.1)
 - The store: personas, panels, lenses, subjects, comparators, runs, verdicts, picks and decisions in SQLite
-  (`.personajury/store.db`); verdicts, picks and decisions are append-only.
+  (`.jurypersona/store.db`); verdicts, picks and decisions are append-only.
 - Verbs: `persona add|generate|list`, `panel add|resolve`, `lens add|list`, `subject add`, `comparator add`, `brief`,
   `verdict`, `matrix`, `pick`, `delta`, `check`, `decide`, `should-run`, `setup`, `doctor`, `mcp`.
 - Four shipped lenses as data under `lenses/`: `critical`, `taste`, `compare`, `recall`.
 - Deterministic, hashed briefs, one per persona per lens; `--spend N` and `--detail compact|full`.
 - Verdicts refused without evidence: a `seen` line with no citation, a comparator with no snapshot in the run, a score off
   the lens scale, a stale subject, a persona with no stake, a `pick` with no reason; a matrix that averages across strata.
-- `personajury.toml` trigger rules and `should-run`; a `human` class under a persona quorum is refused.
+- `jurypersona.toml` trigger rules and `should-run`; a `human` class under a persona quorum is refused.
 - The MCP server, the skills `running-a-jury` and `writing-a-persona`, the Claude Code plugin files, the install script.
 - `fixtures/`: the Lantern Notes site with planted defects, ARIA walks, a comparator, seven personas and trigger rules.
 - Verdict lines may be `about` one option (an attachment label or `cmp:<name>`), only under a lens that picks or compares;

@@ -1,5 +1,5 @@
 ---
-title: "PersonaJury's own README, judged by a persona jury, fixed and judged again"
+title: "JuryPersona's own README, judged by a persona jury, fixed and judged again"
 date: 2026-10-24
 valid_until: 2027-04-24
 verdict: "Ten composite personas (4 primary, 3 secondary, 3 bystander, one a deliberate critic) judged the README and quickstart under four lenses, against two other READMEs. Round 1 raised 32 findings: 27 fixed, 4 to the backlog, 1 dismissed. In round 2, critical blockers fell from 22 to 9 and the delta landed (primary 8 → 3, secondary 10 → 3, bystander 4 → 3). Docs blockers fell from 5 to 3 (landed), and taste stayed at 0 (landed). Compare did not land: blockers rose from 5 to 8, 6 of them one juror marking each section screenshot 'shows no price'. Forced picks for this README went from 4 of 10 to 7 of 10. Of the 20 round-2 findings, 5 were fixed, 9 went to one backlog row (a route with no terminal and no coding agent), and 6 were dismissed."
@@ -62,7 +62,7 @@ release binaries that did not exist yet. Three things fixed it:
 - **The v0.5.0 release** (binaries for five platforms, `SHA256SUMS`, an attestation).
 - **A new first screen** with three parts:
   - what it does, in one sentence;
-  - what you need (a coding agent; no key for PersonaJury);
+  - what you need (a coding agent; no key for JuryPersona);
   - three numbered steps to try it.
 - **A replay of the recorded fixture jury** that needs no agent.
 

@@ -5,9 +5,9 @@
 When you have a few candidates and must choose one, ask for a **forced pick**. Each persona scores every candidate, then
 names one, with a reason. You read the picks per group.
 
-## The story: PersonaJury's own logo
+## The story: JuryPersona's own logo
 
-PersonaJury's logo was chosen this way. The full numbers are in
+JuryPersona's logo was chosen this way. The full numbers are in
 [the logo report](../reports/2026-10-24-logo-jury.md).
 
 **Four directions.** A: twelve seats around one node, a jury box. B: three columns of nodes, the groups. C: a check mark
@@ -41,7 +41,7 @@ A name is harder than a logo: people judge it in context. So show each candidate
 2. **Add them as one subject.** The file names become the options.
 
    ```bash
-   personajury subject add console-name --kind design --attach console.example.com.png app.example.com.png example.app.png
+   jurypersona subject add console-name --kind design --attach console.example.com.png app.example.com.png example.app.png
    ```
 3. **Write a lens with `asks_pick = true`.** Anchors in words, as always.
 
@@ -63,7 +63,7 @@ A name is harder than a logo: people judge it in context. So show each candidate
    title = "I can say it out loud"
    anchors = { "1" = "I would have to spell it", "3" = "I would say it once, then repeat it", "5" = "I say it once and the other person types it right" }
    ```
-4. **Brief, answer, read the picks.** `personajury pick <run>` lists each group's choices with their reasons.
+4. **Brief, answer, read the picks.** `jurypersona pick <run>` lists each group's choices with their reasons.
 
 The engine refuses a pick with no choice, a choice that is not one of the options, or a choice with no reason.
 

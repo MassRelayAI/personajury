@@ -65,3 +65,21 @@ The jurors are fictional personas run on one model; the pick is a forced choice,
 registries were checked on one day and the names can be taken tomorrow; the trademark position was not searched. The numbers
 are a dated, hashed snapshot of what these personas said, not a market survey. A jury run on the naming lens can be repeated
 with `personajury` and a new card set.
+
+## The maintainer's override
+On 2026-10-24 the maintainer chose JuryPersona over the jury's pick: "JuryPersona - override go with this." The record above stays as
+it was run; this section adds a second run and the decision (D27 in `docs/decisions.md`).
+
+A second jury run put JuryPersona on a card beside PersonaJury, with the same lens and the same panel. Medians per stratum
+(primary / secondary / bystander):
+
+| name | understood | findable | ownable | memorable |
+|---|---|---|---|---|
+| JuryPersona | 3 / 3 / 3 | 3 / 3 / 3 | 3 / 3 / 3 | 3 / 3 / 3 |
+| PersonaJury | 4 / 4 / 3 | 3 / 4 / 4 | 5 / 5 / 5 | 4 / 4 / 4 |
+
+The picks were PersonaJury 8 of 8 again. So the maintainer's choice does not rest on the jury: it overrides it, in both runs. A name
+is a human class of decision, a brand, and the jury informs it without owning it. JuryPersona was kept by a person who prefers it;
+the jury's numbers say it is the weaker name on every axis, most of all on *ownable* (3 against 5). The cost of the override is a
+repository rename (GitHub redirects the old URL), release 0.5.1 with new asset names, and a plugin reinstall; v0.5.0 was not adopted
+by anyone, so no shim and no migration were written.

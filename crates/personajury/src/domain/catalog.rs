@@ -60,3 +60,14 @@ pub const CATALOG: &[(&str, &str)] = &[
     ("trait-sets/name-and-design.toml", include_str!("../../../../trait-sets/name-and-design.toml")),
     ("trait-sets/public-sector-legal.toml", include_str!("../../../../trait-sets/public-sector-legal.toml")),
 ];
+
+/// Whether `id` is a trait the catalog ships (`traits/<family>/<trait>.toml` is the trait `<family>.<trait>`).
+pub fn is_shipped(id: &str) -> bool {
+    shipped_text(id).is_some()
+}
+/// The embedded text of the shipped trait `id`.
+pub fn shipped_text(id: &str) -> Option<&'static str> {
+    let (family, name) = id.split_once('.')?;
+    let path = format!("traits/{family}/{name}.toml");
+    CATALOG.iter().find(|(p, _)| *p == path).map(|(_, t)| *t)
+}

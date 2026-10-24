@@ -131,9 +131,10 @@ fn out_writes_the_answer_and_apply_check_reads_it() {
     // a clean low-rule run (a workspace of its own: the human run above would supersede it) applies on its own ...
     let ws = Ws::new();
     ws.site();
-    let j = ws.run("critical", &PB, false);
+    let j = ws.run("critical", &THREE, false);
     ws.ingest(j, &critical("ana", [5, 4, 3], &[], &["page.json#n1"]));
     ws.ingest(j, &critical("bob", [5, 4, 3], &[], &["page.json#n1"]));
+    ws.ingest(j, &critical("cat", [5, 4, 3], &[], &["page.json#n1"]));
     std::fs::write(ws.root().join("personajury.toml"), LOW_RULE).unwrap();
     ws.store.conn().execute("UPDATE run SET rule_class = 'public-surface', quorum = 'low' WHERE id = ?1", [j]).unwrap();
     let a = data(ws.cli(&["apply-check", &rs(j)]));

@@ -63,11 +63,11 @@ fn seats_every_serving_persona_and_exactly_one_control() {
 }
 
 #[test]
-fn effort_caps_the_serving_seats_and_the_control_sits_beside_them() {
+fn effort_caps_the_whole_jury_and_the_control_sits_inside_the_cap() {
     let ws = world();
     let d = ok(auto(ws.path(), &["--effort", "low"]));
     let s = seats(&d);
-    assert_eq!(s.iter().filter(|(_, w)| w.starts_with("serves")).count(), 3);
+    assert_eq!(s.iter().filter(|(_, w)| w.starts_with("serves")).count(), 2);
     assert_eq!(s.iter().filter(|(_, w)| w.starts_with("control")).count(), 1);
 }
 
@@ -120,13 +120,11 @@ fn with_no_unrelated_persona_no_control_sits_and_it_says_so() {
 }
 
 #[test]
-fn under_a_rule_it_is_an_override_of_the_panel() {
+fn under_a_rule_it_is_no_override_by_itself() {
     let ws = world();
     let w = ws.path();
     ok(jg(w, &["panel", "add", "p", "--query", "2 x=primary"]));
     std::fs::write(w.join("personajury.toml"), "[[rule]]\nclass = \"docs\"\npaths = [\"page.md\"]\nquorum = \"low\"\npanel = \"p\"\nlenses = [\"critical\"]\n").unwrap();
-    let v = jg(w, &["brief", "--subject", "s", "--rule", "docs", "--seats", "auto", "--model", "m"]);
-    assert_eq!(code(&v), "override_without_reason");
-    let d = ok(jg(w, &["brief", "--subject", "s", "--rule", "docs", "--seats", "auto", "--model", "m", "--reason", "audience-matched jury"]));
-    assert_eq!(d["override"]["fields"]["panel"]["given"], "seats: auto");
+    let d = ok(jg(w, &["brief", "--subject", "s", "--rule", "docs", "--seats", "auto", "--model", "m"]));
+    assert!(d.get("override").is_none_or(serde_json::Value::is_null), "{}", d["override"]);
 }

@@ -223,6 +223,8 @@ pub fn compare(persona: &str, choice: &str, reason: &str) -> Value {
 }
 
 pub const TWO: [(&str, Stake); 2] = [("ana", Stake::Primary), ("bob", Stake::Secondary)];
+/// Two primary seats and one secondary: the smallest jury that may apply (a primary stratum of one is `thin_primary`).
+pub const THREE: [(&str, Stake); 3] = [("ana", Stake::Primary), ("cat", Stake::Primary), ("bob", Stake::Secondary)];
 
 /// critical-lens verdict with no citations anywhere and `told` evidence; `blockers` on the first line.
 pub fn told(persona: &str, blockers: &[&str]) -> Value {

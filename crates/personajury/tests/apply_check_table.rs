@@ -26,8 +26,14 @@ fn under(ws: &Ws, run: i64, rule: &str, quorum: &str) {
 fn set(ws: &Ws, run: i64, col: &str, v: &str) {
     ws.store.conn().execute(&format!("UPDATE run SET {col} = ?2 WHERE id = ?1"), rusqlite::params![run, v]).unwrap();
 }
+/// Two primary seats and one secondary: a primary stratum of one is `thin_primary` (I5), so a run that may apply seats two.
+const SEATS: [(&str, Stake); 3] = [("ana", Stake::Primary), ("cara", Stake::Primary), ("bob", Stake::Secondary)];
 fn clean(ws: &Ws, run: i64) {
     ws.ingest(run, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
+    // cara sits only in the runs seated with SEATS
+    if ws.store.run(run).unwrap().unwrap().personas.iter().any(|p| p == "cara") {
+        ws.ingest(run, &critical("cara", [4, 4, 4], &[], &["page.json#n1"]));
+    }
     ws.ingest(run, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
 }
 /// The site, the toml, one clean run of the two seats under `public-surface` at `quorum`.
@@ -35,7 +41,7 @@ fn base(body: &str, quorum: &str) -> (Ws, i64) {
     let ws = Ws::new();
     ws.site();
     toml(&ws, body);
-    let run = ws.run("critical", &TWO, false);
+    let run = ws.run("critical", &SEATS, false);
     under(&ws, run, "public-surface", quorum);
     (ws, run)
 }
@@ -59,6 +65,16 @@ fn cases() -> Vec<Case> {
             clean(&ws, r);
             (ws, vec![r.to_string()])
         }},
+        Case { name: "I5 one judged primary seat is a thin primary stratum", answer: "advise", code: "thin_primary", setup: || {
+            let ws = Ws::new();
+            ws.site();
+            toml(&ws, LOW);
+            let r = ws.run("critical", &TWO, false);
+            under(&ws, r, "public-surface", "low");
+            ws.ingest(r, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
+            ws.ingest(r, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+            (ws, vec![r.to_string()])
+        }},
         Case { name: "C1 nobody judged", answer: "advise", code: "incomplete_jury", setup: || {
             let (ws, r) = base(LOW, "low");
             (ws, vec![r.to_string()])
@@ -71,7 +87,7 @@ fn cases() -> Vec<Case> {
         Case { name: "C1 a seat of an earlier given round never answered", answer: "advise", code: "incomplete_jury", setup: || {
             let (ws, r1) = base(LOW, "low");
             ws.ingest(r1, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
-            let r2 = ws.run("critical", &TWO, false);
+            let r2 = ws.run("critical", &SEATS, false);
             under(&ws, r2, "public-surface", "low");
             clean(&ws, r2);
             (ws, vec![r1.to_string(), r2.to_string()])
@@ -79,7 +95,7 @@ fn cases() -> Vec<Case> {
         Case { name: "C3 no rule and no classifiable source", answer: "advise", code: "quorum_unknown", setup: || {
             let ws = Ws::new();
             ws.site();
-            let r = ws.run("critical", &TWO, false);
+            let r = ws.run("critical", &SEATS, false);
             clean(&ws, r);
             (ws, vec![r.to_string()])
         }},
@@ -128,7 +144,7 @@ fn cases() -> Vec<Case> {
             let ws = Ws::new();
             ws.site();
             toml(&ws, LOW);
-            let r = ws.run("critical", &TWO, false);
+            let r = ws.run("critical", &SEATS, false);
             clean(&ws, r);
             (ws, vec![r.to_string()])
         }},
@@ -162,7 +178,7 @@ fn cases() -> Vec<Case> {
         Case { name: "I1 a later round supersedes the run", answer: "advise", code: "stale_run", setup: || {
             let (ws, r1) = base(LOW, "low");
             clean(&ws, r1);
-            let r2 = ws.run("critical", &TWO, false);
+            let r2 = ws.run("critical", &SEATS, false);
             under(&ws, r2, "public-surface", "low");
             clean(&ws, r2);
             (ws, vec![r1.to_string()])
@@ -171,7 +187,7 @@ fn cases() -> Vec<Case> {
             let (ws, r1) = base(LOW, "low");
             clean(&ws, r1);
             bump_critical(&ws);
-            let r2 = ws.run("critical", &TWO, false);
+            let r2 = ws.run("critical", &SEATS, false);
             under(&ws, r2, "public-surface", "low");
             clean(&ws, r2);
             (ws, vec![r2.to_string()])
@@ -196,7 +212,7 @@ fn cases() -> Vec<Case> {
             ws.site();
             ws.rival();
             toml(&ws, LOW);
-            let a = ws.run("critical", &TWO, false);
+            let a = ws.run("critical", &SEATS, false);
             under(&ws, a, "public-surface", "low");
             let d = ws.ingest(a, &critical("ana", [3, 3, 3], &["price hidden"], &["page.json#n1"]));
             ws.ingest(a, &critical("bob", [3, 3, 3], &[], &["page.json#n1"]));
@@ -218,7 +234,7 @@ fn cases() -> Vec<Case> {
             let (ws, r1) = base(LOW, "low");
             ws.ingest(r1, &critical("ana", [5, 5, 5], &[], &["page.json#n1"]));
             ws.ingest(r1, &critical("bob", [5, 5, 5], &[], &["page.json#n1"]));
-            let r2 = ws.run("critical", &TWO, false);
+            let r2 = ws.run("critical", &SEATS, false);
             under(&ws, r2, "public-surface", "low");
             ws.ingest(r2, &critical("ana", [2, 2, 2], &[], &["page.json#n1"]));
             ws.ingest(r2, &critical("bob", [2, 2, 2], &[], &["page.json#n1"]));
@@ -228,7 +244,7 @@ fn cases() -> Vec<Case> {
             let (ws, r1) = base(LOW, "low");
             ws.ingest(r1, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
             ws.ingest(r1, &critical("bob", [4, 4, 4], &["slow"], &["page.json#n1"]));
-            let r2 = ws.run("critical", &TWO, false);
+            let r2 = ws.run("critical", &SEATS, false);
             under(&ws, r2, "public-surface", "low");
             clean(&ws, r2);
             (ws, vec![r2.to_string()])
@@ -245,7 +261,7 @@ fn cases() -> Vec<Case> {
             let ws = Ws::new();
             ws.site();
             toml(&ws, HUMAN);
-            let r = ws.run("critical", &TWO, false);
+            let r = ws.run("critical", &SEATS, false);
             clean(&ws, r);
             (ws, vec![r.to_string()])
         }},
@@ -285,7 +301,7 @@ fn the_table_has_a_row_for_every_reason_code() {
     for code in [
         "incomplete_jury", "quorum_unknown", "rule_below_sources", "overridden_down", "effort_below_quorum",
         "independence_sequential", "stale_run", "delta_unavailable", "primary_blocker", "split", "delta_not_landed",
-        "check_failed", "human_blocker", "human_class", "single_model",
+        "check_failed", "human_blocker", "human_class", "single_model", "thin_primary",
     ] {
         assert!(rows.contains(&code), "no row of the table carries {code}");
     }

@@ -291,8 +291,15 @@ pub enum PersonaCmd {
 }
 #[derive(Subcommand, Debug)]
 pub enum TraitCmd {
-    /// Add every embedded catalog trait and set the store lacks; a changed one becomes a new version
-    Install,
+    /// Add every embedded catalog trait and set the store lacks; an earlier catalog version is updated; a local edit is
+    /// kept (`kept_local`) unless --force
+    Install {
+        /// overwrite local edits with the catalog's text (needs --reason, which the new version records)
+        #[arg(long)]
+        force: bool,
+        #[arg(long)]
+        reason: Option<String>,
+    },
     /// Add one trait file (traits/<family>/<trait>.toml)
     Add {
         #[arg(long)]
@@ -375,7 +382,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Persona { what: PersonaCmd::Add { .. } } => "persona add",
         Cmd::Persona { what: PersonaCmd::Generate { .. } } => "persona generate",
         Cmd::Persona { what: PersonaCmd::List } => "persona list",
-        Cmd::Trait { what: TraitCmd::Install } => "trait install",
+        Cmd::Trait { what: TraitCmd::Install { .. } } => "trait install",
         Cmd::Trait { what: TraitCmd::Add { .. } } => "trait add",
         Cmd::Trait { what: TraitCmd::List } => "trait list",
         Cmd::Trait { what: TraitCmd::Show { .. } } => "trait show",
@@ -450,7 +457,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             PersonaCmd::List => app::persona::list(root),
         },
         Cmd::Trait { what } => match what {
-            TraitCmd::Install => app::traits::install(root),
+            TraitCmd::Install { force, reason } => app::traits::install(root, *force, reason.as_deref()),
             TraitCmd::Add { file, generated_from } => app::traits::add(root, file, generated_from.as_deref()),
             TraitCmd::List => app::traits::list(root),
             TraitCmd::Show { id } => app::traits::show(root, id),

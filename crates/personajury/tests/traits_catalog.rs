@@ -92,7 +92,7 @@ fn a_changed_anchor_is_a_new_version() {
     let ws = tempfile::tempdir().unwrap();
     let store = personajury::store::Store::open(ws.path()).unwrap();
     let v1: Vec<(&str, &str)> = CATALOG.to_vec();
-    personajury::application::traits::install_from(&store, &v1).unwrap();
+    personajury::application::traits::install_from(&store, &v1, None).unwrap();
     let changed = CATALOG
         .iter()
         .find(|(p, _)| p.ends_with("marketing_skepticism.toml"))
@@ -102,7 +102,7 @@ fn a_changed_anchor_is_a_new_version() {
     let mut v2: Vec<(&str, &str)> = CATALOG.to_vec();
     let at = v2.iter().position(|(p, _)| p.ends_with("marketing_skepticism.toml")).unwrap();
     v2[at].1 = &changed;
-    let d = personajury::application::traits::install_from(&store, &v2).unwrap();
+    let d = personajury::application::traits::install_from(&store, &v2, None).unwrap();
     assert_eq!((d["installed"].as_i64(), d["versions_added"].as_i64(), d["skipped"].as_i64()), (Some(0), Some(1), Some(56)));
     assert_eq!(store.trait_def("trust.marketing_skepticism").unwrap().unwrap().version, 2);
 }

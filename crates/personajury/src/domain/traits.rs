@@ -53,6 +53,113 @@ pub const REFUSED: [(&str, &str); 27] = [
     ("outsider", ATTRIBUTE),
 ];
 
+/// The protected-attribute screen (D29, as ruled after the v0.6-A review): every trait a user adds (`trait add`, generated
+/// or not) and every free-text value passes it. A word of the id (split on `.` and `_`) or of the title (split on anything
+/// not a letter) that starts with one of these stems refuses the trait as `refused_trait_id`, with the attribute it names.
+/// It errs safe: `colorful` and `unions` are refused too; `access.*`, the assistive needs, keep `disab`.
+pub const PROTECTED_STEMS: [(&str, &str); 28] = [
+    ("age", "age"),
+    ("gender", "gender"),
+    ("sex", "sex"),
+    ("sexual", "sexual orientation"),
+    ("orientation", "sexual orientation"),
+    ("race", "race"),
+    ("racial", "race"),
+    ("ethnic", "ethnicity"),
+    ("religion", "religion"),
+    ("religio", "religion"),
+    ("faith", "religion"),
+    ("caste", "caste"),
+    ("nationality", "nationality"),
+    ("national", "national origin"),
+    ("citizenship", "citizenship"),
+    ("country", "country as an identity"),
+    ("pregnan", "pregnancy"),
+    ("marital", "marital status"),
+    ("disab", "disability"),
+    ("politic", "political opinion"),
+    ("union", "union membership"),
+    ("health", "health"),
+    ("genetic", "genetic data"),
+    ("skin", "skin colour"),
+    ("color", "skin colour"),
+    ("colour", "skin colour"),
+    ("tribe", "tribe"),
+    ("tribal", "tribe"),
+];
+/// Words that start with a stem and name no protected attribute: `agent` and `agency` are not `age`.
+const STEM_EXCEPTIONS: [&str; 3] = ["agent", "agenc", "agend"];
+/// Families no trait may belong to (`project.<f>` included): a demographic, a culture or a protected attribute.
+pub const REFUSED_FAMILIES: [&str; 3] = ["demo", "culture", "protected"];
+
+/// The stem a word starts with, if it is on the screen (`skip_disab` for the assistive needs of `access.*`).
+fn stem_of(word: &str, skip_disab: bool) -> Option<&'static str> {
+    if STEM_EXCEPTIONS.iter().any(|e| word.starts_with(e)) {
+        return None;
+    }
+    PROTECTED_STEMS
+        .iter()
+        .find(|(stem, _)| word.starts_with(stem) && !(skip_disab && *stem == "disab"))
+        .map(|(_, what)| *what)
+}
+/// The protected attribute a free text names, if any (words split on anything not a letter, lower-cased).
+pub fn text_names_protected(text: &str, skip_disab: bool) -> Option<&'static str> {
+    text.to_lowercase().split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).find_map(|w| stem_of(w, skip_disab))
+}
+/// The screen of a trait id: a refused family (its first segment), or a stem in a word of the id.
+pub fn screen_id(id: &str) -> Result<(), Refusal> {
+    let first = id.split('.').next().unwrap_or(id);
+    let refuse = || Refusal::RefusedTraitId { id: id.to_string(), why: PROTECTED.to_string() };
+    if REFUSED_FAMILIES.contains(&first) {
+        return Err(refuse());
+    }
+    let skip_disab = first == "access";
+    if id.split(['.', '_']).any(|w| stem_of(w, skip_disab).is_some()) {
+        return Err(refuse());
+    }
+    Ok(())
+}
+/// The whole screen of a trait a user adds: family, id and title. `shipped` is the catalog's own trait of the same id,
+/// when there is one: its reviewed id and title are not screened again (`risk.health_safety`, "in good faith"); an
+/// edited title is.
+pub fn screen_trait(t: &TraitDef, shipped: Option<&TraitDef>) -> Result<(), Refusal> {
+    let refuse = || Refusal::RefusedTraitId { id: t.id.clone(), why: PROTECTED.to_string() };
+    let family = t.family.strip_prefix("project.").unwrap_or(&t.family);
+    if REFUSED_FAMILIES.contains(&family) {
+        return Err(refuse());
+    }
+    if shipped.is_none() {
+        screen_id(&t.id)?;
+    }
+    if shipped.is_none_or(|s| s.title != t.title) && text_names_protected(&t.title, t.family == "access").is_some() {
+        return Err(refuse());
+    }
+    Ok(())
+}
+/// The most characters a free-text trait value holds, whatever the trait's `max_chars` says (D31 as ruled).
+pub const MAX_TRAIT_TEXT: usize = 80;
+/// A free-text value (`situation.job`): one line of at most 80 characters, no digit, not a self-description ("You are",
+/// "I am"), and no protected attribute (`trait_text_refused`).
+pub fn check_text(id: &str, s: &str, max: usize) -> Result<(), Refusal> {
+    let one_line = s.split_whitespace().collect::<Vec<_>>().join(" ");
+    let lower = one_line.to_lowercase();
+    let n = one_line.chars().count();
+    let why = if one_line.is_empty() {
+        Some("empty".to_string())
+    } else if n > max.min(MAX_TRAIT_TEXT) {
+        Some(format!("{n} characters; at most {}", max.min(MAX_TRAIT_TEXT)))
+    } else if one_line.chars().any(|c| c.is_ascii_digit()) {
+        Some("holds a digit; describe the work, not a number about the person".to_string())
+    } else if lower.starts_with("you are") || lower.starts_with("i am") || lower.starts_with("i'm") {
+        Some("starts as a self-description (\"You are\", \"I am\"); describe the work".to_string())
+    } else {
+        text_names_protected(&one_line, false).map(|what| format!("names a protected attribute ({what})"))
+    };
+    match why {
+        Some(why) => Err(Refusal::TraitTextRefused { id: id.to_string(), why }),
+        None => Ok(()),
+    }
+}
 /// Why `id` may not be a trait id, when its last segment (or the whole id) is on the refused list.
 pub fn refused_why(id: &str) -> Option<&'static str> {
     let last = id.rsplit('.').next().unwrap_or(id);
@@ -330,7 +437,7 @@ impl TraitDef {
                 _ => Err(off()),
             },
             "words" => match v {
-                TraitValue::Str(s) if !s.trim().is_empty() && s.chars().count() <= self.max_chars.unwrap_or(200) => Ok(()),
+                TraitValue::Str(s) => check_text(&self.id, s, self.max_chars.unwrap_or(MAX_TRAIT_TEXT)),
                 _ => Err(off()),
             },
             _ => match v {
@@ -367,7 +474,7 @@ impl TraitDef {
                 .collect(),
             ("words", TraitValue::Str(s)) => {
                 let one_line = s.split_whitespace().collect::<Vec<_>>().join(" ");
-                vec![format!("You tend to: want to {one_line}")]
+                vec![format!("Your work: {one_line}")]
             }
             _ => vec![],
         }
@@ -468,6 +575,9 @@ pub fn are_correlated(defs: &BTreeMap<String, TraitDef>, a: &str, b: &str) -> bo
 pub fn check_map_shape(map: &BTreeMap<String, TraitValue>) -> Result<(), Refusal> {
     for id in map.keys() {
         check_not_refused(id)?;
+        if !super::catalog::is_shipped(id) {
+            screen_id(id)?;
+        }
     }
     if map.len() > MAX_PERSONA_TRAITS {
         return Err(Refusal::TraitsTooMany { count: map.len() });

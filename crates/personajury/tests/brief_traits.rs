@@ -142,12 +142,13 @@ fn the_block_speaks_in_tendencies_with_no_digit_and_no_you_are() {
     let block = &t[from..to];
     let bullets: Vec<&str> = block.lines().filter(|l| l.starts_with("- ")).collect();
     assert!(bullets.len() >= 9, "{block}");
+    // a tendency, or the persona's work (a words trait, review I3): never "You are"
     for b in &bullets {
-        assert!(b.starts_with("- You tend to"), "{b}");
+        assert!(b.starts_with("- You tend to") || b.starts_with("- Your work: "), "{b}");
     }
     assert!(!block.contains("You are"), "{block}");
     assert!(!block.chars().any(|c| c.is_ascii_digit()), "{block}");
-    assert!(block.contains("- You tend to: want to compare two plans for my team"));
+    assert!(block.contains("- Your work: compare two plans for my team"));
     // ids and titles are never printed
     assert!(!block.contains("trust.") && !block.contains("Disbelieves"));
     // sorted by trait id: access.need first
@@ -208,4 +209,28 @@ fn apply_check_notes_an_incomplete_set_without_changing_the_answer() {
     let d = ok(brief(ws.path(), &[]));
     let a = ok(jg(ws.path(), &["apply-check", &d["run"].to_string()]));
     assert!(a["reasons"].as_array().unwrap().iter().all(|r| r["code"] != "trait_set_incomplete"));
+}
+
+#[test]
+fn set_mode_renders_the_cover_and_the_set_traits_that_say_something() {
+    // the docs set: cover expertise.domain, access.need, situation.time_pressure; conscientiousness and need for cognition
+    // are set traits off the cover
+    let ws = world(json!({"expertise.domain": 3, "personality.conscientiousness": 3, "cognition.need_for_cognition": 5, "risk.financial": 5}));
+    let t = text_of(ws.path(), &ok(brief(ws.path(), &["--traits", "docs"])), "a");
+    assert!(t.contains("know the basics of this field"), "a cover trait renders even at the middle: {t}");
+    assert!(t.contains("like to work an argument through"), "a set trait off the middle renders: {t}");
+    assert!(!t.contains("follow the steps in order"), "a set trait at the middle, off the cover, is left out: {t}");
+    assert!(!t.contains("Willing to spend") && !t.contains("money"), "a trait outside the set is left out: {t}");
+    // all mode still renders every trait the persona holds
+    let t = text_of(ws.path(), &ok(brief(ws.path(), &["--traits", "all"])), "a");
+    assert!(t.contains("follow the steps in order"), "{t}");
+}
+
+#[test]
+fn the_closing_line_is_short() {
+    let ws = world(json!({"expertise.domain": 3}));
+    let t = text_of(ws.path(), &ok(brief(ws.path(), &["--traits", "all"])), "a");
+    let line = "Told, not seen: a line leaning on one is `told`; a line about the subject still cites it.";
+    assert!(t.contains(&format!("\n{line}\n")), "{t}");
+    assert!(line.len() <= 90);
 }

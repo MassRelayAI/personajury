@@ -105,6 +105,8 @@ pub enum Refusal {
     InvalidTraitFile { why: String },
     #[error("trait id {id}: {why}; it is not a trait")]
     RefusedTraitId { id: String, why: String },
+    #[error("the text of trait {id} is refused: {why}")]
+    TraitTextRefused { id: String, why: String },
     #[error("trait set {name} lists {traits} traits; a set holds at most 8")]
     TraitSetTooLarge { name: String, traits: usize },
     #[error("{name} names {cover} cover traits; a cover holds at most 4")]
@@ -172,6 +174,7 @@ impl Refusal {
             Refusal::InvalidUsage(_) => "invalid_usage",
             Refusal::InvalidTraitFile { .. } => "invalid_trait_file",
             Refusal::RefusedTraitId { .. } => "refused_trait_id",
+            Refusal::TraitTextRefused { .. } => "trait_text_refused",
             Refusal::TraitSetTooLarge { .. } => "trait_set_too_large",
             Refusal::CoverTooLarge { .. } => "cover_too_large",
             Refusal::UnknownTrait { .. } => "unknown_trait",
@@ -202,7 +205,9 @@ impl Refusal {
             Refusal::OverBudget { needed, budget, minimum_plan } => Some(
                 serde_json::json!({"needed": needed, "budget": budget, "minimum_plan": minimum_plan}),
             ),
-            Refusal::RefusedTraitId { id, why } => Some(serde_json::json!({"id": id, "why": why})),
+            Refusal::RefusedTraitId { id, why } | Refusal::TraitTextRefused { id, why } => {
+                Some(serde_json::json!({"id": id, "why": why}))
+            }
             Refusal::TraitSetTooLarge { name, traits } => Some(serde_json::json!({"name": name, "traits": traits})),
             Refusal::CoverTooLarge { name, cover } => Some(serde_json::json!({"name": name, "cover": cover})),
             Refusal::UnknownTrait { id } => Some(serde_json::json!({"id": id})),

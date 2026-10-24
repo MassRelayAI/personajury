@@ -174,7 +174,7 @@ A category trait takes one option id{}. Write at most 8 traits per persona. Thes
                     t.push_str(&format!("  - `{}`: {}\n", o.id, o.sentence));
                 }
             }
-            _ => t.push_str(&format!("  - a short phrase, at most {} characters, that completes \"want to ...\"\n", d.max_chars.unwrap_or(200))),
+            _ => t.push_str(&format!("  - a short phrase, at most {} characters and no digit, that names the work (the brief prints \"Your work: ...\"); never \"You are\" or \"I am\"\n", d.max_chars.unwrap_or(80).min(80))),
         }
     }
     if set.cover.is_empty() {

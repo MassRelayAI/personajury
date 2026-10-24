@@ -122,14 +122,16 @@ fn the_persona_key_is_checked_against_the_store() {
     let ws = installed();
     let w = ws.path();
     let try_add = |traits: serde_json::Value| add_persona(w, &persona_body("p", &["x"], traits));
-    assert_eq!(code(&try_add(json!({"culture.power_distance": 3}))), "unknown_trait");
+    // a culture trait is refused by its family before the store is asked (review I2); a plain unknown id is unknown
+    assert_eq!(code(&try_add(json!({"culture.power_distance": 3}))), "refused_trait_id");
+    assert_eq!(code(&try_add(json!({"trust.never_added": 3}))), "unknown_trait");
     assert_eq!(code(&try_add(json!({"gender": "x"}))), "refused_trait_id");
     let v = try_add(json!({"beauty": 5}));
     assert_eq!(v["data"]["why"], "an attribute of the persona, not a sensitivity of the juror");
     assert_eq!(code(&try_add(json!({"trust.propensity": 6}))), "trait_value_off_scale");
     assert_eq!(code(&try_add(json!({"trust.propensity": "high"}))), "trait_value_off_scale");
     assert_eq!(code(&try_add(json!({"trust.propensity": 2.5}))), "invalid_arguments");
-    assert_eq!(code(&try_add(json!({"situation.job": "x".repeat(201)}))), "trait_value_off_scale");
+    assert_eq!(code(&try_add(json!({"situation.job": "x".repeat(201)}))), "trait_text_refused");
     assert_eq!(code(&try_add(json!({"choice.decision_style": "wild"}))), "trait_option_unknown");
     assert_eq!(code(&try_add(json!({"choice.decision_style": ["rational", "intuitive"]}))), "trait_option_unknown");
     assert_eq!(code(&try_add(json!({"access.need": ["telepathy"]}))), "trait_option_unknown");

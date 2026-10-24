@@ -10,6 +10,9 @@ use serde_json::{json, Value};
 use std::collections::BTreeSet;
 use std::path::Path;
 
+/// The fewest judged primary seats a run may apply on (I5, `thin_primary`).
+pub const THIN_PRIMARY: usize = 2;
+
 /// A reason in the answer: its code, what it does to the answer (`human`, `escalate`, `advise`, `info`) and its data.
 fn reason(code: &str, effect: &str, mut data: Value) -> Value {
     data["code"] = json!(code);
@@ -315,6 +318,24 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
             "advise",
             json!({"missing": missing, "remedy": "ingest a verdict for every briefed seat, then ask again"}),
         ));
+    }
+
+    // I5: a primary stratum of fewer than two judged seats is one reader's view, not a jury's: it advises
+    for r in &judged {
+        let judged_primary: BTreeSet<String> = store
+            .verdict_rows(r.id, false)?
+            .into_iter()
+            .filter(|x| !super::verdict::is_human(&x.persona) && r.stakes.get(&x.persona) == Some(&Stake::Primary))
+            .map(|x| x.persona)
+            .collect();
+        if judged_primary.len() < THIN_PRIMARY {
+            reasons.push(reason(
+                "thin_primary",
+                "advise",
+                json!({"run": r.id, "primary": judged_primary, "needs": THIN_PRIMARY,
+                       "remedy": "seat and judge at least two primary personas (another persona that serves the audience)"}),
+            ));
+        }
     }
 
     // ---- the verdicts of the judged runs, each with its own stakes (C5) ----

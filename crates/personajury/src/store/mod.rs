@@ -21,7 +21,10 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
 /// The columns schema v5 added to existing tables (idempotent `ALTER TABLE`, checked with `pragma_table_info`):
 /// (table, column, declaration). D29 persona traits and `serves`; D30 panel cover; D31 run traits; `--seats auto` run seats
 /// and subject audience.
-const V5_COLUMNS: [(&str, &str, &str); 6] = [
+/// A stored trait's latest version: the definition, its origin, its hash and the reason a forced install recorded.
+pub type TraitRow = (TraitDef, String, String, Option<String>);
+const V5_COLUMNS: [(&str, &str, &str); 7] = [
+    ("trait", "reason", "TEXT"),
     ("persona", "traits_json", "TEXT"),
     ("persona", "serves_json", "TEXT"),
     ("panel", "cover_json", "TEXT"),
@@ -565,16 +568,31 @@ impl Store {
     // ---- traits and trait sets (D29) ----
     /// Same rule as lenses, by the hash of the body with `version` 0. `Err(version)`: the latest already has this hash.
     pub fn insert_trait(&self, t: &TraitDef, origin: &str) -> Result<std::result::Result<i64, i64>> {
+        self.insert_trait_why(t, origin, None)
+    }
+    /// `insert_trait` with the reason a forced `trait install` recorded (D29).
+    pub fn insert_trait_why(&self, t: &TraitDef, origin: &str, reason: Option<&str>) -> Result<std::result::Result<i64, i64>> {
         let (body, hash) = t.body_and_hash();
         let version = match self.next_version("trait", "id", &t.id, &hash)? {
             Err(existing) => return Ok(Err(existing)),
             Ok(v) => v,
         };
         self.conn.execute(
-            "INSERT INTO trait(id, version, family, body_json, hash, origin, created_at) VALUES (?1,?2,?3,?4,?5,?6,?7)",
-            params![t.id, version, t.family, body, hash, origin, now_iso()],
+            "INSERT INTO trait(id, version, family, body_json, hash, origin, created_at, reason) VALUES (?1,?2,?3,?4,?5,?6,?7,?8)",
+            params![t.id, version, t.family, body, hash, origin, now_iso(), reason],
         )?;
         Ok(Ok(version))
+    }
+    /// The origin and hash of the latest version of trait `id`.
+    pub fn trait_latest(&self, id: &str) -> Result<Option<(String, String)>> {
+        Ok(self
+            .conn
+            .query_row(
+                "SELECT origin, hash FROM trait WHERE id = ?1 ORDER BY version DESC LIMIT 1",
+                params![id],
+                |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)),
+            )
+            .optional()?)
     }
     fn trait_from(version: i64, body: &str) -> Result<TraitDef> {
         let mut t: TraitDef = json_vec("trait", body)?;
@@ -592,19 +610,21 @@ impl Store {
             .map(|(v, b)| Self::trait_from(v, &b))
             .transpose()
     }
-    /// Latest version of each trait, by id, with its origin and hash.
-    pub fn traits(&self) -> Result<Vec<(TraitDef, String, String)>> {
+    /// Latest version of each trait, by id, with its origin, hash and the reason a forced install recorded.
+    pub fn traits(&self) -> Result<Vec<TraitRow>> {
         let mut st = self.conn.prepare(
-            "SELECT version, body_json, origin, hash FROM trait t WHERE version = (SELECT max(version) FROM trait u WHERE u.id = t.id) ORDER BY id",
+            "SELECT version, body_json, origin, hash, reason FROM trait t WHERE version = (SELECT max(version) FROM trait u WHERE u.id = t.id) ORDER BY id",
         )?;
         let rows = st
-            .query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?)))?
+            .query_map([], |r| {
+                Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?, r.get::<_, Option<String>>(4)?))
+            })?
             .collect::<std::result::Result<Vec<_>, _>>()?;
-        rows.into_iter().map(|(v, b, o, h)| Ok((Self::trait_from(v, &b)?, o, h))).collect()
+        rows.into_iter().map(|(v, b, o, h, why)| Ok((Self::trait_from(v, &b)?, o, h, why))).collect()
     }
     /// The latest trait definitions by id.
     pub fn trait_map(&self) -> Result<BTreeMap<String, TraitDef>> {
-        Ok(self.traits()?.into_iter().map(|(t, _, _)| (t.id.clone(), t)).collect())
+        Ok(self.traits()?.into_iter().map(|(t, _, _, _)| (t.id.clone(), t)).collect())
     }
     pub fn insert_trait_set(&self, s: &TraitSetDef) -> Result<std::result::Result<i64, i64>> {
         let (body, hash) = s.body_and_hash();

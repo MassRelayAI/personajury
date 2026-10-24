@@ -62,7 +62,7 @@ CREATE TRIGGER IF NOT EXISTS decision_no_delete BEFORE DELETE ON decision BEGIN 
 -- D29 (v0.6): the trait catalog and project traits, one row per version; trait sets likewise. Installed by `trait install`, never seeded.
 CREATE TABLE IF NOT EXISTS trait (
   id TEXT NOT NULL, version INTEGER NOT NULL, family TEXT NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL,
-  origin TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (id, version));
+  origin TEXT NOT NULL, created_at TEXT NOT NULL, reason TEXT, PRIMARY KEY (id, version));
 CREATE TABLE IF NOT EXISTS trait_set (
   name TEXT NOT NULL, version INTEGER NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT NOT NULL,
   PRIMARY KEY (name, version));

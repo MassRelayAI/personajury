@@ -83,11 +83,29 @@ fn separates_counts_the_cells_on_which_two_groups_do_not_overlap() {
     assert_eq!(primary["separates"]["total"].as_u64().unwrap() as usize, total);
 }
 
+/// A key that names a pooled figure: any key containing one of these stems, at any depth (`mean_score` and
+/// `share_low` count), or exactly `rate` (as a substring it would hit `separates`).
+const POOLED: [&str; 8] = ["mean", "avg", "average", "share", "pct", "percent", "prob", "probability"];
+fn is_pooled_key(k: &str) -> bool {
+    let k = k.to_lowercase();
+    k == "rate" || POOLED.iter().any(|s| k.contains(s))
+}
+#[test]
+fn the_key_walk_catches_a_pooled_key_at_any_depth() {
+    for k in ["mean", "mean_score", "avg", "group_average", "share_low", "pct", "percent_high", "prob", "probability", "rate"] {
+        let mut bad = Vec::new();
+        walk(&serde_json::json!({"a": [{"b": {k: 1}}]}), "x", &mut bad);
+        assert_eq!(bad, vec![format!("x.a[0].b.{k}")], "{k}");
+    }
+    let mut bad = Vec::new();
+    walk(&serde_json::json!({"separates": {"cells": 1}, "median": 2, "thin": true}), "x", &mut bad);
+    assert!(bad.is_empty(), "{bad:?}");
+}
 fn walk(v: &Value, path: &str, bad: &mut Vec<String>) {
     match v {
         Value::Object(m) => {
             for (k, x) in m {
-                if ["mean", "average", "avg", "share", "rate", "probability"].contains(&k.as_str()) {
+                if is_pooled_key(k) {
                     bad.push(format!("{path}.{k}"));
                 }
                 walk(x, &format!("{path}.{k}"), bad);

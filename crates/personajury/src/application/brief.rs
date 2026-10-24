@@ -58,8 +58,10 @@ impl TraitCtx {
         let mut ids: Vec<String> = Vec::new();
         let mut bullets: Vec<String> = Vec::new();
         for (id, v) in held {
+            // set mode renders the set's cover traits, and the persona's other set traits that say something: a band
+            // at 3 (the middle) is the default reading and is left out (the 15% budget of D29)
             if let Some(set) = &self.set {
-                if !set.traits.contains(id) {
+                if !set.traits.contains(id) || (!set.cover.contains(id) && is_default(v)) {
                     continue;
                 }
             }
@@ -83,13 +85,20 @@ impl TraitCtx {
         for b in &bullets {
             t.push_str(&format!("- {b}\n"));
         }
-        t.push_str("\nThese tendencies are told, not seen: a line that leans on one is `told` evidence; a line about the subject still needs its citation.\n");
+        t.push_str(CLOSING);
         Some((t, ids))
     }
 }
 
 /// Seats per wave when the caller does not say (D12).
 pub const DEFAULT_WAVE: usize = 30;
+
+/// The closing line of the trait block (D31), kept short: it is paid once per brief.
+pub(crate) const CLOSING: &str = "\nTold, not seen: a line leaning on one is `told`; a line about the subject still cites it.\n";
+/// A trait value that is the default reading: the middle of a band. Set mode leaves it out unless it is a cover trait.
+fn is_default(v: &traits::TraitValue) -> bool {
+    matches!(v, traits::TraitValue::Int(3))
+}
 
 /// What a brief costs the agent when the project says nothing (the same default `should-run` documents).
 pub(crate) const DEFAULT_TOKENS_PER_BRIEF: u64 = 15_000;
@@ -482,9 +491,10 @@ struct AutoSeats {
     warnings: Vec<Value>,
 }
 
-/// `--seats auto`: every persona whose `serves` meets the subject's audience (at most `cap`; a seeded draw, or the cover
-/// of the trait set when it has one), then exactly one control persona that serves none of it (a seeded draw). Serving
-/// seats are primary and the control a bystander unless `--stake` says otherwise.
+/// `--seats auto`: every persona whose `serves` meets the subject's audience (a seeded draw, or the cover of the trait
+/// set when it has one), then exactly one control persona that serves none of it (a seeded draw). `cap` is the total:
+/// the control counts inside it, so the serving seats are at most `cap - 1` when a control sits. Serving seats are
+/// primary and the control a bystander unless `--stake` says otherwise.
 fn seats_auto(
     audience: &[String],
     personas: &[Persona],
@@ -498,6 +508,9 @@ fn seats_auto(
     if serving.is_empty() {
         return Err(Refusal::NoMatchingPersonas { audience: audience.join(",") }.into());
     }
+    // the control sits inside the cap: the total is the effort's number, never one above it (review I1)
+    let has_control = personas.iter().any(|p| !meets(p));
+    let cap = if has_control { cap.saturating_sub(1).max(1) } else { cap.max(1) };
     let mut rng = crate::domain::rng::SplitMix64::from_bytes(hash::term_seed(seed, "serves"));
     if serving.len() > cap {
         rng.shuffle(&mut serving);
@@ -1006,11 +1019,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             if audience.is_empty() {
                 return Err(Refusal::AudienceUnknown { subject: subject.name.clone() }.into());
             }
-            // the cap: the effort's seats (the control sits beside them), else the ceiling of D10 less the control
+            // the cap on the whole jury, the control included: the effort's seats, else the ceiling of D10
             let e = a.effort.or(cfg.as_ref().and_then(|c| c.effort)).or(rule.map(|_| Effort::Medium));
-            let cap = e
-                .and_then(Effort::seat_cap)
-                .unwrap_or(if a.allow_large { SEAT_HARD_MAX - 1 } else { SEAT_CEILING - 1 });
+            let cap = e.and_then(Effort::seat_cap).unwrap_or(if a.allow_large { SEAT_HARD_MAX } else { SEAT_CEILING });
             auto_cover = trait_ctx.as_ref().and_then(|c| c.set.as_ref()).map(|s| s.cover.clone()).unwrap_or_default();
             let defs = store.trait_map()?;
             let cover = super::panel::cover_traits(&auto_cover, &defs)?;
@@ -1192,9 +1203,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
                     fields.insert("panel".into(), json!({"rule": r.panel, "given": p}));
                 }
                 PanelSrc::Saved(_) => {}
-                PanelSrc::Auto => {
-                    fields.insert("panel".into(), json!({"rule": r.panel, "given": "seats: auto"}));
-                }
+                // the seats follow the subject's audience, the same way every time: not an override by itself (I5);
+                // apply-check's `thin_primary` guards a primary stratum of one
+                PanelSrc::Auto => {}
             }
             let (mut given_l, mut rule_l) = (lens_names.clone(), r.lenses.clone());
             given_l.sort();

@@ -38,8 +38,9 @@ fn two_subjects() -> (Ws, i64, i64) {
     assert_eq!(ws.cli(&["decide", &f, "dismissed", "--why", "x", "--by", "ana"])["ok"], true);
     low(&ws, a);
     ws.subject("other", SubjectKind::Page, false, &[("page.json", br#"{"nodes":[{"id":"n1"}]}"#)]);
-    let b = ws.run_of("other", "critical", &PB, false);
+    let b = ws.run_of("other", "critical", &THREE, false);
     ws.ingest(b, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
+    ws.ingest(b, &critical("cat", [4, 4, 4], &[], &["page.json#n1"]));
     ws.ingest(b, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
     low(&ws, b);
     (ws, a, b)
@@ -431,9 +432,10 @@ fn m1_a_calibration_for_another_lens_or_run_is_refused() {
     let ws = Ws::new();
     std::fs::write(ws.root().join("personajury.toml"), RULE_ALL).unwrap();
     ws.site();
-    let a = ws.run("critical", &PB, false);
+    let a = ws.run("critical", &THREE, false);
     ws.ingest(a, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
     ws.ingest(a, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+    ws.ingest(a, &critical("cat", [4, 4, 4], &[], &["page.json#n1"]));
     low(&ws, a);
     let lv = ws.store.lens("critical").unwrap().unwrap().version;
     let f = ws.root().join("cal.json");

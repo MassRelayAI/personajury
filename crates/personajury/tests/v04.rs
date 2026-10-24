@@ -133,15 +133,17 @@ fn a_delta_that_did_not_land_escalates() {
 fn a_clean_second_round_applies() {
     let ws = Ws::new();
     ws.site();
-    let r1 = ws.run("critical", &TWO, false);
+    let r1 = ws.run("critical", &THREE, false);
     let d = ws.ingest(r1, &critical("ana", [3, 3, 3], &["the price is hidden"], &["page.json#n1"]));
     ws.ingest(r1, &critical("bob", [3, 3, 3], &[], &["page.json#n1"]));
+    ws.ingest(r1, &critical("cat", [3, 3, 3], &[], &["page.json#n1"]));
     let finding = d["findings"][0].as_str().unwrap().to_string();
     let r = ws.cli(&["decide", &finding, "fixed", "--by", "ana"]);
     assert_eq!(r["ok"], true, "{r}");
-    let r2 = ws.run("critical", &TWO, false);
+    let r2 = ws.run("critical", &THREE, false);
     ws.ingest(r2, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
     ws.ingest(r2, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+    ws.ingest(r2, &critical("cat", [4, 4, 4], &[], &["page.json#n1"]));
     under_low_rule(&ws, &[r1, r2]);
     for args in [vec!["apply-check", "2"], vec!["apply-check", "1", "2"]] {
         let a = data(ws.cli(&args));
@@ -601,11 +603,12 @@ fn the_briefs_are_byte_identical_whatever_the_independence() {
 fn a_sequential_run_with_nothing_in_the_way_advises_never_applies() {
     let ws = Ws::new();
     ws.site();
-    let seq = ws.run("critical", &TWO, false);
-    let ind = ws.run("critical", &TWO, false);
+    let seq = ws.run("critical", &THREE, false);
+    let ind = ws.run("critical", &THREE, false);
     for r in [seq, ind] {
         ws.ingest(r, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
         ws.ingest(r, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+        ws.ingest(r, &critical("cat", [4, 4, 4], &[], &["page.json#n1"]));
     }
     mark(&ws, seq, "sequential");
     under_low_rule(&ws, &[seq, ind]);
@@ -789,9 +792,10 @@ fn by_human(ws: &Ws, run: i64, v: &Value, who: &str) -> Value {
 }
 fn clean_run(ws: &Ws) -> i64 {
     ws.site();
-    let run = ws.run("critical", &TWO, false);
+    let run = ws.run("critical", &THREE, false);
     ws.ingest(run, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
     ws.ingest(run, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+    ws.ingest(run, &critical("cat", [4, 4, 4], &[], &["page.json#n1"]));
     run
 }
 

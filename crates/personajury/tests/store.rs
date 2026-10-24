@@ -475,3 +475,20 @@ fn a_v4_store_becomes_v5_once_and_gains_every_column() {
         assert!(!cols("trait").is_empty() && !cols("trait_set").is_empty());
     }
 }
+
+#[test]
+fn a_v5_store_made_before_the_fix_round_gains_trait_reason() {
+    let d = tempfile::tempdir().unwrap();
+    {
+        let s = Store::open(d.path()).unwrap();
+        s.conn().execute("ALTER TABLE trait DROP COLUMN reason", []).unwrap();
+    }
+    for _ in 0..2 {
+        let s = Store::open(d.path()).unwrap();
+        let has: i64 = s
+            .conn()
+            .query_row("SELECT count(*) FROM pragma_table_info('trait') WHERE name = 'reason'", [], |r| r.get(0))
+            .unwrap();
+        assert_eq!(has, 1);
+    }
+}

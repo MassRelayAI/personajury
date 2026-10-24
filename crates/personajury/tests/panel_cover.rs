@@ -189,6 +189,21 @@ fn collinear_and_confounded_are_reported() {
 }
 
 #[test]
+fn confounded_needs_two_members_of_the_tag_and_one_seat_without_it_that_differs() {
+    let ws = installed();
+    let w = ws.path();
+    // pair: two members, both ms high, and s3 without the tag is low: confounded
+    // solo: one member only: never confounded, however different the others are
+    // expertise.domain is mid for every seat: a tag that shares it with everyone is not confounded
+    add_ok(w, "s1", &["x", "pair"], json!({RF: 1, MS: 5, "expertise.domain": 3}));
+    add_ok(w, "s2", &["x", "pair"], json!({RF: 3, MS: 5, "expertise.domain": 3}));
+    add_ok(w, "s3", &["x", "solo"], json!({RF: 5, MS: 1, "expertise.domain": 3}));
+    ok(panel(w, "c", "3 x=primary", &[RF, MS, "expertise.domain"]));
+    let c = resolve(w, "c")["data"]["coverage"].clone();
+    assert_eq!(c["confounded"], json!([{"trait": MS, "tag": "pair", "band": "high"}]), "{c}");
+}
+
+#[test]
 fn an_unstaked_term_is_its_own_stratum_and_a_category_has_its_options_as_bands() {
     let ws = installed();
     let w = ws.path();

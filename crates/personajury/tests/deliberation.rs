@@ -224,3 +224,42 @@ fn deliberation_alone_without_a_deliberated_verdict_leaves_apply() {
     let a = ws.cli(&["apply-check", &rs(run)])["data"].clone();
     assert_eq!(a["answer"], "apply", "{a}");
 }
+
+/// A second run of the same jury whose first word equals the first run's, deliberated too.
+fn second_round(ws: &Ws, scores: [i64; 3]) -> i64 {
+    let run = ws.run("critical", &SEATS, false);
+    ws.ingest(run, &critical("ana", [4, 4, 4], &[], &["page.json#n1"]));
+    ws.ingest(run, &critical("cara", [2, 3, 4], &[], &["page.json#n1"]));
+    ws.ingest(run, &critical("bob", [4, 4, 4], &[], &["page.json#n1"]));
+    deliberate(ws, run);
+    for p in ["ana", "bob"] {
+        assert_eq!(ingest_d(ws, run, &delib(p, [4, 4, 4]))["ok"], true);
+    }
+    assert_eq!(ingest_d(ws, run, &delib("cara", scores))["ok"], true);
+    run
+}
+
+#[test]
+fn delta_graph_and_calibrate_read_the_initial_batch_unless_asked_for_the_deliberated_one() {
+    let (ws, a) = world();
+    deliberate(&ws, a);
+    for p in ["ana", "bob"] {
+        ingest_d(&ws, a, &delib(p, [4, 4, 4]));
+    }
+    ingest_d(&ws, a, &delib("cara", [3, 3, 4]));
+    let b = second_round(&ws, [5, 5, 4]);
+    // the first words are the same: nothing moved
+    let first = ws.cli(&["delta", &rs(a), &rs(b)])["data"].clone();
+    let moved = |d: &Value| d["moves"].as_array().unwrap().iter().filter(|m| m["before"] != m["after"]).count();
+    assert_eq!(moved(&first), 0, "{first}");
+    // the deliberated words differ for cara
+    let second = ws.cli(&["delta", &rs(a), &rs(b), "--phase", "deliberated"])["data"].clone();
+    assert!(moved(&second) > 0, "{second}");
+    assert_eq!(code(&ws.cli(&["delta", &rs(a), &rs(b), "--phase", "both"])), "invalid_arguments");
+    // the graph draws the other batch: other bytes
+    let g1 = ws.cli(&["graph", &rs(a), "--svg"])["data"]["svg"].as_str().unwrap().to_string();
+    let g2 = ws.cli(&["graph", &rs(a), "--svg", "--phase", "deliberated"])["data"]["svg"].as_str().unwrap().to_string();
+    assert_ne!(g1, g2);
+    // calibrate accepts the flag and refuses a word it does not know
+    assert_eq!(code(&ws.cli(&["calibrate", &rs(a), &rs(b), "--phase", "sideways"])), "invalid_arguments");
+}

@@ -175,9 +175,18 @@ pub enum Cmd {
         /// write the SVG to this file instead of answering it
         #[arg(long)]
         out: Option<PathBuf>,
+        /// initial (default) or deliberated: which batch of each persona is drawn
+        #[arg(long, default_value = "initial")]
+        phase: String,
     },
     /// What moved between two runs on the same subject and lens
-    Delta { a: i64, b: i64 },
+    Delta {
+        a: i64,
+        b: i64,
+        /// initial (default) or deliberated: which batch of each run is read
+        #[arg(long, default_value = "initial")]
+        phase: String,
+    },
     /// Stale runs (the subject moved) and findings with no decision; exits 1 on an unresolved finding
     Check {
         #[arg(long)]
@@ -206,6 +215,9 @@ pub enum Cmd {
         /// also write the answer to this file, for `apply-check --calibration`
         #[arg(long)]
         out: Option<PathBuf>,
+        /// initial (default) or deliberated: which batch of the jury is set beside the people
+        #[arg(long, default_value = "initial")]
+        phase: String,
     },
     /// The answer display: sentences, the numbers "for checking", then Next; --html / --md / --save write views
     Summary {
@@ -539,9 +551,9 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Matrix { runs, across_strata, history, table, detail: d, slice, phase } => {
             app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref(), phase)
         }
-        Cmd::Graph { runs, svg, out } => app::graph::show(root, runs, *svg, out.as_deref()),
+        Cmd::Graph { runs, svg, out, phase } => app::graph::show(root, runs, *svg, out.as_deref(), phase),
         Cmd::Pick { run } => app::pick::show(root, *run),
-        Cmd::Delta { a, b } => app::delta::show(root, *a, *b),
+        Cmd::Delta { a, b, phase } => app::delta::show_phase(root, *a, *b, phase),
         Cmd::Check { history } => app::check::run(root, *history),
         Cmd::ApplyCheck { runs, latest, subject, rule, calibration } => {
             let groups = app::apply_check::runs_to_judge(root, runs, *latest, subject.as_deref())?;
@@ -551,7 +563,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 app::apply_check::run(root, &groups[0], rule.as_deref(), calibration.as_deref())
             }
         }
-        Cmd::Calibrate { jury_run, human_run, out } => app::calibrate::show(root, *jury_run, *human_run, out.as_deref()),
+        Cmd::Calibrate { jury_run, human_run, out, phase } => app::calibrate::show(root, *jury_run, *human_run, out.as_deref(), phase),
         Cmd::Summary { runs, html, md, save, width, confined, slice } => {
             app::summary::show(root, runs, html.as_deref(), md.as_deref(), *save, *width, *confined, slice.as_deref())
         }

@@ -6,6 +6,10 @@ use serde_json::{json, Value};
 use std::path::Path;
 
 pub fn show(root: &Path, a: i64, b: i64) -> Result<Value> {
+    show_phase(root, a, b, "initial")
+}
+
+pub fn show_phase(root: &Path, a: i64, b: i64, phase: &str) -> Result<Value> {
     let store = open(root)?;
     let (ra, rb) = (load_run(&store, a)?, load_run(&store, b)?);
     if ra.subject_name != rb.subject_name || ra.lens_name != rb.lens_name {
@@ -21,8 +25,8 @@ pub fn show(root: &Path, a: i64, b: i64) -> Result<Value> {
         )));
     }
     let step = load_lens(&store, &rb)?.anchor_step();
-    let before = score_rows(&ra, &store.verdict_rows(a, false)?);
-    let after = score_rows(&rb, &store.verdict_rows(b, false)?);
+    let before = score_rows(&ra, &super::verdict::rows_in(&store, a, phase)?);
+    let after = score_rows(&rb, &super::verdict::rows_in(&store, b, phase)?);
     let d = delta::compute(&before, &after, step, &ra.stakes, &rb.stakes);
     let mut out = serde_json::to_value(&d).expect("delta serialises");
     out["a"] = json!(a);

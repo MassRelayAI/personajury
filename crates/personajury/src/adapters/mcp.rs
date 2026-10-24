@@ -354,6 +354,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             runs: runs_arg(a)?,
             svg: true,
             out: None,
+            phase: "initial".into(),
         },
         "personajury_apply_check" => Cmd::ApplyCheck {
             runs: runs_arg(a)?,
@@ -380,6 +381,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "personajury_delta" => Cmd::Delta {
             a: id_arg(a, "a")?,
             b: id_arg(a, "b")?,
+            phase: "initial".into(),
         },
         "personajury_trait_list" => Cmd::Trait {
             what: if bool_arg(a, "sets")? {

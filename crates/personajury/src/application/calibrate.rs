@@ -7,7 +7,10 @@ use crate::domain::*;
 use serde_json::{json, Value};
 use std::path::Path;
 
-pub fn show(root: &Path, jury: i64, human: i64, out: Option<&Path>) -> Result<Value> {
+pub fn show(root: &Path, jury: i64, human: i64, out: Option<&Path>, phase: &str) -> Result<Value> {
+    if !matches!(phase, "initial" | "deliberated") {
+        return Err(AppError::InvalidArguments(format!("--phase {phase:?}: the words are initial and deliberated")));
+    }
     let store = open(root)?;
     let (jr, hr) = (load_run(&store, jury)?, load_run(&store, human)?);
     if store.human_batches(human)?.is_empty() {
@@ -19,7 +22,7 @@ pub fn show(root: &Path, jury: i64, human: i64, out: Option<&Path>) -> Result<Va
             jr.subject_name, jr.lens_name, jr.lens_version, hr.subject_name, hr.lens_name, hr.lens_version
         )));
     }
-    let jury_rows: Vec<ScoreRow> = score_rows(&jr, &store.verdict_rows(jury, false)?.into_iter().filter(|r| !is_human(&r.persona)).collect::<Vec<_>>());
+    let jury_rows: Vec<ScoreRow> = score_rows(&jr, &super::verdict::rows_in(&store, jury, phase)?.into_iter().filter(|r| !is_human(&r.persona)).collect::<Vec<_>>());
     // a person speaks in the stratum of the seat they sat in: `human:<name>:<seat>` counts as the seat
     let mut human_rows: Vec<ScoreRow> = Vec::new();
     for r in score_rows(&hr, &store.verdict_rows(human, false)?) {

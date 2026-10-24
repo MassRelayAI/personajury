@@ -11,6 +11,15 @@ pub(crate) fn open(root: &Path) -> Result<Store> {
     Ok(Store::open_existing(root)?)
 }
 
+/// The rows a verb reads: the jury's first word (`initial`) or the advise-only round (`deliberated`), D33.
+pub(crate) fn rows_in(store: &Store, run: i64, phase: &str) -> Result<Vec<VerdictRow>> {
+    Ok(match phase {
+        "initial" => store.verdict_rows(run, false)?,
+        "deliberated" => store.deliberated_rows(run)?,
+        other => return Err(AppError::InvalidArguments(format!("--phase {other:?}: the words are initial and deliberated"))),
+    })
+}
+
 pub(crate) fn load_run(store: &Store, id: i64) -> Result<RunRow> {
     store
         .run(id)?

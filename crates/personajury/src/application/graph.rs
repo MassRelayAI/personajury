@@ -120,6 +120,10 @@ struct PersonaBox {
 }
 
 pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
+    render_phase(root, run_ids, "initial")
+}
+
+pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String> {
     let store = open(root)?;
     let mut ids: Vec<i64> = run_ids.to_vec();
     ids.sort_unstable();
@@ -170,7 +174,7 @@ pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
     let mut line_rows: Vec<(String, VerdictRow)> = Vec::new();
     for l in &lenses {
         let run = &latest[&l.name];
-        let vr = store.verdict_rows(run.id, false)?;
+        let vr = super::verdict::rows_in(&store, run.id, phase)?;
         rows.extend(score_rows(run, &vr));
         line_rows.extend(vr.into_iter().map(|v| (l.name.clone(), v)));
     }
@@ -546,11 +550,11 @@ pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
 }
 
 /// The verb: the SVG text, or a file when `out` is given.
-pub fn show(root: &Path, runs: &[i64], svg: bool, out: Option<&Path>) -> Result<Value> {
+pub fn show(root: &Path, runs: &[i64], svg: bool, out: Option<&Path>, phase: &str) -> Result<Value> {
     if !svg {
         return Err(AppError::InvalidArguments("graph draws an SVG: pass --svg".into()));
     }
-    let text = render(root, runs)?;
+    let text = render_phase(root, runs, phase)?;
     let mut ids: Vec<i64> = runs.to_vec();
     ids.sort_unstable();
     ids.dedup();

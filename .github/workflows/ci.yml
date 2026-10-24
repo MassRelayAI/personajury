@@ -22,6 +22,8 @@ jobs:
         run: cargo test -p personajury
       - name: Clippy
         run: cargo clippy -p personajury --tests -- -D warnings
+      - name: Walk exporter tests (capture tests skip when no Chrome)
+        run: node --test tools/test/*.test.mjs
       - name: README illustration script tests
         run: node --test scripts/test/*.test.mjs
       - name: README illustrations are current

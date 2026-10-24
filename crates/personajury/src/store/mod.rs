@@ -34,7 +34,9 @@ const V5_COLUMNS: [(&str, &str, &str); 7] = [
 ];
 /// The columns schema v6 added (v0.6-C: D32, D33, D34, D37). They change what a batch means (`verdict.phase`), so the
 /// version moved: a v0.5 binary refuses a v6 store by its version instead of reading a deliberated batch as the latest.
-const V6_COLUMNS: [(&str, &str, &str); 4] = [
+const V6_COLUMNS: [(&str, &str, &str); 5] = [
+    // D36: a person's own declared traits, beside the batch they entered (append-only like the table)
+    ("human_batch", "traits_json", "TEXT"),
     ("run", "options_mode", "TEXT"),
     ("verdict", "phase", "TEXT"),
     ("pick", "about", "TEXT"),
@@ -1001,6 +1003,21 @@ impl Store {
         by_human: Option<&str>,
         phase: Option<&str>,
     ) -> Result<()> {
+        self.insert_verdict_full(run_id, batch, persona_version, subject_name, v, by_human, phase, None)
+    }
+    /// `insert_verdict_phase`, and with the traits a person declared for their batch (D36), as canonical JSON.
+    #[allow(clippy::too_many_arguments)]
+    pub fn insert_verdict_full(
+        &self,
+        run_id: i64,
+        batch: i64,
+        persona_version: i64,
+        subject_name: &str,
+        v: &ValidVerdict,
+        by_human: Option<&str>,
+        phase: Option<&str>,
+        human_traits: Option<&str>,
+    ) -> Result<()> {
         let tx = self.conn.unchecked_transaction()?;
         let now = now_iso();
         for l in &v.lines {
@@ -1027,8 +1044,8 @@ impl Store {
         }
         if let Some(by) = by_human {
             tx.execute(
-                "INSERT INTO human_batch(run_id, batch, persona_id, by_human, created_at) VALUES (?1,?2,?3,?4,?5)",
-                params![run_id, batch, v.persona, by, now],
+                "INSERT INTO human_batch(run_id, batch, persona_id, by_human, created_at, traits_json) VALUES (?1,?2,?3,?4,?5,?6)",
+                params![run_id, batch, v.persona, by, now, human_traits],
             )?;
         }
         for p in &v.picks {
@@ -1167,6 +1184,22 @@ impl Store {
             .query_map(params![run_id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))?
             .collect::<std::result::Result<Vec<_>, _>>()?;
         Ok(rows.into_iter().collect())
+    }
+    /// The traits each person declared (D36): persona id (`human:<name>:<seat>`) to the traits of their latest batch.
+    /// A person whose latest batch declared none holds none.
+    pub fn human_traits(&self, run_id: i64) -> Result<BTreeMap<String, BTreeMap<String, crate::domain::traits::TraitValue>>> {
+        let mut st = self.conn.prepare("SELECT persona_id, traits_json FROM human_batch WHERE run_id = ?1 ORDER BY id")?;
+        let rows = st
+            .query_map(params![run_id], |r| Ok((r.get::<_, String>(0)?, r.get::<_, Option<String>>(1)?)))?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        let mut out = BTreeMap::new();
+        for (id, json) in rows {
+            out.remove(&id);
+            if let Some(t) = json.and_then(|j| serde_json::from_str(&j).ok()) {
+                out.insert(id, t);
+            }
+        }
+        Ok(out)
     }
     /// The tokens reported by verdicts stored at or after `since` (an `iso_days_ago` text): (input, output, verdicts).
     pub fn reported_usage_since(&self, since: &str) -> Result<Option<(u64, u64, u64)>> {

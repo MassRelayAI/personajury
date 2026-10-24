@@ -131,6 +131,9 @@ pub enum Cmd {
         /// person speaks in; the rows stand beside the jury's, never in its cells. Only a person enters one.
         #[arg(long)]
         by_human: Option<String>,
+        /// with --by-human: the person's own declared traits, a JSON file in the shape of a persona's `traits` (D36)
+        #[arg(long)]
+        traits: Option<PathBuf>,
         /// the advise-only round (D33): the file carries "phase": "deliberated"; needs `deliberate` first
         #[arg(long)]
         deliberated: bool,
@@ -218,6 +221,9 @@ pub enum Cmd {
         /// initial (default) or deliberated: which batch of the jury is set beside the people
         #[arg(long, default_value = "initial")]
         phase: String,
+        /// also compare the groups of one trait's bands or options, in each stratum, on both sides (D36)
+        #[arg(long)]
+        slice: Option<String>,
     },
     /// The answer display: sentences, the numbers "for checking", then Next; --html / --md / --save write views
     Summary {
@@ -368,6 +374,11 @@ pub enum TraitCmd {
         #[arg(long)]
         runs: Option<String>,
     },
+    /// Per trait and stratum, how many calibration files said predicts, played, missed, inert or thin (D36)
+    Report {
+        #[arg(long, num_args = 1.., required = true)]
+        calibration: Vec<PathBuf>,
+    },
     /// Trait sets: up to 8 traits an audience is judged by, up to 4 of them the cover of a panel
     Set {
         #[command(subcommand)]
@@ -447,6 +458,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Trait { what: TraitCmd::Generate { .. } } => "trait generate",
         Cmd::Trait { what: TraitCmd::Suggest { .. } } => "trait suggest",
         Cmd::Trait { what: TraitCmd::Observed { .. } } => "trait observed",
+        Cmd::Trait { what: TraitCmd::Report { .. } } => "trait report",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::Add { .. } } } => "trait set add",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::List } } => "trait set list",
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
@@ -525,6 +537,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::List => app::traits::list(root),
             TraitCmd::Show { id } => app::traits::show(root, id),
             TraitCmd::Generate { from, count } => app::traits::generate(root, from, *count),
+            TraitCmd::Report { calibration } => app::calibrate::report(calibration),
             TraitCmd::Observed { persona, runs } => app::trait_reverse::observed(root, persona, runs.as_deref()),
             TraitCmd::Suggest { persona, set, check } => match check {
                 Some(f) => app::trait_reverse::suggest_check(root, f, persona.as_deref()),
@@ -576,13 +589,20 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             },
         ),
         Cmd::Deliberate { run, wave } => app::deliberate::run(root, *run, *wave),
-        Cmd::Verdict { run, file, json, by_human, deliberated } => {
+        Cmd::Verdict { run, file, json, by_human, traits, deliberated } => {
             let input = match (file, json) {
                 (Some(f), None) => app::read_text(f)?,
                 (None, Some(j)) => j.clone(),
                 _ => return Err(AppError::InvalidArguments("give the verdict as --file <path> or --json <text>".into())),
             };
-            app::verdict::ingest_with(root, *run, &input, by_human.as_deref(), *deliberated)
+            let traits = match traits {
+                None => None,
+                Some(f) => Some(
+                    serde_json::from_str(&app::read_text(f)?)
+                        .map_err(|e| AppError::InvalidArguments(format!("{}: not a traits map: {e}", f.display())))?,
+                ),
+            };
+            app::verdict::ingest_with(root, *run, &input, by_human.as_deref(), *deliberated, traits)
         }
         Cmd::Matrix { runs, across_strata, history, table, detail: d, slice, phase } => {
             app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref(), phase)
@@ -599,7 +619,9 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 app::apply_check::run(root, &groups[0], rule.as_deref(), calibration.as_deref())
             }
         }
-        Cmd::Calibrate { jury_run, human_run, out, phase } => app::calibrate::show(root, *jury_run, *human_run, out.as_deref(), phase),
+        Cmd::Calibrate { jury_run, human_run, out, phase, slice } => {
+            app::calibrate::show(root, *jury_run, *human_run, out.as_deref(), phase, slice.as_deref())
+        }
         Cmd::Summary { runs, html, md, save, width, confined, slice } => {
             app::summary::show(root, runs, html.as_deref(), md.as_deref(), *save, *width, *confined, slice.as_deref())
         }

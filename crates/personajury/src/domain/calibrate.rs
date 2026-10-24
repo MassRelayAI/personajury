@@ -4,7 +4,7 @@
 //! for itself, and `calibrated` is the primary stratum's rule (the held-out detector's): every primary cell within one.
 use super::model::{ScoreRow, Stake};
 use serde::Serialize;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 type Key = (String, String, Option<String>);
 
@@ -102,4 +102,128 @@ pub fn calibrated(strata: &[StratumCal]) -> bool {
         .iter()
         .find(|s| s.stake == Stake::Primary)
         .is_some_and(|s| !s.cells.is_empty() && s.cells.iter().all(|c| c.within_one_rank) && !s.uncompared.iter().any(|u| u.missing == "human"))
+}
+
+
+// ---- a trait slice of the calibration (D36): does the trait move the jury as it moves people? ----
+
+/// The jurors (or the people) holding one band or option in one stratum, with their rows.
+#[derive(Debug, Clone, Default)]
+pub struct Side {
+    pub members: Vec<String>,
+    pub rows: Vec<ScoreRow>,
+}
+/// One band in a stratum: the two sides, and the D20 rank comparison of its cells.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SliceGroup {
+    pub band: String,
+    pub jury_n: usize,
+    pub people_n: usize,
+    pub jury: Vec<String>,
+    pub people: Vec<String>,
+    pub cells: Vec<CellCal>,
+    pub uncompared: Vec<Uncompared>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Separates {
+    pub cells: usize,
+    pub total: usize,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SliceCal {
+    #[serde(rename = "trait")]
+    pub trait_id: String,
+    pub stratum: Stake,
+    pub groups: Vec<SliceGroup>,
+    pub jury_unset: Vec<String>,
+    pub people_unset: Vec<String>,
+    pub separates_in_jury: Separates,
+    pub separates_in_people: Separates,
+    /// the cells on which both sides separate
+    pub separates_in_both: usize,
+    pub word: &'static str,
+}
+
+/// The cells on which two bands' `anchor_met` ranges do not overlap (the split rule of D13 applied to bands).
+fn separated(sides: &[&Side]) -> BTreeSet<Key> {
+    let mut per: BTreeMap<Key, Vec<(i64, i64)>> = BTreeMap::new();
+    for side in sides.iter().filter(|s| !s.members.is_empty()) {
+        let mut cell: BTreeMap<Key, (i64, i64)> = BTreeMap::new();
+        for r in &side.rows {
+            let e = cell.entry((r.lens.clone(), r.dimension.clone(), r.about.clone())).or_insert((r.anchor_met, r.anchor_met));
+            e.0 = e.0.min(r.anchor_met);
+            e.1 = e.1.max(r.anchor_met);
+        }
+        for (k, v) in cell {
+            per.entry(k).or_default().push(v);
+        }
+    }
+    per.into_iter().filter(|(_, rs)| rs.iter().enumerate().any(|(i, a)| rs[i + 1..].iter().any(|b| a.1 < b.0 || b.1 < a.0))).map(|(k, _)| k).collect()
+}
+fn cells_of(rows: &[ScoreRow]) -> usize {
+    rows.iter().map(|r| (&r.lens, &r.dimension, &r.about)).collect::<BTreeSet<_>>().len()
+}
+
+/// One stratum of `calibrate --slice`: `bands` in the trait's order, each with the jury's and the people's holders;
+/// `stakes` gives every member (a persona id, a `human:<name>:<seat>` id) its stratum, `jury_total` and `people_total` the
+/// cells of the whole stratum on each side. The word: `thin` when any band has fewer than two on either side or fewer
+/// than two bands are held at all (nothing can separate); else `predicts` when both sides separate on a common cell,
+/// `missed` when the people separate and the jury does not, `inert` when neither does, and `played` otherwise (the jury
+/// separates and the people do not, or on other cells than the people).
+#[allow(clippy::too_many_arguments)]
+pub fn slice(
+    trait_id: &str,
+    stake: Stake,
+    bands: &[(String, Side, Side)],
+    stakes: &BTreeMap<String, Stake>,
+    jury_unset: Vec<String>,
+    people_unset: Vec<String>,
+    jury_total: usize,
+    people_total: usize,
+) -> SliceCal {
+    let mut groups = Vec::new();
+    let held: Vec<&(String, Side, Side)> = bands.iter().filter(|(_, j, p)| !j.members.is_empty() || !p.members.is_empty()).collect();
+    for (band, j, p) in &held {
+        let cal = compare(&j.rows, stakes, &p.rows, stakes).into_iter().find(|s| s.stake == stake);
+        let (cells, uncompared) = cal.map(|c| (c.cells, c.uncompared)).unwrap_or_default();
+        groups.push(SliceGroup {
+            band: band.clone(),
+            jury_n: j.members.len(),
+            people_n: p.members.len(),
+            jury: j.members.clone(),
+            people: p.members.clone(),
+            cells,
+            uncompared,
+        });
+    }
+    let sj = separated(&held.iter().map(|(_, j, _)| j).collect::<Vec<_>>());
+    let sp = separated(&held.iter().map(|(_, _, p)| p).collect::<Vec<_>>());
+    let both = sj.intersection(&sp).count();
+    let thin = held.len() < 2 || held.iter().any(|(_, j, p)| j.members.len() < 2 || p.members.len() < 2);
+    let word = if thin {
+        "thin"
+    } else if both > 0 {
+        "predicts"
+    } else if sp.is_empty() && sj.is_empty() {
+        "inert"
+    } else if sj.is_empty() {
+        "missed"
+    } else {
+        "played"
+    };
+    SliceCal {
+        trait_id: trait_id.to_string(),
+        stratum: stake,
+        groups,
+        jury_unset,
+        people_unset,
+        separates_in_jury: Separates { cells: sj.len(), total: jury_total },
+        separates_in_people: Separates { cells: sp.len(), total: people_total },
+        separates_in_both: both,
+        word,
+    }
+}
+/// The cells of a stratum on one side, for `total`.
+pub fn total_cells(rows: &[ScoreRow]) -> usize {
+    cells_of(rows)
 }

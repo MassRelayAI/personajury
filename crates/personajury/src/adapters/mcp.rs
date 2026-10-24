@@ -322,6 +322,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                     file: None,
                     json: Some(v.to_string()),
                     by_human: None,
+                    traits: None,
                     deliberated: bool_arg(a, "deliberated")?,
                 },
                 None | Some(Value::Null) => return Err("missing required argument verdict".into()),

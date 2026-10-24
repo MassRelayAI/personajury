@@ -232,12 +232,24 @@ pub(crate) fn is_human(persona: &str) -> bool {
 /// Ingest a verdict. With `by_human` ("<name, credential>") the batch is a person's (D19): the same refusals, stored
 /// under `human:<name>:<seat>` beside the jury's rows, never merged with a persona's cell.
 pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> Result<Value> {
-    ingest_with(root, run, input, by_human, false)
+    ingest_with(root, run, input, by_human, false, None)
 }
 
 /// `ingest_by`, and with `deliberated` the advise-only round's batch (D33): the file carries `"phase": "deliberated"`,
 /// the run holds a deliberation, and the persona has an accepted initial verdict; the same evidence refusals apply.
-pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, deliberated: bool) -> Result<Value> {
+/// `traits` (D36) is a person's own declared traits, in the shape of a persona's `traits`: only with `by_human`, validated
+/// with the refusals of `persona add`, stored beside the batch.
+pub fn ingest_with(
+    root: &Path,
+    run: i64,
+    input: &str,
+    by_human: Option<&str>,
+    deliberated: bool,
+    traits: Option<std::collections::BTreeMap<String, crate::domain::traits::TraitValue>>,
+) -> Result<Value> {
+    if traits.is_some() && by_human.is_none() {
+        return Err(AppError::InvalidArguments("--traits goes with --by-human: a juror's traits are its persona's".into()));
+    }
     let store = open(root)?;
     let run = load_run(&store, run)?;
     if let Some(why) = moved_why(&store, &run)? {
@@ -333,6 +345,19 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
         input.persona = human_id(by, &seat);
         stakes.insert(input.persona.clone(), stake);
     }
+    // a person's declared traits: the refusals of `persona add`, the canonical form stored (D36)
+    let human_traits = match &traits {
+        None => None,
+        Some(m) => {
+            crate::domain::traits::check_map_shape(m)?;
+            let defs = store.trait_map()?;
+            for (id, v) in m {
+                defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?.check_value(v)?;
+            }
+            let canon: std::collections::BTreeMap<_, _> = m.iter().map(|(k, v)| (k.clone(), v.canonical())).collect();
+            Some(crate::domain::hash::canonical_json(&serde_json::to_value(&canon).expect("traits serialise")))
+        }
+    };
     let cx = VerdictContext {
         lens,
         subject_name: run.subject_name.clone(),
@@ -355,7 +380,7 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
             ))
         })?;
     let batch = store.next_batch(run.id, &valid.persona)?;
-    store.insert_verdict_phase(
+    store.insert_verdict_full(
         run.id,
         batch,
         persona_version,
@@ -363,6 +388,7 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
         &valid,
         by_human.map(str::trim),
         deliberated.then_some("deliberated"),
+        human_traits.as_deref(),
     )?;
     let mut ids: Vec<&str> = Vec::new();
     for f in &valid.findings {

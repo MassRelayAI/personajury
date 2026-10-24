@@ -46,6 +46,7 @@ pub fn show(
     let mut models: BTreeMap<Stake, std::collections::BTreeSet<String>> = BTreeMap::new();
     // who entered each human batch (D19)
     let mut human_batches: BTreeMap<String, String> = BTreeMap::new();
+    let mut human_declared: BTreeMap<String, BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
     // the persona version each run briefed: a slice reads the traits the juror was briefed with
     let mut versions: BTreeMap<String, i64> = BTreeMap::new();
     for id in runs {
@@ -60,6 +61,7 @@ pub fn show(
         for (k, v) in store.human_batches(*id)? {
             human_batches.insert(k, v);
         }
+        human_declared.extend(store.human_traits(*id)?);
         if let Some(e) = &run.effort {
             match efforts.iter_mut().find(|(x, t, _)| x == e && *t == run.trimmed) {
                 Some((_, _, ids)) => ids.push(*id),
@@ -142,7 +144,7 @@ pub fn show(
         .map(|l| (l.name.clone(), l.standard.trim().to_string()))
         .collect();
     // what people entered by hand stands beside the jury's cells, never in them (D19)
-    let humans = humans_of(&rows, &stakes, &human_batches)?;
+    let humans = humans_of(&rows, &stakes, &human_batches, &human_declared)?;
     let usage = usage_summary(root, &store, runs)?;
     // cost (D34): what each juror's verdict reported, listed; nothing is divided
     let cost = {
@@ -278,23 +280,30 @@ struct Human {
     seat: String,
     stake: Stake,
     by: String,
+    /// the traits the person declared for themselves (D36)
+    traits: Option<BTreeMap<String, traits::TraitValue>>,
     rows: Vec<ScoreRow>,
 }
 impl Human {
     fn json(&self) -> Value {
-        json!({
+        let mut v = json!({
             "persona": self.persona, "seat": self.seat, "stake": self.stake, "by": self.by,
             "lines": self.rows.iter().map(|r| json!({
                 "lens": r.lens, "dimension": r.dimension, "about": r.about, "score": r.score,
                 "anchor_met": r.anchor_met, "evidence": r.evidence, "citations": r.citations, "blockers": r.blockers,
             })).collect::<Vec<_>>(),
-        })
+        });
+        if let Some(t) = &self.traits {
+            v["traits"] = json!(t);
+        }
+        v
     }
 }
 fn humans_of(
     rows: &[ScoreRow],
     stakes: &BTreeMap<String, Stake>,
     by: &BTreeMap<String, String>,
+    declared: &BTreeMap<String, BTreeMap<String, traits::TraitValue>>,
 ) -> Result<Vec<Human>> {
     let mut out: Vec<Human> = Vec::new();
     for r in rows.iter().filter(|r| super::verdict::is_human(&r.persona)) {
@@ -309,6 +318,7 @@ fn humans_of(
             seat,
             stake,
             by: by.get(&r.persona).cloned().unwrap_or_default(),
+            traits: declared.get(&r.persona).cloned(),
             rows: vec![r.clone()],
         });
     }

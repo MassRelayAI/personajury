@@ -29,6 +29,16 @@ Code correctness goes to tests (an unmatched path gets none). Visible surfaces g
 go to builder personas through the rule's panel. Code is also a fine subject for judgement (readability, API ergonomics,
 trade-offs between options: `fixtures/lenses/tradeoffs.toml`, `docs/playbooks/a-technical-decision.md`): never correctness.
 
+## Keep the jury fair (short rules, each with its reason)
+- **Neutral material.** Briefs and cards carry facts, not your opinion. *Why: jurors repeat your hints back as reasons.*
+- **Mixed models.** Seat jurors on two or more models when you can (`@model` per panel term). *Why: one model's taste looks
+  like agreement.*
+- **One group you are not building for.** *Why: if outsiders read it the opposite way, you learn something cheaply.*
+- **Read each juror, not only the medians.** *Why: on close calls a 1–5 scale bunches at 3; the spread is the signal.*
+- **A critic sits as a bystander.** *Why: you read its blockers, and its harsh scores cannot drag down your users.*
+- **Never quote real people.** Composites only. *Why: a model guessing a real person puts words in their mouth.*
+- **Taste, names and brand stay human.** The jury advises; the owner decides and the record says so.
+
 ## 1. Brief
 Subject, panel and lens exist already (`subject add`, `panel add`, `lens list`). The panel's own terms give each persona
 its stake (`3 builder=primary, 2 approver=secondary, 1 others=bystander`), and where a term's pool is bigger than its seats

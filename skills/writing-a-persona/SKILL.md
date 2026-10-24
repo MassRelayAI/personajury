@@ -64,6 +64,13 @@ strata you will need. Personas are composites, never identifiable real people: n
 
 Two cautions: a flattering self-persona biases upward, and a constant critic never scores high. Worked example: `docs/playbooks/your-own-jurors.md`.
 
+## Fair personas in five lines
+- Write from real material (tickets, interviews, notes), not imagination. *Why: invented people agree with you.*
+- Give each persona its own fears and its own way of deciding. *Why: if two could swap lines, you have one juror twice.*
+- Include someone you are not selling to. *Why: they find what your fans forgive.*
+- Describe traits, never a named or famous person. *Why: a guessed real person is fiction with a face.*
+- Do not make a persona of yourself; enter your real verdict with `verdict --by-human`. *Why: a flattering self is bias.*
+
 ## Stake is not in the persona
 A persona has `stake_rules` in words as guidance, but the stake itself belongs to the audience: the panel's term
 (`2 approver=secondary`) gives it, and `brief --stake <persona>=primary|secondary|bystander` overrides it for one run. The

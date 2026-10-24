@@ -356,6 +356,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             svg: true,
             out: None,
             phase: "initial".into(),
+            slice: None,
         },
         "personajury_apply_check" => Cmd::ApplyCheck {
             runs: runs_arg(a)?,

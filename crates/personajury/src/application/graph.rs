@@ -124,6 +124,71 @@ pub fn render(root: &Path, run_ids: &[i64]) -> Result<String> {
 }
 
 pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String> {
+    render_with(root, run_ids, phase, None)
+}
+
+/// The fill of a persona node by trait group (D36): the lightest, the middle and the darkest step of the blue scale, grey
+/// for a persona without the trait. A category's options cycle the three steps in option order.
+const GROUP_STEP: [&str; 3] = [STEP[0], STEP[2], STEP[4]];
+
+/// What `--slice TRAIT` adds: each persona's fill, and the legend line (D36).
+struct SliceDraw {
+    title: String,
+    /// the groups in order, each with its fill
+    groups: Vec<(String, &'static str)>,
+    /// persona id to fill
+    fills: BTreeMap<String, &'static str>,
+    /// per stratum, the count of each group and of the unset
+    counts: [Option<(Vec<usize>, usize)>; 3],
+}
+impl SliceDraw {
+    fn build(store: &crate::store::Store, trait_id: &str, runs: &[RunRow], by_stake: &[Vec<PersonaBox>; 3]) -> Result<SliceDraw> {
+        let defs = store.trait_map()?;
+        let def = defs.get(trait_id).ok_or_else(|| Refusal::UnknownTrait { id: trait_id.to_string() })?;
+        if def.shape == "words" {
+            return Err(AppError::InvalidArguments(format!("{trait_id} holds words; a slice groups by band or option")));
+        }
+        // the traits each persona was briefed with, from the latest run that seated it
+        let mut versions: BTreeMap<&str, i64> = BTreeMap::new();
+        for r in runs {
+            for b in &r.briefs {
+                versions.insert(b.persona.as_str(), b.persona_version);
+            }
+        }
+        let bands = def.bands();
+        let groups: Vec<(String, &'static str)> = bands.iter().enumerate().map(|(i, b)| (b.clone(), GROUP_STEP[i % 3])).collect();
+        let mut fills = BTreeMap::new();
+        let mut counts: [Option<(Vec<usize>, usize)>; 3] = [None, None, None];
+        for (s, col) in by_stake.iter().enumerate() {
+            if col.is_empty() {
+                continue;
+            }
+            let mut n = vec![0usize; groups.len()];
+            let mut unset = 0;
+            for p in col {
+                let v = match versions.get(p.id.as_str()) {
+                    Some(v) => store.persona_at(&p.id, *v)?,
+                    None => store.persona(&p.id)?,
+                };
+                let held = v.and_then(|p| p.traits).and_then(|t| t.get(trait_id).cloned()).map(|v| def.bands_held(&v)).unwrap_or_default();
+                match held.first().and_then(|b| groups.iter().position(|(g, _)| g == b)) {
+                    Some(i) => {
+                        fills.insert(p.id.clone(), groups[i].1);
+                        n[i] += 1;
+                    }
+                    None => {
+                        fills.insert(p.id.clone(), GREY);
+                        unset += 1;
+                    }
+                }
+            }
+            counts[s] = Some((n, unset));
+        }
+        Ok(SliceDraw { title: def.title.clone(), groups, fills, counts })
+    }
+}
+
+pub fn render_with(root: &Path, run_ids: &[i64], phase: &str, slice: Option<&str>) -> Result<String> {
     let store = open(root)?;
     let mut ids: Vec<i64> = run_ids.to_vec();
     ids.sort_unstable();
@@ -191,6 +256,11 @@ pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String>
         let name = store.persona(id)?.map_or_else(|| id.clone(), |p| p.name);
         by_stake[stake_idx(stake)].push(PersonaBox { id: id.clone(), name, stake, x: 0, y: 0 });
     }
+
+    let slice_draw = match slice {
+        Some(t) => Some(SliceDraw::build(&store, t, &runs, &by_stake)?),
+        None => None,
+    };
 
     // dimension nodes, lens by lens: each dimension, then its options (sorted; the whole subject is the dimension)
     let mut nodes_by_lens: Vec<Vec<Node>> = Vec::new();
@@ -365,6 +435,31 @@ pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String>
     let _ = writeln!(o, "<g font-family=\"{FONT}\" fill=\"{INK}\">");
     let _ = writeln!(o, "<text x=\"30\" y=\"40\" font-size=\"18\" font-weight=\"700\">PersonaJury · {}</text>", esc(&lay::fit(&subject, 760, 18)));
     let _ = writeln!(o, "<text x=\"30\" y=\"62\" font-size=\"13\" fill=\"{MUTED}\">Personas by stake, the dimensions they scored, the blockers they raised. Edge colour is the score; badges are medians per stratum, never one number.</text>");
+    if let Some(sd) = &slice_draw {
+        // the legend line of a slice: the trait, its groups and their fills, then the counts of each stratum (D36)
+        let mut x = 30;
+        let _ = writeln!(o, "<text x=\"{x}\" y=\"80\" font-size=\"12\" font-weight=\"700\">{}</text>", esc(&lay::fit(&sd.title, 520, 12)));
+        x += lay::text_px(&lay::fit(&sd.title, 520, 12), 12) + 14;
+        for (name, fill) in &sd.groups {
+            let _ = writeln!(o, "<rect x=\"{x}\" y=\"70\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{fill}\" stroke=\"{MUTED}\" stroke-width=\"0.6\"/>");
+            let _ = writeln!(o, "<text x=\"{}\" y=\"80\" font-size=\"11\" fill=\"{MUTED}\">{}</text>", x + 16, esc(name));
+            x += 16 + lay::text_px(name, 11) + 12;
+        }
+        let _ = writeln!(o, "<rect x=\"{x}\" y=\"70\" width=\"12\" height=\"12\" rx=\"2\" fill=\"{GREY}\" stroke=\"{MUTED}\" stroke-width=\"0.6\"/>");
+        let _ = writeln!(o, "<text x=\"{}\" y=\"80\" font-size=\"11\" fill=\"{MUTED}\">unset</text>", x + 16);
+        x += 16 + lay::text_px("unset", 11) + 20;
+        let per: Vec<String> = STAKES
+            .iter()
+            .zip(&sd.counts)
+            .filter_map(|(st, c)| {
+                c.as_ref().map(|(n, unset)| {
+                    let joined = n.iter().map(usize::to_string).collect::<Vec<_>>().join("\u{b7}");
+                    format!("{} {joined}{}", st.name()[..1].to_uppercase(), if *unset > 0 { format!(" +{unset} unset") } else { String::new() })
+                })
+            })
+            .collect();
+        let _ = writeln!(o, "<text x=\"{x}\" y=\"80\" font-size=\"11\" font-family=\"{MONO}\" fill=\"{INK}\">{}</text>", esc(&per.join("   ")));
+    }
     let rounds = format!(
         "run{} {}",
         if runs.len() == 1 { "" } else { "s" },
@@ -433,11 +528,14 @@ pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String>
     // ---- nodes ----
     for p in by_stake.iter().flatten() {
         let _ = writeln!(o, "<g>");
+        let fill = slice_draw.as_ref().and_then(|sd| sd.fills.get(&p.id).copied()).unwrap_or("#ffffff");
+        // on the darkest step the names turn white
+        let (ink, idc) = if fill == STEP[4] { (" fill=\"#ffffff\"".to_string(), "#ffffff") } else { (String::new(), MUTED) };
         let _ = writeln!(o, "<title>{} ({}, {})</title>", esc(&p.name), esc(&p.id), p.stake.name());
-        let _ = writeln!(o, "<rect class=\"persona\" data-persona=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"7\" fill=\"#ffffff\" stroke=\"{LINE}\" stroke-width=\"1.2\"/>", esc(&p.id), p.x, p.y, lay::PERSONA_W, lay::PERSONA_H);
-        let _ = writeln!(o, "<text x=\"{}\" y=\"{}\" font-size=\"12\" font-weight=\"700\">{}</text>", p.x + 10, p.y + 17, esc(&lay::fit(&p.name, lay::PERSONA_W - 20, 12)));
+        let _ = writeln!(o, "<rect class=\"persona\" data-persona=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"7\" fill=\"{fill}\" stroke=\"{LINE}\" stroke-width=\"1.2\"/>", esc(&p.id), p.x, p.y, lay::PERSONA_W, lay::PERSONA_H);
+        let _ = writeln!(o, "<text x=\"{}\" y=\"{}\" font-size=\"12\" font-weight=\"700\"{}>{}</text>", p.x + 10, p.y + 17, ink, esc(&lay::fit(&p.name, lay::PERSONA_W - 20, 12)));
         let pill_w = lay::text_px(p.stake.name(), 9) + 12;
-        let _ = writeln!(o, "<text x=\"{}\" y=\"{}\" font-size=\"10\" font-family=\"{MONO}\" fill=\"{MUTED}\">{}</text>", p.x + 10, p.y + 31, esc(&lay::fit(&p.id, lay::PERSONA_W - 22 - pill_w, 10)));
+        let _ = writeln!(o, "<text x=\"{}\" y=\"{}\" font-size=\"10\" font-family=\"{MONO}\" fill=\"{idc}\">{}</text>", p.x + 10, p.y + 31, esc(&lay::fit(&p.id, lay::PERSONA_W - 22 - pill_w, 10)));
         let _ = writeln!(o, "<rect x=\"{}\" y=\"{}\" width=\"{pill_w}\" height=\"13\" rx=\"6.5\" fill=\"{}\" stroke=\"{MUTED}\" stroke-width=\"0.8\"/>", p.x + lay::PERSONA_W - 8 - pill_w, p.y + 21, tint(p.stake));
         let _ = writeln!(o, "<text x=\"{}\" y=\"{}\" font-size=\"9\" text-anchor=\"middle\">{}</text>", p.x + lay::PERSONA_W - 8 - pill_w / 2, p.y + 31, p.stake.name());
         let _ = writeln!(o, "</g>");
@@ -550,11 +648,11 @@ pub fn render_phase(root: &Path, run_ids: &[i64], phase: &str) -> Result<String>
 }
 
 /// The verb: the SVG text, or a file when `out` is given.
-pub fn show(root: &Path, runs: &[i64], svg: bool, out: Option<&Path>, phase: &str) -> Result<Value> {
+pub fn show(root: &Path, runs: &[i64], svg: bool, out: Option<&Path>, phase: &str, slice: Option<&str>) -> Result<Value> {
     if !svg {
         return Err(AppError::InvalidArguments("graph draws an SVG: pass --svg".into()));
     }
-    let text = render_phase(root, runs, phase)?;
+    let text = render_with(root, runs, phase, slice)?;
     let mut ids: Vec<i64> = runs.to_vec();
     ids.sort_unstable();
     ids.dedup();

@@ -181,6 +181,9 @@ pub enum Cmd {
         /// initial (default) or deliberated: which batch of each persona is drawn
         #[arg(long, default_value = "initial")]
         phase: String,
+        /// fill the persona nodes by one trait's bands or options, with a legend line of the counts per stratum (D36)
+        #[arg(long)]
+        slice: Option<String>,
     },
     /// What moved between two runs on the same subject and lens
     Delta {
@@ -611,7 +614,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         Cmd::Matrix { runs, across_strata, history, table, detail: d, slice, phase } => {
             app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref(), phase)
         }
-        Cmd::Graph { runs, svg, out, phase } => app::graph::show(root, runs, *svg, out.as_deref(), phase),
+        Cmd::Graph { runs, svg, out, phase, slice } => app::graph::show(root, runs, *svg, out.as_deref(), phase, slice.as_deref()),
         Cmd::Pick { run } => app::pick::show(root, *run),
         Cmd::Delta { a, b, phase } => app::delta::show_phase(root, *a, *b, phase),
         Cmd::Check { history } => app::check::run(root, *history),

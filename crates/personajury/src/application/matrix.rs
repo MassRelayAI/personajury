@@ -544,6 +544,8 @@ fn slices(
             held.insert(id.clone(), t);
         }
     }
+    // a project's own trait is badged (P) in every header, as a credential is (C): the catalog did not vouch for it (D35)
+    let badge = if store.traits()?.iter().any(|(t, origin, _, _)| t.id == trait_id && origin == "project") { " (P)" } else { "" };
     let mut out = Vec::new();
     let mut table = String::new();
     for st in &m.strata {
@@ -555,7 +557,7 @@ fn slices(
             let members: Vec<String> =
                 st.personas.iter().filter(|p| mine(p).is_some_and(|v| def.bands_held(v).contains(&band))).cloned().collect();
             if members.is_empty() {
-                table_blocks.push_str(&format!("slice {trait_id}: {}, {band}: \u{2014}\n\n", st.stake.name()));
+                table_blocks.push_str(&format!("slice {trait_id}{badge}: {}, {band}: \u{2014}\n\n", st.stake.name()));
                 continue;
             }
             let gr: Vec<ScoreRow> = rows.iter().filter(|r| members.contains(&r.persona)).cloned().collect();
@@ -566,7 +568,7 @@ fn slices(
                 cells: vec![],
             });
             table_blocks.push_str(&format!(
-                "slice {trait_id}: {}, {band} (n {}: {})\n\n{}\n",
+                "slice {trait_id}{badge}: {}, {band} (n {}: {})\n\n{}\n",
                 st.stake.name(),
                 members.len(),
                 members.join(", "),
@@ -621,9 +623,14 @@ fn slices(
             "separates": {"cells": separated, "total": st.cells.len()},
             "warnings": warnings,
         }));
+        if !badge.is_empty() {
+            if let Some(last) = out.last_mut() {
+                last["badge"] = json!("P");
+            }
+        }
         table.push_str(&table_blocks);
         if !unset.is_empty() {
-            table.push_str(&format!("slice {trait_id}: {}, unset: {}\n\n", st.stake.name(), unset.join(", ")));
+            table.push_str(&format!("slice {trait_id}{badge}: {}, unset: {}\n\n", st.stake.name(), unset.join(", ")));
         }
     }
     Ok((out, table))

@@ -9,6 +9,7 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::Path;
 
+#[allow(clippy::too_many_arguments)]
 pub fn show(
     root: &Path,
     runs: &[i64],

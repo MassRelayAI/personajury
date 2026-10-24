@@ -37,6 +37,8 @@ const V5_COLUMNS: [(&str, &str, &str); 11] = [
     ("pick", "about", "TEXT"),
     ("run", "panel_terms_json", "TEXT"),
 ];
+/// A reported usage: `(run, persona, batch, input tokens, output tokens)`.
+pub type UsageRow = (i64, String, i64, u64, u64);
 pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
 
@@ -716,7 +718,7 @@ impl Store {
         Ok(())
     }
     /// What the agent reported for each verdict of these runs, in the order stored: `(run, persona, batch, input, output)`.
-    pub fn usage_rows(&self, run_ids: &[i64]) -> Result<Vec<(i64, String, i64, u64, u64)>> {
+    pub fn usage_rows(&self, run_ids: &[i64]) -> Result<Vec<UsageRow>> {
         let mut st = self
             .conn
             .prepare("SELECT run_id, persona_id, batch, input_tokens, output_tokens FROM usage ORDER BY id")?;

@@ -78,6 +78,7 @@ fn verdict(persona: &str, score: i64, blocker: Option<&str>, pick: bool) -> Vali
         } else {
             None
         },
+        picks: vec![],
         findings: blockers
             .iter()
             .map(|b| Finding {
@@ -168,15 +169,15 @@ fn open_existing_refuses_missing_workspace() {
 }
 
 #[test]
-fn open_seeds_four_shipped_lenses() {
+fn open_seeds_five_shipped_lenses() {
     let (d, s) = tmp();
     let names: Vec<String> = s.lenses().unwrap().into_iter().map(|l| l.name).collect();
-    assert_eq!(names, vec!["compare", "critical", "recall", "taste"]);
+    assert_eq!(names, vec!["compare", "critical", "decide", "recall", "taste"]);
     assert_eq!(s.lens("critical").unwrap().unwrap().version, 1);
     // re-opening seeds nothing new
     let s2 = Store::open(d.path()).unwrap();
     assert_eq!(s2.lens_at("taste", 2).unwrap(), None);
-    assert_eq!(s2.lenses().unwrap().len(), 4);
+    assert_eq!(s2.lenses().unwrap().len(), 5);
 }
 
 #[test]

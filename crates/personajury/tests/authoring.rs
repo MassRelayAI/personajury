@@ -231,7 +231,7 @@ fn lens_add_and_list() {
         .iter()
         .map(|v| v["name"].as_str().unwrap())
         .collect();
-    assert_eq!(names, ["compare", "critical", "mine", "recall", "taste"]);
+    assert_eq!(names, ["compare", "critical", "decide", "mine", "recall", "taste"]);
     let cmp = &l["items"][0];
     assert_eq!(cmp["asks_pick"], true);
     assert_eq!(cmp["dimensions"][0], "clarity");

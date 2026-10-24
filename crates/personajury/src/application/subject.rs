@@ -89,6 +89,17 @@ pub fn add(
         blobs.push((hash, bytes));
     }
     atts.sort_by(|a, b| a.label.cmp(&b.label));
+    // a decision subject carries its questions (D37): refused here, not at the first brief
+    if kind == SubjectKind::Decision {
+        if comparator {
+            return Err(AppError::InvalidArguments("a comparator is a thing to compare against; a decision has no comparator form".into()));
+        }
+        let at = atts.iter().position(|a| a.label == crate::domain::decision::QUESTIONS_LABEL).ok_or_else(|| {
+            Refusal::InvalidQuestions { why: format!("a decision subject attaches {} (## Q1 <question>, then - option lines)", crate::domain::decision::QUESTIONS_LABEL) }
+        })?;
+        let bytes = &blobs.iter().find(|(h, _)| *h == atts[at].hash).expect("the blob was read above").1;
+        super::decision::parse(bytes)?;
+    }
     let store = Store::open(root)?;
     if let Some(existing) = store.subject(name)? {
         if existing.is_comparator != comparator {

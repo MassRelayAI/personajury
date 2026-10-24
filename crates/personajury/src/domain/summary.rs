@@ -82,6 +82,9 @@ pub struct Facts {
     pub agreement: Option<String>,
     pub evidence_line: Option<String>,
     pub shift_line: Option<String>,
+    /// a decision jury's questions (D37): id, text and the picks of each stratum; and the ones that need a person
+    pub questions: Vec<(String, String, Vec<PickLine>)>,
+    pub needs_person: Vec<(String, Vec<String>)>,
     /// `panel: asked 3 builder=primary, seated 3, answered 3; …`
     pub panel_lines: Vec<String>,
     /// per run and per seat when they carry a number, then the total `cost:` line last
@@ -90,6 +93,8 @@ pub struct Facts {
 pub const TOP_ROWS: usize = 5;
 const SHOWN_BLOCKERS: usize = 3;
 const QUOTE: usize = 60;
+/// a decision question quoted in a sentence: long enough to read whole
+const QUOTE_Q: usize = 90;
 
 fn plural(n: usize, one: &str, many: &str) -> String {
     format!("{n} {}", if n == 1 { one } else { many })
@@ -218,6 +223,11 @@ fn reason_words(f: &Facts) -> Vec<(String, String)> {
             }
             "human_blocker" => "a person raised a blocker that is still open".to_string(),
             "delta_not_landed" => "the fixes from the last round did not all land".to_string(),
+            "human_class" if d["question"].is_string() => format!(
+                "{} is for a person to decide ({})",
+                d["question"].as_str().unwrap_or("a question"),
+                d["class"].as_str().unwrap_or("a human class")
+            ),
             "human_class" => format!("the change touches {}, which a person decides", d["class"].as_str().unwrap_or("a human class")),
             "quorum_unknown" => "no rule was given, so the jury can only advise".to_string(),
             "rule_below_sources" => "the rule given asks less than the changed files need".to_string(),
@@ -302,6 +312,28 @@ pub fn sentences(f: &Facts) -> Vec<String> {
     if !below.is_empty() {
         s.push(format!("Even without that, the jury could only advise: {}.", list(&below, 3)));
     }
+    // a decision jury: each question's picks per stratum, then the questions that still need a person (D37)
+    for (id, text, picks) in &f.questions {
+        let parts: Vec<String> = picks
+            .iter()
+            .filter_map(|p| {
+                let (c, n) = p.choices.first()?;
+                let tied = p.choices.get(1).is_some_and(|(_, m)| m == n);
+                Some(if tied {
+                    format!("{} was split, {} of {} each for the top choices", p.stake.name(), n, p.total)
+                } else {
+                    format!("{} chose {c}, {n} of {}", p.stake.name(), p.total)
+                })
+            })
+            .collect();
+        if !parts.is_empty() {
+            s.push(format!("On {id} ({}), {}.", quote(text, QUOTE_Q), parts.join("; ")));
+        }
+    }
+    if !f.needs_person.is_empty() {
+        let items: Vec<String> = f.needs_person.iter().map(|(q, why)| format!("{q} ({})", why.join(", "))).collect();
+        s.push(format!("Needs a person: {}.", list(&items, 8)));
+    }
     // who won: the pick when a lens asked for one, else the best row by the primary stratum
     if !f.picks.is_empty() {
         let mut parts = Vec::new();
@@ -324,7 +356,7 @@ pub fn sentences(f: &Facts) -> Vec<String> {
             }
         }
         s.push(t);
-    } else if f.rows.len() > 1 {
+    } else if f.questions.is_empty() && f.rows.len() > 1 {
         s.push(format!("By the primary medians {} leads, then {}.", f.rows[0].label, f.rows[1].label));
     }
     if !f.weakest.is_empty() {

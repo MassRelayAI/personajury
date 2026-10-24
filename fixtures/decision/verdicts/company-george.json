@@ -1,0 +1,61 @@
+{
+  "persona": "company-george",
+  "lines": [
+    {
+      "dimension": "confidence",
+      "about": "Q1",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L3",
+        "owner-notes.md#L3"
+      ],
+      "blockers": [],
+      "note": "D1."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q2",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L7",
+        "owner-notes.md#L7"
+      ],
+      "blockers": [],
+      "note": "Within my approval limit."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q3",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L12",
+        "owner-notes.md#L9"
+      ],
+      "blockers": [],
+      "note": "D3 asks who checked it."
+    }
+  ],
+  "picks": [
+    {
+      "about": "Q1",
+      "choice": "Install first, account second",
+      "reason": "The pilot is easier to approve when people see it work first."
+    },
+    {
+      "about": "Q2",
+      "choice": "12 dollars",
+      "reason": "Twelve a seat fits a budget line I can approve without a chain."
+    },
+    {
+      "about": "Q3",
+      "choice": "Yes, hire one before launch",
+      "reason": "I need a named reviewer to sign off a security claim, as D3 asks."
+    }
+  ]
+}

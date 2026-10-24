@@ -430,6 +430,20 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
     if !incomplete.is_empty() {
         reasons.push(reason("trait_set_incomplete", "info", json!({"seats": incomplete, "note": "some seats lack traits of the set the briefs rendered; their briefs say less about how they decide"})));
     }
+    // D37: a question of a decision jury that falls in a human class, or that the jurors split on over money or trust
+    if subject.kind == SubjectKind::Decision {
+        for r in &judged {
+            for n in super::decision::needs_person(root, &store, r, &subject)? {
+                for w in n["why"].as_array().into_iter().flatten().filter(|w| w["via"] != "sources") {
+                    reasons.push(reason(
+                        "human_class",
+                        "human",
+                        json!({"class": w["class"], "via": w["via"], "question": n["question"], "run": r.id}),
+                    ));
+                }
+            }
+        }
+    }
     // D33: a deliberated verdict broke the jury's independence; the run advises, it never applies
     let deliberated: Vec<i64> = {
         let mut v = Vec::new();

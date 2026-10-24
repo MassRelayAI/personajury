@@ -73,9 +73,11 @@ pub enum SubjectKind {
     Document,
     Menu,
     Prices,
+    /// questions to decide from a point of view written in files (D37)
+    Decision,
 }
 impl SubjectKind {
-    pub const ALL: [SubjectKind; 7] = [
+    pub const ALL: [SubjectKind; 8] = [
         SubjectKind::Page,
         SubjectKind::Diff,
         SubjectKind::Design,
@@ -83,12 +85,14 @@ impl SubjectKind {
         SubjectKind::Document,
         SubjectKind::Menu,
         SubjectKind::Prices,
+        SubjectKind::Decision,
     ];
     /// What a juror may score `about` and pick when the caller does not say (D32): a design or a logo is a set of
     /// candidate boards, so its files are the options; every other kind is one thing, so the subject is.
     pub fn default_options_mode(self) -> &'static str {
         match self {
             SubjectKind::Design | SubjectKind::Logo => "attachments",
+            SubjectKind::Decision => "questions",
             _ => "subject",
         }
     }
@@ -104,6 +108,7 @@ impl SubjectKind {
             SubjectKind::Document => "document",
             SubjectKind::Menu => "menu",
             SubjectKind::Prices => "prices",
+            SubjectKind::Decision => "decision",
         }
     }
 }
@@ -486,6 +491,9 @@ pub struct VerdictInput {
     pub lines: Vec<VerdictLine>,
     #[serde(default)]
     pub pick: Option<PickInput>,
+    /// a decision run's picks, one per question (D37)
+    #[serde(default)]
+    pub picks: Vec<QuestionPickInput>,
     /// what the agent says this verdict cost: `{input_tokens, output_tokens}`, non-negative integers (D12). The engine
     /// measures nothing; `validate` refuses a shape it cannot read as `invalid_usage`.
     #[serde(default)]
@@ -529,6 +537,15 @@ pub struct PickInput {
     pub reason: String,
 }
 
+/// One question's pick in a decision verdict: the question (`Q1`), the option chosen verbatim, and why.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct QuestionPickInput {
+    pub about: String,
+    pub choice: String,
+    pub reason: String,
+}
+
 /// What one attachment offers to citation resolution.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct AttachmentView {
@@ -564,6 +581,8 @@ pub struct VerdictContext {
     /// "the same point" of this persona's dismissed findings on this subject (report §10(3), D6 B3):
     /// `<dimension>\t<citation hash>` for a cited finding, the finding id for an uncited one
     pub dismissed: BTreeSet<String>,
+    /// the questions of a decision run (D37); empty for every other run
+    pub questions: Vec<super::decision::Question>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -591,6 +610,8 @@ pub struct ValidVerdict {
     pub stake: Stake,
     pub lines: Vec<ValidLine>,
     pub pick: Option<PickInput>,
+    /// a decision run's picks, one per question (D37)
+    pub picks: Vec<QuestionPickInput>,
     /// one per blocker, id = hash::finding_id(..)
     pub findings: Vec<Finding>,
     pub usage: Option<Usage>,

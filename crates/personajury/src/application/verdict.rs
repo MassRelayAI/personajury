@@ -251,7 +251,11 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
     // what a line may be about and a pick may choose: the subject's labels, then `cmp:<name>` per run comparator
     // a run with no recorded mode was briefed before v0.6: attachment labels (D32)
     let subject_mode = store.run_options_mode(run.id)?.as_deref() == Some("subject");
-    let mut options: Vec<String> = if subject_mode {
+    // a decision run (D37): what a line may be about is a question, and a pick is made per question
+    let questions = if subject.kind == SubjectKind::Decision { super::decision::questions_of(root, &subject)? } else { vec![] };
+    let mut options: Vec<String> = if !questions.is_empty() {
+        questions.iter().map(|q| q.id.clone()).collect()
+    } else if subject_mode {
         vec![run.subject_name.clone()]
     } else {
         evidence.attachments.keys().cloned().collect()
@@ -322,6 +326,7 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
         evidence,
         options,
         dismissed: store.dismissed_citations(&run.subject_name, &input.persona)?,
+        questions,
     };
     let valid = refuse::validate(&input, &cx)?;
     let persona_version = run

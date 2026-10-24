@@ -76,7 +76,7 @@ fn doctor_counts() {
         ),
         (Some(2), Some(1), Some(0))
     );
-    assert_eq!(c["lenses"], 4, "the four shipped lenses are seeded");
+    assert_eq!(c["lenses"], 5, "the five shipped lenses are seeded");
     for k in ["subjects", "comparators", "verdict_lines"] {
         assert_eq!(c[k], 0, "{k}");
     }

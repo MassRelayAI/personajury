@@ -40,12 +40,13 @@ const V5_COLUMNS: [(&str, &str, &str); 11] = [
 pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
 
-/// The four shipped lenses, seeded into a store that has no lens of that name (plan Task 2).
-pub const SHIPPED_LENSES: [(&str, &str); 4] = [
+/// The five shipped lenses (the fifth, `decide`, is the decision jury's, D37), seeded into a store that has no lens of that name (plan Task 2).
+pub const SHIPPED_LENSES: [(&str, &str); 5] = [
     ("critical", include_str!("../../../../lenses/critical.toml")),
     ("taste", include_str!("../../../../lenses/taste.toml")),
     ("compare", include_str!("../../../../lenses/compare.toml")),
     ("recall", include_str!("../../../../lenses/recall.toml")),
+    ("decide", include_str!("../../../../lenses/decide.toml")),
 ];
 
 #[derive(Debug, thiserror::Error)]
@@ -1022,6 +1023,12 @@ impl Store {
             tx.execute(
                 "INSERT INTO human_batch(run_id, batch, persona_id, by_human, created_at) VALUES (?1,?2,?3,?4,?5)",
                 params![run_id, batch, v.persona, by, now],
+            )?;
+        }
+        for p in &v.picks {
+            tx.execute(
+                "INSERT INTO pick(run_id, batch, persona_id, choice, reason, created_at, about) VALUES (?1,?2,?3,?4,?5,?6,?7)",
+                params![run_id, batch, v.persona, p.choice, p.reason, now, p.about],
             )?;
         }
         if let Some(p) = &v.pick {

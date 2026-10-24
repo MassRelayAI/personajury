@@ -270,6 +270,7 @@ fn compose_text(
     detail: Detail,
     run_on: Option<&str>,
     traits_block: Option<&str>,
+    questions: &[crate::domain::decision::Question],
 ) -> Result<String> {
     let mut t = String::new();
     t.push_str("personajury-brief 1\n\n");
@@ -348,7 +349,15 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
         ));
     }
     let scores_options = lens.asks_pick || lens.compares;
-    if scores_options && !options.is_empty() {
+    if !questions.is_empty() {
+        t.push_str("\n## Questions\n\n`about` names the question a line scores (`Q1`), and the score is how sure the sources let you be of the option you pick for it. Answer every question: one entry in `picks` for each, with the option verbatim and a reason.\n");
+        for q in questions {
+            t.push_str(&format!("\n### {} \u{2014} {}\n\n", q.id, q.text));
+            for o in &q.options {
+                t.push_str(&format!("- {o}\n"));
+            }
+        }
+    } else if scores_options && !options.is_empty() {
         t.push_str("\n## Options\n\n`about` names the option a line scores, and the score is that option's own score on the lens anchors. A line without `about` scores the subject as a whole.");
         if lens.compares {
             t.push_str(" Under this lens a line without `about` judges the subject against the comparators: such a `seen` line must cite a held comparator (`cmp:<name>/<label>`) and may also cite subject attachments. A line `about: \"cmp:<name>\"` scores that comparator itself. Never put a comparator in `about` to score the subject against it.");
@@ -360,17 +369,20 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
             t.push_str(&format!("- `{o}`\n"));
         }
     }
-    if lens.asks_pick {
+    if lens.asks_pick && questions.is_empty() {
         t.push_str("\n## Pick\n\nThis lens also asks you to pick one of the options above and give a reason.\n");
     }
     t.push_str("\n## How to cite\n\n- `<label>`: an attachment of the subject\n- `<label>#<node id>`: a node of an aria-json walk\n- `<label>#L<n>`: line n of a diff\n");
     t.push_str("- `cmp:<name>/<label>` (and `#…` as above): an attachment of a comparator\n");
     t.push_str("\n## Your answer\n\nAnswer with one JSON object and nothing else, in this shape (a filled example for you and this lens):\n\n");
-    let example = example_verdict(persona, lens, subject, cmps, options);
+    let example = example_verdict(persona, lens, subject, cmps, options, questions);
     t.push_str("```json\n");
     t.push_str(&serde_json::to_string_pretty(&example).expect("example serialises"));
     t.push_str("\n```\n\nRules, checked when the verdict is ingested:\n\n");
-    if scores_options {
+    if !questions.is_empty() {
+        t.push_str("- One line per dimension and question: at most one line for each (`dimension`, `about`) pair, and at least one line for every lens dimension.\n");
+        t.push_str("- `about`, when given, is a question id above.\n");
+    } else if scores_options {
         t.push_str("- One line per dimension and option: at most one line for each (`dimension`, `about`) pair, and at least one line for every lens dimension.\n");
         t.push_str("- `about`, when given, is one of the options above.\n");
     } else {
@@ -401,7 +413,9 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
     t.push_str(
         "- `blockers` lists what stops you, one sentence each; leave it empty when nothing does.\n",
     );
-    if lens.asks_pick {
+    if !questions.is_empty() {
+        t.push_str("- `picks` is required: one entry per question, `about` the question, `choice` one of that question's options verbatim, with a `reason`. Leave `pick` out.\n");
+    } else if lens.asks_pick {
         t.push_str(
             "- `pick` is required: `choice` is one of the options above, with a `reason`.\n",
         );
@@ -439,6 +453,7 @@ fn example_verdict(
     subject: &Subject,
     cmps: &[Cmp],
     options: &[String],
+    questions: &[crate::domain::decision::Question],
 ) -> Value {
     // a comparing lens with no comparator in the run cannot show a seen line (D6 A2): show the next class it allows
     let evidence = lens
@@ -457,6 +472,13 @@ fn example_verdict(
         .first()
         .and_then(|c| c.subject.attachments.first().map(|a| (c, a.label.clone())));
     for (i, d) in lens.dimensions.iter().enumerate() {
+        if !questions.is_empty() {
+            for q in questions {
+                let cites = if evidence == Evidence::Seen { subject.attachments.first().map(|a| a.label.clone()).into_iter().collect() } else { vec![] };
+                lines.push(example_line(&d.id, mid, evidence, cites, Some(q.id.clone()), "one sentence in your own voice"));
+            }
+            continue;
+        }
         let mut cites: Vec<String> = Vec::new();
         if evidence == Evidence::Seen {
             if let Some(a) = subject.attachments.first() {
@@ -492,7 +514,13 @@ fn example_verdict(
     let mut v = serde_json::Map::new();
     v.insert("persona".into(), json!(persona.id));
     v.insert("lines".into(), Value::Array(lines));
-    if lens.asks_pick {
+    if !questions.is_empty() {
+        let picks: Vec<Value> = questions
+            .iter()
+            .map(|q| json!({"about": q.id, "choice": q.options.first().cloned().unwrap_or_default(), "reason": "why, in one sentence"}))
+            .collect();
+        v.insert("picks".into(), Value::Array(picks));
+    } else if lens.asks_pick {
         v.insert(
             "pick".into(),
             json!({"choice": options.first().cloned().unwrap_or_default(), "reason": "why, in one sentence"}),
@@ -611,13 +639,17 @@ struct Shared<'a> {
     seats: Option<&'a Value>,
     /// `subject` or `attachments`: what a line may be about and a pick may choose (D32)
     options_mode: &'static str,
+    /// the questions of a decision subject (D37); empty for every other kind
+    questions: &'a [crate::domain::decision::Question],
 }
 
 /// Compose and write the briefs of one lens and create its run.
 fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value> {
     // the same list `verdict` checks `about` and a pick against: the subject's name (or its labels, D32), then
     // `cmp:<name>` per comparator
-    let mut options: Vec<String> = if sh.options_mode == "subject" {
+    let mut options: Vec<String> = if !sh.questions.is_empty() {
+        sh.questions.iter().map(|q| q.id.clone()).collect()
+    } else if sh.options_mode == "subject" {
         vec![sh.subject.name.clone()]
     } else {
         sh.subject.attachments.iter().map(|x| x.label.clone()).collect()
@@ -675,6 +707,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         let text = compose_text(
             root, &persona, stake, lens, sh.subject, sh.cmps, &options, sh.detail, run_on,
             block.as_ref().map(|(b, _)| b.as_str()),
+            sh.questions,
         )?;
         texts.push((id.clone(), persona.version, stake, text, model));
     }
@@ -858,6 +891,17 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         Some(other) => return Err(Refusal::InvalidOptionsMode { given: other.to_string() }.into()),
     };
 
+    // a decision subject (D37): its questions are the options, a pick is made per question, and nothing is compared
+    let questions = if subject.kind == SubjectKind::Decision { super::decision::questions_of(root, &subject)? } else { vec![] };
+    if !questions.is_empty() {
+        if a.options.is_some() {
+            return Err(AppError::InvalidArguments("a decision jury's options are its questions; leave --options out".into()));
+        }
+        if !a.comparators.is_empty() {
+            return Err(AppError::InvalidArguments("a decision jury takes no comparators".into()));
+        }
+    }
+
     // the rule, when one is named: its panel, lenses, spend and detail are the defaults (D9)
     let cfg_path = root.join("personajury.toml");
     let cfg: Option<TriggerConfig> = match &a.rule {
@@ -1035,6 +1079,12 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         })?;
         // the lens name and every persona id become a file name below (I6): checked again here, before the join
         super::slug("lens name", &lens.name)?;
+        if !questions.is_empty() && !lens.asks_pick {
+            return Err(AppError::InvalidArguments(format!(
+                "{} is a decision subject: brief it under a lens that asks for a pick (the shipped `decide` lens)",
+                subject.name
+            )));
+        }
         lenses.push(lens);
     }
     let mut cmp_names = a.comparators.clone();
@@ -1370,6 +1420,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             .collect::<Vec<_>>())
     });
     let sh = Shared {
+        questions: &questions,
         subject: &subject,
         cmps: &cmps,
         panel_name: &panel_name,

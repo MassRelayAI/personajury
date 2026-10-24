@@ -1,0 +1,61 @@
+{
+  "persona": "builder-mei",
+  "lines": [
+    {
+      "dimension": "confidence",
+      "about": "Q1",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L3",
+        "owner-notes.md#L3"
+      ],
+      "blockers": [],
+      "note": "D1 settles it."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q2",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L7",
+        "owner-notes.md#L7"
+      ],
+      "blockers": [],
+      "note": "12 is where the notes point."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q3",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L12",
+        "owner-notes.md#L9"
+      ],
+      "blockers": [],
+      "note": "Money is tight in the notes."
+    }
+  ],
+  "picks": [
+    {
+      "about": "Q1",
+      "choice": "Install first, account second",
+      "reason": "Seeing a result first is what keeps me."
+    },
+    {
+      "about": "Q2",
+      "choice": "12 dollars",
+      "reason": "12 is the price small teams compare with and it does not look cheap-built."
+    },
+    {
+      "about": "Q3",
+      "choice": "No, review it ourselves",
+      "reason": "A week of the owners' time costs less than a vendor this quarter."
+    }
+  ]
+}

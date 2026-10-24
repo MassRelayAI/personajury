@@ -1,0 +1,61 @@
+{
+  "persona": "builder-ana",
+  "lines": [
+    {
+      "dimension": "confidence",
+      "about": "Q1",
+      "score": 4,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L3",
+        "owner-notes.md#L3"
+      ],
+      "blockers": [],
+      "note": "The notes and D1 agree with what I do."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q2",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L7",
+        "owner-notes.md#L7"
+      ],
+      "blockers": [],
+      "note": "I lean to 9 but the sources do not give a number."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q3",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L12",
+        "owner-notes.md#L9"
+      ],
+      "blockers": [],
+      "note": "The notes lean no, I can name what would change my mind."
+    }
+  ],
+  "picks": [
+    {
+      "about": "Q1",
+      "choice": "Install first, account second",
+      "reason": "I leave at an account wall before anything works, and the decisions say it installs first."
+    },
+    {
+      "about": "Q2",
+      "choice": "9 dollars",
+      "reason": "Two of us compare tools at 9 and 12 dollars and a price above that sends me elsewhere."
+    },
+    {
+      "about": "Q3",
+      "choice": "No, review it ourselves",
+      "reason": "The notes say the owners can do it in a week, and I would not pay for it as a customer."
+    }
+  ]
+}

@@ -128,6 +128,32 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     // the picks, per stratum, as counts
     for r in &given {
         let p = pick::show(root, r.id)?;
+        for q in p["questions"].as_array().into_iter().flatten() {
+            let mut lines = Vec::new();
+            for s in q["strata"].as_array().into_iter().flatten() {
+                let Some(stake) = stake_of(&s["stake"]) else { continue };
+                let choices: Vec<(String, usize)> = s["choices"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|c| (c["choice"].as_str().unwrap_or("").to_string(), c["count"].as_u64().unwrap_or(0) as usize))
+                    .collect();
+                lines.push(sm::PickLine { stake, total: choices.iter().map(|c| c.1).sum(), choices });
+            }
+            f.questions.push((q["about"].as_str().unwrap_or("").to_string(), q["question"].as_str().unwrap_or("").to_string(), lines));
+        }
+        if let Some(sub) = store.subject_at(&r.subject_name, r.subject_version)?.filter(|s| s.kind == SubjectKind::Decision) {
+            for n in super::decision::needs_person(root, &store, r, &sub)? {
+                let mut why: Vec<String> = Vec::new();
+                for w in n["why"].as_array().into_iter().flatten() {
+                    let c = w["class"].as_str().unwrap_or("").to_string();
+                    if !why.contains(&c) {
+                        why.push(c);
+                    }
+                }
+                f.needs_person.push((n["question"].as_str().unwrap_or("").to_string(), why));
+            }
+        }
         for s in p["strata"].as_array().into_iter().flatten() {
             let Some(stake) = stake_of(&s["stake"]) else { continue };
             let choices: Vec<(String, usize)> = s["choices"]

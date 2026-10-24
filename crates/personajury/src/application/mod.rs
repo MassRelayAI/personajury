@@ -5,6 +5,7 @@ pub mod brief;
 pub mod calibrate;
 pub mod check;
 pub mod decide;
+pub mod decision;
 pub mod deliberate;
 pub mod delta;
 pub mod doctor;

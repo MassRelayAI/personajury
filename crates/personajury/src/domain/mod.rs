@@ -5,6 +5,7 @@ pub mod cover;
 pub mod calibrate;
 pub mod citation;
 pub mod csv;
+pub mod decision;
 pub mod delta;
 pub mod graphlayout;
 pub mod hash;

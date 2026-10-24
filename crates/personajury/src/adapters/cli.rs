@@ -40,7 +40,7 @@ pub enum Cmd {
         #[command(subcommand)]
         what: PanelCmd,
     },
-    /// Lenses: dimension sets with anchors in words (four ship: critical, taste, compare, recall)
+    /// Lenses: dimension sets with anchors in words (five ship: critical, taste, compare, recall, decide)
     Lens {
         #[command(subcommand)]
         what: LensCmd,
@@ -383,7 +383,7 @@ pub enum LensCmd {
 pub enum SubjectCmd {
     Add {
         name: String,
-        /// page | diff | design | logo | document | menu | prices
+        /// page | diff | design | logo | document | menu | prices | decision (a questions.md plus the files a point of view is read from)
         #[arg(long)]
         kind: String,
         #[arg(long, num_args = 1.., required = true)]

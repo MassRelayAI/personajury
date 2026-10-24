@@ -1,0 +1,15 @@
+# The decide lens (D37): a decision jury answers a list of questions from a point of view written in files. Each question
+# is an option set (`about: "Q1"`); the juror picks one option per question (`picks`) and scores how sure the sources let
+# it be. A line `seen` cites the questions file or a source file of the run.
+name = "decide"
+version = 1
+scale = [1, 5]
+asks_pick = true
+compares = false
+evidence = ["seen", "told", "recalled"]
+standard = ""
+
+[[dimension]]
+id = "confidence"
+title = "How sure the sources let you be of the option you pick"
+anchors = { "1" = "the sources do not let me choose; I would be guessing", "3" = "I lean one way and I can name what would change my mind", "5" = "the sources settle it and I would defend this pick to the people it affects" }

@@ -1,0 +1,61 @@
+{
+  "persona": "investor-claire",
+  "lines": [
+    {
+      "dimension": "confidence",
+      "about": "Q1",
+      "score": 2,
+      "anchor_met": 1,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L3",
+        "owner-notes.md#L3"
+      ],
+      "blockers": [],
+      "note": "I am guessing; the sources point the other way."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q2",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L7",
+        "owner-notes.md#L7"
+      ],
+      "blockers": [],
+      "note": "I lean to 12."
+    },
+    {
+      "dimension": "confidence",
+      "about": "Q3",
+      "score": 3,
+      "anchor_met": 3,
+      "evidence": "seen",
+      "citations": [
+        "questions.md#L12",
+        "owner-notes.md#L9"
+      ],
+      "blockers": [],
+      "note": "I lean yes and can name what would change my mind."
+    }
+  ],
+  "picks": [
+    {
+      "about": "Q1",
+      "choice": "Account first, install second",
+      "reason": "I read onboarding as a gate that proves the account is real, but I do not use it."
+    },
+    {
+      "about": "Q2",
+      "choice": "12 dollars",
+      "reason": "A price that does not need a discount to close."
+    },
+    {
+      "about": "Q3",
+      "choice": "Yes, hire one before launch",
+      "reason": "An outside name on the review reduces the risk I carry."
+    }
+  ]
+}

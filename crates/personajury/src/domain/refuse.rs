@@ -141,6 +141,10 @@ pub enum Refusal {
     DeliberatedWithoutPhase,
     #[error("the file says \"phase\": \"deliberated\"; ingest it with --deliberated")]
     PhaseWithoutFlag,
+    #[error("the questions file: {why}")]
+    InvalidQuestions { why: String },
+    #[error("{}", if question.is_empty() { format!("picks: {why}") } else { format!("pick for {question}: {why}") })]
+    QuestionPickInvalid { question: String, why: String },
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -206,6 +210,8 @@ impl Refusal {
             Refusal::DeliberatedWithoutInitial { .. } => "deliberated_without_initial",
             Refusal::DeliberatedWithoutPhase => "deliberated_without_phase",
             Refusal::PhaseWithoutFlag => "phase_without_flag",
+            Refusal::InvalidQuestions { .. } => "invalid_questions",
+            Refusal::QuestionPickInvalid { .. } => "question_pick_invalid",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
@@ -240,6 +246,7 @@ impl Refusal {
             Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
             Refusal::IncompleteJuryForDeliberation { missing } => Some(serde_json::json!({"missing": missing})),
             Refusal::AlreadyDeliberated { run } | Refusal::NoDeliberation { run } => Some(serde_json::json!({"run": run})),
+            Refusal::QuestionPickInvalid { question, why } => Some(serde_json::json!({"question": question, "why": why})),
             Refusal::InvalidOptionsMode { given } => Some(serde_json::json!({"given": given})),
             _ => None,
         }
@@ -420,7 +427,34 @@ pub fn validate(v: &VerdictInput, cx: &VerdictContext) -> Result<ValidVerdict, R
             dimension: d.id.clone(),
         });
     }
+    if !cx.questions.is_empty() {
+        // a decision run is picked per question (D37): one entry of `picks` for each, from that question's own options
+        let bad = |q: &str, why: String| Refusal::QuestionPickInvalid { question: q.to_string(), why };
+        if v.pick.is_some() {
+            return Err(bad("", "a decision run is picked per question: give `picks`, leave `pick` out".into()));
+        }
+        for p in &v.picks {
+            if p.reason.trim().is_empty() {
+                return Err(Refusal::PickWithoutReason);
+            }
+            let Some(q) = cx.questions.iter().find(|q| q.id == p.about) else {
+                return Err(bad(&p.about, format!("{} is not a question of this run", p.about)));
+            };
+            if !q.options.contains(&p.choice) {
+                return Err(bad(&q.id, format!("{:?} is not one of: {}", p.choice, q.options.join(" | "))));
+            }
+            if v.picks.iter().filter(|x| x.about == p.about).count() > 1 {
+                return Err(bad(&q.id, "picked more than once".into()));
+            }
+        }
+        if let Some(q) = cx.questions.iter().find(|q| !v.picks.iter().any(|p| p.about == q.id)) {
+            return Err(bad(&q.id, "no pick; every question needs one".into()));
+        }
+    } else if !v.picks.is_empty() {
+        return Err(Refusal::QuestionPickInvalid { question: String::new(), why: "this run has no questions; use `pick`".into() });
+    }
     match &v.pick {
+        _ if !cx.questions.is_empty() => {}
         None if cx.lens.asks_pick => return Err(Refusal::PickMissing),
         Some(_) if !cx.lens.asks_pick => {
             return Err(Refusal::PickNotAsked {
@@ -445,6 +479,7 @@ pub fn validate(v: &VerdictInput, cx: &VerdictContext) -> Result<ValidVerdict, R
         stake,
         lines,
         pick: v.pick.clone(),
+        picks: v.picks.clone(),
         findings,
         usage,
     })
@@ -515,6 +550,7 @@ mod tests {
             },
             options: vec!["page".into()],
             dismissed: BTreeSet::new(),
+            questions: vec![],
         }
     }
     // a lens that asks for a pick: the only non-comparing lens where `about` is allowed
@@ -548,6 +584,7 @@ mod tests {
             persona: "ana".into(),
             lines,
             pick: None,
+            picks: vec![],
             usage: None,
             phase: None,
         }

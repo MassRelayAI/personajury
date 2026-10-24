@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Added (v0.6-A, D29-D31; becomes the 0.6.0 entry on release)
+
+## [0.6.0] - 2026-10-24
+### Added: traits, cover and slices (D29-D31)
 - Traits as data: 49 traits in 14 families and eight trait sets ship embedded (`traits/`, `trait-sets/`); `trait install | add | list | show`
   and `trait set add | list`; every anchor is our own words, no questionnaire item is copied (D29).
 - Schema v5 (one migration for the v0.6 lanes, idempotent): persona `traits` and `serves`, panel cover, run traits and seats, subject
@@ -26,7 +28,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `brief --seats auto`, persona `serves`, `subject add --audience`: the personas that serve the audience plus one control.
 - The MCP tool `personajury_trait_list`; `traits`, `seats` on brief, `slice` on matrix and summary.
 
-### Added (v0.6-B, D35-D36)
+### Added: traits proven (D35, D36, D39)
 - `trait generate --from PATH [--count N]`: the brief that asks the agent for project traits from a material; what it writes enters through
   `trait add --generated-from`, which reads and labels every text of the trait like any other; project traits show `(P)` (D35, D39).
 - The reverse generators, without a model and writing nothing: `trait suggest --persona` (a brief from the persona's prose) and
@@ -48,7 +50,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   `quote_not_in_prose`). `label_echo` reads only the traits the brief rendered. Tests hold the three-juror rule and the initial-batch
   filter of `trait observed`.
 
-### Added (v0.6-C, D32-D34, D37, D38)
+### Added: options, deliberation, metrics, decision juries (D32-D34, D37, D38)
 - `brief --options subject|attachments`: what a juror may score `about` and pick, by subject kind (D32); `about: "<subject name>"` is the
   whole subject; `invalid_options_mode`; the fixture and the pinned compare-brief test pass `--options attachments`.
 - `personajury deliberate RUN`, `verdict --deliberated`, `verdict.phase`, `matrix --phase initial|deliberated|both`, `--phase` on
@@ -61,7 +63,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   the "Needs a person" list and `human` from `apply-check` (D37).
 - `personajury init` and `setup` write a starter `personajury.toml` (D38).
 
-### Added (v0.6-E, D40-D41)
+### Added: the walk exporter (D42)
+- `tools/walk.mjs`: captures an ARIA walk (`.walk.json`) and a full-height screenshot of any page with headless Chrome, `--phone` for a
+  390x844 pass; no npm dependency, Node 22 or later; ids `<role>-<slug(name)>` in document order (docs/walks.md, D42).
+
+### Added: docs
+- `docs/own-metrics.md`: your own metric from `export --format csv` in a short stdlib script, counted per stratum; the stable columns.
+- The v0.6 measured report and the v0.6 as-built plan.
+
+### Added: export and the chat pack (D40, D41)
 - `personajury export RUN... [--format csv|ndjson] [--out F] [--phase initial|deliberated|all]`: the verdict rows as stored (persona traits as
   `trait.<id>`, `sensitive` labels, `by_human`), in a fixed order, RFC 4180 csv or ndjson, never a pooled or derived number; the MCP tool
   `personajury_export` (thirteen tools now, capped at 10,000 rows with `truncated`) (D40).

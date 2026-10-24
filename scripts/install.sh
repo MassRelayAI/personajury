@@ -3,7 +3,7 @@
 # Installs the personajury release binary for this platform and checks it against the release's SHA256SUMS.
 #   curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
 # Environment:
-#   PERSONAJURY_VERSION      a tag such as v0.5.1 (default: the latest release)
+#   PERSONAJURY_VERSION      a tag such as v0.6.0 (default: the latest release)
 #   PERSONAJURY_INSTALL_DIR  where the binary goes (default: ~/.local/bin)
 #   PERSONAJURY_BASE_URL     where the assets are read from (default: the GitHub release; tests point it at a file:// dir)
 # Platforms: linux-x64, linux-arm64, darwin-arm64, darwin-x64. Windows: download the release asset by hand. Anything else: build from source.

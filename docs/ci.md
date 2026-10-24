@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }          # the diff needs the base
       - id: jg
-        uses: massrelay-ai/personajury@v0.5.1
+        uses: massrelay-ai/personajury@v0.6.0
         with:
           config: personajury.toml
           store: .                          # optional: a root holding a committed .personajury
@@ -28,7 +28,7 @@ jobs:
 | `config` | `personajury.toml` | the rules |
 | `base` | the pull request base | what the diff is taken against |
 | `store` | none | a project root with a committed `.personajury`; without it only `should-run` runs |
-| `version` | this Action's release (`v0.5.1`) | the release to install; `latest` follows the newest release |
+| `version` | this Action's release (`v0.6.0`) | the release to install; `latest` follows the newest release |
 | `fail-on` | `human,escalate,unavailable` | answers that fail the job: `human`, `escalate`, `advise`, `unavailable` |
 
 Outputs: `quorum` (`none | low | high | human`, or `unavailable`), `spend` (JSON), `effort`, `answer` (`apply | escalate |

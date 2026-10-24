@@ -11,7 +11,7 @@
   "plugins": [
     {
       "name": "personajury",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "source": "./",
       "description": "Skills for running a jury and writing personas, plus the PersonaJury MCP server. Needs the personajury binary on PATH.",
       "category": "development"

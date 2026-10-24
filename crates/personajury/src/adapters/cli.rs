@@ -341,6 +341,14 @@ pub enum TraitCmd {
     },
     List,
     Show { id: String },
+    /// Write the brief that asks the agent to draft trait files from a material (D35); no model is called
+    Generate {
+        #[arg(long)]
+        from: PathBuf,
+        /// how many trait files to ask for (1 to 8)
+        #[arg(long, default_value_t = 3)]
+        count: usize,
+    },
     /// Trait sets: up to 8 traits an audience is judged by, up to 4 of them the cover of a panel
     Set {
         #[command(subcommand)]
@@ -417,6 +425,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Trait { what: TraitCmd::Add { .. } } => "trait add",
         Cmd::Trait { what: TraitCmd::List } => "trait list",
         Cmd::Trait { what: TraitCmd::Show { .. } } => "trait show",
+        Cmd::Trait { what: TraitCmd::Generate { .. } } => "trait generate",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::Add { .. } } } => "trait set add",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::List } } => "trait set list",
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
@@ -494,6 +503,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::Add { file, generated_from } => app::traits::add(root, file, generated_from.as_deref()),
             TraitCmd::List => app::traits::list(root),
             TraitCmd::Show { id } => app::traits::show(root, id),
+            TraitCmd::Generate { from, count } => app::traits::generate(root, from, *count),
             TraitCmd::Set { what: TraitSetCmd::Add { file } } => app::traits::set_add(root, file),
             TraitCmd::Set { what: TraitSetCmd::List } => app::traits::set_list(root),
         },

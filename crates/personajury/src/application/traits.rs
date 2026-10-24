@@ -1,7 +1,7 @@
 //! trait install | add | list | show and trait set add | list (D29). The catalog is embedded and installed, never seeded.
 use super::{AppError, Result};
 use crate::domain::catalog::CATALOG;
-use crate::domain::traits::{correlated_pairs, TraitDef, TraitSetDef, FAMILIES};
+use crate::domain::traits::{correlated_pairs, TraitDef, TraitSetDef, FAMILIES, PROTECTED_STEMS, REFUSED, REFUSED_FAMILIES};
 use crate::domain::*;
 use crate::store::Store;
 use serde_json::{json, Value};
@@ -144,6 +144,10 @@ pub fn list(root: &Path) -> Result<Value> {
             if let Some(r) = reason {
                 v["reason"] = json!(r);
             }
+            // a project's own trait is badged (P), as a credential is (C): the catalog did not vouch for it (D35)
+            if origin == "project" {
+                v["badge"] = json!("P");
+            }
             v
         })
         .collect();
@@ -162,4 +166,110 @@ pub fn set_list(root: &Path) -> Result<Value> {
         .map(|s| json!({"name": s.name, "version": s.version, "traits": s.traits, "cover": s.cover, "note": s.note}))
         .collect();
     Ok(json!({"sets": sets}))
+}
+
+/// The most trait files a `trait generate` brief asks for (D35).
+pub const MAX_GENERATED_TRAITS: usize = 8;
+
+/// `[a-z0-9_]` slug of a material's name (a file's stem, a folder's name): the family `project.<slug>` and the first
+/// segment of every generated id.
+fn material_slug(from: &Path) -> String {
+    let name = if from.is_dir() { from.file_name() } else { from.file_stem() };
+    let raw = name.map(|n| n.to_string_lossy().to_lowercase()).unwrap_or_default();
+    let mut slug = String::new();
+    for c in raw.chars() {
+        let c = if c.is_ascii_lowercase() || c.is_ascii_digit() { c } else { '_' };
+        if c == '_' && (slug.is_empty() || slug.ends_with('_')) {
+            continue;
+        }
+        slug.push(c);
+    }
+    let slug = slug.trim_end_matches('_').to_string();
+    if slug.is_empty() {
+        "material".into()
+    } else {
+        slug
+    }
+}
+
+/// `trait generate --from PATH [--count N]` (D35): hash the material and write `.personajury/generate/trait-<hash>.md`,
+/// the brief that asks the agent to list the ways the material's readers differ, then to draft `count` trait files in the
+/// exact TOML shape. The engine calls no model. What the agent writes enters through `trait add --generated-from <hash>`,
+/// which runs the same protected-attribute screen as any trait: this verb screens the family slug with that same
+/// function and refuses a material whose name would put a protected word into every id.
+pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
+    if count == 0 || count > MAX_GENERATED_TRAITS {
+        return Err(AppError::InvalidArguments(format!("--count is from 1 to {MAX_GENERATED_TRAITS}")));
+    }
+    let slug = material_slug(from);
+    crate::domain::traits::screen_id(&format!("{slug}.example")).map_err(|e| match e {
+        Refusal::RefusedTraitId { why, .. } => AppError::from(Refusal::RefusedTraitId {
+            id: format!("{slug}.*"),
+            why: format!("{why}; the material's name becomes the family of every id, so rename the file or folder"),
+        }),
+        other => AppError::from(other),
+    })?;
+    let (hash, sources) = super::persona::material_of(root, from)?;
+    let plural = if count == 1 { "" } else { "s" };
+    let mut t = String::new();
+    t.push_str("personajury-trait-generate 1\n\n");
+    t.push_str(&format!("# Write {count} trait file{plural} from this material\n\n"));
+    t.push_str(&format!("Material hash: {hash}\n\nThe material, read these files:\n\n"));
+    for s in &sources {
+        t.push_str(&format!("- {s}\n"));
+    }
+    t.push_str(
+        "\n## Step 1: how the material's readers differ\n\n\
+List, in the material's own words, the ways its readers are known to differ: \"procurement versus an engineering lead\", \
+\"clinicians under time pressure\". Give the list to the caller as a `readers_differ` list in your answer, each entry with the \
+file it came from; it is not part of any trait file. Add no difference the material does not state: where it is silent, \
+say so instead of filling the gap.\n",
+    );
+    t.push_str(&format!(
+        "\n## Step 2: the traits\n\nDraft {count} trait file{plural}, one per difference of step 1, each in this shape and no other. A trait is a tendency or a \
+standing fact that makes one reader decide differently from another, never a type or a diagnosis. A band trait:\n\n```toml\n\
+id = \"{slug}.reads_the_fine_print\"\nversion = 1\nfamily = \"project.{slug}\"\ntitle = \"Reads the fine print before deciding\"\nshape = \"band\"\nscale = [1, 5]\n\
+moves = [\"approve_vendor\"]\nevidence = \"project\"\nsource = \"material:{hash}\"\nitems_copied = false\n\
+caveats = \"Drawn from the material alone; check it against the readers you know.\"\n\n[anchors]\n\
+\"1\" = \"takes the summary page as the whole offer and signs without opening the terms behind it.\"\n\
+\"3\" = \"skims the terms for price, dates and anything that looks unusual, and asks only if something stands out.\"\n\
+\"5\" = \"reads every clause of the terms before anything else and will not move until each odd one is explained.\"\n```\n\n\
+A category trait, when the readers fall into kinds rather than degrees:\n\n```toml\n\
+id = \"{slug}.first_question\"\nversion = 1\nfamily = \"project.{slug}\"\ntitle = \"The first question asked of an offer\"\nshape = \"category\"\n\
+moves = [\"approve_vendor\"]\nevidence = \"project\"\nsource = \"material:{hash}\"\nitems_copied = false\n\n[[option]]\n\
+id = \"cost\"\ntitle = \"What it costs\"\nsentence = \"ask first what the whole thing costs over a year, and judge the rest against that figure.\"\n\n[[option]]\n\
+id = \"fit\"\ntitle = \"Whether it fits\"\nsentence = \"ask first whether it fits the systems already in use, and treat price as a detail for later.\"\n```\n\n"
+    ));
+    t.push_str(&format!(
+        "The rules of the shape:\n\n\
+- `id` is `{slug}.<name>` in `[a-z0-9_]`; `family` is `project.{slug}`; `evidence` is `project`; keep `source` and `items_copied = false` as written.\n\
+- Write each anchor (1, 3 and 5) or option `sentence` as the predicate that follows \"You tend to\": second person, lower case at the start, \
+40 to 400 characters, what the reader does or looks at, never a score, a label or \"I agree\".\n\
+- A band trait has exactly the anchors 1, 3 and 5; a category trait has at least two options.\n\
+- Draw each trait from the material. No protected attribute, no typology, no country dimension, no trait that reads a person as a type. {}.\n\
+\nThen add each file with:\n\n`personajury trait add --file <file> --generated-from {hash}`\n\nThe engine screens every trait it is given \
+and refuses one that does not fit the shape or that names a protected attribute.\n",
+        refused_line()
+    ));
+    let dir = root.join(".personajury").join("generate");
+    std::fs::create_dir_all(&dir).map_err(|e| AppError::Io(dir.clone(), e))?;
+    let path = dir.join(format!("trait-{hash}.md"));
+    std::fs::write(&path, t.as_bytes()).map_err(|e| AppError::Io(path.clone(), e))?;
+    let rel = format!(".personajury/generate/trait-{hash}.md");
+    let store = Store::open(root)?;
+    store.insert_material(&hash, &sources, &rel)?;
+    Ok(json!({
+        "material_hash": hash, "brief": rel, "brief_hash": crate::domain::hash::sha256_hex(t.as_bytes()),
+        "count": count, "family": format!("project.{slug}"), "sources": sources,
+    }))
+}
+
+/// The refused list in one line: families, typologies and protected attributes, as the screen holds them.
+fn refused_line() -> String {
+    let mut words: Vec<&str> = REFUSED.iter().map(|(w, _)| *w).collect();
+    words.extend(REFUSED_FAMILIES);
+    let mut stems: Vec<&str> = PROTECTED_STEMS.iter().map(|(s, _)| *s).collect();
+    stems.sort();
+    stems.dedup();
+    format!("Refused ids and families: {}. Refused word stems in an id or a title: {}", words.join(", "), stems.join(", "))
 }

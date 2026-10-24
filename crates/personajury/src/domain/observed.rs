@@ -112,8 +112,8 @@ fn word(mine: usize, median: usize) -> &'static str {
 }
 
 /// Count `persona`'s behaviour across `runs`. A comparison against the stratum needs two other jurors in it (a median of
-/// one or two is the persona itself or nearly), so a thinner stratum adds nothing to severity, blockers, pick or bottom;
-/// the evidence counts are the persona's own and need no peer.
+/// one or two is the persona itself or nearly), so a thinner stratum adds nothing to severity, blockers or bottom, and
+/// no majority to follow; the evidence counts and the class of a pick are the persona's own and need no peer.
 pub fn observe(persona: &str, runs: &[RunData]) -> Signals {
     let mut s = Signals::default();
     for r in runs {
@@ -141,6 +141,32 @@ pub fn observe(persona: &str, runs: &[RunData]) -> Signals {
             v.dedup();
             v
         };
+        // picks: what it chose, and whether the stratum's most common choice was the same
+        let in_stratum: Vec<&(String, String)> = r.picks.iter().filter(|(p, _)| r.stakes.get(p) == Some(&stake)).collect();
+        if let Some((_, choice)) = in_stratum.iter().find(|(p, _)| p == persona) {
+            if choice.starts_with("cmp:") {
+                s.pick.1 += 1;
+            } else if *choice == r.subject {
+                s.pick.0 += 1;
+            } else {
+                s.pick.2 += 1;
+            }
+            if in_stratum.len() >= 3 {
+                let mut tally: BTreeMap<&str, usize> = BTreeMap::new();
+                for (_, c) in &in_stratum {
+                    *tally.entry(c).or_default() += 1;
+                }
+                let top = tally.values().copied().max().unwrap_or(0);
+                let leaders: Vec<&&str> = tally.iter().filter(|(_, n)| **n == top).map(|(c, _)| c).collect();
+                if leaders.len() == 1 {
+                    if **leaders[0] == **choice {
+                        s.pick.3 += 1;
+                    } else {
+                        s.pick.4 += 1;
+                    }
+                }
+            }
+        }
         if peers.len() < 3 {
             continue;
         }
@@ -175,32 +201,6 @@ pub fn observe(persona: &str, runs: &[RunData]) -> Signals {
             "more" => s.bottom.0 += 1,
             "same" => s.bottom.1 += 1,
             _ => s.bottom.2 += 1,
-        }
-        // picks: what it chose, and whether the stratum's most common choice was the same
-        let in_stratum: Vec<&(String, String)> = r.picks.iter().filter(|(p, _)| r.stakes.get(p) == Some(&stake)).collect();
-        if let Some((_, choice)) = in_stratum.iter().find(|(p, _)| p == persona) {
-            if choice.starts_with("cmp:") {
-                s.pick.1 += 1;
-            } else if *choice == r.subject {
-                s.pick.0 += 1;
-            } else {
-                s.pick.2 += 1;
-            }
-            if in_stratum.len() >= 3 {
-                let mut tally: BTreeMap<&str, usize> = BTreeMap::new();
-                for (_, c) in &in_stratum {
-                    *tally.entry(c).or_default() += 1;
-                }
-                let top = tally.values().copied().max().unwrap_or(0);
-                let leaders: Vec<&&str> = tally.iter().filter(|(_, n)| **n == top).map(|(c, _)| c).collect();
-                if leaders.len() == 1 {
-                    if **leaders[0] == **choice {
-                        s.pick.3 += 1;
-                    } else {
-                        s.pick.4 += 1;
-                    }
-                }
-            }
         }
     }
     s

@@ -87,6 +87,11 @@ panel `--cover`, read `coverage` and especially `balance` before you brief: a ba
 After the matrix, `--slice <trait>` groups each stratum's scores by that trait (counts; `thin` means fewer than two, `separates` counts the
 cells where groups do not overlap); say "in this jury", never "people like this".
 
+After a few runs, ask whether a persona does what its traits say: `personajury trait observed --persona ID` counts what it did in its
+verdicts (below, at or above its stratum's median, blockers, evidence, picks) and says, per declared trait, `consistent`, `contradicted`,
+`mixed` or `no_signal`. It is a bearing, not a measurement: a contradicted trait is a question for the author, not a verdict on the
+persona, and nothing is changed except through `persona add`. `graph RUN --svg --slice TRAIT` colours the personas by a trait.
+
 ### Large juries: run in waves
 Every brief answers `waves`, the persona ids in groups of 30 (`--wave N` changes it; up to 12 seats it is one wave). **Run
 one wave at a time:** give its personas to subagents, ingest their verdicts, and only then start the next wave. A jury of a
@@ -241,7 +246,10 @@ makes `apply-check` escalate until a person closes the finding with `decide --by
 **Calibrate** the jury against people: enter a person's verdicts as a human run (`--by-human`), then
 `personajury calibrate <jury-run> <human-run> --out cal.json`. It ranks the cells per stratum for each side and says which are within one
 rank; `calibrated` is true when every primary cell is. Then `apply-check <run> --calibration cal.json`: an uncalibrated jury advises
-(`uncalibrated`), it never applies. Bystander differences are reported, never averaged in.
+(`uncalibrated`), it never applies. Bystander differences are reported, never averaged in. With people who declared their own traits
+(`verdict --by-human "<name, credential>" --traits T.json`), `calibrate <jury> <human> --slice <trait>` says per stratum whether the trait
+`predicts` (jury and people separate on the same cells), is `played` (the jury separates, the people do not), `missed`, `inert`, or `thin`
+(a group under two); `trait report --calibration cal1.json cal2.json` counts those words across files, which tells you which traits to keep.
 
 **CI:** `action.yml` runs `should-run` on a pull request's diff and, with a committed store, `check` and `apply-check --latest`
 (`docs/ci.md`). A CSV attachment can be cited by cell: `prices.csv#R2C3` (row, column, 1-based, the header is row 1; a row is a record, so a

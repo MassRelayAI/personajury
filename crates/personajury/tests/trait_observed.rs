@@ -142,6 +142,7 @@ fn picks_are_classed_and_set_against_the_strata_majority() {
     let eve = observed(&ws, "eve");
     assert_eq!(eve["signals"]["pick"], json!({"subject": 0, "comparator": 1, "attachment": 0, "with_majority": 0, "against_majority": 1}));
     assert_eq!(observed(&ws, "bob")["signals"]["pick"]["with_majority"], 0, "a stratum of one has no majority to follow");
+    assert_eq!(observed(&ws, "bob")["signals"]["pick"]["attachment"], 1, "but its own pick is classed");
 }
 
 #[test]

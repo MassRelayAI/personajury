@@ -594,6 +594,73 @@ are their sum), so a juror with two batches is listed once. The agreement senten
 jurors agree ..."); the goldens `summary.txt` and `summary.md` changed in that line only, a line this lane added, so against main they
 still only gain lines.
 
+## D35 — trait generate, and the reverse generators: traits from material, from prose, from verdicts (2026-10-24, the maintainer)
+*Built in v0.6-B. The maintainer's words: "reverse traits generator based on juror". Reference: [`traits.md`](traits.md).*
+Three ways to a trait that are not "pick one from the catalog", none of which calls a model and none of which writes a trait back.
+- **`trait generate --from PATH [--count N]`.** As `lens generate` (D14): hash the material, write `.personajury/generate/trait-<material
+  hash>.md` and record the material. `--count` is 3 by default, 1 to 8 (`invalid_arguments` outside). The brief has two steps for the
+  agent: list, in the material's own words, the ways its readers are known to differ; then draft N trait files in the exact TOML shape of
+  D29 with `family = "project.<slug>"` (the slug is the material's file or folder name in `[a-z0-9_]`), `evidence = "project"`,
+  `source = "material:<hash>"`, `items_copied = false`, anchors or options as the predicate after "You tend to". Its two examples (a
+  band trait and a category trait) are valid files, and a test adds them. The brief states the refusals in one line (no protected
+  attribute, no typology, no country dimension) and prints the list. **The screen is never bypassed.** What the agent writes enters through
+  `trait add --generated-from <hash>`, the path D29 already screens (family, id, title; `refused_trait_id`); `trait generate` runs the same
+  `screen_id` on the slug and refuses a material named `gender-survey.md` instead of writing a brief whose every id would be refused.
+  A project trait shows `(P)` in `trait list` (`badge`) and in `matrix --slice` headers, as a credential shows `(C)`.
+- **`trait suggest --persona ID [--set NAME]`.** A brief, `.personajury/generate/trait-suggest-<persona id>-<hash8>.md`; `hash8` is the
+  first eight hex digits of sha256(the persona's hash, then the sorted `id@version` of the candidates, one per line). It lays the
+  persona's seven prose fields beside the candidates' anchors (the set's traits, `trait_set_unknown` if missing, else every trait in the
+  store, in id order) and asks for one JSON object `{persona, traits, evidence}` with a verbatim quote per trait. No model; the answer
+  is the path, hash and bytes. **`trait suggest --check FILE [--persona ID]`** validates the object: ids and values as `persona add`
+  would (`unknown_trait`, `trait_value_off_scale`, `trait_option_unknown`, `traits_too_many`, `refused_trait_id`); every trait has a quote
+  (`suggestion_without_quote`); the quote, whitespace folded, is a substring of the folded prose (`quote_not_in_prose`, case-sensitive).
+  It answers `data.persona_file` (the stored persona with `traits` replaced where suggested, others kept) and `data.evidence`, and
+  **writes nothing**: the caller saves the file and runs `persona add`, a new version. Prose first, traits as its summary, each with its
+  line of evidence. The MCP tool `personajury_trait_suggest_check` takes the object inline.
+- **`trait observed --persona ID [--persona ID ...] [--runs A,B]`.** Counts, from the persona's accepted initial verdicts: `severity`
+  (its score in each cell below, at or above its stratum's median, the lower middle as `matrix` computes it, keyed by lens and dimension),
+  `blockers` and `bottom` (its count against the stratum's median count: more, same, fewer), `punished` (the cell with the most
+  `below`, ties by id order, null when none), `evidence` (seen, told, recalled), `pick` (subject, comparator or attachment; with or
+  against the stratum's majority, a tie counting as neither). **A comparison needs a stratum of at least three jurors** (the persona and two
+  others): with fewer, severity, blockers, bottom and the majority add nothing (the evidence counts and the class of a pick are the persona's own); this refines the brief, which asked it for severity only,
+  because a median of one or two is the persona itself. Then `traits/observe-map.toml`, shipped data embedded beside the catalog
+  (`domain/catalog.rs` `OBSERVE_MAP`; it needs no install, `trait install` has nothing to load for it), 18 rows, and a project's own rows
+  in `.personajury/observe-map.toml`: **a project row adds a rule and overrides none** (a repeated id is `invalid_arguments`). Per declared
+  trait: the rules whose pole fits (a band of 4 or 5 the `high` rules, 1 or 2 the `low` rules, 3 none; a category the rules whose pole is
+  the option); a rule is `consistent` when its direction's count exceeds the opposite one's, `contradicted` when the opposite exceeds it,
+  `no_signal` on a tie; the trait's word is `contradicted` if a rule contradicts and none is consistent, `consistent` the other way,
+  `mixed` if both, `no_signal` otherwise. **It is a bearing, not a measurement; a contradicted trait is a question for the author, not a
+  verdict on the persona.** Several personas answer `{personas: [...]}`. The MCP tool `personajury_trait_observed` reads only. The tools
+  are twelve now (the brief counted nine to eleven; lane C had made the base ten).
+
+## D36 — traits proven: human traits, calibrate --slice, trait report, persona lint, label_echo, graph --slice (2026-10-24, the maintainer)
+*Built in v0.6-B. Reference: [`traits.md`](traits.md).*
+- **A person's own traits.** `verdict --by-human "<name, credential>" --traits T.json`: `T.json` is a `traits` map in the persona's
+  shape, validated with the persona's refusals, stored in `human_batch.traits_json` (the column joined the v6 migration; no version
+  bump, the column is read only by this lane) and shown by `matrix` under `human[].traits`. `--traits` without `--by-human` is
+  `invalid_arguments`. The MCP has no `by_human` (D19), so no `traits` either. A person's traits are what they say of themselves;
+  the engine administers no questionnaire and infers nothing from a score.
+- **`calibrate JURY HUMAN --slice TRAIT [--out F]`.** In each stratum the jury's personas (with the traits they were briefed with) and
+  the people (their declared traits) are grouped by band or option; a side without the trait is `unset` and left out. Per group, the D20
+  rank comparison of its cells on both sides (`within_one_rank`). Then `separates_in_jury {cells, total}` and `separates_in_people`
+  (two groups' `anchor_met` ranges on a cell not overlapping, the D13 rule), and the stratum's `word`: `thin` if any group held on
+  either side has fewer than two (or fewer than two groups are held at all: nothing can separate); else `predicts` if both sides
+  separate on at least one common cell; `missed` if the people separate and the jury does not; `inert` if neither does; else `played`
+  (the jury separates and the people do not, or on other cells than they do). Written under `slices` in the calibration file;
+  `calibrated` is untouched and `apply-check --calibration` reads nothing new. Nothing crosses a stratum.
+- **`trait report --calibration F [F ...]`.** Per trait and stratum, the count of each word across the files and the number of files
+  that sliced it; a file that is not a calibration is `not_a_calibration {path}`. No total across strata, no share.
+- **`persona lint [ID ...]`.** Warnings, exit 0 always: `near_copy {a, b}` (the same non-empty trait map and a shared tag, or the same
+  tags) and `confounded {trait, tag, band}` (two or more personas with the tag in the band, one or more without it in another).
+  With ids, only the warnings that name one of them. `trait_without_prose` is not built: the engine cannot read prose for meaning.
+- **`label_echo`.** A verdict whose note or blocker repeats a trait the persona carries gets `warnings: [{code: label_echo, line, trait}]`
+  and is still accepted; the trait's title (any case) or the id's last segment with `_` as a space matches, each word by its first seven
+  letters and in order, so "a marketing skeptic" echoes `marketing skepticism`. A one-word segment (`domain`) echoes by chance; it is a
+  warning. `matrix` counts the echoes per stratum under `warnings` where there is one.
+- **`graph --svg --slice TRAIT`.** Persona nodes take the lightest, middle or darkest step of the blue scale by band (a category's
+  options cycle the three in option order), grey for unset; a legend line under the title names the trait and gives the counts per
+  stratum (`P 1·0·2`, never one total). Layout and medians are unchanged; without `--slice` the bytes are v0.5's.
+
 ## D37 — decision juries (2026-10-24, the maintainer, adopter feedback from a build terminal)
 *Built in v0.6-C. Numbered D37 because lane B holds D35 and D36. Reference: [`commands.md`](commands.md), Decision juries.*
 The adopter replaced owner questions with a small jury: a list of questions plus the owner's point of view written in files, three

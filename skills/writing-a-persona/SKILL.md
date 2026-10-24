@@ -38,6 +38,15 @@ never write a personality label, and these ids are refused: `mbti`, `enneagram`,
 outsider is a trait, a persona's own is not). `access.need` says what the page must do for this reader (a screen reader, captions), not who
 the person is. Add `serves` (tags such as `["docs"]`) when the persona should sit in `--seats auto` juries. See `docs/traits.md`.
 
+**Migrate a persona you already have: suggest, check, add.** Write the prose first and the traits as its summary, never the reverse.
+`personajury trait suggest --persona ID [--set NAME]` writes a brief laying the persona's prose beside the candidate traits' anchors.
+Answer it with one JSON object `{"persona", "traits", "evidence"}`: propose a value only where a sentence of the prose supports it, and
+copy that sentence (or a phrase of it, verbatim) as the evidence; leave out every trait the prose does not support. Then
+`personajury trait suggest --check answer.json` verifies the ids, the values and each quote, and answers `persona_file`, the persona with
+the traits set. It writes nothing: save that file and `persona add` it for a new version. Afterwards `personajury persona lint` warns about
+near copies and a tag that cannot be told from a band; whether a trait fits the prose is yours to read, the engine cannot. For traits
+that belong to a material rather than the catalog, `personajury trait generate --from material.md` and `trait add --generated-from`.
+
 ## Add it
 ```
 personajury persona add --file personas/builder-ana.json

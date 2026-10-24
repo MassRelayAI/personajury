@@ -1,7 +1,7 @@
 <!-- shape follows comparegraph docs/mcp-tools.md -->
 # MCP tools
 
-`personajury mcp` serves MCP over stdio. Ten tools, each the same call as its CLI verb and answering with the same envelope
+`personajury mcp` serves MCP over stdio. Twelve tools, each the same call as its CLI verb and answering with the same envelope
 (including the same refusals). Their arguments carry the CLI flags' names. This is the v0.1 contract in the plan; the server
 is built in plan Task 6.
 
@@ -15,9 +15,11 @@ is built in plan Task 6.
 | `personajury_delta` | `delta` | two runs |
 | `personajury_apply_check` | `apply-check` | `runs`, `rule` and `calibration` (a file from `calibrate --out`); answers `apply`, `escalate`, `human` or `advise` with the reasons as data; reads only |
 | `personajury_trait_list` | `trait list` | the trait catalog the store holds (`data.traits`), or with `sets: true` the trait sets; reads only; install the catalog with the CLI |
+| `personajury_trait_observed` | `trait observed` | `persona` (an id, or an array of ids) and `runs`; counts from the persona's accepted initial verdicts and, per declared trait, `consistent`, `contradicted`, `mixed` or `no_signal` against the mapping table: a bearing, not a measurement; writes nothing, reads only (D35) |
+| `personajury_trait_suggest_check` | `trait suggest --check` | `suggestion` (the agent's `{persona, traits, evidence}` object) and `persona`; verifies ids, values and a verbatim quote per trait (`suggestion_without_quote`, `quote_not_in_prose`, and `persona add`'s refusals) and answers the merged persona file as `data.persona_file`; writes nothing, the caller saves it and runs `persona add` (D35) |
 | `personajury_summary` | `summary` | `runs`, `width`, `slice` (one sentence per stratum on a trait), and optional `md` / `html` (relative paths inside the project root, else `invalid_report_dir`); answers the text in `data.text` (sentences, numbers for checking, Next); writes a file only when `md` or `html` is given |
 | `personajury_should_run` | `should-run` | classifies a diff, a list of paths or a subject's recorded source paths (`subject`) |
 
-There is no tool that enters a person's verdict (`--by-human`) or records a decision: a person does that. Everything else (adding personas, panels, lenses and subjects, `lens generate`, `pick`, `check`, `decide`) is CLI only. Register the
+There is no tool that enters a person's verdict (`--by-human`, and so no `--traits` of a person's own) or records a decision: a person does that. `trait generate`, `trait suggest` (the brief), `trait report`, `persona lint` and `calibrate` are CLI only. Everything else (adding personas, panels, lenses and subjects, `lens generate`, `pick`, `check`, `decide`) is CLI only. Register the
 server with `personajury setup --apply`; `personajury doctor` shows each client's registration. The engine makes no model call
 and no network call whichever way it is driven.

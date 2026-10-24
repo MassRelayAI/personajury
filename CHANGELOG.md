@@ -25,6 +25,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `brief --seats auto`, persona `serves`, `subject add --audience`: the personas that serve the audience plus one control.
 - The MCP tool `personajury_trait_list`; `traits`, `seats` on brief, `slice` on matrix and summary.
 
+### Added (v0.6-B, D35-D36)
+- `trait generate --from PATH [--count N]`: the brief that asks the agent for project traits from a material; what it writes enters through
+  `trait add --generated-from`, so the protected-attribute screen and `refused_trait_id` apply unchanged; project traits show `(P)` (D35).
+- The reverse generators, without a model and writing nothing: `trait suggest --persona` (a brief from the persona's prose) and
+  `--check` (ids and values as `persona add`, a verbatim quote per trait: `suggestion_without_quote`, `quote_not_in_prose`; answers the
+  merged persona file); `trait observed --persona` (counts from the accepted initial verdicts, and `consistent`, `contradicted`, `mixed`
+  or `no_signal` per declared trait against `traits/observe-map.toml`, 18 rows, extendable per project) (D35).
+- The MCP tools `personajury_trait_observed` and `personajury_trait_suggest_check` (twelve tools now).
+- `verdict --by-human --traits` (a person's own traits, shown by `matrix` under `human[].traits`), `calibrate --slice TRAIT` (`predicts`,
+  `played`, `missed`, `inert`, `thin` per stratum, under `slices`), `trait report --calibration` (`not_a_calibration`) (D36).
+- `persona lint` (`near_copy`, `confounded`), `label_echo` warnings on `verdict` and per stratum in `matrix`, `graph --svg --slice TRAIT` (D36).
+
 ### Added (v0.6-C, D32-D34, D37, D38)
 - `brief --options subject|attachments`: what a juror may score `about` and pick, by subject kind (D32); `about: "<subject name>"` is the
   whole subject; `invalid_options_mode`; the fixture and the pinned compare-brief test pass `--options attachments`.

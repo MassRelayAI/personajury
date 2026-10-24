@@ -93,7 +93,9 @@ jobs:
           if-no-files-found: error
 
   release:
-    needs: build
+    needs: [build, bundle]
+    # the bundle job is opt-in (ENABLE_MCPB): a skipped one still releases the binaries, a failed one does not
+    if: ${{ always() && needs.build.result == 'success' && (needs.bundle.result == 'success' || needs.bundle.result == 'skipped') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -105,7 +107,13 @@ jobs:
           path: dist
           pattern: 'bin-*'
           merge-multiple: true
-      - name: SHA256SUMS
+      - name: The Claude Desktop bundles, when the bundle job ran
+        if: ${{ needs.bundle.result == 'success' }}
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: dist
+          name: mcpb-bundles
+      - name: SHA256SUMS (binaries and bundles)
         working-directory: dist
         run: |
           cat personajury-*.sha256 > SHA256SUMS

@@ -18,7 +18,9 @@ Maintainers only. A release is a tag; the workflow in `.github/workflows/release
 
 Nothing has been released yet, so these are still placeholders. Set each one before the first tag:
 
-- `MCPB_CLI_VERSION` in `.github/workflows/release.yml` is a placeholder pin: verify the `@anthropic-ai/mcpb` version and set it.
+- Bundles are on: the repository variable `ENABLE_MCPB=true` was set on 2026-10-24. `MCPB_CLI_VERSION` (2.1.2) matches the current npm
+  release of `@anthropic-ai/mcpb`, and a locally built linux bundle passed `mcpb validate`. The MCP registry stays opt-in
+  (`ENABLE_REGISTRY`).
 - The sha256 of each `.mcpb` bundle in `server.json` is written by the `publish-registry` job; check it after the first run.
 - The GitHub repository `massrelay-ai/personajury` exists, with the settings in [`../github-settings.md`](../github-settings.md).
 - The domains `personajury.com` and `personajury.ai` are registered by the maintainer before the announcement.
@@ -35,11 +37,13 @@ git push origin vX.Y.Z
 - `build`: five jobs, one per platform (linux-x64, linux-arm64, darwin-arm64, darwin-x64, win32-x64), each on a runner of
   that platform. Each checks the version, builds with `--locked`, strips the Linux binaries, and uploads the binary with
   its `.sha256`.
-- `release`: downloads the five binaries, writes `SHA256SUMS`, checks it, publishes a GitHub release with the binaries,
-  the sums and generated notes, and signs a build-provenance attestation over them.
-
-- `bundle` (opt-in: runs only when the repository variable `ENABLE_MCPB` is `true`): builds the four `.mcpb` bundles (linux-x64, darwin-arm64, darwin-x64, win32-x64) from the built binaries and validates
-  them with a pinned `@anthropic-ai/mcpb` (`MCPB_CLI_VERSION` in the workflow: verify the pin before the first tag).
+- `bundle` (runs only when the repository variable `ENABLE_MCPB` is `true`, which it is): builds the four `.mcpb` bundles (linux-x64,
+  darwin-arm64, darwin-x64, win32-x64) from the built binaries and validates them with the pinned `@anthropic-ai/mcpb`
+  (`MCPB_CLI_VERSION` in the workflow).
+- `release` (needs `build` and `bundle`; runs when `build` succeeded and `bundle` succeeded or was skipped, so a failed bundle stops the
+  release and an opt-out does not): downloads the five binaries and, when the bundle job ran, the four `.mcpb` files with their
+  `.sha256`; writes `SHA256SUMS` over all of them, checks it, publishes a GitHub release with the binaries, the bundles, the sums and
+  generated notes, and signs a build-provenance attestation over them.
 - `publish-registry` (opt-in: `ENABLE_REGISTRY` and `ENABLE_MCPB` both `true`): after `release` and `bundle`, writes the bundles' sha256 into `server.json` and publishes it with a pinned,
   checksum-verified `mcp-publisher` over GitHub OIDC.
 

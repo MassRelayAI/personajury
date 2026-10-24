@@ -28,6 +28,7 @@ status: measured        # measured | decided | stale | superseded
 | 2026-10-24 | [v0.3 measured: the jury graph, waves and usage](2026-10-24-v0-3-measured.md) | 332 tests green; the graph is byte-identical and goes red when one score moves; 3 Important findings fixed | measured |
 | 2026-10-24 | [v0.4 measured: the apply check](2026-10-24-v0-4-measured.md) | 409 tests green; the review found 5 Critical cases where apply-check said apply, all fixed; the .mcpb bundle is unverified | measured |
 | 2026-10-24 | [v0.5 measured: summary, calibration, CSV cells, CI](2026-10-24-v0-5-measured.md) | 471 tests green; the CI gate now judges every subject and fails closed; the Action has not run on GitHub | measured |
+| 2026-10-24 | [v0.6 measured: traits, decision juries, deliberation, walks, export](2026-10-24-v0-6-measured.md) | 704 tests green after three fix rounds; the reviews found 5 Critical and 12 Important findings, all fixed; `trait observed` on the fixture: 3 contradicted, 4 consistent, 46 no_signal of 53, a bearing only | measured |
 | 2026-10-24 | [How to show a jury's answer](2026-10-24-display-jury.md) | sentences first, numbers for checking, no bars: bars got 0 of 8 picks, numbers and sentences tied 4 to 4 by reader | decided |
 
 The held-out check is still to be reported: a jury run on the fixture site compared with the

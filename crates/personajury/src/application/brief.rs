@@ -51,7 +51,7 @@ pub struct BriefArgs {
 pub(crate) struct TraitCtx {
     mode: &'static str,
     set: Option<TraitSetDef>,
-    defs: BTreeMap<String, TraitDef>,
+    pub(crate) defs: BTreeMap<String, TraitDef>,
 }
 impl TraitCtx {
     /// The context a run rendered its briefs under, from the `traits_json` the run recorded (D31); none when it rendered nothing.
@@ -70,7 +70,7 @@ impl TraitCtx {
         self.block(p).map(|(b, _)| b)
     }
     /// The block of one persona and the trait ids it renders; none when the mode renders nothing for it.
-    fn block(&self, p: &Persona) -> Option<(String, Vec<String>)> {
+    pub(crate) fn block(&self, p: &Persona) -> Option<(String, Vec<String>)> {
         let held = p.traits.as_ref()?;
         let mut ids: Vec<String> = Vec::new();
         let mut bullets: Vec<String> = Vec::new();
@@ -687,10 +687,14 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
     let mut texts = Vec::new();
     let mut versions: BTreeMap<String, i64> = BTreeMap::new();
     let mut incomplete: Vec<Value> = Vec::new();
+    // D39: the sensitive categories the seated personas name, recorded on the run (simulations, labelled)
+    let mut sensitive: Vec<&'static str> = Vec::new();
+    let trait_defs = store.trait_map()?;
     for id in sh.selected {
         let persona = store
             .persona(id)?
             .ok_or_else(|| AppError::NotFound(format!("no persona {id}")))?;
+        sensitive.extend(super::persona::sensitive_of(&persona, &trait_defs));
         let stake = sh.stakes[id];
         let model = sh.models.get(id).cloned().unwrap_or_else(|| sh.model.to_string());
         // every brief of a run with a model in its terms states its own; a run with none is as it always was
@@ -712,6 +716,8 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         texts.push((id.clone(), persona.version, stake, text, model));
     }
     let run_id = store.insert_run(&run)?;
+    crate::domain::traits::order(&mut sensitive);
+    store.set_run_sensitive(run_id, &sensitive)?;
     // what the run rendered and how it was drawn (D31); null when nothing was rendered and the panel has no cover
     let traits_json = (sh.traits.is_some() || sh.cover).then(|| {
         let mut v = json!({
@@ -797,6 +803,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
             }).collect::<Vec<_>>(),
         },
         "options": {"mode": sh.options_mode, "list": options},
+        "uses_sensitive": sensitive,
         "detail": if sh.detail == Detail::Full { "full" } else { "compact" },
         // run one wave, ingest it, then the next (D12): persona ids in the order of `briefs`
         "waves": sh.selected.chunks(sh.wave).map(|c| c.to_vec()).collect::<Vec<_>>(),

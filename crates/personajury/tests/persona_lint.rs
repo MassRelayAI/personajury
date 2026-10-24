@@ -87,6 +87,10 @@ fn verdict(persona: &str, note: Option<&str>, blocker: Option<&str>) -> Value {
         .collect();
     json!({"persona": persona, "lines": lines})
 }
+/// The run's briefs rendered every trait the persona holds (`label_echo` reads only the traits a brief rendered).
+fn briefed_with_traits(ws: &fx::Ws, run: i64) {
+    ws.store.set_run_traits(run, Some(&json!({"mode": "all"})), None).unwrap();
+}
 fn two() -> Vec<(&'static str, Stake)> {
     vec![("ana", Stake::Primary), ("bob", Stake::Primary)]
 }
@@ -95,6 +99,7 @@ fn two() -> Vec<(&'static str, Stake)> {
 fn a_note_that_echoes_the_label_warns_and_the_verdict_is_still_accepted() {
     let ws = world();
     let run = ws.run("critical", &two(), false);
+    briefed_with_traits(&ws, run);
     let d = ws.ingest(run, &verdict("ana", Some("As a marketing skeptic I do not believe the headline."), None));
     assert_eq!(d["warnings"], json!([{"code": "label_echo", "line": 2, "trait": "trust.marketing_skepticism"}]));
     assert_eq!(d["lines"], 3, "accepted");
@@ -103,6 +108,7 @@ fn a_note_that_echoes_the_label_warns_and_the_verdict_is_still_accepted() {
 fn a_blocker_echo_warns_and_so_does_the_title_in_any_case() {
     let ws = world();
     let run = ws.run("critical", &two(), false);
+    briefed_with_traits(&ws, run);
     let d = ws.ingest(run, &verdict("ana", None, Some("Marketing Skepticism makes this a no")));
     assert_eq!(d["warnings"][0]["line"], 2);
     let title = "disbelieves advertising and claims by default";
@@ -113,6 +119,7 @@ fn a_blocker_echo_warns_and_so_does_the_title_in_any_case() {
 fn a_note_without_the_words_has_no_warnings_key() {
     let ws = world();
     let run = ws.run("critical", &two(), false);
+    briefed_with_traits(&ws, run);
     let d = ws.ingest(run, &verdict("ana", Some("The price is hidden behind a form."), None));
     assert!(d.get("warnings").is_none(), "{d}");
 }
@@ -120,6 +127,7 @@ fn a_note_without_the_words_has_no_warnings_key() {
 fn matrix_counts_label_echo_per_stratum_and_only_when_there_is_one() {
     let ws = world();
     let run = ws.run("critical", &[("ana", Stake::Primary), ("bob", Stake::Secondary)], false);
+    briefed_with_traits(&ws, run);
     ws.ingest(run, &verdict("ana", Some("a marketing skeptic would stop here"), None));
     ws.ingest(run, &verdict("bob", Some("plain note"), None));
     let m = ws.cli(&["matrix", &run.to_string()])["data"].clone();

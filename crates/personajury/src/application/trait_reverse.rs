@@ -3,7 +3,7 @@
 use super::{AppError, Result};
 use crate::domain::hash::sha256_hex;
 use crate::domain::observed::{self, RunData};
-use crate::domain::traits::{check_map_shape, TraitDef, TraitValue, MAX_PERSONA_TRAITS};
+use crate::domain::traits::{check_held, TraitDef, TraitValue, MAX_PERSONA_TRAITS};
 use crate::domain::*;
 use crate::store::Store;
 use serde_json::{json, Value};
@@ -24,6 +24,9 @@ fn prose_of(p: &Persona) -> Vec<(&'static str, String)> {
         ("Stake rules", p.stake_rules.clone()),
     ]
 }
+/// The floor of a quote (D35 as ruled after the v0.6-B review): at least 3 words and at least 12 characters, folded.
+pub const MIN_QUOTE_WORDS: usize = 3;
+pub const MIN_QUOTE_CHARS: usize = 12;
 /// Runs of whitespace folded to one space, the ends trimmed.
 fn fold(s: &str) -> String {
     s.split_whitespace().collect::<Vec<_>>().join(" ")
@@ -86,7 +89,7 @@ pub fn suggest(root: &Path, persona: Option<&str>, set: Option<&str>) -> Result<
     t.push_str(
         "## Your task\n\n\
 Propose a value only where a sentence of the prose above supports it, and copy that sentence (or a phrase of it, verbatim) as the \
-evidence. Leave out every trait the prose does not support. At most 8. A band takes an integer from 1 to 5 (2 and 4 lean toward \
+evidence: at least 3 words and 12 characters, from one field (a quote never runs from one field into the next). Leave out every trait the prose does not support. At most 8. A band takes an integer from 1 to 5 (2 and 4 lean toward \
 their neighbour); a category takes one option id. Answer with one JSON object:\n\n\
 { \"persona\": \"<id>\", \"traits\": { \"<trait id>\": <value>, ... }, \"evidence\": { \"<trait id>\": \"<verbatim quote>\", ... } }\n\n\
 Then check it with `personajury trait suggest --check <file>`; the engine verifies every quote and answers the persona file with \
@@ -130,21 +133,21 @@ pub fn suggest_check_text(root: &Path, text: &str, label: &str, persona: Option<
     let store = Store::open_existing(root)?;
     let p = store.persona(id)?.ok_or_else(|| AppError::NotFound(format!("no persona {id}")))?;
     // as `persona add` would: the refused list and the ceiling, then the store's traits and their values
-    check_map_shape(&traits)?;
     let defs = store.trait_map()?;
-    for (tid, val) in &traits {
-        let def = defs.get(tid).ok_or_else(|| Refusal::UnknownTrait { id: tid.clone() })?;
-        def.check_value(val)?;
-    }
-    let prose = fold(&prose_of(&p).iter().map(|(_, t)| fold(t)).collect::<Vec<_>>().join(" "));
+    check_held(&traits, &defs)?;
+    // each quote stands inside one prose field: a quote that runs from one field into the next is no sentence of the prose
+    let fields: Vec<String> = prose_of(&p).iter().map(|(_, t)| fold(t)).collect();
     let mut quotes = BTreeMap::new();
     for tid in traits.keys() {
         let q = fold(evidence.get(tid).map(String::as_str).unwrap_or(""));
         if q.is_empty() {
             return Err(Refusal::SuggestionWithoutQuote { id: tid.clone() }.into());
         }
-        if !prose.contains(&q) {
-            return Err(Refusal::QuoteNotInProse { id: tid.clone(), quote: q }.into());
+        if q.split(' ').count() < MIN_QUOTE_WORDS || q.chars().count() < MIN_QUOTE_CHARS {
+            return Err(Refusal::QuoteTooShort { id: tid.clone(), quote: q }.into());
+        }
+        if !fields.iter().any(|f| f.contains(&q)) {
+            return Err(Refusal::QuoteNotFound { id: tid.clone(), quote: q }.into());
         }
         quotes.insert(tid.clone(), q);
     }
@@ -172,9 +175,17 @@ pub fn suggest_check_text(root: &Path, text: &str, label: &str, persona: Option<
         traits: Some(merged),
         serves: p.serves.clone(),
     };
+    // D39: the sensitive categories the merged persona names (its prose, tags and traits): a label, never a refusal
+    let mut texts: Vec<&str> = vec![&file.role, &file.context, &file.daily_tasks, &file.fears, &file.never_reads, &file.decides_by, &file.stake_rules];
+    texts.extend(file.credential.as_deref());
+    texts.extend(file.tags.iter().map(String::as_str));
+    let mut sensitive = crate::domain::traits::sensitive_of(texts);
+    sensitive.extend(crate::domain::traits::held_sensitive(file.traits.as_ref().expect("merged traits"), &defs));
+    crate::domain::traits::order(&mut sensitive);
     Ok(json!({
         "persona_file": serde_json::to_value(&file).expect("persona file serialises"),
         "evidence": quotes,
+        "sensitive": sensitive,
         "from_version": p.version,
     }))
 }

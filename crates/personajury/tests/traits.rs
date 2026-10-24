@@ -81,7 +81,6 @@ fn a_category_with_a_duplicate_option_is_refused() {
 fn refused_trait_ids_name_their_reason() {
     for (id, why) in [
         ("mbti", "typology without predictive validity"),
-        ("gender", "protected attribute, not a mechanism"),
         ("beauty", "an attribute of the persona, not a sensitivity of the juror"),
     ] {
         let ws = tempfile::tempdir().unwrap();
@@ -122,10 +121,11 @@ fn the_persona_key_is_checked_against_the_store() {
     let ws = installed();
     let w = ws.path();
     let try_add = |traits: serde_json::Value| add_persona(w, &persona_body("p", &["x"], traits));
-    // a culture trait is refused by its family before the store is asked (review I2); a plain unknown id is unknown
+    // a culture trait is refused by its family before the store is asked (review I2); a plain unknown id is unknown, and so
+    // is a sensitive one the store does not hold (D39: labelled, not refused)
     assert_eq!(code(&try_add(json!({"culture.power_distance": 3}))), "refused_trait_id");
     assert_eq!(code(&try_add(json!({"trust.never_added": 3}))), "unknown_trait");
-    assert_eq!(code(&try_add(json!({"gender": "x"}))), "refused_trait_id");
+    assert_eq!(code(&try_add(json!({"gender": "x"}))), "unknown_trait");
     let v = try_add(json!({"beauty": 5}));
     assert_eq!(v["data"]["why"], "an attribute of the persona, not a sensitivity of the juror");
     assert_eq!(code(&try_add(json!({"trust.propensity": 6}))), "trait_value_off_scale");

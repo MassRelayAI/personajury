@@ -35,6 +35,19 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     }
     given.sort_by_key(|r| r.id);
     let mut f = Facts { subject: given[0].subject_name.clone(), runs: given.iter().map(|r| r.id).collect(), ..Default::default() };
+    // D39: the sensitive categories the runs recorded, once each, in the order of the categories
+    {
+        let mut cats: Vec<&'static str> = Vec::new();
+        for r in &given {
+            for c in store.run_sensitive(r.id)? {
+                if let Some(k) = crate::domain::traits::SENSITIVE.iter().find(|k| **k == c) {
+                    cats.push(k);
+                }
+            }
+        }
+        crate::domain::traits::order(&mut cats);
+        f.uses_sensitive = cats.iter().map(|c| c.to_string()).collect();
+    }
     for r in &given {
         if !f.lenses.contains(&r.lens_name) {
             f.lenses.push(r.lens_name.clone());

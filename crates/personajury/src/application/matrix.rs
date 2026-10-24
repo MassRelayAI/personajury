@@ -49,9 +49,9 @@ pub fn show(
     let mut human_declared: BTreeMap<String, BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
     // the persona version each run briefed: a slice reads the traits the juror was briefed with
     let mut versions: BTreeMap<String, i64> = BTreeMap::new();
-    // D36: label echoes of the jury's first word, per stratum; the traits each persona version carried
+    // D36: label echoes of the jury's first word, per stratum; the traits each run's brief rendered for each persona version
     let mut echoes: BTreeMap<Stake, usize> = BTreeMap::new();
-    let mut carried: BTreeMap<(String, i64), BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
+    let mut carried: BTreeMap<(i64, String, i64), Vec<String>> = BTreeMap::new();
     let trait_defs = store.trait_map()?;
     for id in runs {
         let run = load_run(&store, *id)?;
@@ -115,19 +115,19 @@ pub fn show(
             lenses.push(lens);
         }
         let initial = store.verdict_rows(*id, false)?;
+        let ctx = super::brief::TraitCtx::for_run(&store, store.run_traits(*id)?.0.as_ref())?;
         for r in initial.iter().filter(|r| !super::verdict::is_human(&r.persona)) {
             let Some(stake) = run.stakes.get(&r.persona) else { continue };
-            let held = match carried.get(&(r.persona.clone(), r.persona_version)) {
-                Some(h) => h.clone(),
-                None => {
-                    let h = store.persona_at(&r.persona, r.persona_version)?.and_then(|p| p.traits).unwrap_or_default();
-                    carried.insert((r.persona.clone(), r.persona_version), h.clone());
-                    h
-                }
-            };
+            let Some(ctx) = &ctx else { continue };
+            let key = (*id, r.persona.clone(), r.persona_version);
+            if !carried.contains_key(&key) {
+                let shown = store.persona_at(&r.persona, r.persona_version)?.and_then(|p| ctx.block(&p)).map(|(_, ids)| ids).unwrap_or_default();
+                carried.insert(key.clone(), shown);
+            }
+            let held = &carried[&key];
             let mut texts: Vec<&str> = r.blockers.iter().map(String::as_str).collect();
             texts.extend(r.note.as_deref());
-            let n = held.keys().filter(|t| trait_defs.get(*t).is_some_and(|d| crate::domain::lint::label_echo(d, &texts))).count();
+            let n = held.iter().filter(|t| trait_defs.get(*t).is_some_and(|d| crate::domain::lint::label_echo(d, &texts))).count();
             if n > 0 {
                 *echoes.entry(*stake).or_default() += n;
             }
@@ -215,7 +215,18 @@ pub fn show(
     }
     // strata that disagree on a cell (D13): beside the strata, never inside one
     let splits = apply::splits(&rows, &stakes);
+    // D39: the sensitive categories the runs recorded (simulated demographics), once each, in category order
+    let mut sensitive: Vec<&'static str> = Vec::new();
+    for id in runs {
+        for c in store.run_sensitive(*id)? {
+            if let Some(k) = crate::domain::traits::SENSITIVE.iter().find(|k| **k == c) {
+                sensitive.push(k);
+            }
+        }
+    }
+    crate::domain::traits::order(&mut sensitive);
     let mut out = json!({ "runs": runs, "strata": strata_json(&m, &shifts), "splits": splits, "usage": usage, "cost": cost });
+    out["uses_sensitive"] = json!(sensitive);
     // D36: the label echoes of the jury's lines, a count per stratum, only where there is one
     for (stake, n) in &echoes {
         if let Some(s) = out["strata"].as_array_mut().into_iter().flatten().find(|s| s["stake"] == stake.name()) {

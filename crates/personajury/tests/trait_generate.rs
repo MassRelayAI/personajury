@@ -1,6 +1,7 @@
-//! D35: `trait generate --from` writes a brief for the agent; its example is a valid trait file; the screen stays on.
+//! D35: `trait generate --from` writes a brief for the agent; its example is a valid trait file; what it names is labelled (D39).
 #[path = "traits_support/mod.rs"]
 mod support;
+use serde_json::json;
 use support::*;
 
 fn material(ws: &std::path::Path, name: &str) -> String {
@@ -32,7 +33,8 @@ fn generate_writes_a_brief_named_by_the_material_hash_and_records_it() {
     assert!(t.contains("evidence = \"project\"") && t.contains("items_copied = false"));
     assert!(t.contains("You tend to"));
     let low = t.to_lowercase();
-    assert!(low.contains("no protected attribute") && low.contains("no typology") && low.contains("no country"));
+    assert!(low.contains("no typology") && low.contains("no country"));
+    assert!(low.contains("labelled `sensitive`") && low.contains("never a real or named person"), "D39: labelled, composites only");
     // deterministic
     let again = ok(jg(ws.path(), &["trait", "generate", "--from", &m]));
     assert_eq!(again["brief_hash"], d["brief_hash"]);
@@ -73,16 +75,18 @@ fn every_example_in_the_brief_is_a_valid_file_that_trait_add_takes_as_a_project_
 }
 
 #[test]
-fn a_material_whose_name_trips_the_protected_screen_is_refused_not_bypassed() {
+fn a_material_whose_name_names_a_sensitive_attribute_is_labelled_and_culture_is_refused() {
     let ws = installed();
     let m = material(ws.path(), "gender-survey.md");
+    let v = ok(jg(ws.path(), &["trait", "generate", "--from", &m]));
+    assert_eq!(v["sensitive"], json!(["gender"]), "{v}");
+    let m = material(ws.path(), "culture.md");
     let v = jg(ws.path(), &["trait", "generate", "--from", &m]);
     assert_eq!(code(&v), "refused_trait_id", "{v}");
-    assert!(!ws.path().join(".personajury/generate").exists() || std::fs::read_dir(ws.path().join(".personajury/generate")).unwrap().count() == 0);
 }
 
 #[test]
-fn a_generated_trait_that_names_a_protected_attribute_is_still_refused_by_trait_add() {
+fn a_generated_trait_that_names_a_sensitive_attribute_is_added_and_labelled() {
     let ws = installed();
     let m = material(ws.path(), "buyers.md");
     let d = ok(jg(ws.path(), &["trait", "generate", "--from", &m]));
@@ -90,6 +94,7 @@ fn a_generated_trait_that_names_a_protected_attribute_is_still_refused_by_trait_
     let body = blocks(&brief(ws.path(), &d))[0].replace("Reads the fine print before deciding", "Decides by nationality of the vendor");
     let f = ws.path().join("bad.toml");
     std::fs::write(&f, body).unwrap();
-    let v = jg(ws.path(), &["trait", "add", "--file", f.to_str().unwrap(), "--generated-from", &hash]);
-    assert_eq!(code(&v), "refused_trait_id", "{v}");
+    let v = ok(jg(ws.path(), &["trait", "add", "--file", f.to_str().unwrap(), "--generated-from", &hash]));
+    assert_eq!(v["sensitive"], json!(["nationality"]), "{v}");
+    assert_eq!(v["origin"], "project");
 }

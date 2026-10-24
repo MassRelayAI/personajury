@@ -33,12 +33,7 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
     // traits (D29): the refused list and the ceiling first, so the refusal names the reason; then the store's catalog
     let mut pf = pf;
     if let Some(m) = &pf.traits {
-        crate::domain::traits::check_map_shape(m)?;
-        let defs = store.trait_map()?;
-        for (id, v) in m {
-            let def = defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?;
-            def.check_value(v)?;
-        }
+        crate::domain::traits::check_held(m, &store.trait_map()?)?;
         pf.traits = Some(m.iter().map(|(k, v)| (k.clone(), v.canonical())).collect());
     }
     pf.serves = {
@@ -84,7 +79,28 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
         serves: pf.serves.clone(),
     };
     let version = store.insert_persona(&persona)?;
-    Ok(json!({"id": pf.id, "version": version, "hash": hash, "origin": origin.to_db()}))
+    let sensitive = sensitive_of(&persona, &store.trait_map()?);
+    Ok(json!({"id": pf.id, "version": version, "hash": hash, "origin": origin.to_db(), "sensitive": sensitive}))
+}
+
+/// The sensitive categories a persona names (D39): its prose (role, context, daily tasks, fears, never reads, decides by,
+/// credential), its stake rules and tags, and its traits (each trait's label and each free-text value). A label, never a
+/// refusal: a persona is a simulation, a composite, never a real or named person.
+pub(crate) fn sensitive_of(p: &crate::domain::model::Persona, defs: &std::collections::BTreeMap<String, crate::domain::traits::TraitDef>) -> Vec<&'static str> {
+    use crate::domain::traits;
+    let profile: Value = serde_json::from_str(&p.profile_json).unwrap_or(Value::Null);
+    let mut texts: Vec<String> = ["role", "context", "daily_tasks", "fears", "never_reads", "decides_by", "credential"]
+        .iter()
+        .filter_map(|k| profile.get(*k).and_then(Value::as_str).map(str::to_string))
+        .collect();
+    texts.push(p.stake_rules.clone());
+    texts.extend(p.tags.iter().cloned());
+    let mut out = traits::sensitive_of(texts.iter().map(String::as_str));
+    if let Some(m) = &p.traits {
+        out.extend(traits::held_sensitive(m, defs));
+    }
+    traits::order(&mut out);
+    out
 }
 
 fn collect(dir: &Path, rel: &str, out: &mut Vec<(String, PathBuf)>) -> Result<()> {

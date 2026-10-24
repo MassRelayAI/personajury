@@ -346,14 +346,13 @@ pub fn ingest_with(
         stakes.insert(input.persona.clone(), stake);
     }
     // a person's declared traits: the refusals of `persona add`, the canonical form stored (D36)
+    let mut human_sensitive: Vec<&'static str> = Vec::new();
     let human_traits = match &traits {
         None => None,
         Some(m) => {
-            crate::domain::traits::check_map_shape(m)?;
             let defs = store.trait_map()?;
-            for (id, v) in m {
-                defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?.check_value(v)?;
-            }
+            crate::domain::traits::check_held(m, &defs)?;
+            human_sensitive = crate::domain::traits::held_sensitive(m, &defs);
             let canon: std::collections::BTreeMap<_, _> = m.iter().map(|(k, v)| (k.clone(), v.canonical())).collect();
             Some(crate::domain::hash::canonical_json(&serde_json::to_value(&canon).expect("traits serialise")))
         }
@@ -416,23 +415,29 @@ pub fn ingest_with(
         out["by_human"] = json!(by.trim());
         out["seat"] = json!(seat);
     }
+    if traits.is_some() {
+        out["sensitive"] = json!(human_sensitive);
+    }
     Ok(out)
 }
 
-/// `label_echo` warnings of a valid verdict (D36): for each line, each trait the persona carries (the version the run
-/// briefed) whose title or last id segment its note or a blocker repeats. A person's verdict carries none.
+/// `label_echo` warnings of a valid verdict (D36): for each line, each trait the run's brief rendered for the persona (the
+/// version the run briefed, under the run's trait mode) whose title or last id segment its note or a blocker repeats. A
+/// brief that rendered no trait gives none (a label the juror was never handed is no echo), and a person's verdict none.
 fn label_echoes(store: &Store, run: &RunRow, v: &ValidVerdict) -> Result<Vec<Value>> {
     if is_human(&v.persona) {
         return Ok(vec![]);
     }
     let Some(version) = run.briefs.iter().find(|b| b.persona == v.persona).map(|b| b.persona_version) else { return Ok(vec![]) };
-    let Some(held) = store.persona_at(&v.persona, version)?.and_then(|p| p.traits) else { return Ok(vec![]) };
-    let defs = store.trait_map()?;
+    let Some(ctx) = super::brief::TraitCtx::for_run(store, store.run_traits(run.id)?.0.as_ref())? else { return Ok(vec![]) };
+    let Some(persona) = store.persona_at(&v.persona, version)? else { return Ok(vec![]) };
+    let Some((_, shown)) = ctx.block(&persona) else { return Ok(vec![]) };
+    let defs = &ctx.defs;
     let mut out = Vec::new();
     for (i, l) in v.lines.iter().enumerate() {
         let mut texts: Vec<&str> = l.line.blockers.iter().map(String::as_str).collect();
         texts.extend(l.line.note.as_deref());
-        for id in held.keys() {
+        for id in &shown {
             if defs.get(id).is_some_and(|d| crate::domain::lint::label_echo(d, &texts)) {
                 out.push(json!({"code": "label_echo", "line": i + 1, "trait": id}));
             }

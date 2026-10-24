@@ -155,7 +155,7 @@ fn human_traits_are_validated_like_a_persona_s_and_shown_in_the_matrix() {
     for (traits, want) in [
         (json!({"nope.nothing": 3}), "unknown_trait"),
         (json!({ T: 9 }), "trait_value_off_scale"),
-        (json!({"x.gender": 3}), "refused_trait_id"),
+        (json!({"culture.power_distance": 3}), "refused_trait_id"),
         (json!({"choice.decision_style": "moody"}), "trait_option_unknown"),
     ] {
         assert_eq!(support::code(&human(&ws, hr, "ann", "j1", 3, Some(traits))), want);

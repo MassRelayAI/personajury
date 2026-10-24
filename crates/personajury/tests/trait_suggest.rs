@@ -130,7 +130,8 @@ fn check_refusals_each_have_a_code() {
     assert_eq!(with(&|v| v["traits"]["nope.nothing"] = json!(3)), "unknown_trait");
     assert_eq!(with(&|v| v["traits"]["consumer.price_consciousness"] = json!(9)), "trait_value_off_scale");
     assert_eq!(with(&|v| v["traits"]["choice.decision_style"] = json!("moody")), "trait_option_unknown");
-    assert_eq!(with(&|v| v["traits"]["x.gender"] = json!(3)), "refused_trait_id");
+    assert_eq!(with(&|v| v["traits"]["x.gender"] = json!(3)), "unknown_trait", "labelled, not refused (D39), when held");
+    assert_eq!(with(&|v| v["traits"]["culture.power_distance"] = json!(3)), "refused_trait_id");
     assert_eq!(
         with(&|v| {
             for i in 0..8 {
@@ -142,13 +143,13 @@ fn check_refusals_each_have_a_code() {
     assert_eq!(with(&|v| { v["evidence"].as_object_mut().unwrap().remove("trust.marketing_skepticism"); }), "suggestion_without_quote");
     assert_eq!(with(&|v| v["evidence"]["trust.marketing_skepticism"] = json!("   ")), "suggestion_without_quote");
     let c = with(&|v| v["evidence"]["trust.marketing_skepticism"] = json!("Distrusts every claim by default"));
-    assert_eq!(c, "quote_not_in_prose");
+    assert_eq!(c, "quote_not_found");
     let e = check(ws.path(), &json!({"persona": "builder-ravi", "traits": {"trust.marketing_skepticism": 4},
         "evidence": {"trust.marketing_skepticism": "Distrusts every claim"}}));
     assert_eq!(e["data"]["id"], "trust.marketing_skepticism");
     assert_eq!(e["data"]["quote"], "Distrusts every claim");
     // a quote is case-sensitive: verbatim
-    assert_eq!(with(&|v| v["evidence"]["trust.marketing_skepticism"] = json!("testimonials and logo walls")), "quote_not_in_prose");
+    assert_eq!(with(&|v| v["evidence"]["trust.marketing_skepticism"] = json!("testimonials and logo walls")), "quote_not_found");
 }
 
 #[test]

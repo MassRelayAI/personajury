@@ -91,6 +91,14 @@ pub struct Facts {
     pub panel_lines: Vec<String>,
     /// per run and per seat when they carry a number, then the total `cost:` line last
     pub cost_lines: Vec<String>,
+    /// the sensitive categories the runs' seated personas name (D39), in the order of `traits::SENSITIVE`
+    pub uses_sensitive: Vec<String>,
+}
+/// The one line a summary adds when the runs seat personas that name a sensitive attribute (D39).
+pub fn sensitive_line(f: &Facts) -> Option<String> {
+    (!f.uses_sensitive.is_empty()).then(|| {
+        format!("simulated demographics: {} \u{2014} personas are simulations, not real-world data", f.uses_sensitive.join(", "))
+    })
 }
 pub const TOP_ROWS: usize = 5;
 const SHOWN_BLOCKERS: usize = 3;
@@ -489,6 +497,9 @@ pub fn text(f: &Facts, width: usize) -> String {
     let mut out: Vec<String> = Vec::new();
     let runs: Vec<String> = f.runs.iter().map(|r| r.to_string()).collect();
     out.extend(wrap(&format!("PersonaJury summary: {}, runs {} ({})", f.subject, runs.join(" "), f.lenses.join(", ")), width));
+    if let Some(l) = sensitive_line(f) {
+        out.extend(wrap(&l, width));
+    }
     out.push(String::new());
     for s in sentences(f) {
         out.extend(wrap(&s, width));
@@ -542,6 +553,9 @@ pub fn html(f: &Facts, svg: &str) -> String {
         esc(&f.subject)
     );
     let _ = writeln!(o, "<h1>{}</h1>\n<p class=\"muted\">runs {} · lenses {}</p>", esc(&f.subject), runs.join(", "), esc(&f.lenses.join(", ")));
+    if let Some(l) = sensitive_line(f) {
+        let _ = writeln!(o, "<p class=\"muted\">{}</p>", esc(&l));
+    }
     for s in sentences(f) {
         let _ = writeln!(o, "<p>{}</p>", esc(&s));
     }
@@ -613,6 +627,9 @@ pub fn markdown(f: &Facts) -> String {
     let runs: Vec<String> = f.runs.iter().map(|r| r.to_string()).collect();
     let _ = writeln!(o, "# PersonaJury summary: {}\n", f.subject);
     let _ = writeln!(o, "Date: {}\nRuns: {} ({})\n", f.date, runs.join(", "), f.lenses.join(", "));
+    if let Some(l) = sensitive_line(f) {
+        let _ = writeln!(o, "{l}\n");
+    }
     for s in sentences(f) {
         let _ = writeln!(o, "{s}\n");
     }

@@ -20,10 +20,11 @@ pub const MAX_SET_TRAITS: usize = 8;
 pub const MAX_COVER: usize = 4;
 
 const TYPOLOGY: &str = "typology without predictive validity";
-const PROTECTED: &str = "protected attribute, not a mechanism";
+const COUNTRY: &str = "a country dimension, not a mechanism";
 const ATTRIBUTE: &str = "an attribute of the persona, not a sensitivity of the juror";
-/// Ids (or last segments of ids) no trait may carry, and why (D29).
-pub const REFUSED: [(&str, &str); 27] = [
+/// Ids (or last segments of ids) no trait may carry, and why (D29): typologies and attributes of the persona. A protected
+/// attribute is no longer refused: it is labelled (D39).
+pub const REFUSED: [(&str, &str); 16] = [
     ("mbti", TYPOLOGY),
     ("myers_briggs", TYPOLOGY),
     ("enneagram", TYPOLOGY),
@@ -33,17 +34,6 @@ pub const REFUSED: [(&str, &str); 27] = [
     ("astrology", TYPOLOGY),
     ("zodiac", TYPOLOGY),
     ("blood_type", TYPOLOGY),
-    ("age", PROTECTED),
-    ("gender", PROTECTED),
-    ("sex", PROTECTED),
-    ("ethnicity", PROTECTED),
-    ("race", PROTECTED),
-    ("religion", PROTECTED),
-    ("disability", PROTECTED),
-    ("political_affiliation", PROTECTED),
-    ("political_lean", PROTECTED),
-    ("minority", PROTECTED),
-    ("nationality", PROTECTED),
     ("appearance", ATTRIBUTE),
     ("attractiveness", ATTRIBUTE),
     ("beauty", ATTRIBUTE),
@@ -53,93 +43,354 @@ pub const REFUSED: [(&str, &str); 27] = [
     ("outsider", ATTRIBUTE),
 ];
 
-/// The protected-attribute screen (D29, as ruled after the v0.6-A review): every trait a user adds (`trait add`, generated
-/// or not) and every free-text value passes it. A word of the id (split on `.` and `_`) or of the title (split on anything
-/// not a letter) that starts with one of these stems refuses the trait as `refused_trait_id`, with the attribute it names.
-/// It errs safe: `colorful` and `unions` are refused too; `access.*`, the assistive needs, keep `disab`.
-pub const PROTECTED_STEMS: [(&str, &str); 28] = [
-    ("age", "age"),
-    ("gender", "gender"),
-    ("sex", "sex"),
-    ("sexual", "sexual orientation"),
-    ("orientation", "sexual orientation"),
-    ("race", "race"),
-    ("racial", "race"),
-    ("ethnic", "ethnicity"),
-    ("religion", "religion"),
-    ("religio", "religion"),
-    ("faith", "religion"),
-    ("caste", "caste"),
-    ("nationality", "nationality"),
-    ("national", "national origin"),
-    ("citizenship", "citizenship"),
-    ("country", "country as an identity"),
-    ("pregnan", "pregnancy"),
-    ("marital", "marital status"),
-    ("disab", "disability"),
-    ("politic", "political opinion"),
-    ("union", "union membership"),
-    ("health", "health"),
-    ("genetic", "genetic data"),
-    ("skin", "skin colour"),
-    ("color", "skin colour"),
-    ("colour", "skin colour"),
-    ("tribe", "tribe"),
-    ("tribal", "tribe"),
+/// How a stem of the label table meets a word (D39).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Fit {
+    /// anywhere inside a word: `bisexual`, `unhealthy`, `nondisabled`
+    Within,
+    /// at the start of a word: `colorful`, not `international`
+    Start,
+    /// the whole word only, for a short or ambiguous stem: `trans`, not `transform`; `alter`, not `alternative`
+    Word,
+}
+use Fit::{Start, Within, Word};
+/// The categories a label names, in the order an answer lists them (D39).
+pub const SENSITIVE: [&str; 12] = [
+    "age", "gender", "ethnicity", "religion", "nationality", "health", "disability", "sexuality", "politics", "marital",
+    "pregnancy", "genetics",
+];
+/// The sensitive-attribute label (D39, the detection of D29 as ruled after the v0.6-B review), the one table: every text of
+/// every trait (id, family, title, caveats, source, each anchor, each option's id, title and sentence), every free-text
+/// value and a persona's prose are read against it, and each hit names one of `SENSITIVE`. Nothing is refused: personas
+/// are simulations, and a trait or persona that names a sensitive attribute is accepted and labelled `sensitive: [...]`,
+/// and a run that seats it records `uses_sensitive`. Texts and stems are normalised first (`normalise`), and each text is
+/// read twice: word by word, and with the separators `_ - .` and space removed between words, so `gen_der` is `gender`. It
+/// errs wide: `colorful` and `unions` are labelled too.
+pub const SENSITIVE_STEMS: [(&str, &str, Fit); 64] = [
+    ("age", "age", Start),
+    ("gender", "gender", Within),
+    ("sex", "gender", Start),
+    ("sexual", "sexuality", Within),
+    ("orientation", "sexuality", Start),
+    ("race", "ethnicity", Start),
+    ("racial", "ethnicity", Within),
+    ("ethnic", "ethnicity", Within),
+    ("religion", "religion", Within),
+    ("religio", "religion", Within),
+    ("faith", "religion", Within),
+    ("caste", "ethnicity", Start),
+    ("nationality", "nationality", Start),
+    ("national", "nationality", Start),
+    ("citizenship", "nationality", Within),
+    ("country", "nationality", Start),
+    ("pregnan", "pregnancy", Within),
+    ("marital", "marital", Within),
+    ("disab", "disability", Within),
+    ("politic", "politics", Within),
+    ("union", "politics", Start),
+    ("health", "health", Within),
+    ("genetic", "genetics", Within),
+    ("skin", "ethnicity", Start),
+    ("color", "ethnicity", Start),
+    ("colour", "ethnicity", Start),
+    ("tribe", "ethnicity", Start),
+    ("tribal", "ethnicity", Within),
+    // added after the v0.6-B review: gender identity, age, religion and their words in other languages
+    ("trans", "gender", Word),
+    ("transgender", "gender", Within),
+    ("nonbinary", "gender", Within),
+    ("elderly", "age", Within),
+    ("senior citizen", "age", Within),
+    ("pensioner", "age", Within),
+    ("muslim", "religion", Within),
+    ("christian", "religion", Within),
+    ("jewish", "religion", Within),
+    ("hindu", "religion", Within),
+    ("buddhist", "religion", Within),
+    ("sikh", "religion", Word),
+    ("islam", "religion", Within),
+    ("catholic", "religion", Within),
+    ("atheis", "religion", Within),
+    ("etni", "ethnicity", Within),
+    ("\u{e9}tni", "ethnicity", Within),
+    ("ethnie", "ethnicity", Within),
+    ("raza", "ethnicity", Word),
+    ("rasse", "ethnicity", Word),
+    ("religi", "religion", Within),
+    ("nacional", "nationality", Start),
+    ("nationalit", "nationality", Within),
+    ("g\u{e9}nero", "gender", Word),
+    ("genero", "gender", Word),
+    ("geschlecht", "gender", Within),
+    ("edad", "age", Word),
+    ("alter", "age", Word),
+    ("schwanger", "pregnancy", Within),
+    ("behinder", "disability", Within),
+    ("handicap", "disability", Within),
+    // the review's synonyms
+    ("female", "gender", Within),
+    ("male", "gender", Word),
+    ("woman", "gender", Word),
+    ("women", "gender", Word),
+    ("immigra", "nationality", Within),
 ];
 /// Words that start with a stem and name no protected attribute: `agent` and `agency` are not `age`.
-const STEM_EXCEPTIONS: [&str; 3] = ["agent", "agenc", "agend"];
-/// Families no trait may belong to (`project.<f>` included): a demographic, a culture or a protected attribute.
-pub const REFUSED_FAMILIES: [&str; 3] = ["demo", "culture", "protected"];
+const STEM_EXCEPTIONS: [(&str, [&str; 3]); 1] = [("age", ["agent", "agenc", "agend"])];
+/// Short words of ordinary prose that never begin a joined split (the second check): "a general" is not "age...", "be
+/// hindered" is not "behinder".
+const JOIN_STOPS: [&str; 24] = [
+    "a", "an", "the", "of", "to", "in", "is", "be", "by", "as", "at", "on", "or", "it", "we", "us", "no", "so", "do", "my",
+    "if", "up", "and", "for",
+];
+/// Families no trait may belong to (`project.<f>` included): a culture, the country dimension (D29). A demographic family
+/// is a simulation's own and is labelled, not refused (D39).
+pub const REFUSED_FAMILIES: [&str; 1] = ["culture"];
 
-/// The stem a word starts with, if it is on the screen (`skip_disab` for the assistive needs of `access.*`).
-fn stem_of(word: &str, skip_disab: bool) -> Option<&'static str> {
-    if STEM_EXCEPTIONS.iter().any(|e| word.starts_with(e)) {
-        return None;
+/// Latin look-alikes of Cyrillic and Greek capitals, before lower-casing (a Greek capital eta is an H, its small letter is not).
+const CAPITAL_LOOKALIKES: [(char, &str); 30] = [
+    ('\u{0391}', "a"), ('\u{0392}', "b"), ('\u{0395}', "e"), ('\u{0396}', "z"), ('\u{0397}', "h"), ('\u{0399}', "i"),
+    ('\u{039A}', "k"), ('\u{039C}', "m"), ('\u{039D}', "n"), ('\u{039F}', "o"), ('\u{03A1}', "p"), ('\u{03A4}', "t"),
+    ('\u{03A5}', "y"), ('\u{03A7}', "x"), ('\u{0410}', "a"), ('\u{0412}', "b"), ('\u{0415}', "e"), ('\u{041A}', "k"),
+    ('\u{041C}', "m"), ('\u{041D}', "h"), ('\u{041E}', "o"), ('\u{0420}', "p"), ('\u{0421}', "c"), ('\u{0422}', "t"),
+    ('\u{0425}', "x"), ('\u{0405}', "s"), ('\u{0406}', "i"), ('\u{0408}', "j"), ('\u{04C0}', "l"), ('\u{0423}', "y"),
+];
+/// Latin look-alikes of Cyrillic and Greek small letters, and the Latin letters with a mark or a ligature folded to plain
+/// letters (the part of NFKC and of the confusables list the screen needs; no crate).
+const SMALL_FOLDS: [(char, &str); 118] = [
+    // Cyrillic
+    ('\u{0430}', "a"), ('\u{0432}', "b"), ('\u{0435}', "e"), ('\u{0451}', "e"), ('\u{043A}', "k"), ('\u{043C}', "m"),
+    ('\u{043D}', "h"), ('\u{043E}', "o"), ('\u{0440}', "p"), ('\u{0441}', "c"), ('\u{0442}', "t"), ('\u{0443}', "y"),
+    ('\u{0445}', "x"), ('\u{0455}', "s"), ('\u{0456}', "i"), ('\u{0457}', "i"), ('\u{0458}', "j"), ('\u{0501}', "d"),
+    ('\u{04CF}', "l"), ('\u{04BB}', "h"), ('\u{051B}', "q"), ('\u{051D}', "w"),
+    // Greek
+    ('\u{03B1}', "a"), ('\u{03B5}', "e"), ('\u{03B9}', "i"), ('\u{03BA}', "k"), ('\u{03BD}', "v"), ('\u{03BF}', "o"),
+    ('\u{03C1}', "p"), ('\u{03C4}', "t"), ('\u{03C5}', "u"), ('\u{03C7}', "x"), ('\u{03F2}', "c"), ('\u{03AF}', "i"),
+    ('\u{03CC}', "o"), ('\u{03AD}', "e"), ('\u{03AC}', "a"),
+    // Latin with marks
+    ('\u{e0}', "a"), ('\u{e1}', "a"), ('\u{e2}', "a"), ('\u{e3}', "a"), ('\u{e4}', "a"), ('\u{e5}', "a"), ('\u{101}', "a"),
+    ('\u{103}', "a"), ('\u{105}', "a"), ('\u{e7}', "c"), ('\u{107}', "c"), ('\u{109}', "c"), ('\u{10b}', "c"), ('\u{10d}', "c"),
+    ('\u{10f}', "d"), ('\u{111}', "d"), ('\u{e8}', "e"), ('\u{e9}', "e"), ('\u{ea}', "e"), ('\u{eb}', "e"), ('\u{113}', "e"),
+    ('\u{115}', "e"), ('\u{117}', "e"), ('\u{119}', "e"), ('\u{11b}', "e"), ('\u{ec}', "i"), ('\u{ed}', "i"), ('\u{ee}', "i"),
+    ('\u{ef}', "i"), ('\u{129}', "i"), ('\u{12b}', "i"), ('\u{12d}', "i"), ('\u{12f}', "i"), ('\u{131}', "i"), ('\u{f1}', "n"),
+    ('\u{144}', "n"), ('\u{146}', "n"), ('\u{148}', "n"), ('\u{f2}', "o"), ('\u{f3}', "o"), ('\u{f4}', "o"), ('\u{f5}', "o"),
+    ('\u{f6}', "o"), ('\u{f8}', "o"), ('\u{14d}', "o"), ('\u{151}', "o"), ('\u{f9}', "u"), ('\u{fa}', "u"), ('\u{fb}', "u"),
+    ('\u{fc}', "u"), ('\u{169}', "u"), ('\u{16b}', "u"), ('\u{16f}', "u"), ('\u{171}', "u"), ('\u{173}', "u"), ('\u{fd}', "y"),
+    ('\u{ff}', "y"), ('\u{15b}', "s"), ('\u{15f}', "s"), ('\u{161}', "s"), ('\u{219}', "s"), ('\u{163}', "t"), ('\u{165}', "t"),
+    ('\u{21b}', "t"), ('\u{17a}', "z"), ('\u{17c}', "z"), ('\u{17e}', "z"), ('\u{11f}', "g"), ('\u{123}', "g"), ('\u{261}', "g"),
+    ('\u{142}', "l"), ('\u{13e}', "l"), ('\u{159}', "r"), ('\u{df}', "ss"), ('\u{e6}', "ae"), ('\u{153}', "oe"),
+    // ligatures (NFKC)
+    ('\u{fb00}', "ff"), ('\u{fb01}', "fi"), ('\u{fb02}', "fl"), ('\u{fb03}', "ffi"), ('\u{fb04}', "ffl"),
+];
+/// Characters that print nothing: zero-width spaces and joiners, the soft hyphen, the word joiner, the byte-order mark and
+/// the direction marks.
+fn is_invisible(c: char) -> bool {
+    matches!(c, '\u{00AD}' | '\u{180E}' | '\u{200B}'..='\u{200F}' | '\u{202A}'..='\u{202E}' | '\u{2060}'..='\u{2064}' | '\u{2066}'..='\u{2069}' | '\u{FEFF}')
+}
+/// Combining marks (a `g` followed by an accent is a `g`).
+fn is_combining(c: char) -> bool {
+    matches!(c, '\u{0300}'..='\u{036F}' | '\u{1AB0}'..='\u{1AFF}' | '\u{1DC0}'..='\u{1DFF}' | '\u{20D0}'..='\u{20FF}' | '\u{FE20}'..='\u{FE2F}')
+}
+/// The NFKC compatibility forms the screen folds: fullwidth ASCII and the mathematical alphanumeric letters.
+fn compat(c: char) -> char {
+    let n = c as u32;
+    match n {
+        0xFF01..=0xFF5E => char::from_u32(n - 0xFF01 + 0x21).unwrap_or(c),
+        0x1D400..=0x1D6A3 => {
+            let k = (n - 0x1D400) % 52;
+            char::from_u32(if k < 26 { 0x41 + k } else { 0x61 + k - 26 }).unwrap_or(c)
+        }
+        _ => c,
     }
-    PROTECTED_STEMS
+}
+/// The text the screen reads: the NFKC compatibility forms folded, the look-alikes of Cyrillic and Greek mapped to Latin,
+/// lower case, invisible characters and combining marks removed, marked Latin letters folded to plain ones. A small,
+/// documented subset of Unicode NFKC and of the confusables list, without a crate (D29 as ruled).
+pub fn normalise(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    for c in text.chars().map(compat) {
+        if is_invisible(c) || is_combining(c) {
+            continue;
+        }
+        if let Some((_, s)) = CAPITAL_LOOKALIKES.iter().find(|(k, _)| *k == c) {
+            out.push_str(s);
+            continue;
+        }
+        for l in c.to_lowercase() {
+            if is_combining(l) {
+                continue;
+            }
+            match SMALL_FOLDS.iter().find(|(k, _)| *k == l) {
+                Some((_, s)) => out.push_str(s),
+                None => out.push(l),
+            }
+        }
+    }
+    out
+}
+fn is_sep(c: char) -> bool {
+    matches!(c, '_' | '-' | '.') || c.is_whitespace()
+}
+/// A stem as the screen matches it: normalised, its separators removed (`senior citizen` is `seniorcitizen`).
+fn stem_key(stem: &str) -> String {
+    normalise(stem).chars().filter(|c| !is_sep(*c)).collect()
+}
+fn excepted(stem: &str, tail: &str) -> bool {
+    STEM_EXCEPTIONS.iter().any(|(s, words)| *s == stem && words.iter().any(|w| tail.starts_with(w)))
+}
+/// Whether a stem meets a word read whole (the first check).
+fn in_word(word: &str, stem: &str, fit: Fit) -> bool {
+    let k = stem_key(stem);
+    match fit {
+        Within => word.contains(&k),
+        Start => word.starts_with(&k) && !excepted(stem, word),
+        Word => word == k,
+    }
+}
+/// Whether a stem is made by two or more words once the separators between them are removed (the second check): it starts
+/// where a word starts and runs into the next word; a whole-word stem ends where a word ends. A short prose word
+/// (`JOIN_STOPS`) never starts one.
+fn in_join(words: &[&str], stem: &str, fit: Fit) -> bool {
+    let k = stem_key(stem);
+    (0..words.len().saturating_sub(1)).any(|i| {
+        if JOIN_STOPS.contains(&words[i]) || k.len() <= words[i].len() {
+            return false;
+        }
+        let tail: String = words[i..].concat();
+        if !tail.starts_with(&k) {
+            return false;
+        }
+        match fit {
+            Word => {
+                let mut at = 0;
+                words[i..].iter().any(|w| {
+                    at += w.len();
+                    at == k.len()
+                })
+            }
+            Start => !excepted(stem, &tail),
+            Within => true,
+        }
+    })
+}
+/// The categories of `SENSITIVE` that one text names, in that order: normalised, then read word by word and with the
+/// separators removed.
+pub fn sensitive_in(text: &str) -> Vec<&'static str> {
+    let n = normalise(text);
+    let words: Vec<&str> = n.split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).collect();
+    let segments: Vec<Vec<&str>> = n
+        .split(|c: char| !(c.is_alphabetic() || is_sep(c)))
+        .map(|seg| seg.split(is_sep).filter(|w| !w.is_empty()).collect())
+        .collect();
+    let mut hit: Vec<&'static str> = SENSITIVE_STEMS
         .iter()
-        .find(|(stem, _)| word.starts_with(stem) && !(skip_disab && *stem == "disab"))
-        .map(|(_, what)| *what)
+        .filter(|(stem, _, fit)| {
+            words.iter().any(|w| in_word(w, stem, *fit)) || segments.iter().any(|ws| in_join(ws, stem, *fit))
+        })
+        .map(|(_, what, _)| *what)
+        .collect();
+    order(&mut hit);
+    hit
 }
-/// The protected attribute a free text names, if any (words split on anything not a letter, lower-cased).
-pub fn text_names_protected(text: &str, skip_disab: bool) -> Option<&'static str> {
-    text.to_lowercase().split(|c: char| !c.is_alphabetic()).filter(|w| !w.is_empty()).find_map(|w| stem_of(w, skip_disab))
+/// Categories in the order of `SENSITIVE`, once each.
+pub fn order(cats: &mut Vec<&'static str>) {
+    cats.sort_by_key(|c| SENSITIVE.iter().position(|s| s == c).unwrap_or(usize::MAX));
+    cats.dedup();
 }
-/// The screen of a trait id: a refused family (its first segment), or a stem in a word of the id.
+/// The categories several texts name, in order.
+pub fn sensitive_of<'a>(texts: impl IntoIterator<Item = &'a str>) -> Vec<&'static str> {
+    let mut out: Vec<&'static str> = texts.into_iter().flat_map(sensitive_in).collect();
+    order(&mut out);
+    out
+}
+/// The screen of a trait id: a refused family (its first segment, D29). A sensitive word in the id is labelled, not refused.
 pub fn screen_id(id: &str) -> Result<(), Refusal> {
     let first = id.split('.').next().unwrap_or(id);
-    let refuse = || Refusal::RefusedTraitId { id: id.to_string(), why: PROTECTED.to_string() };
     if REFUSED_FAMILIES.contains(&first) {
-        return Err(refuse());
-    }
-    let skip_disab = first == "access";
-    if id.split(['.', '_']).any(|w| stem_of(w, skip_disab).is_some()) {
-        return Err(refuse());
+        return Err(Refusal::RefusedTraitId { id: id.to_string(), why: COUNTRY.to_string() });
     }
     Ok(())
 }
-/// The whole screen of a trait a user adds: family, id and title. `shipped` is the catalog's own trait of the same id,
-/// when there is one: its reviewed id and title are not screened again (`risk.health_safety`, "in good faith"); an
-/// edited title is.
-pub fn screen_trait(t: &TraitDef, shipped: Option<&TraitDef>) -> Result<(), Refusal> {
-    let refuse = || Refusal::RefusedTraitId { id: t.id.clone(), why: PROTECTED.to_string() };
+/// Every text of a trait, each with where it stands: id, family, title, caveats, source, each anchor, each option's id,
+/// title and sentence.
+pub fn trait_texts(t: &TraitDef) -> Vec<(String, String)> {
+    let mut out = vec![
+        ("the id".to_string(), t.id.clone()),
+        ("the family".to_string(), t.family.clone()),
+        ("the title".to_string(), t.title.clone()),
+        ("the caveats".to_string(), t.caveats.clone()),
+        ("the source".to_string(), t.source.clone()),
+    ];
+    for (k, s) in &t.anchors {
+        out.push((format!("anchor {k}"), s.clone()));
+    }
+    for o in &t.options {
+        out.push((format!("option {}", o.id), o.id.clone()));
+        out.push((format!("option {} title", o.id), o.title.clone()));
+        out.push((format!("option {} sentence", o.id), o.sentence.clone()));
+    }
+    out
+}
+/// The refusal a trait still meets (D29): a refused family (`culture`, as `project.culture` too). Nothing else of a trait's
+/// words is refused; `trait_sensitive` labels them (D39).
+pub fn screen_trait(t: &TraitDef) -> Result<(), Refusal> {
     let family = t.family.strip_prefix("project.").unwrap_or(&t.family);
-    if REFUSED_FAMILIES.contains(&family) {
-        return Err(refuse());
-    }
-    if shipped.is_none() {
-        screen_id(&t.id)?;
-    }
-    if shipped.is_none_or(|s| s.title != t.title) && text_names_protected(&t.title, t.family == "access").is_some() {
-        return Err(refuse());
+    if REFUSED_FAMILIES.contains(&family) || REFUSED_FAMILIES.contains(&t.id.split('.').next().unwrap_or("")) {
+        return Err(Refusal::RefusedTraitId { id: t.id.clone(), why: COUNTRY.to_string() });
     }
     Ok(())
+}
+/// The sensitive categories a trait names (D39), over every text. `shipped` is the catalog's own trait of the same id, when
+/// there is one: a text the catalog ships unchanged carries the catalog's reviewed label (`shipped_label`), an edited one is
+/// read again.
+pub fn trait_sensitive(t: &TraitDef, shipped: Option<&TraitDef>) -> Vec<&'static str> {
+    let reviewed = shipped.map(trait_texts).unwrap_or_default();
+    let mut out: Vec<&'static str> = shipped.map(|s| shipped_label(&s.id).to_vec()).unwrap_or_default();
+    for (place, text) in trait_texts(t) {
+        if !reviewed.iter().any(|(p, x)| *p == place && *x == text) {
+            out.extend(sensitive_in(&text));
+        }
+    }
+    order(&mut out);
+    out
+}
+/// The labels of the shipped traits, reviewed by hand (D39): a shipped trait is labelled only where it truly names a
+/// sensitive attribute, not where a stem falls on a word by chance ("in good faith", "colour vision").
+pub const SHIPPED_LABELS: [(&str, &[&str]); 1] = [("risk.health_safety", &["health"])];
+pub fn shipped_label(id: &str) -> &'static [&'static str] {
+    SHIPPED_LABELS.iter().find(|(i, _)| *i == id).map(|(_, l)| *l).unwrap_or(&[])
+}
+/// The whole check of a traits map a persona or a person holds (`persona add`, `trait suggest --check`, `verdict --by-human
+/// --traits`): the refused list and the ceiling, then each trait the store holds, then the value.
+pub fn check_held(map: &BTreeMap<String, TraitValue>, defs: &BTreeMap<String, TraitDef>) -> Result<(), Refusal> {
+    check_map_shape(map)?;
+    for (id, v) in map {
+        let def = defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?;
+        screen_trait(def)?;
+        def.check_value(v)?;
+    }
+    Ok(())
+}
+/// The sensitive categories a held map names (D39): each trait's own label (`trait_sensitive`), and each free-text value.
+pub fn held_sensitive(map: &BTreeMap<String, TraitValue>, defs: &BTreeMap<String, TraitDef>) -> Vec<&'static str> {
+    let mut out = Vec::new();
+    for (id, v) in map {
+        if let Some(def) = defs.get(id) {
+            let shipped = super::catalog::shipped_text(id).and_then(|t| TraitDef::from_toml(t).ok());
+            out.extend(trait_sensitive(def, shipped.as_ref()));
+        }
+        if let TraitValue::Str(s) = v {
+            if defs.get(id).is_some_and(|d| d.shape == "words") {
+                out.extend(sensitive_in(s));
+            }
+        }
+    }
+    order(&mut out);
+    out
 }
 /// The most characters a free-text trait value holds, whatever the trait's `max_chars` says (D31 as ruled).
 pub const MAX_TRAIT_TEXT: usize = 80;
 /// A free-text value (`situation.job`): one line of at most 80 characters, no digit, not a self-description ("You are",
-/// "I am"), and no protected attribute (`trait_text_refused`).
+/// "I am") (`trait_text_refused`). A sensitive word in it is labelled, not refused (D39).
 pub fn check_text(id: &str, s: &str, max: usize) -> Result<(), Refusal> {
     let one_line = s.split_whitespace().collect::<Vec<_>>().join(" ");
     let lower = one_line.to_lowercase();
@@ -153,7 +404,7 @@ pub fn check_text(id: &str, s: &str, max: usize) -> Result<(), Refusal> {
     } else if lower.starts_with("you are") || lower.starts_with("i am") || lower.starts_with("i'm") {
         Some("starts as a self-description (\"You are\", \"I am\"); describe the work".to_string())
     } else {
-        text_names_protected(&one_line, false).map(|what| format!("names a protected attribute ({what})"))
+        None
     };
     match why {
         Some(why) => Err(Refusal::TraitTextRefused { id: id.to_string(), why }),
@@ -575,9 +826,7 @@ pub fn are_correlated(defs: &BTreeMap<String, TraitDef>, a: &str, b: &str) -> bo
 pub fn check_map_shape(map: &BTreeMap<String, TraitValue>) -> Result<(), Refusal> {
     for id in map.keys() {
         check_not_refused(id)?;
-        if !super::catalog::is_shipped(id) {
-            screen_id(id)?;
-        }
+        screen_id(id)?;
     }
     if map.len() > MAX_PERSONA_TRAITS {
         return Err(Refusal::TraitsTooMany { count: map.len() });
@@ -694,7 +943,7 @@ mod tests {
 
     #[test]
     fn refused_ids_match_the_last_segment_or_the_whole() {
-        assert_eq!(refused_why("gender"), Some(PROTECTED));
+        assert_eq!(refused_why("gender"), None, "a sensitive id is labelled, not refused (D39)");
         assert_eq!(refused_why("culture.beauty"), Some(ATTRIBUTE));
         assert_eq!(refused_why("x.mbti"), Some(TYPOLOGY));
         assert_eq!(refused_why("trust.propensity"), None);

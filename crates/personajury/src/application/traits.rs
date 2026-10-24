@@ -1,7 +1,7 @@
 //! trait install | add | list | show and trait set add | list (D29). The catalog is embedded and installed, never seeded.
 use super::{AppError, Result};
 use crate::domain::catalog::CATALOG;
-use crate::domain::traits::{correlated_pairs, TraitDef, TraitSetDef, FAMILIES, PROTECTED_STEMS, REFUSED, REFUSED_FAMILIES};
+use crate::domain::traits::{correlated_pairs, TraitDef, TraitSetDef, FAMILIES, REFUSED, REFUSED_FAMILIES};
 use crate::domain::*;
 use crate::store::Store;
 use serde_json::{json, Value};
@@ -91,8 +91,9 @@ pub fn install(root: &Path, force: bool, reason: Option<&str>) -> Result<Value> 
 pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Value> {
     let text = super::read_text(file)?;
     let t = TraitDef::from_toml(&text)?;
-    // the protected-attribute screen (D29): family, id and title; a shipped id and title are the catalog's reviewed words
-    crate::domain::traits::screen_trait(&t, shipped_def(&t.id).as_ref())?;
+    // the refused family (D29); every text of the trait is read for a sensitive word and labelled, never refused (D39)
+    crate::domain::traits::screen_trait(&t)?;
+    let sensitive = crate::domain::traits::trait_sensitive(&t, shipped_def(&t.id).as_ref());
     let store = Store::open(root)?;
     if let Some(h) = generated_from {
         if !store.material_exists(h)? {
@@ -105,7 +106,7 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
         Err(v) => (v, false),
     };
     let (_, hash) = t.body_and_hash();
-    Ok(json!({"id": t.id, "version": version, "hash": hash, "origin": origin, "added": added}))
+    Ok(json!({"id": t.id, "version": version, "hash": hash, "origin": origin, "added": added, "sensitive": sensitive}))
 }
 
 pub fn set_add(root: &Path, file: &Path) -> Result<Value> {
@@ -195,13 +196,16 @@ fn material_slug(from: &Path) -> String {
 /// `trait generate --from PATH [--count N]` (D35): hash the material and write `.personajury/generate/trait-<hash>.md`,
 /// the brief that asks the agent to list the ways the material's readers differ, then to draft `count` trait files in the
 /// exact TOML shape. The engine calls no model. What the agent writes enters through `trait add --generated-from <hash>`,
-/// which runs the same protected-attribute screen as any trait: this verb screens the family slug with that same
-/// function and refuses a material whose name would put a protected word into every id.
+/// which reads every text of the trait for a sensitive attribute and labels it (D39); this verb labels the material's name
+/// and slug the same way, and refuses only a refused family (`culture`).
 pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
     if count == 0 || count > MAX_GENERATED_TRAITS {
         return Err(AppError::InvalidArguments(format!("--count is from 1 to {MAX_GENERATED_TRAITS}")));
     }
     let slug = material_slug(from);
+    // the material's own name and its slug are read for a sensitive word (`género.md` is `g_nero`): labelled, not refused
+    let raw = from.file_name().map(|n| n.to_string_lossy().into_owned()).unwrap_or_default();
+    let sensitive = crate::domain::traits::sensitive_of([raw.as_str(), slug.as_str()]);
     crate::domain::traits::screen_id(&format!("{slug}.example")).map_err(|e| match e {
         Refusal::RefusedTraitId { why, .. } => AppError::from(Refusal::RefusedTraitId {
             id: format!("{slug}.*"),
@@ -246,9 +250,10 @@ id = \"fit\"\ntitle = \"Whether it fits\"\nsentence = \"ask first whether it fit
 - Write each anchor (1, 3 and 5) or option `sentence` as the predicate that follows \"You tend to\": second person, lower case at the start, \
 40 to 400 characters, what the reader does or looks at, never a score, a label or \"I agree\".\n\
 - A band trait has exactly the anchors 1, 3 and 5; a category trait has at least two options.\n\
-- Draw each trait from the material. No protected attribute, no typology, no country dimension, no trait that reads a person as a type. {}.\n\
-\nThen add each file with:\n\n`personajury trait add --file <file> --generated-from {hash}`\n\nThe engine screens every trait it is given \
-and refuses one that does not fit the shape or that names a protected attribute.\n",
+- Draw each trait from the material. No typology, no country dimension, no trait that reads a person as a type. {}.\n\
+\nThen add each file with:\n\n`personajury trait add --file <file> --generated-from {hash}`\n\nThe engine checks every trait it is given \
+and refuses one that does not fit the shape or is on the refused list; every text of it is read for a sensitive attribute, and a hit \
+is labelled in the answer (`sensitive`), not refused.\n",
         refused_line()
     ));
     let dir = root.join(".personajury").join("generate");
@@ -260,16 +265,17 @@ and refuses one that does not fit the shape or that names a protected attribute.
     store.insert_material(&hash, &sources, &rel)?;
     Ok(json!({
         "material_hash": hash, "brief": rel, "brief_hash": crate::domain::hash::sha256_hex(t.as_bytes()),
-        "count": count, "family": format!("project.{slug}"), "sources": sources,
+        "count": count, "family": format!("project.{slug}"), "sources": sources, "sensitive": sensitive,
     }))
 }
 
-/// The refused list in one line: families, typologies and protected attributes, as the screen holds them.
+/// The refused list in one line (families and typologies), and the label rule of D39.
 fn refused_line() -> String {
     let mut words: Vec<&str> = REFUSED.iter().map(|(w, _)| *w).collect();
     words.extend(REFUSED_FAMILIES);
-    let mut stems: Vec<&str> = PROTECTED_STEMS.iter().map(|(s, _)| *s).collect();
-    stems.sort();
-    stems.dedup();
-    format!("Refused ids and families: {}. Refused word stems in an id or a title: {}", words.join(", "), stems.join(", "))
+    format!(
+        "Refused ids and families: {}. A trait that names a sensitive attribute (age, gender, ethnicity, religion and the rest) \
+is accepted and labelled `sensitive`: personas are simulations, composites, never a real or named person",
+        words.join(", ")
+    )
 }

@@ -3,6 +3,8 @@
 Date: <run date>
 Runs: 1, 2 (critical, compare)
 
+simulated demographics: health — personas are simulations, not real-world data
+
 The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree on 2 scores, and 26 findings have no decision yet.
 
 Even without that, the jury could only advise: no rule was given.

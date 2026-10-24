@@ -34,13 +34,15 @@ const V5_COLUMNS: [(&str, &str, &str); 7] = [
 ];
 /// The columns schema v6 added (v0.6-C: D32, D33, D34, D37). They change what a batch means (`verdict.phase`), so the
 /// version moved: a v0.5 binary refuses a v6 store by its version instead of reading a deliberated batch as the latest.
-const V6_COLUMNS: [(&str, &str, &str); 5] = [
+const V6_COLUMNS: [(&str, &str, &str); 6] = [
     // D36: a person's own declared traits, beside the batch they entered (append-only like the table)
     ("human_batch", "traits_json", "TEXT"),
     ("run", "options_mode", "TEXT"),
     ("verdict", "phase", "TEXT"),
     ("pick", "about", "TEXT"),
     ("run", "panel_terms_json", "TEXT"),
+    // D39: the sensitive categories the run's seated personas name (simulated demographics, labelled and recorded)
+    ("run", "uses_sensitive_json", "TEXT"),
 ];
 /// A reported usage: `(run, persona, batch, input tokens, output tokens)`.
 pub type UsageRow = (i64, String, i64, u64, u64);
@@ -689,6 +691,18 @@ impl Store {
             params![id, traits.map(to_json), seats.map(to_json)],
         )?;
         Ok(())
+    }
+    /// Record the sensitive categories a run's seated personas name (D39); none when they name none.
+    pub fn set_run_sensitive(&self, id: i64, cats: &[&str]) -> Result<()> {
+        let v = (!cats.is_empty()).then(|| to_json(&serde_json::json!(cats)));
+        self.conn.execute("UPDATE run SET uses_sensitive_json = ?2 WHERE id = ?1", params![id, v])?;
+        Ok(())
+    }
+    /// The sensitive categories a run recorded (D39); empty for a run that recorded none or was made before.
+    pub fn run_sensitive(&self, id: i64) -> Result<Vec<String>> {
+        let s: Option<String> =
+            self.conn.query_row("SELECT uses_sensitive_json FROM run WHERE id = ?1", params![id], |r| r.get(0))?;
+        Ok(s.and_then(|t| serde_json::from_str(&t).ok()).unwrap_or_default())
     }
     pub fn run_traits(&self, id: i64) -> Result<(Option<serde_json::Value>, Option<serde_json::Value>)> {
         let (t, s): (Option<String>, Option<String>) = self.conn.query_row(

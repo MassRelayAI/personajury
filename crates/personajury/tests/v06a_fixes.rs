@@ -157,32 +157,32 @@ const STEMS: [&str; 30] = [
 ];
 
 #[test]
-fn i2_the_review_reproductions_are_refused() {
+fn i2_the_review_reproductions_are_accepted_and_labelled_and_culture_is_refused() {
+    // D39 (the maintainer, after the v0.6-B review): simulated demographics are allowed, labelled and recorded
     let ws = tempfile::tempdir().unwrap();
     let w = ws.path();
-    for (id, family) in [
-        ("demo.age_band", "project.demo"),
-        ("demo.gender_identity", "project.demo"),
-        ("demo.religious_practice", "project.demo"),
-        ("demo.ethnic_background", "project.demo"),
-        ("culture.power_distance", "project.culture"),
-        ("x.gender_identity", "project.x"),
-        ("protected.anything", "project.protected"),
+    for (id, family, want) in [
+        ("demo.age_band", "project.demo", json!(["age"])),
+        ("demo.gender_identity", "project.demo", json!(["gender"])),
+        ("demo.religious_practice", "project.demo", json!(["religion"])),
+        ("demo.ethnic_background", "project.demo", json!(["ethnicity"])),
+        ("x.gender_identity", "project.x", json!(["gender"])),
+        ("protected.anything", "project.protected", json!([])),
     ] {
-        let v = add_trait(w, &band(id, family, "A plain title"));
-        assert_eq!(code(&v), "refused_trait_id", "{id}: {v}");
-        assert_eq!(
-            v["data"]["why"], "protected attribute, not a mechanism",
-            "{id}"
-        );
+        let v = ok(add_trait(w, &band(id, family, "A plain title")));
+        assert_eq!(v["sensitive"], want, "{id}");
     }
+    // the country dimension is still refused, for that reason
+    let v = add_trait(w, &band("culture.power_distance", "project.culture", "A plain title"));
+    assert_eq!(code(&v), "refused_trait_id");
+    assert_eq!(v["data"]["why"], "a country dimension, not a mechanism");
 }
 
 #[test]
-fn i2_every_stem_is_refused_in_the_id_and_in_the_title() {
-    let table: Vec<&str> = personajury::domain::traits::PROTECTED_STEMS
+fn i2_every_stem_is_labelled_in_the_id_and_in_the_title() {
+    let table: Vec<&str> = personajury::domain::traits::SENSITIVE_STEMS
         .iter()
-        .map(|(s, _)| *s)
+        .map(|e| e.0)
         .collect();
     for s in STEMS.iter().filter(|s| {
         ![
@@ -203,7 +203,7 @@ fn i2_every_stem_is_refused_in_the_id_and_in_the_title() {
             w,
             &band(&format!("acme.{s}_level"), "project.acme", "A plain title"),
         );
-        assert_eq!(code(&v), "refused_trait_id", "id with {s}: {v}");
+        assert_ne!(ok(v)["sensitive"], json!([]), "id with {s}");
         let v = add_trait(
             w,
             &band(
@@ -212,10 +212,10 @@ fn i2_every_stem_is_refused_in_the_id_and_in_the_title() {
                 &format!("Reads the page by {s}"),
             ),
         );
-        assert_eq!(code(&v), "refused_trait_id", "title with {s}: {v}");
+        assert_ne!(ok(v)["sensitive"], json!([]), "title with {s}");
     }
-    // a trait with none of them is added; a word that only contains a stem inside it is not a stem
-    ok(add_trait(
+    // a trait with none of them has no label; a word that only contains a stem inside it is not a stem
+    let plain = ok(add_trait(
         w,
         &band(
             "acme.page_usage",
@@ -223,12 +223,13 @@ fn i2_every_stem_is_refused_in_the_id_and_in_the_title() {
             "Reads every page of the message",
         ),
     ));
+    assert_eq!(plain["sensitive"], json!([]));
 }
 
 #[test]
-fn i2_access_needs_keep_disab() {
+fn i2_access_traits_are_labelled_like_any_other() {
     let ws = tempfile::tempdir().unwrap();
-    ok(add_trait(
+    let v = ok(add_trait(
         ws.path(),
         &band(
             "access.disability_aid",
@@ -236,14 +237,9 @@ fn i2_access_needs_keep_disab() {
             "An aid for a disability the page must serve",
         ),
     ));
-    // and only disab: another stem under access is still refused
-    assert_eq!(
-        code(&add_trait(
-            ws.path(),
-            &band("access.health_aid", "access", "A plain title")
-        )),
-        "refused_trait_id"
-    );
+    assert_eq!(v["sensitive"], json!(["disability"]));
+    let v = ok(add_trait(ws.path(), &band("access.health_aid", "access", "A plain title")));
+    assert_eq!(v["sensitive"], json!(["health"]));
 }
 
 #[test]
@@ -260,7 +256,7 @@ fn i2_the_shipped_catalog_passes_its_own_screen() {
         ok(jg(w, &["trait", "add", "--file", f.to_str().unwrap()]));
         let _ = path;
     }
-    // an edited title on a shipped id is screened
+    // an edited title on a shipped id is read again and labelled
     let text = personajury::domain::catalog::CATALOG
         .iter()
         .find(|(p, _)| *p == "traits/trust/marketing_skepticism.toml")
@@ -270,11 +266,11 @@ fn i2_the_shipped_catalog_passes_its_own_screen() {
         "Disbelieves advertising and claims by default",
         "Disbelieves advertising by gender",
     );
-    assert_eq!(code(&add_trait(w, &edited)), "refused_trait_id");
+    assert_eq!(ok(add_trait(w, &edited))["sensitive"], json!(["gender"]));
 }
 
 #[test]
-fn i2_a_persona_trait_must_be_in_the_store_and_pass_the_screen() {
+fn i2_a_persona_trait_must_be_in_the_store_and_is_labelled() {
     let ws = installed();
     let w = ws.path();
     // a trait that entered the store before the screen (a store written by the unfixed branch)
@@ -283,8 +279,8 @@ fn i2_a_persona_trait_must_be_in_the_store_and_pass_the_screen() {
         toml::from_str(&band("demo.age_band", "project.demo", "Age band")).unwrap();
     store.insert_trait(&def, "project").unwrap().unwrap();
     drop(store);
-    let v = add_persona(w, &persona_body("p", &["x"], json!({"demo.age_band": 5})));
-    assert_eq!(code(&v), "refused_trait_id", "{v}");
+    let v = ok(add_persona(w, &persona_body("p", &["x"], json!({"demo.age_band": 5}))));
+    assert_eq!(v["sensitive"], json!(["age"]));
     assert_eq!(
         code(&add_persona(
             w,
@@ -297,7 +293,7 @@ fn i2_a_persona_trait_must_be_in_the_store_and_pass_the_screen() {
 // ---- I3: free text in a trait value ----
 
 #[test]
-fn i3_free_text_values_are_screened() {
+fn i3_free_text_values_are_checked_and_labelled() {
     let ws = installed();
     let w = ws.path();
     let try_job = |id: &str, job: &str| {
@@ -314,14 +310,15 @@ fn i3_free_text_values_are_screened() {
         ("youare2", "you are a buyer".to_string()),
         ("iam", "I am a buyer who reads every page".to_string()),
         ("digit", "ship the plan by Q3".to_string()),
-        ("stem", "compare plans for the gender gap".to_string()),
-        ("stem2", "find a church for my faith".to_string()),
     ] {
         let v = try_job(n, &job);
         assert_eq!(code(&v), "trait_text_refused", "{n}: {v}");
     }
     ok(try_job("fine", &"a".repeat(80)));
     ok(try_job("plain", "compare two plans for my team"));
+    // a sensitive word is labelled, not refused (D39)
+    assert_eq!(ok(try_job("stem", "compare plans for the gender gap"))["sensitive"], json!(["gender"]));
+    assert_eq!(ok(try_job("stem2", "find a church for my faith"))["sensitive"], json!(["religion"]));
 }
 
 #[test]

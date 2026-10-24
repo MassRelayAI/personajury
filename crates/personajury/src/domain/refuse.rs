@@ -123,8 +123,10 @@ pub enum Refusal {
     InvalidFilter { term: String, why: String },
     #[error("trait {id} has no quote: every suggested trait carries a verbatim sentence or phrase of the persona's prose as its evidence")]
     SuggestionWithoutQuote { id: String },
-    #[error("trait {id}: the quote {quote:?} is not in the persona's prose (whitespace folded); copy the words as they are written")]
-    QuoteNotInProse { id: String, quote: String },
+    #[error("trait {id}: the quote {quote:?} is too short; a quote is at least 3 words and 12 characters of the persona's prose")]
+    QuoteTooShort { id: String, quote: String },
+    #[error("trait {id}: the quote {quote:?} is not inside one field of the persona's prose (whitespace folded); copy the words as they are written")]
+    QuoteNotFound { id: String, quote: String },
     #[error("{path} is not a calibration file")]
     NotACalibration { path: String },
     #[error("no trait set named {name}; add it with `personajury trait set add` or install the catalog")]
@@ -212,7 +214,8 @@ impl Refusal {
             Refusal::InvalidFilter { .. } => "invalid_filter",
             Refusal::TraitSetUnknown { .. } => "trait_set_unknown",
             Refusal::SuggestionWithoutQuote { .. } => "suggestion_without_quote",
-            Refusal::QuoteNotInProse { .. } => "quote_not_in_prose",
+            Refusal::QuoteTooShort { .. } => "quote_too_short",
+            Refusal::QuoteNotFound { .. } => "quote_not_found",
             Refusal::NotACalibration { .. } => "not_a_calibration",
             Refusal::NoMatchingPersonas { .. } => "no_matching_personas",
             Refusal::AudienceUnknown { .. } => "audience_unknown",
@@ -260,7 +263,9 @@ impl Refusal {
             Refusal::InvalidFilter { term, why } => Some(serde_json::json!({"term": term, "why": why})),
             Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
             Refusal::SuggestionWithoutQuote { id } => Some(serde_json::json!({"id": id})),
-            Refusal::QuoteNotInProse { id, quote } => Some(serde_json::json!({"id": id, "quote": quote})),
+            Refusal::QuoteTooShort { id, quote } | Refusal::QuoteNotFound { id, quote } => {
+                Some(serde_json::json!({"id": id, "quote": quote}))
+            }
             Refusal::NotACalibration { path } => Some(serde_json::json!({"path": path})),
             Refusal::IncompleteJuryForDeliberation { missing } => Some(serde_json::json!({"missing": missing})),
             Refusal::AlreadyDeliberated { run } | Refusal::NoDeliberation { run } | Refusal::InitialClosed { run } => Some(serde_json::json!({"run": run})),

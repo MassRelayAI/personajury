@@ -161,9 +161,9 @@ fn the_trait_suggest_check_tool_answers_the_merged_file_and_writes_nothing() {
     let env = tool_env(&out[0]);
     assert_eq!(env["ok"], true, "{env}");
     assert_eq!(env["data"]["persona_file"]["traits"]["consumer.price_consciousness"], 5);
-    let bad = json!({"persona": "ravi", "traits": {"consumer.price_consciousness": 5}, "evidence": {"consumer.price_consciousness": "made up"}});
+    let bad = json!({"persona": "ravi", "traits": {"consumer.price_consciousness": 5}, "evidence": {"consumer.price_consciousness": "made up out of thin air"}});
     let (_, out) = session(ws.path(), &[call(1, "personajury_trait_suggest_check", json!({"suggestion": bad}))]);
-    assert_eq!(tool_env(&out[0])["error"]["code"], "quote_not_in_prose");
+    assert_eq!(tool_env(&out[0])["error"]["code"], "quote_not_found");
     assert!(!ws.path().join(".personajury/generate").exists(), "nothing was written");
 }
 

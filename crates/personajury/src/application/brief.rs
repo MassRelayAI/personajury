@@ -918,7 +918,8 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         PanelSrc::Adhoc(q) => {
             let terms = query::parse(q)?;
             super::panel::check_seats(super::panel::seats(&terms), a.allow_large)?;
-            super::panel::draw_query(&query::normalise(&terms), &store.personas()?, Some(seed))?
+            super::panel::check_filters(q, &store.trait_map()?)?;
+            super::panel::draw_query(&query::normalise(&terms), &store.personas()?, Some(seed), &[])?
         }
     };
     if let Some((t, _)) = resolved.terms.iter().find(|(_, got)| *got == 0) {
@@ -1184,6 +1185,10 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         .filter(|(id, _)| selected.contains(id))
         .collect();
     let quorum = rule.map(|r| r.quorum).max(sources_quorum).filter(|q| matches!(q, Quorum::Low | Quorum::High));
+    let cover_ids: Vec<String> = match &panel_src {
+        PanelSrc::Saved(n) => store.panel_cover(n)?,
+        PanelSrc::Adhoc(_) => vec![],
+    };
     let sh = Shared {
         subject: &subject,
         cmps: &cmps,
@@ -1203,7 +1208,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         rule: rule.map(|r| r.class.as_str()),
         quorum: quorum.map(quorum_word),
         traits: trait_ctx.as_ref(),
-        cover: false,
+        cover: !cover_ids.is_empty(),
         seats: None,
     };
     let mut runs = Vec::new();
@@ -1232,6 +1237,11 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         out["budget_tokens"] = json!(b);
     }
     out["independence"] = json!(a.independence.name());
+    // what the seated panel covers of the panel's traits, counted per stratum and panel-wide (D30)
+    let seated: Vec<(String, String)> = selected.iter().map(|id| (id.clone(), stakes[id].name().to_string())).collect();
+    if let Some(c) = super::panel::coverage(&store, &cover_ids, &seated)? {
+        out["coverage"] = c;
+    }
     if let Some(c) = trait_ctx.as_ref().filter(|c| c.set.is_some()) {
         let incomplete: Vec<Value> = selected
             .iter()

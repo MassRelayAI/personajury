@@ -318,6 +318,9 @@ pub enum PanelCmd {
         /// allow more than 12 seats (the most is 1000)
         #[arg(long)]
         allow_large: bool,
+        /// up to 4 traits the seats must cover across their bands (the draw picks seats that add new band cells)
+        #[arg(long, value_delimiter = ',')]
+        cover: Vec<String>,
     },
     Resolve {
         name: String,
@@ -443,7 +446,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::Set { what: TraitSetCmd::List } => app::traits::set_list(root),
         },
         Cmd::Panel { what } => match what {
-            PanelCmd::Add { name, query, allow_large } => app::panel::add(root, name, query, *allow_large),
+            PanelCmd::Add { name, query, allow_large, cover } => app::panel::add(root, name, query, *allow_large, cover),
             PanelCmd::Resolve { name, subject } => app::panel::resolve(root, name, subject.as_deref()),
         },
         Cmd::Lens { what } => match what {

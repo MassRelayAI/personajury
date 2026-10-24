@@ -236,6 +236,15 @@ mod tests {
         }
     }
     #[test]
+    fn a_filter_closes_the_term_and_normalise_writes_it_back_sorted() {
+        let t = parse("2 builder=primary@m1[b.c>=4, a.b=2], 1 others").unwrap();
+        assert_eq!(t[0].filter.len(), 2);
+        assert_eq!(normalise(&t), "2 builder=primary@m1[a.b=2,b.c>=4], 1 others");
+        for q in ["1 a[x.y]", "1 a[x.y=1", "1 a[]", "1 a[x.y=1]b", "1 a[x.y~1]"] {
+            assert!(parse(q).is_err(), "{q:?}");
+        }
+    }
+    #[test]
     fn parse_refuses_bad_terms() {
         for q in [
             "",

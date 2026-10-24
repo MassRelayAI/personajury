@@ -1,7 +1,9 @@
 //! panel add | resolve (plan Task 4; D9 the seeded draw, D10 the seat ceilings)
 use super::{AppError, Result};
 use crate::domain::hash::{draw_seed, panel_hash};
+use crate::domain::traits::{self, TraitDef};
 use crate::domain::*;
+use std::collections::BTreeMap;
 use crate::store::Store;
 use serde_json::{json, Value};
 use std::path::Path;
@@ -56,10 +58,15 @@ pub fn check_seats(seats: usize, allow_large: bool) -> Result<()> {
     Ok(())
 }
 
-/// Draw a query's seats from the pool. Pure: nothing is stored.
-pub fn draw_query(query: &str, personas: &[Persona], seed: Option<[u8; 8]>) -> Result<Resolved> {
+/// Draw a query's seats from the pool, covering `cover` when it is not empty (D30). Pure: nothing is stored.
+pub fn draw_query(
+    query: &str,
+    personas: &[Persona],
+    seed: Option<[u8; 8]>,
+    cover: &[cover::CoverTrait],
+) -> Result<Resolved> {
     let terms = query::parse(query)?;
-    let per_term = query::draw_terms(&terms, personas, seed);
+    let per_term = query::draw_terms_cover(&terms, personas, seed, cover);
     let mut ids = Vec::new();
     let mut stakes = Vec::new();
     let mut models = Vec::new();
@@ -90,19 +97,69 @@ pub fn resolve_in(store: &Store, name: &str, seed: Option<[u8; 8]>) -> Result<Re
     let row = store
         .panel(name)?
         .ok_or_else(|| AppError::NotFound(format!("no panel named {name}")))?;
-    let r = draw_query(&row.query, &store.personas()?, seed)?;
+    let defs = store.trait_map()?;
+    check_filters(&row.query, &defs)?;
+    let cover_ids = store.panel_cover(name)?;
+    let cover = cover_traits(&cover_ids, &defs)?;
+    let r = draw_query(&row.query, &store.personas()?, seed, &cover)?;
     store.set_panel_resolution(name, &r.ids, &r.hash)?;
     Ok(r)
 }
 
-pub fn add(root: &Path, name: &str, query: &str, allow_large: bool) -> Result<Value> {
+/// Every filter of a query names a trait the store holds and a value it can hold (D30).
+pub fn check_filters(query: &str, defs: &BTreeMap<String, TraitDef>) -> Result<()> {
+    for t in query::parse(query)? {
+        let raw = query::normalise(std::slice::from_ref(&t));
+        traits::check_conds(&t.filter, &raw, defs)?;
+    }
+    Ok(())
+}
+/// The cover traits with their definitions; a trait the store lacks is `unknown_trait`, a words trait cannot be covered.
+pub fn cover_traits<'a>(ids: &'a [String], defs: &'a BTreeMap<String, TraitDef>) -> Result<Vec<cover::CoverTrait<'a>>> {
+    ids.iter()
+        .map(|id| {
+            let def = defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?;
+            if def.shape == "words" {
+                return Err(AppError::InvalidArguments(format!("{id} holds words; a cover counts bands and options")));
+            }
+            Ok(cover::CoverTrait { id: id.as_str(), def })
+        })
+        .collect()
+}
+/// The coverage of seated personas (D30): `seated` is each persona id with the stratum word it sits in.
+pub fn coverage(store: &Store, cover_ids: &[String], seated: &[(String, String)]) -> Result<Option<Value>> {
+    if cover_ids.is_empty() {
+        return Ok(None);
+    }
+    let defs = store.trait_map()?;
+    let cover = cover_traits(cover_ids, &defs)?;
+    let mut people = Vec::new();
+    for (id, st) in seated {
+        let p = store.persona(id)?.ok_or_else(|| AppError::NotFound(format!("no persona {id}")))?;
+        people.push((p, st.clone()));
+    }
+    let refs: Vec<(&Persona, String)> = people.iter().map(|(p, s)| (p, s.clone())).collect();
+    Ok(Some(cover::coverage(&cover, &refs)))
+}
+
+pub fn add(root: &Path, name: &str, query: &str, allow_large: bool, cover_ids: &[String]) -> Result<Value> {
     super::slug("panel name", name)?;
     let terms = query::parse(query)?;
     let n = seats(&terms);
     check_seats(n, allow_large)?;
+    if cover_ids.len() > traits::MAX_COVER {
+        return Err(Refusal::CoverTooLarge { name: name.to_string(), cover: cover_ids.len() }.into());
+    }
     let store = Store::open(root)?;
+    let defs = store.trait_map()?;
+    cover_traits(cover_ids, &defs)?;
+    check_filters(query, &defs)?;
     store.upsert_panel(name, query)?;
+    store.set_panel_cover(name, cover_ids)?;
     let mut out = json!({"name": name, "query": query, "seats": n});
+    if !cover_ids.is_empty() {
+        out["cover"] = json!(cover_ids);
+    }
     if n > SEAT_CEILING {
         out["large"] = json!(true);
     }
@@ -135,5 +192,16 @@ pub fn resolve(root: &Path, name: &str, subject: Option<&str>) -> Result<Value> 
         (Some(s), Some(sub)) => json!({"seed": hex_seed(s), "subject": sub}),
         _ => json!("none (no subject)"),
     };
-    Ok(json!({"name": name, "query": r.query, "personas": r.ids, "hash": r.hash, "terms": terms, "draw": draw}))
+    let mut out = json!({"name": name, "query": r.query, "personas": r.ids, "hash": r.hash, "terms": terms, "draw": draw});
+    let cover_ids = store.panel_cover(name)?;
+    let seated: Vec<(String, String)> = r
+        .ids
+        .iter()
+        .zip(&r.stakes)
+        .map(|(i, s)| (i.clone(), s.map(|s| s.name()).unwrap_or("unstaked").to_string()))
+        .collect();
+    if let Some(c) = coverage(&store, &cover_ids, &seated)? {
+        out["coverage"] = c;
+    }
+    Ok(out)
 }

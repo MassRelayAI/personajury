@@ -41,7 +41,7 @@ the person is. Add `serves` (tags such as `["docs"]`) when the persona should si
 **Migrate a persona you already have: suggest, check, add.** Write the prose first and the traits as its summary, never the reverse.
 `personajury trait suggest --persona ID [--set NAME]` writes a brief laying the persona's prose beside the candidate traits' anchors.
 Answer it with one JSON object `{"persona", "traits", "evidence"}`: propose a value only where a sentence of the prose supports it, and
-copy that sentence (or a phrase of it, verbatim) as the evidence; leave out every trait the prose does not support. Then
+copy that sentence (or a phrase of it, verbatim, at least 3 words and 12 characters, from one field) as the evidence; leave out every trait the prose does not support. Then
 `personajury trait suggest --check answer.json` verifies the ids, the values and each quote, and answers `persona_file`, the persona with
 the traits set. It writes nothing: save that file and `persona add` it for a new version. Afterwards `personajury persona lint` warns about
 near copies and a tag that cannot be told from a band; whether a trait fits the prose is yours to read, the engine cannot. For traits
@@ -73,6 +73,8 @@ may combine two roles.
 
 Write from the material, not from habit: take the roles, sectors and objections it names. Spread the tags across the
 strata you will need. Personas are composites, never identifiable real people: no real names, no scraped profiles, no customer list turned into a person (`PERSONAS.md`).
+
+Simulated demographics are allowed, labelled and recorded (D39): a persona may have an age, a gender, a religion or a condition when the subject is read differently because of it. `persona add` answers `sensitive: [...]` with the categories its prose and traits name, the run records them, and `summary` prints "simulated demographics: … — personas are simulations, not real-world data". Check the label says what you meant; a word by chance ("public health" as a field of study) is labelled too. Give it to the persona only where it moves the decision, never as decoration.
 
 ## Your own juror, a devil's advocate, real people
 - **Yourself:** enter a real human verdict with `verdict --by-human "NAME, CREDENTIAL"`; do not simulate yourself.

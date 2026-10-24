@@ -19,6 +19,14 @@ A public figure is not a persona either: a verdict "by" a named real person woul
 If a persona turns out to match a real person, that is a bug. Report it (`SUPPORT.md`) and it is changed or removed; it is
 not a feature request.
 
+## Simulated demographics
+A composite may have an age, a gender, a religion, an origin or a health condition, when the subject is read differently
+because of it: personas are simulations, not real-world data (D39). The engine accepts it and labels it: `persona add` and
+`trait add` answer `sensitive: [...]` (age, gender, ethnicity, religion, nationality, health, disability, sexuality, politics,
+marital, pregnancy, genetics), a run records `uses_sensitive`, and `summary` says "simulated demographics: … — personas are
+simulations, not real-world data". The label makes no claim about anyone. It changes nothing above: a demographic never makes a
+composite a real person, and a combination that singles one person out is still an identity.
+
 ## Writing one
 The fixed JSON and the stake rules are in `skills/writing-a-persona/SKILL.md`; `fixtures/personas/` has seven examples.
 Make each persona distinct: if two of them could swap lines, rewrite one.

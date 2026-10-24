@@ -105,11 +105,11 @@ A persona file may carry `traits`: a map of trait id to value, **at most 8**, wr
 ```
 
 A persona trait is accepted only if the store's catalog holds it: shipped and installed, or added with `trait add` (generated
-from material or not) after passing the protected-attribute screen below. Refusals at `persona add`: `unknown_trait` (the store
-has no such trait), `refused_trait_id` (the screen, checked first), `trait_text_refused` (a words value: at most 80 characters,
-no digit, not starting "You are" or "I am", no protected stem), `trait_value_off_scale`,
-`trait_option_unknown` (an option the trait lacks, or a list on a trait that holds one), `traits_too_many` above 8, and
-`refused_trait_id` (see below). A persona with no `traits` keeps the hash it had. `persona list` shows `traits: n`.
+from material or not). Refusals at `persona add`: `unknown_trait` (the store has no such trait), `refused_trait_id` (the refused
+list and the `culture` family, checked first), `trait_text_refused` (a words value: at most 80 characters, no digit, not starting
+"You are" or "I am"), `trait_value_off_scale`, `trait_option_unknown` (an option the trait lacks, or a list on a trait that holds
+one) and `traits_too_many` above 8. A sensitive attribute is never refused: the answer lists it under `sensitive` (see "Simulated
+demographics" below). A persona with no `traits` keeps the hash it had. `persona list` shows `traits: n`.
 
 A persona may also carry `serves`, tags for the audiences it speaks for, used by `brief --seats auto`.
 
@@ -173,10 +173,10 @@ claim about people."
 words, the ways its readers are known to differ ("procurement versus an engineering lead", "clinicians under time pressure"). Step two:
 draft N trait files in the shape of the catalog's, with `family = "project.<slug>"` (the slug is the material's file or folder name),
 `evidence = "project"`, `source = "material:<hash>"`, anchors or options as what the reader does after "You tend to". Then
-`trait add --file F --generated-from HASH` for each. **The protected-attribute screen runs there, as for any trait**, and `trait generate`
-refuses a material whose name would put a protected word in every id (`refused_trait_id`: rename the file). A project trait is accepted
-by the project, not by the catalog: it shows `(P)` in `trait list` (`badge`) and in `matrix --slice` headers. No protected attribute, no
-typology, no country dimension.
+`trait add --file F --generated-from HASH` for each. **Every text of the trait is read there, as for any trait**, and a sensitive
+attribute is labelled in the answer (`sensitive`); `trait generate` labels the material's name the same way and refuses only a
+`culture` material (`refused_trait_id`). A project trait is accepted by the project, not by the catalog: it shows `(P)` in
+`trait list` (`badge`) and in `matrix --slice` headers. No typology, no country dimension.
 
 ## Traits from an existing juror: suggest (prose, with quotes) and observed (verdicts, with counts)
 
@@ -188,9 +188,10 @@ the anchors of the candidate traits (the set's, or every trait in the store), an
 prose supports it, and copy that sentence or a phrase of it as the evidence. The agent answers one JSON object
 `{"persona": ID, "traits": {...}, "evidence": {...}}`. **`trait suggest --check FILE [--persona ID]`** (MCP
 `personajury_trait_suggest_check`) verifies it: ids and values as `persona add` would, a quote for every trait
-(`suggestion_without_quote`), and each quote a substring of the prose with whitespace folded (`quote_not_in_prose`, case-sensitive). It
-answers `data.persona_file` (the stored persona with the suggested traits set; the others kept) and writes nothing: save the file and
-run `persona add`, which makes a new version.
+(`suggestion_without_quote`), each quote at least 3 words and 12 characters (`quote_too_short`) and verbatim inside one prose field
+with whitespace folded (`quote_not_found`, case-sensitive; a quote that runs from one field into the next is not found). It answers
+`data.persona_file` (the stored persona with the suggested traits set; the others kept) and `data.sensitive`, and writes nothing: save
+the file and run `persona add`, which makes a new version.
 
 **`trait observed --persona ID [--persona ID ...] [--runs A,B]`** (MCP `personajury_trait_observed`) counts what the persona did in its
 accepted initial verdicts: where its score fell against its stratum's median in each (lens, dimension) (`below`, `at`, `above`), its
@@ -254,41 +255,62 @@ shared tag, or the same tags) and `confounded {trait, tag, band}` (two or more p
 without it hold another: in what this store would show, the tag and the band cannot be told apart). Whether a trait fits the prose
 is not checked: the engine cannot read prose for meaning, and the author does that. A verdict whose note or blocker repeats a label the
 persona was handed (the trait's title, or the id's last segment with spaces: "marketing skepticism", "a marketing skeptic") is
-accepted with `warnings: [{code: "label_echo", line, trait}]`; `matrix` counts them per stratum. `graph RUN --svg --slice TRAIT` fills
+accepted with `warnings: [{code: "label_echo", line, trait}]`; `matrix` counts them per stratum. Only the traits the run's brief
+rendered for that persona count (its trait mode and set); a run briefed with traits off gives no echo. `graph RUN --svg --slice TRAIT` fills
 the persona nodes by group with a legend line of the counts per stratum.
 
 ## What is refused, and why
 
 `refused_trait_id` names its reason. Typologies without predictive validity: `mbti`, `myers_briggs`, `enneagram`, `disc`,
-`learning_style`, `generation`, `astrology`, `zodiac`, `blood_type`. Protected attributes, which are not mechanisms: `age`, `gender`,
-`sex`, `ethnicity`, `race`, `religion`, `disability`, `political_affiliation`, `political_lean`, `minority`, `nationality`.
-Attributes of the persona rather than sensitivities of the juror: `appearance`, `attractiveness`, `beauty`, `fame`, `celebrity`,
-`outcast`, `outsider`. Beauty, fame and outsider status are the juror's sensitivities (`aesthetics.sensitivity`,
-`social.influence_susceptibility`, `social.stigma_consciousness`), never the persona's attributes. The check looks at the last
-segment of the id, so `culture.gender` is refused too.
+`learning_style`, `generation`, `astrology`, `zodiac`, `blood_type`. Attributes of the persona rather than sensitivities of the
+juror: `appearance`, `attractiveness`, `beauty`, `fame`, `celebrity`, `outcast`, `outsider`. Beauty, fame and outsider status are
+the juror's sensitivities (`aesthetics.sensitivity`, `social.influence_susceptibility`, `social.stigma_consciousness`), never the
+persona's attributes. The check looks at the last segment of the id, so `x.beauty` is refused too. The `culture` family (as
+`project.culture` too) is refused: "a country dimension, not a mechanism". Nothing else is refused for what it names (D39).
 
-**The protected-attribute screen** (after the v0.6-A review) runs on every trait `trait add` takes and on every persona trait id
-that is not shipped. It refuses (`refused_trait_id`, "protected attribute, not a mechanism") a trait whose family is `demo`,
-`culture` or `protected` (`project.demo` and the rest included), and a trait whose id (its words split on `.` and `_`) or title
-(its words) has a word that starts with one of these stems (`PROTECTED_STEMS` in `domain/traits.rs`, the one table):
+## Simulated demographics: allowed, labelled, recorded
 
-| stem | attribute | stem | attribute |
-|---|---|---|---|
-| `age` | age | `country` | country as an identity |
-| `gender` | gender | `pregnan` | pregnancy |
-| `sex`, `sexual`, `orientation` | sex, sexual orientation | `marital` | marital status |
-| `race`, `racial` | race | `disab` | disability (not under `access.*`, the assistive needs) |
-| `ethnic` | ethnicity | `politic` | political opinion |
-| `religion`, `religio`, `faith` | religion | `union` | union membership |
-| `caste` | caste | `health` | health |
-| `nationality`, `national` | nationality, national origin | `genetic` | genetic data |
-| `citizenship` | citizenship | `skin`, `color`, `colour` | skin colour |
-| `tribe`, `tribal` | tribe | | |
+Personas are simulations (D39, the maintainer: "We are keeping everything as sims, not deciding or angling"). A trait or persona
+that names an age, a gender, a religion or another sensitive attribute is accepted and labelled `sensitive: [...]`, with these
+twelve categories, in this order: age, gender, ethnicity, religion, nationality, health, disability, sexuality, politics, marital,
+pregnancy, genetics. `trait add`, `trait generate`, `trait add --generated-from`, `persona add`, `trait suggest --check` and
+`verdict --by-human --traits` answer the labels. `brief` records the categories its seated personas name on the run
+(`uses_sensitive`); `matrix` answers them; `summary` (and `--md`, `--html`) adds one line, "simulated demographics: age, gender —
+personas are simulations, not real-world data". No cap and no human class follow from it. Composites only, still: never a real,
+named person (`PERSONAS.md`).
 
-It errs safe (`colorful` is refused); `agent`, `agency` and `agenda` are not `age`. The shipped catalog's own id and title are
-reviewed words and are not screened again (`risk.health_safety`, "in good faith"); an edited title is. A words value
-(`situation.job`) passes the same stems, at most 80 characters, no digit, and may not start "You are" or "I am"
-(`trait_text_refused`); the brief prints it as "Your work: ...".
+**What is read.** Every text of a trait (id, family, title, caveats, source, each anchor, each option's id, title and sentence),
+every free-text value, and a persona's prose (role, context, daily tasks, fears, never reads, decides by, credential, stake rules,
+tags). **How.** The text is normalised first, without a crate: fullwidth letters, mathematical letters and ligatures folded (the part
+of NFKC the table needs); the Latin look-alikes of Cyrillic and Greek letters mapped (a Cyrillic "е" in "Gеnder"); lower case;
+zero-width characters, the soft hyphen, direction marks and combining marks removed; marked Latin letters folded ("género" is
+"genero"). Then it is read twice: word by word, and with the separators `_ - .` and space removed between words, so `gen_der`,
+`non-binary` and "senior citizen" are read whole. A joined stem starts where a word starts; a short prose word ("a", "be", "the")
+never starts one, so "a general rule" is not `age` and "be hindered" is not `behinder`.
+
+**The table** (`SENSITIVE_STEMS` in `domain/traits.rs`, one test per entry). *within*: anywhere in a word; *start*: at its
+start; *word*: the whole word only, for a short or ambiguous stem.
+
+| category | stems |
+|---|---|
+| age | `age` (start; not `agent`, `agency`, `agenda`), `elderly`, `senior citizen`, `pensioner`, `edad` (word), `alter` (word; not `alternative`) |
+| gender | `gender`, `sex` (start), `trans` (word; not `transform`, `transaction`), `transgender`, `nonbinary`, `género`/`genero` (word; not `generous`), `geschlecht`, `female`, `male` (word), `woman`, `women` (word) |
+| sexuality | `sexual`, `orientation` (start) |
+| ethnicity | `race` (start), `racial`, `ethnic`, `etni`, `étni`, `ethnie`, `raza`, `rasse` (word), `caste`, `tribe`, `skin`, `color`, `colour` (start), `tribal` |
+| religion | `religion`, `religio`, `religi`, `faith`, `muslim`, `christian`, `jewish`, `hindu`, `buddhist`, `islam`, `catholic`, `atheis`, `sikh` (word) |
+| nationality | `nationality`, `national`, `country`, `nacional` (start; not `international`), `nationalit`, `citizenship`, `immigra` |
+| health | `health` |
+| disability | `disab`, `behinder`, `handicap` |
+| politics | `politic`, `union` (start) |
+| marital | `marital` |
+| pregnancy | `pregnan`, `schwanger` |
+| genetics | `genetic` |
+
+Unmarked stems match *within* a word. The table errs wide (`colorful` is labelled ethnicity): a label is a line, not a refusal. The
+shipped catalog is reviewed by hand: a text it ships unchanged carries its reviewed label, and only `risk.health_safety` has one
+(health); "in good faith" and "colour vision" are words by chance. An edited text is read again. A words value (`situation.job`)
+is at most 80 characters, holds no digit and may not start "You are" or "I am" (`trait_text_refused`); the brief prints it as
+"Your work: ...".
 
 ## Culture
 

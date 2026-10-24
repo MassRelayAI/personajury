@@ -12,13 +12,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Schema v5 (one migration for the v0.6 lanes, idempotent): persona `traits` and `serves`, panel cover, run traits and seats, subject
   audience, and the `trait` and `trait_set` tables (D29).
 - The persona key `traits` (at most 8) with `unknown_trait`, `trait_value_off_scale`, `trait_option_unknown`, `traits_too_many` and the
-  refused list (`refused_trait_id`: typologies, protected attributes, the persona's own beauty, fame or outsider status) (D29).
+  refused list (`refused_trait_id`: typologies, the persona's own beauty, fame or outsider status; protected attributes are labelled
+  since D39) (D29).
 - `brief --traits <set>|all|off` and a rule's `trait_set`: the block "How this reader tends to decide (told)", rendered as "you tend to";
   `trait_set_incomplete`; `persona generate --traits` (D31).
 - Panels: `[trait>=4]` filters on a term, `panel add --cover`, `coverage` (one-way, pairs, balance, collinear, confounded) and the
   cover-aware draw (D30).
 - `matrix --slice TRAIT` and `summary --slice TRAIT`: groups per stratum, counted, never averaged (D31).
-- Fix round after the review: the protected-attribute screen on every added trait (refused families and stems, D29);
+- Fix round after the review: the protected-attribute screen on every added trait (refused families and stems, D29; a label since D39);
   `trait_text_refused` for free-text values, rendered "Your work: ..."; `trait install` keeps local edits (`kept_local`,
   `--force --reason`); `--seats auto` counts the control inside the effort's cap and is no override by itself; `apply-check`
   reason `thin_primary` (D13); a shorter closing line and a leaner `set` mode in the trait block (D31).
@@ -27,15 +28,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added (v0.6-B, D35-D36)
 - `trait generate --from PATH [--count N]`: the brief that asks the agent for project traits from a material; what it writes enters through
-  `trait add --generated-from`, so the protected-attribute screen and `refused_trait_id` apply unchanged; project traits show `(P)` (D35).
+  `trait add --generated-from`, which reads and labels every text of the trait like any other; project traits show `(P)` (D35, D39).
 - The reverse generators, without a model and writing nothing: `trait suggest --persona` (a brief from the persona's prose) and
-  `--check` (ids and values as `persona add`, a verbatim quote per trait: `suggestion_without_quote`, `quote_not_in_prose`; answers the
+  `--check` (ids and values as `persona add`, a verbatim quote per trait: `suggestion_without_quote`, `quote_too_short`, `quote_not_found`; answers the
   merged persona file); `trait observed --persona` (counts from the accepted initial verdicts, and `consistent`, `contradicted`, `mixed`
   or `no_signal` per declared trait against `traits/observe-map.toml`, 18 rows, extendable per project) (D35).
 - The MCP tools `personajury_trait_observed` and `personajury_trait_suggest_check` (twelve tools now).
 - `verdict --by-human --traits` (a person's own traits, shown by `matrix` under `human[].traits`), `calibrate --slice TRAIT` (`predicts`,
   `played`, `missed`, `inert`, `thin` per stratum, under `slices`), `trait report --calibration` (`not_a_calibration`) (D36).
 - `persona lint` (`near_copy`, `confounded`), `label_echo` warnings on `verdict` and per stratum in `matrix`, `graph --svg --slice TRAIT` (D36).
+- Fix round after the review (D39, the maintainer: "We are keeping everything as sims"): simulated demographics are allowed, labelled
+  and recorded. One stem table (64 entries, other languages, whole-word rules) reads every text of a trait, every free-text value and a
+  persona's prose, after a crate-free normalisation (NFKC forms, Cyrillic and Greek look-alikes, zero-width and combining marks) and a
+  second read with separators removed; a hit is a `sensitive: [...]` label (twelve categories) on `trait add`, `trait generate`,
+  `persona add`, `trait suggest --check` and `verdict --by-human --traits`, never a refusal. `brief` records `uses_sensitive` on the run
+  (`run.uses_sensitive_json`, v6 migration); `matrix` answers it; `summary` adds "simulated demographics: … — personas are simulations,
+  not real-world data". `refused_trait_id` keeps the typologies, the persona's own attributes and the `culture` family. A
+  `suggest --check` quote is at least 3 words and 12 characters inside one prose field (`quote_too_short`, `quote_not_found`, replacing
+  `quote_not_in_prose`). `label_echo` reads only the traits the brief rendered. Tests hold the three-juror rule and the initial-batch
+  filter of `trait observed`.
 
 ### Added (v0.6-C, D32-D34, D37, D38)
 - `brief --options subject|attachments`: what a juror may score `about` and pick, by subject kind (D32); `about: "<subject name>"` is the

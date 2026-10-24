@@ -478,7 +478,7 @@ store's catalog holds it, shipped or added with `trait add` (generated from mate
 persona trait id that is not shipped, passes a protected-attribute screen: refused (`refused_trait_id`) when its family is `demo`,
 `culture` or `protected` (as `project.<f>` too, so "no country-dimension trait" holds for project traits), or when a word of its id
 or title starts with a stem of `PROTECTED_STEMS` (`domain/traits.rs`, the one table, documented in `traits.md` and tested stem by
-stem): age, gender, sex, sexual, orientation, race, racial, ethnic, religion, religio, faith, caste, nationality, national,
+stem; **amended by D39: these are labelled, not refused**): age, gender, sex, sexual, orientation, race, racial, ethnic, religion, religio, faith, caste, nationality, national,
 citizenship, country, pregnan, marital, disab (not under `access.*`, the assistive needs), politic, union, health, genetic, skin,
 color, colour, tribe, tribal. The shipped catalog's own id and title are reviewed words and are not screened again
 (`risk.health_safety`, "in good faith"). A free-text value (`situation.job`, a words trait) is at most 80 characters, holds no
@@ -613,7 +613,8 @@ Three ways to a trait that are not "pick one from the catalog", none of which ca
   store, in id order) and asks for one JSON object `{persona, traits, evidence}` with a verbatim quote per trait. No model; the answer
   is the path, hash and bytes. **`trait suggest --check FILE [--persona ID]`** validates the object: ids and values as `persona add`
   would (`unknown_trait`, `trait_value_off_scale`, `trait_option_unknown`, `traits_too_many`, `refused_trait_id`); every trait has a quote
-  (`suggestion_without_quote`); the quote, whitespace folded, is a substring of the folded prose (`quote_not_in_prose`, case-sensitive).
+  (`suggestion_without_quote`); the quote, whitespace folded, is a substring of the folded prose (`quote_not_in_prose`, case-sensitive; amended in the fix round, D39: at least 3 words and 12
+  characters, `quote_too_short`, and inside one field, `quote_not_found`).
   It answers `data.persona_file` (the stored persona with `traits` replaced where suggested, others kept) and `data.evidence`, and
   **writes nothing**: the caller saves the file and runs `persona add`, a new version. Prose first, traits as its summary, each with its
   line of evidence. The MCP tool `personajury_trait_suggest_check` takes the object inline.
@@ -653,7 +654,8 @@ Three ways to a trait that are not "pick one from the catalog", none of which ca
 - **`persona lint [ID ...]`.** Warnings, exit 0 always: `near_copy {a, b}` (the same non-empty trait map and a shared tag, or the same
   tags) and `confounded {trait, tag, band}` (two or more personas with the tag in the band, one or more without it in another).
   With ids, only the warnings that name one of them. `trait_without_prose` is not built: the engine cannot read prose for meaning.
-- **`label_echo`.** A verdict whose note or blocker repeats a trait the persona carries gets `warnings: [{code: label_echo, line, trait}]`
+- **`label_echo`.** A verdict whose note or blocker repeats a trait the persona's brief rendered (the fix round: not every trait it
+  carries; a brief with no trait block gives none) gets `warnings: [{code: label_echo, line, trait}]`
   and is still accepted; the trait's title (any case) or the id's last segment with `_` as a space matches, each word by its first seven
   letters and in order, so "a marketing skeptic" echoes `marketing skepticism`. A one-word segment (`domain`) echoes by chance; it is a
   warning. `matrix` counts the echoes per stratum under `warnings` where there is one.
@@ -711,3 +713,47 @@ and `.env*` paths (`secret`); `high` for the other surface paths (`screens/**`, 
 migrations, tools and CI (`crates/**`, `src/**`, `migrations/**`, `tools/**`, `.github/**`, `router/rules/**`, `scripts/**`,
 `tests/**`). The highest quorum wins, so `crates/billing/src/price.rs` and `site/pricing.html` are `human`. The review had found that
 adopting the old starter made `apply` reachable on prices and legal pages (`low`), where no config at all answered `advise`.
+
+## D39 — simulated demographics are allowed, labelled and recorded (2026-10-24, the maintainer)
+*Built in the v0.6-B fix round. Supersedes the refusal half of the D29 protected-attribute screen. Reference: [`traits.md`](traits.md).*
+The maintainer's words: "We are keeping everything as sims, not deciding or angling … everything is supposedly technically produced as
+best practice". The orchestrator's ruling: **allow, label, record.** A persona is a simulation, a composite; a jury of simulations
+that names an age, a gender or a religion is a study design, and refusing the word only pushed it into prose the engine cannot see.
+- **The detection is kept and widened; its outcome changes.** One table (`domain/traits.rs` `SENSITIVE_STEMS`, 64 entries, a test per
+  entry) reads every text of a trait (id, family, title, caveats, source, each anchor, each option's id, title and sentence), every
+  free-text value, and a persona's prose (role, context, daily tasks, fears, never reads, decides by, credential, stake rules, tags).
+  Texts and stems are normalised first, without a crate: the NFKC compatibility forms the screen needs (fullwidth ASCII, the
+  mathematical letters, the Latin ligatures), the Latin look-alikes of Cyrillic and Greek letters, lower case, invisible characters
+  (zero-width, soft hyphen, direction marks) and combining marks removed, marked Latin letters folded (`género` is `genero`). Each
+  text is read twice: word by word, and with the separators `_ - .` and space removed between words (`gen_der`, `non-binary`,
+  `senior citizen`), where a joined stem must start where a word starts and run into the next, a whole-word stem must end where a
+  word ends, and a short prose word (`a`, `be`, `the` …) never starts a join ("a general rule" is not `age`, "be hindered" is not
+  `behinder`). Each entry matches within a word (`bisexual`, `unhealthy`), at its start (`colorful`, not `international`) or as the
+  whole word for a short or ambiguous stem (`trans`, `alter`, `sikh`, `raza`, `edad`, `male`: not `transform`, `alternative`,
+  `maleficent`). The entries: the D29 stems; trans, transgender, nonbinary, elderly, senior citizen, pensioner, muslim, christian,
+  jewish, hindu, buddhist, sikh, islam, catholic, atheis, etni/étni/ethnie, raza, rasse, religi, nacional, nationalit, género/genero,
+  geschlecht, edad, alter, schwanger, behinder, handicap; and the review's female, male, woman, women, immigra.
+- **A label, never a refusal.** Each hit names one of twelve categories: age, gender, ethnicity, religion, nationality, health,
+  disability, sexuality, politics, marital, pregnancy, genetics (`SENSITIVE`, the order an answer lists them). `trait add` (with or
+  without `--generated-from`), `trait generate` (the material's name and slug), `persona add`, `trait suggest --check` and
+  `verdict --by-human --traits` accept, and answer `sensitive: [...]`. `refused_trait_id` keeps only what means something else: the
+  typologies and the persona's own beauty, fame or outsider status (the D29 list without its protected entries), and the `culture`
+  family ("a country dimension, not a mechanism"); the `demo` and `protected` families are a simulation's own and are labelled.
+  `trait_text_refused` keeps its length, digit and "You are" rules. The `access` exemption is gone: `disab` and `health` label where
+  they hit.
+- **The catalog is reviewed by hand.** A text the catalog ships unchanged carries the catalog's own label (`SHIPPED_LABELS`): only
+  `risk.health_safety` names one (health); "in good faith", "colour vision" and "health" in a caveat are words by chance. An edited
+  text is read again.
+- **Recorded on the run.** `brief` records `uses_sensitive` (the categories its seated personas name) in `run.uses_sensitive_json`, a
+  column of the v6 migration (idempotent `ALTER`, no version bump), and answers it. `matrix` answers `uses_sensitive` across its runs;
+  `summary` (text, `--md`, `--html`) adds one line when there is any: "simulated demographics: age, gender — personas are
+  simulations, not real-world data". No advisory cap and no human class follow from it; the decision rules of D13 and D37 are
+  unchanged.
+- **The cost, measured on the fixture.** newcomer-sofia's role ("a final-year student in public health") labels her `health`, so the
+  fixture runs record `health` and `fixtures/run/summary.txt` and `summary.md` gained that one line (regenerated); the briefs, the
+  matrix, the table and the picks are byte-identical. The table errs wide: a label is a line in a summary, not a refusal.
+- **Unchanged: composites only.** A persona is never a real, named person (`PERSONAS.md`); a label records what a simulation names,
+  it makes no claim about anyone.
+- **The other fix-round rulings stand.** A `suggest --check` quote is at least 3 words and 12 characters and stands verbatim inside one
+  prose field (`quote_too_short`, `quote_not_found`, which replaces `quote_not_in_prose`); `label_echo` reads only the traits the brief
+  rendered (none when the run rendered none); the three-juror rule and the initial-batch filter of `trait observed` are held by tests.

@@ -1,13 +1,13 @@
 {
-  "name": "jurypersona",
-  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum, rounds that diff. No LLM inside the engine. Needs the jurypersona binary on PATH (the install script in the README).",
+  "name": "personajury",
+  "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum, rounds that diff. No LLM inside the engine. Needs the personajury binary on PATH (the install script in the README).",
   "version": "0.5.1",
   "author": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"
   },
-  "homepage": "https://github.com/massrelay-ai/jurypersona",
-  "repository": "https://github.com/massrelay-ai/jurypersona",
+  "homepage": "https://github.com/massrelay-ai/personajury",
+  "repository": "https://github.com/massrelay-ai/personajury",
   "license": "Apache-2.0",
   "keywords": [
     "persona-jury",
@@ -22,8 +22,8 @@
     "skills"
   ],
   "mcpServers": {
-    "jurypersona": {
-      "command": "jurypersona",
+    "personajury": {
+      "command": "personajury",
       "args": [
         "mcp"
       ]

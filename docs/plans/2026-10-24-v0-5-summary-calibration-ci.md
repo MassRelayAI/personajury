@@ -1,4 +1,4 @@
-# JuryPersona v0.5 — the summary, calibration and CI — Implementation Plan (as built)
+# PersonaJury v0.5 — the summary, calibration and CI — Implementation Plan (as built)
 
 > **As built.** Written after the work, from the code, the tests and the review. Decisions of record: D20 to D24 in
 > [`../decisions.md`](../decisions.md); the display choice is in [`../reports/2026-10-24-display-jury.md`](../reports/2026-10-24-display-jury.md).
@@ -28,7 +28,7 @@ first, then a numbers table), `calibrate` against a human run, CSV cell citation
 
 ## Tasks
 
-1. **`summary` (D24).** CLI, MCP `jurypersona_summary` (eight tools), `--html`, `--md`, `--save`, `--width`. 12 of 12 tests red first.
+1. **`summary` (D24).** CLI, MCP `personajury_summary` (eight tools), `--html`, `--md`, `--save`, `--width`. 12 of 12 tests red first.
 2. **`calibrate` and `apply-check --calibration` (D20).** 8 of 8 tests red first.
 3. **CSV cell locators (D21).** 6 of 6 unit tests red first, plus a mutation proving the citation guard.
 4. **The Action (D22).** `action.yml`, `scripts/action-run.sh`, `docs/ci.md`, and the new flag `apply-check --latest`. 8 of 8 tests red first.

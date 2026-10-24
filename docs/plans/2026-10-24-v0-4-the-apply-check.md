@@ -1,4 +1,4 @@
-# JuryPersona v0.4 — the apply check — Implementation Plan (as built)
+# PersonaJury v0.4 — the apply check — Implementation Plan (as built)
 
 > **As built.** Written after the work, from the code, the tests and the review. Decisions of record: D13 to D19 in
 > [`../decisions.md`](../decisions.md). Measured result: [`../reports/2026-10-24-v0-4-measured.md`](../reports/2026-10-24-v0-4-measured.md).
@@ -31,7 +31,7 @@ migration from v3. The engine still calls no model and opens no socket (a guard 
 ## Tasks
 
 1. **Apply-check and the split rule (D13).** `tests/v04.rs`: 7 tests, `0 passed; 7 failed` red (`unrecognized subcommand`). MCP: 7 passed / 2 failed
-   red (tool list, `jurypersona_apply_check`). The recorded fixture run answers `escalate` (a primary blocker); a test pins it.
+   red (tool list, `personajury_apply_check`). The recorded fixture run answers `escalate` (a primary blocker); a test pins it.
 2. **Effort (D17).** Compile-red until the `RunRow` fields existed, then 13 passed / 4 failed on behaviour.
 3. **Independence (D18).** 19 passed / 6 failed red.
 4. **Experts and a human verdict (D19).** 26 passed / 8 failed red; the MCP has no `by_human`, and a test says so.

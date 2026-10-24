@@ -11,7 +11,7 @@ decisions: D24 (docs/decisions.md)
 
 ## The question
 
-`jurypersona summary` has to put a jury's answer in front of a person, in a chat or a terminal. Four layouts were candidates. The cards showed
+`personajury summary` has to put a jury's answer in front of a person, in a chat or a terminal. Four layouts were candidates. The cards showed
 the same result (the name jury, [the name, picked by a persona jury](2026-10-24-the-name-picked-by-a-persona-jury.md)) in four ways:
 
 | card | what it shows |

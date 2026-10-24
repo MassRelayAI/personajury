@@ -1,6 +1,6 @@
 # adapted from comparegraph Cargo.toml
 [workspace]
-members = ["crates/jurypersona"]
+members = ["crates/personajury"]
 resolver = "2"
 
 [workspace.package]

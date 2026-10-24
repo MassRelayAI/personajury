@@ -31,21 +31,21 @@ between rounds. A panel is 12 seats or fewer unless you pass `--allow-large`.
 
 ## Add it
 ```
-jurypersona persona add --file personas/builder-ana.json
-jurypersona persona list
-jurypersona panel add fixture --query "3 builder, 2 company, 2 others"
-jurypersona panel resolve fixture
+personajury persona add --file personas/builder-ana.json
+personajury persona list
+personajury panel add fixture --query "3 builder, 2 company, 2 others"
+personajury panel resolve fixture
 ```
 
 ## Generate from material
 ```
-jurypersona persona generate --from docs/icp.md --count 7
+personajury persona generate --from docs/icp.md --count 7
 ```
 This writes a **brief addressed to you**: it asks you, the agent, to write N personas from the material in the fixed JSON.
-JuryPersona calls no model. Write the files yourself, then add each one with the material's hash, so the origin is recorded
+PersonaJury calls no model. Write the files yourself, then add each one with the material's hash, so the origin is recorded
 and the same material regenerates the same panel:
 ```
-jurypersona persona add --file personas/new-one.json --generated-from <hash from the brief>
+personajury persona add --file personas/new-one.json --generated-from <hash from the brief>
 ```
 The brief works in two steps. First list the roles, sectors and objections the material names or implies (who it speaks
 to, who pays, who is turned away, what each pushes back on), and hand that `roles` list to the caller; mark which role uses,

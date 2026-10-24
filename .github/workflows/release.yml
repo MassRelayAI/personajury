@@ -14,11 +14,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { platform: linux-x64, os: ubuntu-latest, exe: jurypersona }
-          - { platform: linux-arm64, os: ubuntu-24.04-arm, exe: jurypersona }
-          - { platform: darwin-arm64, os: macos-15, exe: jurypersona }
-          - { platform: darwin-x64, os: macos-15-intel, exe: jurypersona }
-          - { platform: win32-x64, os: windows-latest, exe: jurypersona.exe }
+          - { platform: linux-x64, os: ubuntu-latest, exe: personajury }
+          - { platform: linux-arm64, os: ubuntu-24.04-arm, exe: personajury }
+          - { platform: darwin-arm64, os: macos-15, exe: personajury }
+          - { platform: darwin-x64, os: macos-15-intel, exe: personajury }
+          - { platform: win32-x64, os: windows-latest, exe: personajury.exe }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 45
     steps:
@@ -31,16 +31,16 @@ jobs:
       - name: The tag must equal the Cargo.toml version (bump it in the tagged commit; exit 4)
         shell: bash
         run: |
-          v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="jurypersona") | .version')
+          v=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[] | select(.name=="personajury") | .version')
           [ "$v" = "${GITHUB_REF_NAME#v}" ] || { echo "Cargo.toml $v != tag ${GITHUB_REF_NAME#v}"; exit 4; }
       - name: Build
-        run: cargo build --release --locked -p jurypersona
+        run: cargo build --release --locked -p personajury
       - name: Stage the release asset and its checksum
         shell: bash
         run: |
           mkdir -p dist
-          ext=""; [ "${{ matrix.exe }}" = "jurypersona.exe" ] && ext=".exe"
-          out="jurypersona-${{ matrix.platform }}$ext"
+          ext=""; [ "${{ matrix.exe }}" = "personajury.exe" ] && ext=".exe"
+          out="personajury-${{ matrix.platform }}$ext"
           cp "target/release/${{ matrix.exe }}" "dist/$out"
           case "${{ matrix.platform }}" in linux-*) strip "dist/$out" ;; esac
           (cd dist && (sha256sum "$out" 2>/dev/null || shasum -a 256 "$out") > "$out.sha256")
@@ -69,12 +69,12 @@ jobs:
       - name: The binaries are the built ones (checksums verified)
         working-directory: bins
         run: |
-          cat jurypersona-*.sha256 > SHA256SUMS
+          cat personajury-*.sha256 > SHA256SUMS
           sha256sum -c SHA256SUMS
       - name: Build the four bundles
         run: |
           for p in linux-x64 darwin-arm64 darwin-x64 win32-x64; do
-            bin="bins/jurypersona-$p"; [ "$p" = win32-x64 ] && bin="bins/jurypersona-$p.exe"
+            bin="bins/personajury-$p"; [ "$p" = win32-x64 ] && bin="bins/personajury-$p.exe"
             scripts/build-mcpb.sh "$p" "$bin" dist
           done
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
@@ -108,7 +108,7 @@ jobs:
       - name: SHA256SUMS
         working-directory: dist
         run: |
-          cat jurypersona-*.sha256 > SHA256SUMS
+          cat personajury-*.sha256 > SHA256SUMS
           sha256sum -c SHA256SUMS
       - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
@@ -118,7 +118,7 @@ jobs:
         uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
         with:
           subject-path: |
-            dist/jurypersona-*
+            dist/personajury-*
             dist/SHA256SUMS
 
   # D16: the MCP registry entry, after the bundles are released and their hashes are known
@@ -152,8 +152,8 @@ jobs:
       - name: Put the released bundles' hashes in server.json
         run: |
           for p in linux-x64 darwin-arm64 darwin-x64 win32-x64; do
-            sha=$(cut -d' ' -f1 "bundles/jurypersona-$p.mcpb.sha256")
-            jq --arg p "$p" --arg sha "$sha" '(.packages[] | select(.identifier | endswith("jurypersona-" + $p + ".mcpb")) | .fileSha256) = $sha' server.json > server.tmp
+            sha=$(cut -d' ' -f1 "bundles/personajury-$p.mcpb.sha256")
+            jq --arg p "$p" --arg sha "$sha" '(.packages[] | select(.identifier | endswith("personajury-" + $p + ".mcpb")) | .fileSha256) = $sha' server.json > server.tmp
             mv server.tmp server.json
           done
           ! grep -q '"fileSha256": "0000000000000000000000000000000000000000000000000000000000000000"' server.json

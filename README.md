@@ -1,10 +1,10 @@
 <!-- adapted from comparegraph README.md (shape only) -->
-<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/jurypersona-graph.svg <desc> (graph alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size); docs/decisions.md D13 to D24 (apply-check, effort seats 3, 7, 12; 0 of 8 for bars); fixtures/run/summary.txt (the summary excerpt); fixtures/run/setup.sh and verdicts/ (the replay, run as written on 2026-10-24); docs/usage.md and docs/ci.md (results, display, Desktop, the Action); docs/playbooks/README-section.md (the gallery block); fixtures/lenses/*.toml (dimension counts); scripts/install.sh and .github/workflows/release.yml (five binaries, SHA256SUMS, the attestation; the .mcpb bundles are opt-in); .claude-plugin/marketplace.json and plugin.json (jurypersona@jurypersona, needs the binary on PATH); crates/jurypersona/src/application/setup.rs (what setup writes, the .bak backups, the rules block only beside a store); crates/jurypersona/tests/guards.rs and deny.toml (the no-network checks) -->
+<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (graph alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size); docs/decisions.md D13 to D24 (apply-check, effort seats 3, 7, 12; 0 of 8 for bars); fixtures/run/summary.txt (the summary excerpt); fixtures/run/setup.sh and verdicts/ (the replay, run as written on 2026-10-24); docs/usage.md and docs/ci.md (results, display, Desktop, the Action); docs/playbooks/README-section.md (the gallery block); fixtures/lenses/*.toml (dimension counts); scripts/install.sh and .github/workflows/release.yml (five binaries, SHA256SUMS, the attestation; the .mcpb bundles are opt-in); .claude-plugin/marketplace.json and plugin.json (personajury@personajury, needs the binary on PATH); crates/personajury/src/application/setup.rs (what setup writes, the .bak backups, the rules block only beside a store); crates/personajury/tests/guards.rs and deny.toml (the no-network checks) -->
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/brand/lockup-dark.svg">
-    <img src="docs/assets/brand/lockup.svg" alt="JuryPersona" height="64">
+    <img src="docs/assets/brand/lockup.svg" alt="PersonaJury" height="64">
   </picture>
 </p>
 
@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/massrelay-ai/jurypersona/actions/workflows/ci.yml"><img src="https://github.com/massrelay-ai/jurypersona/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
-  <a href="https://github.com/massrelay-ai/jurypersona/releases/latest"><img src="https://img.shields.io/github/v/release/massrelay-ai/jurypersona?display_name=tag" alt="Release"></a>
+  <a href="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml"><img src="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/massrelay-ai/personajury/releases/latest"><img src="https://img.shields.io/github/v/release/massrelay-ai/personajury?display_name=tag" alt="Release"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0%2C%20free-blue.svg" alt="License: Apache-2.0, free"></a>
 </p>
 
@@ -27,43 +27,43 @@
   <a href="docs/faq.md">FAQ</a>
 </p>
 
-You give JuryPersona the files people would see: screenshots of a page, a document, slides, a diff. Your AI coding agent then plays a small jury of made-up readers, such as a customer, a buyer and a passer-by. Each juror scores what it read and says what stopped it. A juror that claims "I saw this" must point at a file, a line or a page element, or JuryPersona sends the answer back. You get each group's view side by side, never blended into one score, and a list of findings to fix or dismiss. It is free and open source (Apache-2.0), one program on your computer, and it never calls an AI model or the network itself.
+You give PersonaJury the files people would see: screenshots of a page, a document, slides, a diff. Your AI coding agent then plays a small jury of made-up readers, such as a customer, a buyer and a passer-by. Each juror scores what it read and says what stopped it. A juror that claims "I saw this" must point at a file, a line or a page element, or PersonaJury sends the answer back. You get each group's view side by side, never blended into one score, and a list of findings to fix or dismiss. It is free and open source (Apache-2.0), one program on your computer, and it never calls an AI model or the network itself.
 
 **What you need**
 
 - **An AI coding agent,** such as Claude Code or Codex ([the full list](#agents-and-platforms)). It plays the personas on its own model and your own plan.
-- **No API key for JuryPersona.** The program keeps the jury and checks the answers; it calls no model.
+- **No API key for PersonaJury.** The program keeps the jury and checks the answers; it calls no model.
 - **A terminal, once,** to install it. After that you talk to your agent.
 
 ## Try it
 
 1. **Install** on macOS or Linux ([Windows, read-first and from source](#install)):
    ```bash
-   curl -fsSL https://raw.githubusercontent.com/massrelay-ai/jurypersona/main/scripts/install.sh | sh
+   curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
    ```
-   It downloads one file for your system from the [v0.5.1 release](https://github.com/massrelay-ai/jurypersona/releases/tag/v0.5.1),
+   It downloads one file for your system from the [v0.5.1 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.5.1),
    checks it against `SHA256SUMS`, and puts it in `~/.local/bin`. No sudo, nothing else. To read it before running it,
    see [Install](#install). To remove everything later, see [Uninstall](#uninstall).
 2. **Connect your agent.** In Claude Code, type:
    ```text
-   /plugin marketplace add massrelay-ai/jurypersona
-   /plugin install jurypersona@jurypersona
+   /plugin marketplace add massrelay-ai/personajury
+   /plugin install personajury@personajury
    ```
-   With Codex or another agent, run `jurypersona setup --apply` ([what it writes](#what-setup-writes)) and point the agent at the [`running-a-jury`](skills/running-a-jury/SKILL.md) skill.
+   With Codex or another agent, run `personajury setup --apply` ([what it writes](#what-setup-writes)) and point the agent at the [`running-a-jury`](skills/running-a-jury/SKILL.md) skill.
 3. **Ask your agent,** in your project folder, for example:
-   > Use JuryPersona to run a jury on README.md: five personas who would read it. Show me the summary.
+   > Use PersonaJury to run a jury on README.md: five personas who would read it. Show me the summary.
 
    The `running-a-jury` skill teaches the agent the steps. You read the summary and decide each finding: fixed, dismissed with a reason, or filed as an issue.
 
 **See a finished jury first, with no agent.** The repository holds a recorded jury: seven personas on Lantern Notes, a made-up site with four planted mistakes. Replay it and open the report in your browser:
 
 ```bash
-git clone --depth 1 https://github.com/massrelay-ai/jurypersona
-jurypersona/fixtures/run/setup.sh jurypersona pj-try jurypersona   # 7 personas, 14 briefs
-cd pj-try && v=../jurypersona/fixtures/run/verdicts                # the recorded answers
-for f in $v/*--critical.json; do jurypersona verdict --run 1 --file "$f"; done
-for f in $v/*--compare.json; do jurypersona verdict --run 2 --file "$f"; done
-jurypersona summary 1 2 --html jury.html                           # open jury.html
+git clone --depth 1 https://github.com/massrelay-ai/personajury
+personajury/fixtures/run/setup.sh personajury pj-try personajury   # 7 personas, 14 briefs
+cd pj-try && v=../personajury/fixtures/run/verdicts                # the recorded answers
+for f in $v/*--critical.json; do personajury verdict --run 1 --file "$f"; done
+for f in $v/*--compare.json; do personajury verdict --run 2 --file "$f"; done
+personajury summary 1 2 --html jury.html                           # open jury.html
 ```
 
 The report opens with "The jury says: escalate. Primary jurors raised 15 blockers", then each group's scores, the forced picks and the jury drawn as a graph. Each command prints one line of JSON; `--pretty` makes it readable.
@@ -88,93 +88,93 @@ The report opens with "The jury says: escalate. Primary jurors raised 15 blocker
 - **Persona:** a made-up reader with a role, daily tasks and fears, written as a small JSON file. Personas are composites, never real people.
 - **Stake, or stratum:** how much the persona has riding on it. `primary` would use it, `secondary` buys, approves or supports it, `bystander` passes by. Each stratum is reported on its own.
 - **Lens:** what the jury scores, with what a 1, a 3 and a 5 look like, in words. `critical` asks: does it work, what blocks me, what is missing.
-- **Brief and verdict:** the brief is one persona's instructions, written by JuryPersona; the verdict is that persona's answer, as JSON.
+- **Brief and verdict:** the brief is one persona's instructions, written by PersonaJury; the verdict is that persona's answer, as JSON.
 - **Subagent:** a separate helper your agent starts, one per persona, so jurors do not read each other's answers.
-- **MCP:** the standard way agents call tools. `jurypersona mcp` serves JuryPersona's commands to your agent.
-- **The store:** `.jurypersona/store.db` in your project, a SQLite file (one ordinary file) that keeps every run.
+- **MCP:** the standard way agents call tools. `personajury mcp` serves PersonaJury's commands to your agent.
+- **The store:** `.personajury/store.db` in your project, a SQLite file (one ordinary file) that keeps every run.
 
 ## Install
 
 Release binaries for Linux x64 and arm64, macOS arm64 and x64, and Windows x64, each listed in the release's `SHA256SUMS`. Anywhere else, build from source.
 
-The install script downloads one file, the `jurypersona` binary for your platform, checks it against `SHA256SUMS`, and copies it to `~/.local/bin` (`JURYPERSONA_INSTALL_DIR` moves it). It does not use `sudo` and changes nothing else. To read it before it runs:
+The install script downloads one file, the `personajury` binary for your platform, checks it against `SHA256SUMS`, and copies it to `~/.local/bin` (`PERSONAJURY_INSTALL_DIR` moves it). It does not use `sudo` and changes nothing else. To read it before it runs:
 
 ```bash
 # the script as tagged for v0.5.1: download it, read it, run it pinned to that release
-curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/jurypersona/v0.5.1/scripts/install.sh
+curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/personajury/v0.5.1/scripts/install.sh
 less install.sh
-JURYPERSONA_VERSION=v0.5.1 sh install.sh
+PERSONAJURY_VERSION=v0.5.1 sh install.sh
 ```
 
-- **By hand, and on Windows:** download your platform's file (`jurypersona-linux-x64`, `jurypersona-darwin-arm64`, `jurypersona-win32-x64.exe`, …) and `SHA256SUMS` from the [latest release](https://github.com/massrelay-ai/jurypersona/releases/latest). Check it with `sha256sum -c --ignore-missing SHA256SUMS` (macOS: `shasum -a 256 <file>`; Windows: `Get-FileHash <file>`) and compare with its line. Rename it `jurypersona` (`jurypersona.exe` on Windows) and put it on your `PATH`.
-- **Provenance:** the release workflow signs a build-provenance attestation over the binaries and `SHA256SUMS`. The script checks the checksum only; check the attestation yourself with GitHub CLI 2.49 or later: `gh attestation verify jurypersona-linux-x64 -R massrelay-ai/jurypersona`.
+- **By hand, and on Windows:** download your platform's file (`personajury-linux-x64`, `personajury-darwin-arm64`, `personajury-win32-x64.exe`, …) and `SHA256SUMS` from the [latest release](https://github.com/massrelay-ai/personajury/releases/latest). Check it with `sha256sum -c --ignore-missing SHA256SUMS` (macOS: `shasum -a 256 <file>`; Windows: `Get-FileHash <file>`) and compare with its line. Rename it `personajury` (`personajury.exe` on Windows) and put it on your `PATH`.
+- **Provenance:** the release workflow signs a build-provenance attestation over the binaries and `SHA256SUMS`. The script checks the checksum only; check the attestation yourself with GitHub CLI 2.49 or later: `gh attestation verify personajury-linux-x64 -R massrelay-ai/personajury`.
 - **From source,** with Rust 1.85 or newer:
   ```bash
-  cargo install --locked --git https://github.com/massrelay-ai/jurypersona jurypersona
+  cargo install --locked --git https://github.com/massrelay-ai/personajury personajury
   ```
 
 Then connect your agents:
 
 ```bash
-jurypersona setup            # a plan: what it would write, and where; writes nothing
-jurypersona setup --apply    # writes it
-jurypersona doctor           # the store, the counts, and each agent's registration
+personajury setup            # a plan: what it would write, and where; writes nothing
+personajury setup --apply    # writes it
+personajury doctor           # the store, the counts, and each agent's registration
 ```
 
-In Claude Code, the plugin does this instead (`/plugin marketplace add massrelay-ai/jurypersona`, then `/plugin install jurypersona@jurypersona`); it needs the binary on your `PATH`.
+In Claude Code, the plugin does this instead (`/plugin marketplace add massrelay-ai/personajury`, then `/plugin install personajury@personajury`); it needs the binary on your `PATH`.
 
 ### What `setup` writes
 
 `setup --apply` only adds, and backs up every file it changes as `<file>.bak-<unix-seconds>` beside it. For each agent it finds:
 
-- a `jurypersona` MCP server entry in that agent's config, such as `~/.claude.json`, `~/.codex/config.toml` or `~/.gemini/settings.json` (`--scope project` writes the project's own file instead, such as `.mcp.json` or `.cursor/mcp.json`);
-- for Claude Code, a SessionStart hook in `~/.claude/settings.json` that runs `jurypersona doctor --brief` (`--no-hook` skips it);
-- in a folder that already holds a `.jurypersona/` store, a short block between `<!-- jurypersona -->` markers in `CLAUDE.md`, `AGENTS.md` or `GEMINI.md` that tells the agent about the jury (`--no-rules` skips it).
+- a `personajury` MCP server entry in that agent's config, such as `~/.claude.json`, `~/.codex/config.toml` or `~/.gemini/settings.json` (`--scope project` writes the project's own file instead, such as `.mcp.json` or `.cursor/mcp.json`);
+- for Claude Code, a SessionStart hook in `~/.claude/settings.json` that runs `personajury doctor --brief` (`--no-hook` skips it);
+- in a folder that already holds a `.personajury/` store, a short block between `<!-- personajury -->` markers in `CLAUDE.md`, `AGENTS.md` or `GEMINI.md` that tells the agent about the jury (`--no-rules` skips it).
 
-An entry named `jurypersona` that points elsewhere is left alone unless you pass `--force`. `--client NAME` limits it to one agent.
+An entry named `personajury` that points elsewhere is left alone unless you pass `--force`. `--client NAME` limits it to one agent.
 
 ### Uninstall
 
 There is no uninstall command yet. By hand:
 
-1. Claude Code: `/plugin uninstall jurypersona@jurypersona`, then `/plugin marketplace remove jurypersona`.
-2. Other agents: run `jurypersona doctor` to list the files that hold a `jurypersona` entry, and delete that entry, the `<!-- jurypersona -->` block and the hook. A `.bak-` file beside each one holds the file as it was before `setup` changed it.
-3. The binary: delete `~/.local/bin/jurypersona` (or wherever you put it), or `cargo uninstall jurypersona`.
-4. Your juries: each project's `.jurypersona/` folder. Keep a copy first if you want one: `jurypersona summary RUN... --md jury.md` writes a report, and `store.db` is a plain SQLite file any SQLite tool reads.
+1. Claude Code: `/plugin uninstall personajury@personajury`, then `/plugin marketplace remove personajury`.
+2. Other agents: run `personajury doctor` to list the files that hold a `personajury` entry, and delete that entry, the `<!-- personajury -->` block and the hook. A `.bak-` file beside each one holds the file as it was before `setup` changed it.
+3. The binary: delete `~/.local/bin/personajury` (or wherever you put it), or `cargo uninstall personajury`.
+4. Your juries: each project's `.personajury/` folder. Keep a copy first if you want one: `personajury summary RUN... --md jury.md` writes a report, and `store.db` is a plain SQLite file any SQLite tool reads.
 
 ## The loop by hand
 
 What the agent does for you, on the fixture site in this repository. Each comment says what the next line does:
 
 ```bash
-git clone https://github.com/massrelay-ai/jurypersona && cd jurypersona
+git clone https://github.com/massrelay-ai/personajury && cd personajury
 # seven personas, each a JSON file
-for f in fixtures/personas/*.json; do jurypersona persona add --file "$f"; done
+for f in fixtures/personas/*.json; do personajury persona add --file "$f"; done
 # who sits on the jury, and with which stake
-jurypersona panel add fixture \
+personajury panel add fixture \
   --query "3 builder=primary, 1 newcomer=primary, 2 company=secondary, 1 investor=bystander"
 # what they judge, as files: the site's page walks and screenshots
-jurypersona subject add lantern-site --kind page --attach fixtures/site-walk/*
+personajury subject add lantern-site --kind page --attach fixtures/site-walk/*
 # one brief per persona, for the critical lens
-jurypersona brief --subject lantern-site --panel fixture --lens critical --model sonnet
+personajury brief --subject lantern-site --panel fixture --lens critical --model sonnet
 # here the agent starts one subagent per brief; each writes one verdict JSON, such as:
-jurypersona verdict --run 1 --file verdicts/builder-ana.json
+personajury verdict --run 1 --file verdicts/builder-ana.json
 # (a verdict without evidence is refused, and that juror answers again)
 # sentences first, then the scores per stratum
-jurypersona summary 1
+personajury summary 1
 # your word on each finding: fixed, dismissed --why "...", or row --row ISSUE-12
-jurypersona decide <finding> fixed --by me
+personajury decide <finding> fixed --by me
 # exits 1 while a finding has no decision
-jurypersona check
+personajury check
 ```
 
 Every command prints one JSON envelope (`--pretty` to read it). The full walk, with comparators and the second round, is [`docs/quickstart.md`](docs/quickstart.md).
 
-## Why JuryPersona
+## Why PersonaJury
 
-An agent asked "is this page good?" answers with confidence and no evidence. One number then hides that the people who pay and the people who pass by disagree. JuryPersona is three laws, each enforced by a refusal:
+An agent asked "is this page good?" answers with confidence and no evidence. One number then hides that the people who pay and the people who pass by disagree. PersonaJury is three laws, each enforced by a refusal:
 
-1. **The engine never calls a model.** It stores personas, panels, lenses and subjects, writes the briefs and checks the verdicts. Your agent runs the personas on its own model and its own bill. The engine makes no network call either: `deny.toml` bans every HTTP client crate in CI, and two tests in [`crates/jurypersona/tests/guards.rs`](crates/jurypersona/tests/guards.rs) fail on a network crate in `Cargo.lock` or a `std::net` socket in the source.
+1. **The engine never calls a model.** It stores personas, panels, lenses and subjects, writes the briefs and checks the verdicts. Your agent runs the personas on its own model and its own bill. The engine makes no network call either: `deny.toml` bans every HTTP client crate in CI, and two tests in [`crates/personajury/tests/guards.rs`](crates/personajury/tests/guards.rs) fail on a network crate in `Cargo.lock` or a `std::net` socket in the source.
 2. **Evidence, or it is labelled.** Every verdict line is `seen` (it cites an attachment of the run: an ARIA node, a screenshot, a diff line), `told` (the brief said it) or `recalled` (the model's memory, shown as such). A `seen` line with no citation is refused, and the persona answers again.
 3. **Strata are never averaged.** Each persona has a stake: `primary` (would use it), `secondary` (buys, approves or supports it) or `bystander` (passes by). Scores are reported per stratum, side by side. The engine refuses the table that pools them.
 
@@ -188,11 +188,11 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 
 `should-run` says whether a change needs a jury. `brief` writes one hashed brief per persona. Your agent's subagents answer, and `verdict` ingests or refuses each answer. `matrix` reports per stratum. `decide` closes each finding as `fixed`, `dismissed` (with a why) or `row` (an issue). `delta` says whether the next round landed. `apply-check` says, last, whether the agent may apply the fixes.
 
-`jurypersona graph` draws the whole fixture jury as one picture. Read it left to right: the personas, grouped by stake; the dimensions they scored, each with one median per stratum; the findings they raised, outlined by what was decided.
+`personajury graph` draws the whole fixture jury as one picture. Read it left to right: the personas, grouped by stake; the dimensions they scored, each with one median per stratum; the findings they raised, outlined by what was decided.
 
-<p align="center"><img src="docs/assets/jurypersona-graph.svg" alt="JuryPersona · lantern-site, the fixture run on the Lantern Notes site, drawn by jurypersona graph: 7 personas in three strata (primary 4, secondary 2, bystander 1) on the left, the 6 dimensions they scored across 2 lenses in the middle, each with one median badge per stratum and never one number across strata, and the 26 findings on the right, coloured by their decision: 0 open, 0 fixed, 11 dismissed, 15 sent to a row." width="100%"></p>
+<p align="center"><img src="docs/assets/personajury-graph.svg" alt="PersonaJury · lantern-site, the fixture run on the Lantern Notes site, drawn by personajury graph: 7 personas in three strata (primary 4, secondary 2, bystander 1) on the left, the 6 dimensions they scored across 2 lenses in the middle, each with one median badge per stratum and never one number across strata, and the 26 findings on the right, coloured by their decision: 0 open, 0 fixed, 11 dismissed, 15 sent to a row." width="100%"></p>
 
-- **Rules pick the panel per audience.** `brief --rule CLASS` takes the panel, lenses, spend and detail from `jurypersona.toml`, one run per lens.
+- **Rules pick the panel per audience.** `brief --rule CLASS` takes the panel, lenses, spend and detail from `personajury.toml`, one run per lens.
 - **A seeded draw.** When a pool holds more personas than seats, the seats are drawn from the subject's name, so round 2 meets the same jurors and `delta` can land.
 - **Agent overrides carry a reason.** The agent may change a rule's panel, spend, lens or detail, but each change needs `--reason`, and `matrix` shows it. A brief seats at most 12 without a reason, up to 1000 with `--allow-large`.
 - **Waves.** Every brief lists its jurors in waves of 30 (`--wave N`). The agent runs a wave, ingests it, then the next.
@@ -208,7 +208,7 @@ Measured by `scripts/readme-assets-data.sh` ([`docs/assets/spend.json`](docs/ass
 
 ### The last word: `apply-check`
 
-`jurypersona apply-check RUN...` answers one of four words, with its reasons as data. The agent runs it last and obeys it. It applies nothing itself.
+`personajury apply-check RUN...` answers one of four words, with its reasons as data. The agent runs it last and obeys it. It applies nothing itself.
 
 - **`apply`**: the agent may apply the fixes.
 - **`advise`**: something is unknown, missing or lowered. The findings still help; the agent does not apply them on its own.
@@ -219,7 +219,7 @@ Measured by `scripts/readme-assets-data.sh` ([`docs/assets/spend.json`](docs/ass
 
 ### Cost, independence, experts
 
-- **Effort.** One word sets what a jury may spend: `effort = "low|medium|high|max"` in `jurypersona.toml`, or `brief --effort`. Under a rule, `low` seats 3 with one lens, `medium` (the default) at most 7, `high` at most 12. Every cap keeps one seat per stratum.
+- **Effort.** One word sets what a jury may spend: `effort = "low|medium|high|max"` in `personajury.toml`, or `brief --effort`. Under a rule, `low` seats 3 with one lens, `medium` (the default) at most 7, `high` at most 12. Every cap keeps one seat per stratum.
 - **`budget_tokens`.** An optional cap on the estimate. The brief trims lenses, then seats, to fit, and records each cut. A cheap jury on a `high` quorum only advises.
 - **Independence.** A run is `independent` (one context per brief) or `sequential` (one context reads every brief, as in Claude Desktop or a chat window). Sequential runs only advise.
 - **Experts and human verdicts.** A persona may carry a `credential`, and a lens a named `standard`. A real person's verdict goes in with `verdict --by-human "<name, credential>"`. It stands beside the jury, never in a median, and a blocker it raises escalates until a person closes it. An agent cannot enter one.
@@ -229,10 +229,10 @@ Measured by `scripts/readme-assets-data.sh` ([`docs/assets/spend.json`](docs/ass
 
 ### Reading the answer: `summary`
 
-`jurypersona summary RUN...` writes sentences first, then the numbers for checking, then what to do next. There are no bars: a display jury of eight gave bars 0 picks ([D24](docs/decisions.md)). The fixture run, from [`fixtures/run/summary.txt`](fixtures/run/summary.txt):
+`personajury summary RUN...` writes sentences first, then the numbers for checking, then what to do next. There are no bars: a display jury of eight gave bars 0 picks ([D24](docs/decisions.md)). The fixture run, from [`fixtures/run/summary.txt`](fixtures/run/summary.txt):
 
 ```text
-JuryPersona summary: lantern-site, runs 1 2 (critical, compare)
+PersonaJury summary: lantern-site, runs 1 2 (critical, compare)
 
 The jury says: escalate. Primary jurors raised 15 blockers, the groups disagree
 on 2 scores, and 26 findings have no decision yet.
@@ -248,16 +248,16 @@ lantern-site       2·2·2  2·2·2   2·2·2    2·1·2    2·2·2  2·2·2
 Next: run the high quorum with these reasons in hand before applying anything.
 ```
 
-`--md` and `--html` write the same summary as a file. The MCP tool is `jurypersona_summary`.
+`--md` and `--html` write the same summary as a file. The MCP tool is `personajury_summary`.
 
 ### In CI and in your own code
 
 - **The GitHub Action** ([`action.yml`](action.yml), [`docs/ci.md`](docs/ci.md)) classifies a pull request with `should-run`. With a committed store it also runs `check` and `apply-check`. It calls no model and needs no secret. By default `human`, `escalate` or an engine error fails the job. It installs the release binary through `scripts/install.sh`, checksum checked. Unverified on GitHub: it is tested against a local binary.
-- **The Claude Agent SDK recipe** ([`docs/agent-sdk.md`](docs/agent-sdk.md)) runs one SDK session per brief, so each juror has its own context. A coordinator ingests the verdicts through `jurypersona mcp`. A test checks only that the example compiles; running it needs your own key.
+- **The Claude Agent SDK recipe** ([`docs/agent-sdk.md`](docs/agent-sdk.md)) runs one SDK session per brief, so each juror has its own context. A coordinator ingests the verdicts through `personajury mcp`. A test checks only that the example compiles; running it needs your own key.
 
 ## Where results live
 
-The store, `.jurypersona/store.db`, is the record. It is append-only, and it does not belong in git unless CI reads it. Reports are views of the store. They are written only when you ask (`summary --md` or `--html`), or into the `report_dir` named in `jurypersona.toml` by `summary --save`. With no `report_dir`, nothing is written ([`docs/usage.md`](docs/usage.md#where-results-live)).
+The store, `.personajury/store.db`, is the record. It is append-only, and it does not belong in git unless CI reads it. Reports are views of the store. They are written only when you ask (`summary --md` or `--html`), or into the `report_dir` named in `personajury.toml` by `summary --save`. With no `report_dir`, nothing is written ([`docs/usage.md`](docs/usage.md#where-results-live)).
 
 ## Display is free, the verdict is not
 
@@ -297,7 +297,7 @@ Anything people read or look at, as long as you can attach it as files. The jury
 | Logos and design | one board per candidate: small and large, light and dark | the users / the approvers / a passer-by | your own lens with a forced pick, as the [logo jury](docs/reports/2026-10-24-logo-jury.md) did |
 | Technical decisions (the trade-offs, not correctness) | one text file per option: a README excerpt, a usage snippet, the licence, the release cadence | the maintainer and an SRE / a security reviewer and a new hire / a finance approver | [`tradeoffs`](fixtures/lenses/tradeoffs.toml), with a forced pick |
 
-The three sector lenses and `tradeoffs` ship as data in `fixtures/lenses/`, not seeded: `jurypersona lens add --file fixtures/lenses/investor-pitch.toml`. Each sector lens has four dimensions and `tradeoffs` has five, with anchors in words at 1, 3 and 5.
+The three sector lenses and `tradeoffs` ship as data in `fixtures/lenses/`, not seeded: `personajury lens add --file fixtures/lenses/investor-pitch.toml`. Each sector lens has four dimensions and `tradeoffs` has five, with anchors in words at 1, 3 and 5.
 
 Worked stories: [choose between technical options](docs/playbooks/a-technical-decision.md), [your own juror, a devil's advocate, real people](docs/playbooks/your-own-jurors.md), and [all playbooks](docs/playbooks/README.md).
 
@@ -322,7 +322,7 @@ A lens is a set of dimensions with anchors in words: what a 1, a 3 and a 5 look 
 | `tradeoffs` | fit, risk, cost-to-change, operability, learning-curve; the persona also picks one option | `fixtures/lenses/` |
 | `site` | six criteria on a 1 to 10 scale, for the held-out check | `fixtures/lenses/` |
 
-Add your own with `jurypersona lens add --file my-lens.toml`; `jurypersona lens list` shows them.
+Add your own with `personajury lens add --file my-lens.toml`; `personajury lens list` shows them.
 
 ## What the engine refuses
 
@@ -336,11 +336,11 @@ Each refusal is a test that was seen failing first. The codes are in [`docs/trou
 - a rule override, or a brief above 12 seats, without a reason;
 - a decision on a finding a person raised, unless a person makes it;
 - reported usage in any shape but two non-negative token counts;
-- a `jurypersona.toml` that puts a human class under a persona quorum.
+- a `personajury.toml` that puts a human class under a persona quorum.
 
 ## Not every change needs a jury
 
-`jurypersona.toml` holds trigger rules as data ([`fixtures/jurypersona.toml`](fixtures/jurypersona.toml) is an example). `should-run` classifies a diff:
+`personajury.toml` holds trigger rules as data ([`fixtures/personajury.toml`](fixtures/personajury.toml) is an example). `should-run` classifies a diff:
 
 | quorum | who decides |
 |---|---|
@@ -355,7 +355,7 @@ The human classes are money, permission, deploy, secret, licence, public-claim a
 
 ## Agents and platforms
 
-`jurypersona setup` registers the MCP server with Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes, Windsurf, Antigravity, Kiro, GitHub Copilot, Copilot CLI and Qwen Code; any other MCP client can run `jurypersona mcp`. The CLI does everything the tools do. Release builds: Linux x64 and arm64, macOS arm64 and x64, Windows x64. Two skills, [`running-a-jury`](skills/running-a-jury) and [`writing-a-persona`](skills/writing-a-persona), teach your agent the loop.
+`personajury setup` registers the MCP server with Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Hermes, Windsurf, Antigravity, Kiro, GitHub Copilot, Copilot CLI and Qwen Code; any other MCP client can run `personajury mcp`. The CLI does everything the tools do. Release builds: Linux x64 and arm64, macOS arm64 and x64, Windows x64. Two skills, [`running-a-jury`](skills/running-a-jury) and [`writing-a-persona`](skills/writing-a-persona), teach your agent the loop.
 
 - **Claude Desktop:** drop a `.mcpb` bundle on the app. The release does not carry the bundles yet, so build one with `scripts/build-mcpb.sh <platform> <binary>`. Desktop has no subagents, so brief with `--independence sequential`; those runs advise and never apply. Unverified: no maintainer has installed a bundle by hand yet.
 - **A chat window:** no server, files only. Paste one brief per chat and save the verdict JSON it answers ([`docs/usage.md`](docs/usage.md#where-it-runs)).

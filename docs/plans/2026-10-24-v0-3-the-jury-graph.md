@@ -1,4 +1,4 @@
-# JuryPersona v0.3 — the jury graph — Implementation Plan (as built)
+# PersonaJury v0.3 — the jury graph — Implementation Plan (as built)
 
 > **As built.** Written after the work, from the code, the tests and the review. Decisions of record: D11 and D12 in
 > [`../decisions.md`](../decisions.md). Measured result: [`../reports/2026-10-24-v0-3-measured.md`](../reports/2026-10-24-v0-3-measured.md).
@@ -21,7 +21,7 @@ force simulation, no float, no new crate. Medians come from `domain::matrix::bui
 | # | what |
 |---|---|
 | D11 | The graph: columns that descend like stairs so no edge runs behind another stratum's boxes; edge colour by score or by decision; rounds as a strip of dots; the MCP tool count goes 5 to 6 |
-| D12 | Waves (`--wave N`, default 30); `usage` on a verdict (table `usage`, `invalid_usage`); the allowed anchors in the brief; a reason for any brief above 12 seats; a malformed `jurypersona.toml` is refused; comma-separated `--comparator`. Brief hashes: 14 of 14 recorded hashes changed |
+| D12 | Waves (`--wave N`, default 30); `usage` on a verdict (table `usage`, `invalid_usage`); the allowed anchors in the brief; a reason for any brief above 12 seats; a malformed `personajury.toml` is refused; comma-separated `--comparator`. Brief hashes: 14 of 14 recorded hashes changed |
 
 ## Tasks (six commits)
 
@@ -30,7 +30,7 @@ force simulation, no float, no new crate. Medians come from `domain::matrix::bui
 2. **A verdict may report its usage.** Append-only table `usage` (`CREATE TABLE IF NOT EXISTS`, schema version stays 3); `invalid_usage`.
 3. **Test: a refused usage stores nothing.**
 4. **`check --history` lists each finding's life across runs** (`lives`, the same function the graph uses). 3 tests red, then green.
-5. **`graph RUN... --svg [--out F]` and the MCP tool `jurypersona_graph`.** 12 graph tests red (the verb did not exist), 15 green; the MCP
+5. **`graph RUN... --svg [--out F]` and the MCP tool `personajury_graph`.** 12 graph tests red (the verb did not exist), 15 green; the MCP
    list test red (5 tools against 6), then green; an MCP call test added after (16 in the file).
 6. **Docs:** D11, D12, `commands.md`, `mcp-tools.md`, `troubleshooting.md`, the changelog, the skill's waves.
 

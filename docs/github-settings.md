@@ -1,16 +1,16 @@
 # GitHub settings
 
-For the maintainer. These are set by hand on github.com/massrelay-ai/jurypersona (Settings, then the About box on the repository
+For the maintainer. These are set by hand on github.com/massrelay-ai/personajury (Settings, then the About box on the repository
 page); nothing in the repository applies them.
 
 ## Repository
 
-- **Name:** `jurypersona` (organisation `massrelay-ai`).
+- **Name:** `personajury` (organisation `massrelay-ai`).
 - **Description** (the first sentence of the README):
 
-  > JuryPersona: synthetic users as a jury. AI personas judge your page, docs, deck or change, and only verdicts with evidence count. Local, no model calls.
+  > PersonaJury: synthetic users as a jury. AI personas judge your page, docs, deck or change, and only verdicts with evidence count. Local, no model calls.
 
-- **Website:** the documentation or leave empty until `jurypersona.com` is registered.
+- **Website:** the documentation or leave empty until `personajury.com` is registered.
 - **Topics** (ten):
 
   ```

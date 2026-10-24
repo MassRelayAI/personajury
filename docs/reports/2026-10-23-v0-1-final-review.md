@@ -7,10 +7,10 @@ reviewer: final whole-branch review (Opus), read-only
 scope: final-review-package.diff (engine src + lenses; setup.rs excluded), decisions D1–D7, progress.md rulings and deferred minors, docs/reports/2026-10-23-v0-1-measured.md
 ---
 
-# JuryPersona v0.1: final review
+# PersonaJury v0.1: final review
 
-`cargo test -p jurypersona`: 207 passed, 0 failed, the same as the measurement. Every Critical and Important finding below
-was reproduced with `target/debug/jurypersona` in throwaway workspaces under
+`cargo test -p personajury`: 207 passed, 0 failed, the same as the measurement. Every Critical and Important finding below
+was reproduced with `target/debug/personajury` in throwaway workspaces under
 `/tmp/claude-1001/-mnt-extra-disk-repos/10cc8f43-f927-415f-a4e9-2945df54356e/scratchpad/rv/`. The repo was not modified.
 The workspace helper `mk.sh` there builds the base case: personas `ana` and `cy` tagged `t`, panel `p = "2 t"`, subject
 `site` with one `walk.json` (node `n1`), and the briefs use `--stake ana=primary,cy=bystander`.
@@ -29,7 +29,7 @@ The workspace helper `mk.sh` there builds the base case: personas `ana` and `cy`
 - Verdict, pick and decision are append-only through triggers (store/schema.sql:40–45), and no API path issues
   UPDATE or DELETE on them.
 - No network crate is in the lock, and no secret env read appears outside setup.rs (which reads only HOME,
-  XDG_CONFIG_HOME, JURYPERSONA_BIN, PATH and JURYPERSONA_NOW). The engine never spawns a process.
+  XDG_CONFIG_HOME, PERSONAJURY_BIN, PATH and PERSONAJURY_NOW). The engine never spawns a process.
 
 ## Critical
 
@@ -173,7 +173,7 @@ gate's whole value is that the agent cannot clear it without a recorded decision
   question. Fix: key on resolved citations of checked kinds only, plus the finding text.
 - **Network guard covers crates only.** `tests/guards.rs` scans for network crates. `std::net::TcpStream` needs no crate
   and would pass. Fix: add a grep for `std::net` and `TcpStream` to the guard, with a planted test.
-- **MCP descriptions overstate what delta checks.** `jurypersona_delta` says it "refuses runs that differ in lens or
+- **MCP descriptions overstate what delta checks.** `personajury_delta` says it "refuses runs that differ in lens or
   panel", but panel is not checked, and it says "per stratum", which it is not (see I1). Fix the text, or implement both.
 - **Wrong error codes.** A missing `--attach`, `--file` or `verdict --file` returns `io_error` rather than `not_found`
   (should-run already maps NotFound).

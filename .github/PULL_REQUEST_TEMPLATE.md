@@ -22,4 +22,4 @@ Which test went red first, and where is it?
 - [ ] Decision row added or updated in `docs/decisions.md` for any provisional choice, and for any change to the law
       (evidence classes, strata, refusals, human classes)
 - [ ] No model call, network call, API key or new dependency entered the engine
-- [ ] `cargo test -p jurypersona` and `cargo clippy -p jurypersona --tests -- -D warnings` pass locally
+- [ ] `cargo test -p personajury` and `cargo clippy -p personajury --tests -- -D warnings` pass locally

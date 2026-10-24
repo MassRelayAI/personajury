@@ -1,13 +1,13 @@
-<!-- sources: fixtures/jurypersona.toml (the rules); docs/commands.md (should-run); README.md "Not every change needs a jury" (quorum table, human classes); docs/reports/2026-10-24-how-far-can-a-jury-go.md §4 (when a change applies itself); docs/roadmap.md (CI runner not built). v0.4 items (effort, apply-check) are described from the v0.4 plan and may not be in your build yet. -->
+<!-- sources: fixtures/personajury.toml (the rules); docs/commands.md (should-run); README.md "Not every change needs a jury" (quorum table, human classes); docs/reports/2026-10-24-how-far-can-a-jury-go.md §4 (when a change applies itself); docs/roadmap.md (CI runner not built). v0.4 items (effort, apply-check) are described from the v0.4 plan and may not be in your build yet. -->
 
 # Check a change in a pull request
 
-Most changes need no jury. A typo fix in the tests does not. A new pricing page does. JuryPersona lets you write that down
+Most changes need no jury. A typo fix in the tests does not. A new pricing page does. PersonaJury lets you write that down
 once, as rules, and then asks the rules on every change.
 
 ## 1. Write the rules once
 
-`jurypersona.toml` lists paths and what they need. The example in [`fixtures/jurypersona.toml`](../../fixtures/jurypersona.toml)
+`personajury.toml` lists paths and what they need. The example in [`fixtures/personajury.toml`](../../fixtures/personajury.toml)
 says:
 - **the site and pricing pages:** the full panel, every lens (`high`);
 - **copy only:** one persona, one cheap lens (`low`);
@@ -20,7 +20,7 @@ The engine refuses a rules file that lets a jury decide a human class.
 
 ```bash
 git diff main > change.diff
-jurypersona should-run --diff change.diff
+personajury should-run --diff change.diff
 ```
 
 The answer is one word, `none`, `low`, `high` or `human`, with the rule that matched and how many personas it wants.
@@ -32,8 +32,8 @@ The answer is one word, `none`, `low`, `high` or `human`, with the rule that mat
 
 > **v0.4.** `effort` may not be in your build yet.
 
-One word, the same words as your agent's effort setting: `low`, `medium`, `high` or `max`. Set it in `jurypersona.toml`
-(`effort = "medium"` is the default), or per run with `jurypersona brief --effort low`. You can also set a hard cap,
+One word, the same words as your agent's effort setting: `low`, `medium`, `high` or `max`. Set it in `personajury.toml`
+(`effort = "medium"` is the default), or per run with `personajury brief --effort low`. You can also set a hard cap,
 `budget_tokens`.
 
 | effort | personas | lenses | detail |
@@ -54,7 +54,7 @@ your effort is below what the rule needs, the jury still runs, but it may only a
 After the jury and the fixes, one command gives one answer:
 
 ```bash
-jurypersona apply-check <run>...
+personajury apply-check <run>...
 ```
 
 | answer | when | what happens |

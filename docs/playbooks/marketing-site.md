@@ -5,7 +5,7 @@
 A story on **Lantern Notes**, the made-up site in [`fixtures/`](../../fixtures/README.md). It is a shared notebook for small
 teams. We planted four mistakes in it. Nothing on it can be bought.
 
-You will need an agent that can run subagents (Claude Code, Codex, Cursor, …) and JuryPersona installed. You do not need to
+You will need an agent that can run subagents (Claude Code, Codex, Cursor, …) and PersonaJury installed. You do not need to
 read code. You need to read what the jury says, and decide.
 
 <p align="center"><img src="../assets/playbook-site.svg" alt="One round of a marketing-site jury in five steps: screenshots of each page on desktop and phone plus a walk of the page; personas grouped by audience; scores read per group and never pooled; the owner's five rules filter the findings; what passes becomes fixes, and the next round starts with new screenshots." width="100%"></p>
@@ -57,9 +57,9 @@ A lens is the question the jury answers, with the scores written in words. Use f
 The commands, as the fixture runs them ([`fixtures/run/setup.sh`](../../fixtures/run/setup.sh)):
 
 ```bash
-jurypersona subject add lantern-site --kind page --attach home.walk.json home.png pricing.walk.json pricing.png
-jurypersona comparator add acme-pricing --kind prices --attach acme/pricing.walk.json acme/pricing.png
-jurypersona brief --subject lantern-site --panel fixture --lens critical,compare --comparator acme-pricing \
+personajury subject add lantern-site --kind page --attach home.walk.json home.png pricing.walk.json pricing.png
+personajury comparator add acme-pricing --kind prices --attach acme/pricing.walk.json acme/pricing.png
+personajury brief --subject lantern-site --panel fixture --lens critical,compare --comparator acme-pricing \
   --stake "builder-ana=primary,...,investor-claire=bystander" --model claude-sonnet-5-5
 ```
 
@@ -83,7 +83,7 @@ list where your taste lens's `standard` points (a file in your repo), and write 
 - Every section the same shape: icon, bold line, two lines of grey.
 - A button that says "Get started" and does not say what starts.
 
-A taste lens for this, as a file you load with `jurypersona lens add --file`:
+A taste lens for this, as a file you load with `personajury lens add --file`:
 
 ```toml
 name = "taste-site"
@@ -109,7 +109,7 @@ rounds. The jury catches what a lint cannot: a page that is clean and still says
 
 ## 4. Read the scores per group
 
-`jurypersona matrix` gives one table per group. It never gives one number for everybody. On Lantern Notes, round 1:
+`personajury matrix` gives one table per group. It never gives one number for everybody. On Lantern Notes, round 1:
 - On clarity against the rival, every group put Acme ahead: median 4 to 2 for the builders and Sofia, 4 to 1 for the
   companies, 4 to 2 for the investor (`docs/assets/strata.json`).
 - Asked which page they would try first, 3 of the 4 primary personas picked Acme (`fixtures/run/picks.json`).
@@ -138,18 +138,18 @@ with a reason, or open an issue. The **owner** (you) decides. Five rules make th
 Each decision is written down with its reason, and cannot be edited afterwards:
 
 ```bash
-jurypersona decide <finding> fixed --by owner
-jurypersona decide <finding> dismissed --why "not a defect: the Studio plan shows its price" --by owner
-jurypersona decide <finding> row --row "issue: publish the Team price" --by owner
+personajury decide <finding> fixed --by owner
+personajury decide <finding> dismissed --why "not a defect: the Studio plan shows its price" --by owner
+personajury decide <finding> row --row "issue: publish the Team price" --by owner
 ```
 
 ## 6. Fix, and prove the fix landed
 
 Make the fixes. Take new screenshots. Run the same personas on the same lenses again. Then:
-- `jurypersona delta <round 1> <round 2>` says what moved, per group. It refuses to say "landed" if a group's blockers rose,
+- `personajury delta <round 1> <round 2>` says what moved, per group. It refuses to say "landed" if a group's blockers rose,
   a score fell by more than one anchor, or a cell went unscored.
-- `jurypersona check` says whether every fixed finding stayed fixed when the same personas looked again.
-- **v0.4:** `jurypersona apply-check` gives one answer: *apply*, *escalate*, *human* or *advise*. See
+- `personajury check` says whether every fixed finding stayed fixed when the same personas looked again.
+- **v0.4:** `personajury apply-check` gives one answer: *apply*, *escalate*, *human* or *advise*. See
   [a change in a pull request](a-change-in-a-pull-request.md).
 
 We have not run round 2 on the fixture. A real two-round jury did: see [docs and README](docs-and-readme.md).

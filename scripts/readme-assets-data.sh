@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Writes docs/assets/spend.json: the bytes of the briefs for --spend 1, 3, 7 x --detail compact, full on the critical lens,
 # measured by running the binary on the fixture workspace the way fixtures/run/setup.sh does. Deterministic.
-# Usage: scripts/readme-assets-data.sh <jurypersona binary>     (strata.json and matrix.json are derived by readme-assets.mjs --derive)
+# Usage: scripts/readme-assets-data.sh <personajury binary>     (strata.json and matrix.json are derived by readme-assets.mjs --derive)
 set -euo pipefail
-J="${1:?usage: readme-assets-data.sh <jurypersona binary>}"
+J="${1:?usage: readme-assets-data.sh <personajury binary>}"
 R="$(cd "$(dirname "$0")/.." && pwd)"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 j() { "$J" --root "$W" "$@"; }
@@ -17,11 +17,11 @@ for spend in 1 3 7; do for detail in compact full; do
     | node -e 'const d=JSON.parse(require("fs").readFileSync(0,"utf8")).data;
       console.log(JSON.stringify({spend:d.spend,detail:d.detail,briefs:d.briefs.length,bytes:d.briefs.reduce((a,b)=>a+b.bytes,0)}))' >> "$OUT"
 done; done
-TOK="$(sed -n 's/^tokens_per_brief *= *\([0-9]*\).*/\1/p' "$R/fixtures/jurypersona.toml")"
+TOK="$(sed -n 's/^tokens_per_brief *= *\([0-9]*\).*/\1/p' "$R/fixtures/personajury.toml")"
 node -e '
 const rows=require("fs").readFileSync(process.argv[1],"utf8").trim().split("\n").map(JSON.parse);
 const out={title:"What a jury costs the agent: brief bytes by spend and detail",
- command:"jurypersona brief --subject lantern-site --panel fixture --lens critical --stake <seven stakes> --spend N --detail compact|full --model claude-sonnet-5-5, on the workspace fixtures/run/setup.sh builds; the bytes of every brief of the run, summed",
+ command:"personajury brief --subject lantern-site --panel fixture --lens critical --stake <seven stakes> --spend N --detail compact|full --model claude-sonnet-5-5, on the workspace fixtures/run/setup.sh builds; the bytes of every brief of the run, summed",
  tokens_per_brief:+process.argv[2],
  caption:"Two knobs: how many, and how much each carries. The token figure is the project toml’s own estimate, not a measurement.",
  rows};

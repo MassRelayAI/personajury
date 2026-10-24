@@ -217,7 +217,7 @@ ${g < spends.length - 1 ? `<line x1="30" y1="${y + groupH - 14}" x2="${W - 30}" 
 `;
   return o + close;
 }
-const tokenNote = (d) => `Bytes are measured on the fixture (critical lens, linear scale). The token figure is ${num(d.tokens_per_brief)} per brief from fixtures/jurypersona.toml, an estimate.`;
+const tokenNote = (d) => `Bytes are measured on the fixture (critical lens, linear scale). The token figure is ${num(d.tokens_per_brief)} per brief from fixtures/personajury.toml, an estimate.`;
 
 // ---------------------------------------------------------------- matrix
 

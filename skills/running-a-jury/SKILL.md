@@ -1,17 +1,17 @@
 ---
 name: running-a-jury
-description: Use when a change or a subject (a page, a diff, a design, a price table) should be judged by personas - it is the agent's loop with JuryPersona: should-run, brief, one subagent per persona, verdict, matrix per stratum, foreman, decide, delta.
+description: Use when a change or a subject (a page, a diff, a design, a price table) should be judged by personas - it is the agent's loop with PersonaJury: should-run, brief, one subagent per persona, verdict, matrix per stratum, foreman, decide, delta.
 ---
 <!-- adapted from comparegraph skills/using-comparegraph/SKILL.md (style) -->
 # Running a jury
 
-JuryPersona never calls a model. It holds the store, writes the briefs, ingests verdicts, refuses the ones without evidence,
+PersonaJury never calls a model. It holds the store, writes the briefs, ingests verdicts, refuses the ones without evidence,
 and reports scores per stratum. You run the personas, with your own subagents and your own model.
 
 ## 0. Is a jury needed?
 If a diff triggered this, ask the rules first:
 ```
-jurypersona should-run --diff change.diff          # or --paths site/pricing.html,crates/x.rs  [--config jurypersona.toml]
+personajury should-run --diff change.diff          # or --paths site/pricing.html,crates/x.rs  [--config personajury.toml]
 ```
 It answers `none | low | high | human` and the spend. `none`: stop, tests and the adversarial read decide. `human`: a
 person decides; a jury may advise but cannot apply the change. The hook runs at lane finish, not per save.
@@ -46,7 +46,7 @@ the engine draws them, seeded from the subject's name: the same subject keeps it
 
 When a rule matched, let it brief for you:
 ```
-jurypersona brief --subject home --rule public-surface --model sonnet
+personajury brief --subject home --rule public-surface --model sonnet
 ```
 The rule's panel, lenses, spend and detail are the defaults, one run per lens. The answer shows `estimate {briefs, tokens}`
 before anyone spends them. You may override anything: `--panel`, `--query "2 builder=primary, 1 others=bystander"` (an
@@ -56,7 +56,7 @@ needs `--reason "<why>"`, and is recorded on the run (`--by` names you); `matrix
 
 Without a rule, name everything:
 ```
-jurypersona brief --subject home --panel fixture --lens critical --model sonnet --spend 3 --detail compact \
+personajury brief --subject home --panel fixture --lens critical --model sonnet --spend 3 --detail compact \
   [--stake builder-ana=bystander] [--comparator acme-pricing]
 ```
 `--stake` wins over the panel's term and is needed only for a persona whose term has none. `--spend N` takes the first N
@@ -66,7 +66,7 @@ query that resolves to fewer personas than `--spend` is refused, and so is a ter
 (`panel_term_empty`). A citation into a text file (`README.md#L153`) must name a line the file has.
 
 ### How much to spend, and who the jurors are
-`effort` is one word, set in `jurypersona.toml` or per run with `--effort low|medium|high|max` (medium under a rule): `low` runs 3
+`effort` is one word, set in `personajury.toml` or per run with `--effort low|medium|high|max` (medium under a rule): `low` runs 3
 seats (one per stratum) and the rule's first lens, `medium` up to 7 seats, `high` up to 12, `max` the whole panel. A
 `budget_tokens` in the toml fits the run under a cap (`trimmed` in the answer lists every cut) or refuses it as `over_budget`.
 The rule says what the change needs, effort says what you will spend; the run gets the smaller, and `apply-check` will say
@@ -111,7 +111,7 @@ personas in parallel; Sonnet per persona is enough.
 
 ## 3. Ingest
 ```
-jurypersona verdict --run N --file verdicts/builder-ana.json
+personajury verdict --run N --file verdicts/builder-ana.json
 ```
 When it is **refused**, the same persona answers again, given the refusal message. Never edit the evidence, the citation or
 the score yourself to make it pass: the engine refuses what the persona did not see. A score at the bottom of the scale needs
@@ -126,13 +126,13 @@ a blocker (`bottom_score_without_blocker`); a missing or doubled dimension is re
 
 ## 4. Read per stratum
 ```
-jurypersona matrix N --table [--detail full]      # jurypersona pick N for the forced choices
+personajury matrix N --table [--detail full]      # personajury pick N for the forced choices
 ```
 Primary, secondary and bystander are side by side; the engine never averages across them, and neither do you. The
 interesting cell is where strata disagree. Within a stratum you get every score, the median (the lower middle value, an integer), min, max and the blockers. There is no
 mean anywhere.
 
-To look at the whole jury at once, `jurypersona graph N --svg --out jury.svg` (or `graph A B --svg` over two rounds, which
+To look at the whole jury at once, `personajury graph N --svg --out jury.svg` (or `graph A B --svg` over two rounds, which
 draws each finding's life as a strip of dots). Personas by stake, the dimensions they scored, the findings by decision;
 the medians are per stratum, as in the matrix.
 
@@ -140,10 +140,10 @@ the medians are per stratum, as in the matrix.
 A foreman pass reads all verdicts and proposes fixes (report §7: Opus for the foreman, Sonnet per persona). Each blocker
 (a finding) gets exactly one outcome, recorded by a person or by you with `--by` naming who:
 ```
-jurypersona decide <finding> fixed --by ana
-jurypersona decide <finding> dismissed --why "out of scope for v1" --by ana
-jurypersona decide <finding> row --row TRK-12 --by ana
-jurypersona check            # stale runs (the subject moved) and findings with no decision (from every batch) or fixed and raised again; exits 1
+personajury decide <finding> fixed --by ana
+personajury decide <finding> dismissed --why "out of scope for v1" --by ana
+personajury decide <finding> row --row TRK-12 --by ana
+personajury check            # stale runs (the subject moved) and findings with no decision (from every batch) or fixed and raised again; exits 1
 ```
 A dismissed point (same persona, same dimension, same citation hash; an uncited one is matched by its finding id) cannot
 return without new evidence. `check` also lists `fixed_unverified`: findings marked fixed that no later run of the same lens has judged with the persona who raised them. A fixed finding raised again is unresolved (`fix_not_landed`). `delta` lands only when every cell of the earlier run is judged again, no stratum's blockers rose, blockers went down (or stayed at zero) and no dimension fell by more than one anchor.
@@ -151,7 +151,7 @@ return without new evidence. `check` also lists `fixed_unverified`: findings mar
 ## 6. Next round
 After the fixes, attach the changed subject, `brief` again, ingest, then:
 ```
-jurypersona delta A B
+personajury delta A B
 ```
 A fix claimed in prose without a delta did not land as far as the engine can tell. A run whose subject changed since the
 brief is refused until it is briefed again.
@@ -166,7 +166,7 @@ brief is refused until it is briefed again.
 
 ## 7. Apply-check, last
 ```
-jurypersona apply-check <run>... [--rule <class>]
+personajury apply-check <run>... [--rule <class>]
 ```
 Run it last and obey it. It answers `apply | escalate | human | advise` and the reasons as data; it applies nothing itself.
 | answer | what you do |
@@ -181,13 +181,13 @@ A split is two strata whose `anchor_met` ranges on a cell do not overlap (touchi
 
 ## 8. Show the summary, last
 ```
-jurypersona summary <run>... [--html summary.html] [--md summary.md] [--save] [--width 80]
+personajury summary <run>... [--html summary.html] [--md summary.md] [--save] [--width 80]
 ```
 The last step of every run: paste the `text` it returns to the person **as it is** (sentences, then the numbers "for checking", then
 `Next:`), and offer the `--html` file (one offline page with the jury graph and every per-stratum table). Show it in chat first, then
-offer to save it as markdown (`--md`). When `jurypersona.toml` sets `report_dir = "docs/juries"`, save without asking: `--save` writes
+offer to save it as markdown (`--md`). When `personajury.toml` sets `report_dir = "docs/juries"`, save without asking: `--save` writes
 `<report_dir>/<date>-<subject>.md`. Without a `report_dir`, `--save` is refused (`no_report_dir`) and nothing is written; a `report_dir`
-outside the project root is refused (`invalid_report_dir`). The MCP tool `jurypersona_summary` returns the same text, and writes `md` or
+outside the project root is refused (`invalid_report_dir`). The MCP tool `personajury_summary` returns the same text, and writes `md` or
 `html` only at a relative path inside the project root.
 
 ## Display is free, the verdict is not
@@ -203,7 +203,7 @@ run to speak from, and the rows stand beside the jury's, never in a cell. Only a
 makes `apply-check` escalate until a person closes the finding with `decide --by-human "<name>"`; you cannot.
 
 **Calibrate** the jury against people: enter a person's verdicts as a human run (`--by-human`), then
-`jurypersona calibrate <jury-run> <human-run> --out cal.json`. It ranks the cells per stratum for each side and says which are within one
+`personajury calibrate <jury-run> <human-run> --out cal.json`. It ranks the cells per stratum for each side and says which are within one
 rank; `calibrated` is true when every primary cell is. Then `apply-check <run> --calibration cal.json`: an uncalibrated jury advises
 (`uncalibrated`), it never applies. Bystander differences are reported, never averaged in.
 

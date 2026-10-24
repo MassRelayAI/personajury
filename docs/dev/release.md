@@ -5,13 +5,13 @@ Maintainers only. A release is a tag; the workflow in `.github/workflows/release
 
 ## Before the tag
 
-1. The version is `[workspace.package] version` in `Cargo.toml`; `Cargo.lock` (the `jurypersona` entry), `server.json`,
+1. The version is `[workspace.package] version` in `Cargo.toml`; `Cargo.lock` (the `personajury` entry), `server.json`,
    `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`, `.codex-plugin/plugin.json`, `.cursor-plugin/plugin.json`,
    `gemini-extension.json`, `packaging/mcpb/manifest.json` and the release URLs in `server.json`'s `packages` repeat it
    (`tests/manifests.rs` fails when one disagrees). CI checks `server.json`. Bump them in the
    commit that will be tagged; the build jobs exit 4 when the tag disagrees with `Cargo.toml`.
 2. Date the section in `CHANGELOG.md` (`## [x.y.z] - YYYY-MM-DD`) and leave an empty `## [Unreleased]` above it.
-3. `cargo test -p jurypersona` and `cargo clippy -p jurypersona --tests -- -D warnings` green; the `ci` workflow green on
+3. `cargo test -p personajury` and `cargo clippy -p personajury --tests -- -D warnings` green; the `ci` workflow green on
    `main` for that commit.
 
 ## Set before the first release
@@ -20,8 +20,8 @@ Nothing has been released yet, so these are still placeholders. Set each one bef
 
 - `MCPB_CLI_VERSION` in `.github/workflows/release.yml` is a placeholder pin: verify the `@anthropic-ai/mcpb` version and set it.
 - The sha256 of each `.mcpb` bundle in `server.json` is written by the `publish-registry` job; check it after the first run.
-- The GitHub repository `massrelay-ai/jurypersona` exists, with the settings in [`../github-settings.md`](../github-settings.md).
-- The domains `jurypersona.com` and `jurypersona.ai` are registered by the maintainer before the announcement.
+- The GitHub repository `massrelay-ai/personajury` exists, with the settings in [`../github-settings.md`](../github-settings.md).
+- The domains `personajury.com` and `personajury.ai` are registered by the maintainer before the announcement.
 
 ## The tag
 
@@ -51,7 +51,7 @@ soon as the release exists.
 Verify a download with the GitHub CLI (2.49 or later):
 
 ```bash
-gh attestation verify jurypersona-linux-x64 -R massrelay-ai/jurypersona
+gh attestation verify personajury-linux-x64 -R massrelay-ai/personajury
 ```
 
 ## CI audit
@@ -64,8 +64,8 @@ HTTP client crate) and sources. An `ignore` entry in `[advisories]` carries its 
 On a clean machine:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/massrelay-ai/jurypersona/main/scripts/install.sh | sh
-jurypersona --version
+curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
+personajury --version
 ```
 
-In Claude Code: `/plugin install jurypersona --marketplace massrelay-ai/jurypersona`, then `jurypersona doctor` in a workspace.
+In Claude Code: `/plugin install personajury --marketplace massrelay-ai/personajury`, then `personajury doctor` in a workspace.

@@ -40,7 +40,7 @@ ones who can write its anchors.
 ## 3. Does it work in Codex, Claude Code, Claude Desktop, a chat?
 | where | how | independence of jurors |
 |---|---|---|
-| Claude Code, Codex, Cursor, Gemini CLI | the plugin / MCP server (`jurypersona mcp`) plus the skill; one subagent per brief | strong: each juror runs in its own context, in a private folder |
+| Claude Code, Codex, Cursor, Gemini CLI | the plugin / MCP server (`personajury mcp`) plus the skill; one subagent per brief | strong: each juror runs in its own context, in a private folder |
 | Claude Desktop (local) | the same stdio MCP server; a `.mcpb` bundle would make installing one click (not built) | depends on whether the client runs subagents |
 | a chat with no subagents and no local tools | the model plays each persona in turn from the briefs | **weak**: one context sees every juror, so the scores contaminate each other; label such a run as such |
 | a hosted chat connector (remote MCP) | would need a hosted store, which breaks "local, no network" | not planned |
@@ -49,7 +49,7 @@ The rule that makes a jury worth anything is independence: one juror, one contex
 Wherever that holds, the jury holds.
 
 ## 4. Can it answer instead of a human?
-For most changes, yes. JuryPersona's own two real runs went from brief to `delta landed` with no human decision. Every
+For most changes, yes. PersonaJury's own two real runs went from brief to `delta landed` with no human decision. Every
 finding was decided by the foreman with `--by foreman`. The question is not whether it can, but where it must not, and
 how we would know it went wrong.
 
@@ -90,7 +90,7 @@ accountability live.
 - the split rule and automatic escalation;
 - `lens generate`;
 - `brief --model` per term;
-- a calibration run (`jurypersona calibrate`: human scores entered as verdicts by a person, compared with the jury per
+- a calibration run (`personajury calibrate`: human scores entered as verdicts by a person, compared with the jury per
   stratum);
 - a cell locator for spreadsheets;
 - an `.mcpb` bundle.

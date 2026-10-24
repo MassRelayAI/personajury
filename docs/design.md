@@ -1,6 +1,6 @@
 # Design: the law of the tool
 
-This page summarises the design report, "JuryPersona: our second OSS tool, the persona jury as an engine", dated 2026-10-23
+This page summarises the design report, "PersonaJury: our second OSS tool, the persona jury as an engine", dated 2026-10-23
 (kept privately by the maintainer; decision D1). It adds nothing to it. Section numbers below are the report's.
 
 | rule | what it says | report |
@@ -13,8 +13,8 @@ This page summarises the design report, "JuryPersona: our second OSS tool, the p
 | rounds diff | a run is pinned to the subject, panel, lens version and model; `delta` shows what moved; `check` marks a run stale when the subject changed | section 2.6 |
 | the store | personas, panels, lenses, subjects, comparators, runs, verdicts, decisions; verdicts and decisions are append-only | section 4 |
 | what the engine refuses | the list in section 5, each a test seen red first, with codes in the v0.1 plan | section 5 |
-| not every change needs a jury | `should-run` classifies a diff against `jurypersona.toml` into `none`, `low`, `high`, `human`; findings each get one decision; a dismissed point cannot return without new evidence | section 10 |
-| the human classes | money, permission, deploy, secret, licence, public-claim, brand; no persona quorum may decide them, and a `jurypersona.toml` that tries is refused | section 10 |
+| not every change needs a jury | `should-run` classifies a diff against `personajury.toml` into `none`, `low`, `high`, `human`; findings each get one decision; a dismissed point cannot return without new evidence | section 10 |
+| the human classes | money, permission, deploy, secret, licence, public-claim, brand; no persona quorum may decide them, and a `personajury.toml` that tries is refused | section 10 |
 
 Build-time choices the report leaves open are in [`decisions.md`](decisions.md) (D3 to D5). What the engine cannot see (image
 regions, whether a persona really read what it cites, colour and layout outside screenshots) is stated in the README.

@@ -1,7 +1,7 @@
 <!-- structure follows the governance files of goose, A2A, keycloak, openllmetry and openlineage (Apache-2.0); text is our own -->
 # Governance
 
-JuryPersona is a small project with one maintainer. This file says who decides, how a decision is recorded, what only a
+PersonaJury is a small project with one maintainer. This file says who decides, how a decision is recorded, what only a
 recorded decision may change, and how that could widen later. It describes what is true now; it promises no committee.
 
 ## Roles
@@ -27,7 +27,7 @@ These are the commitments users rely on (the design in `docs/design.md`, report 
 - the strata (`primary`, `secondary`, `bystander`) and the rule that nothing averages across them;
 - the refusals (the table in `docs/plans/2026-10-23-v0-1-the-engine.md`, each with its error code);
 - the human classes (money, permission, deploy, secret, licence, public-claim, brand), which no persona quorum may decide.
-  `HUMAN_CLASSES` in the engine is law: a `jurypersona.toml` that puts one under a persona quorum is refused
+  `HUMAN_CLASSES` in the engine is law: a `personajury.toml` that puts one under a persona quorum is refused
   (`human_class_under_persona_quorum`), the list lives in the engine because a toml must not be able to weaken it, a change
   to the list or to that refusal needs a numbered decision, and a pull request that weakens it is closed;
 - the rule that the engine never calls a model and never touches the network.
@@ -48,7 +48,7 @@ the change. A pull request that edits them without both is closed with a pointer
 - **A lens** is data: a TOML file with dimensions and anchors in words at 1, 3 and 5 (see `lenses/`). Open an issue
   (feature request) with the file, the question the lens asks that the four shipped ones do not, and one run that shows it
   separates good from bad. A lens that only renames a shipped dimension is declined. Loading your own is always possible
-  without us: `jurypersona lens add --file my-lens.toml`.
+  without us: `personajury lens add --file my-lens.toml`.
 - **A persona set** is data: JSON personas in the fixed shape (see `skills/writing-a-persona`), plus the material they were
   written from. Say who they are for, what stake rules they carry and where the set could mislead. Personas are composites and must not copy a
   real person's identity (`PERSONAS.md`); a lens follows `docs/lenses.md`. Shipping a set in this repository is a maintainer decision and gets a `docs/decisions.md` entry.

@@ -1,19 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
-  "name": "jurypersona",
+  "name": "personajury",
   "owner": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"
   },
   "metadata": {
-    "description": "JuryPersona: a persona jury as an engine, with evidence on every line and scores per stratum"
+    "description": "PersonaJury: a persona jury as an engine, with evidence on every line and scores per stratum"
   },
   "plugins": [
     {
-      "name": "jurypersona",
+      "name": "personajury",
       "version": "0.5.1",
       "source": "./",
-      "description": "Skills for running a jury and writing personas, plus the JuryPersona MCP server. Needs the jurypersona binary on PATH.",
+      "description": "Skills for running a jury and writing personas, plus the PersonaJury MCP server. Needs the personajury binary on PATH.",
       "category": "development"
     }
   ]

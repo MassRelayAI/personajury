@@ -1,6 +1,6 @@
 # The investor-pitch lens: would a reader take the next meeting. Anchors in words, 1 / 3 / 5. It judges the pitch as
 # read, not the business: the jury is no due diligence. Fixture data, not seeded: load it with
-# `jurypersona lens add --file fixtures/lenses/investor-pitch.toml`. Attach the deck as files (a PDF, one PNG per slide).
+# `personajury lens add --file fixtures/lenses/investor-pitch.toml`. Attach the deck as files (a PDF, one PNG per slide).
 name = "investor-pitch"
 version = 1
 scale = [1, 5]

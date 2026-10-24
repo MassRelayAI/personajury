@@ -83,3 +83,12 @@ is a human class of decision, a brand, and the jury informs it without owning it
 the jury's numbers say it is the weaker name on every axis, most of all on *ownable* (3 against 5). The cost of the override is a
 repository rename (GitHub redirects the old URL), release 0.5.1 with new asset names, and a plugin reinstall; v0.5.0 was not adopted
 by anyone, so no shim and no migration were written.
+
+## The third run, and the final name
+On 2026-10-24 a third naming jury ran with 11 mixed people (primary 4, secondary 3, bystander 4), three models (Sonnet, Opus and Haiku
+mixed across the jurors) and neutral cards, scoring each name 1 to 10. PersonaJury took 8 of 11 picks (primary 3 of 4, secondary 3 of 3,
+bystander 2 of 4); JuryPersona took 3 (the designer, a retired teacher, a student). Medians, PersonaJury against JuryPersona:
+say-and-spell 7 / 7 / 6 against 6 / 6 / 4, and feel 6 / 5 / 6 against 5 / 4 / 4 (primary / secondary / bystander).
+
+The maintainer answered "PersonaJury (Recommended)" and the name is final (D28 in `docs/decisions.md`). The earlier sections stay as
+they were run: D27 and its override are history. Nothing was public under either name, so the restore carries no shim and no migration.

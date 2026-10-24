@@ -127,6 +127,8 @@ pub enum Refusal {
     NoMatchingPersonas { audience: String },
     #[error("subject {subject} has no audience; add it with `subject add --audience tag,...`")]
     AudienceUnknown { subject: String },
+    #[error("--options {given:?}: the words are subject and attachments")]
+    InvalidOptionsMode { given: String },
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -185,6 +187,7 @@ impl Refusal {
             Refusal::TraitSetUnknown { .. } => "trait_set_unknown",
             Refusal::NoMatchingPersonas { .. } => "no_matching_personas",
             Refusal::AudienceUnknown { .. } => "audience_unknown",
+            Refusal::InvalidOptionsMode { .. } => "invalid_options_mode",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
@@ -217,6 +220,7 @@ impl Refusal {
             Refusal::TraitsTooMany { count } => Some(serde_json::json!({"count": count})),
             Refusal::InvalidFilter { term, why } => Some(serde_json::json!({"term": term, "why": why})),
             Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
+            Refusal::InvalidOptionsMode { given } => Some(serde_json::json!({"given": given})),
             _ => None,
         }
     }

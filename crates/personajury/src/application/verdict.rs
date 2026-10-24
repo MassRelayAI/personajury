@@ -243,11 +243,25 @@ pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> 
         evidence.comparators.insert(name.clone(), views(root, &c)?);
     }
     // what a line may be about and a pick may choose: the subject's labels, then `cmp:<name>` per run comparator
-    let mut options: Vec<String> = evidence.attachments.keys().cloned().collect();
+    // a run with no recorded mode was briefed before v0.6: attachment labels (D32)
+    let subject_mode = store.run_options_mode(run.id)?.as_deref() == Some("subject");
+    let mut options: Vec<String> = if subject_mode {
+        vec![run.subject_name.clone()]
+    } else {
+        evidence.attachments.keys().cloned().collect()
+    };
     options.sort();
     options.extend(run.comparators.iter().map(|(n, _)| format!("cmp:{n}")));
     let mut input: VerdictInput = serde_json::from_str(input)
         .map_err(|e| AppError::InvalidArguments(format!("verdict JSON: {e}")))?;
+    if subject_mode {
+        // `about` the subject by its name is the whole subject (D32): the cell stays keyed as it always was
+        for l in &mut input.lines {
+            if l.about.as_deref() == Some(run.subject_name.as_str()) {
+                l.about = None;
+            }
+        }
+    }
     let mut stakes: BTreeMap<String, Stake> = run
         .stakes
         .iter()

@@ -184,7 +184,7 @@ fn fixture_ws(root: &Path, extra: &[&str]) -> (i64, i64) {
     let mut c = vec!["brief", "--lens", "critical", "--subject", "lantern-site", "--panel", "fixture", "--stake", stakes, "--spend", "7", "--model", "claude-sonnet-5-5"];
     c.extend_from_slice(extra);
     let a = data(cli(root, &c))["run"].as_i64().unwrap();
-    let mut c = vec!["brief", "--lens", "compare", "--comparator", "acme-pricing", "--subject", "lantern-site", "--panel", "fixture", "--stake", stakes, "--spend", "7", "--model", "claude-sonnet-5-5"];
+    let mut c = vec!["brief", "--lens", "compare", "--comparator", "acme-pricing", "--options", "attachments", "--subject", "lantern-site", "--panel", "fixture", "--stake", stakes, "--spend", "7", "--model", "claude-sonnet-5-5"];
     c.extend_from_slice(extra);
     let b = data(cli(root, &c))["run"].as_i64().unwrap();
     (a, b)
@@ -1080,8 +1080,9 @@ fn the_three_example_lenses_are_accepted_by_lens_add() {
 
 /// (flag, column): `free` needs no reason, `reason` needs a recorded one. A flag added to `brief` without a row here, or
 /// without a cell in the table of the skill and `docs/usage.md`, turns this red.
-const DIAL: [(&str, &str); 19] = [
+const DIAL: [(&str, &str); 20] = [
     ("--subject", "free"),
+    ("--options", "free"),
     ("--model", "free"),
     ("--comparator", "free"),
     ("--wave", "free"),

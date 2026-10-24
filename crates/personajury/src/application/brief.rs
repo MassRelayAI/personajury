@@ -43,6 +43,8 @@ pub struct BriefArgs {
     pub traits: Option<String>,
     /// `auto`: seat every persona that serves the subject's audience, plus one control (see `seats_auto`)
     pub seats: Option<String>,
+    /// `subject` or `attachments` (D32); none = by the subject's kind
+    pub options: Option<String>,
 }
 
 /// What the briefs of a run render of the personas' traits (D31).
@@ -582,17 +584,19 @@ struct Shared<'a> {
     cover: bool,
     /// the seats `--seats auto` chose, recorded on the run
     seats: Option<&'a Value>,
+    /// `subject` or `attachments`: what a line may be about and a pick may choose (D32)
+    options_mode: &'static str,
 }
 
 /// Compose and write the briefs of one lens and create its run.
 fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value> {
-    // the same list `verdict` checks `about` and a pick against: subject labels, then `cmp:<name>` per comparator
-    let mut options: Vec<String> = sh
-        .subject
-        .attachments
-        .iter()
-        .map(|x| x.label.clone())
-        .collect();
+    // the same list `verdict` checks `about` and a pick against: the subject's name (or its labels, D32), then
+    // `cmp:<name>` per comparator
+    let mut options: Vec<String> = if sh.options_mode == "subject" {
+        vec![sh.subject.name.clone()]
+    } else {
+        sh.subject.attachments.iter().map(|x| x.label.clone()).collect()
+    };
     options.extend(sh.cmps.iter().map(|c| format!("cmp:{}", c.subject.name)));
     let run = RunRow {
         id: 0,
@@ -666,6 +670,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
     if traits_json.is_some() || sh.seats.is_some() {
         store.set_run_traits(run_id, traits_json.as_ref(), sh.seats)?;
     }
+    store.set_run_options_mode(run_id, sh.options_mode)?;
     let dir_rel = format!(".personajury/runs/{run_id}");
     let dir = root.join(&dir_rel);
     // a write that fails leaves no orphan run (final review: an orphan clears nothing and confuses check)
@@ -718,6 +723,7 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
                 v
             }).collect::<Vec<_>>(),
         },
+        "options": {"mode": sh.options_mode, "list": options},
         "detail": if sh.detail == Detail::Full { "full" } else { "compact" },
         // run one wave, ingest it, then the next (D12): persona ids in the order of `briefs`
         "waves": sh.selected.chunks(sh.wave).map(|c| c.to_vec()).collect::<Vec<_>>(),
@@ -804,6 +810,13 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             a.subject
         )));
     }
+
+    let options_mode: &'static str = match a.options.as_deref() {
+        None => subject.kind.default_options_mode(),
+        Some("subject") => "subject",
+        Some("attachments") => "attachments",
+        Some(other) => return Err(Refusal::InvalidOptionsMode { given: other.to_string() }.into()),
+    };
 
     // the rule, when one is named: its panel, lenses, spend and detail are the defaults (D9)
     let cfg_path = root.join("personajury.toml");
@@ -1337,6 +1350,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         traits: trait_ctx.as_ref(),
         cover: !cover_ids.is_empty(),
         seats: seats_value.as_ref(),
+        options_mode,
     };
     let mut runs = Vec::new();
     for lens in &lenses {

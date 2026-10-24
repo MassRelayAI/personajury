@@ -274,7 +274,8 @@ pub fn fixture_run(ws: &Path) -> (i64, i64) {
     let common = ["--subject", "lantern-site", "--panel", "fixture", "--stake", STAKES, "--spend", "7", "--model", "claude-sonnet-5-5"];
     let mut critical = vec!["brief", "--lens", "critical"];
     critical.extend(common);
-    let mut compare = vec!["brief", "--lens", "compare", "--comparator", "acme-pricing"];
+    // recorded before D32: the recorded verdicts score `about: pricing.png`, so this brief keeps the attachment options
+    let mut compare = vec!["brief", "--lens", "compare", "--comparator", "acme-pricing", "--options", "attachments"];
     compare.extend(common);
     let a = j(ws, &critical)["data"]["run"].as_i64().unwrap();
     let b = j(ws, &compare)["data"]["run"].as_i64().unwrap();

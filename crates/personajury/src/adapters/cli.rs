@@ -114,6 +114,10 @@ pub enum Cmd {
         /// `auto`: seat every persona whose `serves` meets the subject's audience (capped by effort), plus one control that does not
         #[arg(long)]
         seats: Option<String>,
+        /// what a juror may score `about` and pick: `subject` (the subject and each comparator) or `attachments` (its
+        /// files and each comparator); default by kind: design and logo attachments, every other kind subject
+        #[arg(long)]
+        options: Option<String>,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
@@ -480,7 +484,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             app::subject::add(root, name, kind(k)?, attach, true, audience)
         }
         Cmd::Brief {
-            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats,
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats, options,
         } => app::brief::compose(
             root,
             &app::brief::BriefArgs {
@@ -503,6 +507,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 independence: independence.as_deref().map(parse_independence).transpose()?.unwrap_or_default(),
                 traits: traits.clone(),
                 seats: seats.clone(),
+                options: options.clone(),
             },
         ),
         Cmd::Verdict { run, file, json, by_human } => {

@@ -623,6 +623,9 @@ fn brief_cmp(ws: &Path, c: &str) -> Value {
             "m",
             "--comparator",
             c,
+            // recorded before D32: the recorded verdicts score `about: pricing.png`, so this brief keeps the attachment options
+            "--options",
+            "attachments",
         ],
     )
 }

@@ -84,6 +84,14 @@ impl SubjectKind {
         SubjectKind::Menu,
         SubjectKind::Prices,
     ];
+    /// What a juror may score `about` and pick when the caller does not say (D32): a design or a logo is a set of
+    /// candidate boards, so its files are the options; every other kind is one thing, so the subject is.
+    pub fn default_options_mode(self) -> &'static str {
+        match self {
+            SubjectKind::Design | SubjectKind::Logo => "attachments",
+            _ => "subject",
+        }
+    }
     pub fn parse(s: &str) -> Option<SubjectKind> {
         Self::ALL.into_iter().find(|k| k.name() == s)
     }

@@ -11,4 +11,5 @@ j subject add lantern-site --kind page --attach "$R"/fixtures/site-walk/home.wal
 j comparator add acme-pricing --kind prices --attach "$R"/fixtures/comparators/acme-pricing/pricing.walk.json "$R"/fixtures/comparators/acme-pricing/pricing.png >/dev/null
 STAKES="builder-ana=primary,builder-mei=primary,builder-ravi=primary,newcomer-sofia=primary,company-george=secondary,company-hanna=secondary,investor-claire=bystander"
 j brief --subject lantern-site --panel fixture --lens critical --stake "$STAKES" --spend 7 --model claude-sonnet-5-5
-j brief --subject lantern-site --panel fixture --lens compare --stake "$STAKES" --spend 7 --model claude-sonnet-5-5 --comparator acme-pricing
+# recorded before D32: the recorded verdicts score `about: pricing.png`, so this brief keeps the attachment options
+j brief --options attachments --subject lantern-site --panel fixture --lens compare --stake "$STAKES" --spend 7 --model claude-sonnet-5-5 --comparator acme-pricing

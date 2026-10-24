@@ -63,6 +63,11 @@ CREATE TRIGGER IF NOT EXISTS decision_no_delete BEFORE DELETE ON decision BEGIN 
 CREATE TABLE IF NOT EXISTS trait (
   id TEXT NOT NULL, version INTEGER NOT NULL, family TEXT NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL,
   origin TEXT NOT NULL, created_at TEXT NOT NULL, reason TEXT, PRIMARY KEY (id, version));
+-- D32-D34 (v0.6-C): run.options_mode, verdict.phase and pick.about are columns added on open (V5_COLUMNS); the deliberation round is a table.
+CREATE TABLE IF NOT EXISTS deliberation (
+  run_id INTEGER PRIMARY KEY REFERENCES run(id), briefs_json TEXT NOT NULL, created_at TEXT NOT NULL);
+CREATE TRIGGER IF NOT EXISTS deliberation_no_update BEFORE UPDATE ON deliberation BEGIN SELECT RAISE(ABORT, 'deliberation is append-only'); END;
+CREATE TRIGGER IF NOT EXISTS deliberation_no_delete BEFORE DELETE ON deliberation BEGIN SELECT RAISE(ABORT, 'deliberation is append-only'); END;
 CREATE TABLE IF NOT EXISTS trait_set (
   name TEXT NOT NULL, version INTEGER NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT NOT NULL,
   PRIMARY KEY (name, version));

@@ -228,7 +228,7 @@ recorded; four things stay with a person.
 
 | choice | you decide (no reason) | needs a recorded reason (`--reason`, `--by`) | a person only |
 |---|---|---|---|
-| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject` and `--comparator` are yours | `--panel`, `--query`, `--seats` or `--stake` that differ from the rule | |
+| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject`, `--comparator` and `--options` are yours | `--panel`, `--query`, `--seats` or `--stake` that differ from the rule | |
 | persona count | the rule's seats, trimmed by effort | `--spend` above the rule; 13 to 1000 seats with `--allow-large` | above 1000 seats: nobody |
 | lens choice | any of the rule's lenses; the first under effort `low` | `--lens` that the rule does not name | |
 | dimensions and anchors | `lens generate` drafts them, you accept with `lens add` | editing a shipped lens's anchors (a new version) | an anchor set claimed as a named standard carries the expert's name in `standard` |

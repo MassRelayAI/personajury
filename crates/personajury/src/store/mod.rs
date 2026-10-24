@@ -23,7 +23,7 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
 /// and subject audience.
 /// A stored trait's latest version: the definition, its origin, its hash and the reason a forced install recorded.
 pub type TraitRow = (TraitDef, String, String, Option<String>);
-const V5_COLUMNS: [(&str, &str, &str); 7] = [
+const V5_COLUMNS: [(&str, &str, &str); 10] = [
     ("trait", "reason", "TEXT"),
     ("persona", "traits_json", "TEXT"),
     ("persona", "serves_json", "TEXT"),
@@ -31,6 +31,10 @@ const V5_COLUMNS: [(&str, &str, &str); 7] = [
     ("run", "traits_json", "TEXT"),
     ("run", "seats_json", "TEXT"),
     ("subject", "audience_json", "TEXT"),
+    // v0.6-C (D32, D33, D34)
+    ("run", "options_mode", "TEXT"),
+    ("verdict", "phase", "TEXT"),
+    ("pick", "about", "TEXT"),
 ];
 pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
@@ -686,6 +690,18 @@ impl Store {
         ))
     }
     /// The audience tags a subject was added with (`subject add --audience`).
+    /// The options mode a run was briefed under (D32): `subject` or `attachments`; none for a run made before v0.6.
+    pub fn run_options_mode(&self, id: i64) -> Result<Option<String>> {
+        Ok(self
+            .conn
+            .query_row("SELECT options_mode FROM run WHERE id = ?1", params![id], |r| r.get::<_, Option<String>>(0))
+            .optional()?
+            .flatten())
+    }
+    pub fn set_run_options_mode(&self, id: i64, mode: &str) -> Result<()> {
+        self.conn.execute("UPDATE run SET options_mode = ?2 WHERE id = ?1", params![id, mode])?;
+        Ok(())
+    }
     pub fn subject_audience(&self, name: &str) -> Result<Vec<String>> {
         let t: Option<Option<String>> = self
             .conn

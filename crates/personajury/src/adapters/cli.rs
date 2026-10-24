@@ -325,6 +325,8 @@ pub enum PersonaCmd {
         traits: Option<String>,
     },
     List,
+    /// Warnings over the latest persona versions: near copies, and a tag that cannot be told from a band (D36)
+    Lint { ids: Vec<String> },
 }
 #[derive(Subcommand, Debug)]
 pub enum TraitCmd {
@@ -451,6 +453,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Persona { what: PersonaCmd::Add { .. } } => "persona add",
         Cmd::Persona { what: PersonaCmd::Generate { .. } } => "persona generate",
         Cmd::Persona { what: PersonaCmd::List } => "persona list",
+        Cmd::Persona { what: PersonaCmd::Lint { .. } } => "persona lint",
         Cmd::Trait { what: TraitCmd::Install { .. } } => "trait install",
         Cmd::Trait { what: TraitCmd::Add { .. } } => "trait add",
         Cmd::Trait { what: TraitCmd::List } => "trait list",
@@ -530,6 +533,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             PersonaCmd::Add { file, generated_from } => app::persona::add(root, file, generated_from.as_deref()),
             PersonaCmd::Generate { from, count, traits } => app::persona::generate(root, from, *count, traits.as_deref()),
             PersonaCmd::List => app::persona::list(root),
+            PersonaCmd::Lint { ids } => app::persona::lint(root, ids),
         },
         Cmd::Trait { what } => match what {
             TraitCmd::Install { force, reason } => app::traits::install(root, *force, reason.as_deref()),

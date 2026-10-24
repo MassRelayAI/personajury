@@ -396,6 +396,8 @@ pub fn ingest_with(
             ids.push(&f.id);
         }
     }
+    // D36: a note or blocker that repeats a label the juror was handed is a warning, never a refusal
+    let echoes = label_echoes(&store, &run, &valid)?;
     let mut out = json!({
         "run": run.id,
         "persona": valid.persona,
@@ -407,9 +409,34 @@ pub fn ingest_with(
     if deliberated {
         out["phase"] = json!("deliberated");
     }
+    if !echoes.is_empty() {
+        out["warnings"] = json!(echoes);
+    }
     if let Some(by) = by_human {
         out["by_human"] = json!(by.trim());
         out["seat"] = json!(seat);
+    }
+    Ok(out)
+}
+
+/// `label_echo` warnings of a valid verdict (D36): for each line, each trait the persona carries (the version the run
+/// briefed) whose title or last id segment its note or a blocker repeats. A person's verdict carries none.
+fn label_echoes(store: &Store, run: &RunRow, v: &ValidVerdict) -> Result<Vec<Value>> {
+    if is_human(&v.persona) {
+        return Ok(vec![]);
+    }
+    let Some(version) = run.briefs.iter().find(|b| b.persona == v.persona).map(|b| b.persona_version) else { return Ok(vec![]) };
+    let Some(held) = store.persona_at(&v.persona, version)?.and_then(|p| p.traits) else { return Ok(vec![]) };
+    let defs = store.trait_map()?;
+    let mut out = Vec::new();
+    for (i, l) in v.lines.iter().enumerate() {
+        let mut texts: Vec<&str> = l.line.blockers.iter().map(String::as_str).collect();
+        texts.extend(l.line.note.as_deref());
+        for id in held.keys() {
+            if defs.get(id).is_some_and(|d| crate::domain::lint::label_echo(d, &texts)) {
+                out.push(json!({"code": "label_echo", "line": i + 1, "trait": id}));
+            }
+        }
     }
     Ok(out)
 }

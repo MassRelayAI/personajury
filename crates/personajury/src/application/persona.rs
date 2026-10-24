@@ -313,3 +313,39 @@ pub fn list(root: &Path) -> Result<Value> {
         .collect();
     Ok(json!({"items": items}))
 }
+
+/// `persona lint [ID ...]` (D36): warnings over the latest version of every persona, never refusals. `near_copy` (the same
+/// non-empty trait map and a shared tag, or the same tags) and `confounded` (a tag and a band that the store cannot tell
+/// apart). With ids, only the warnings that name one of them. Whether a trait fits the prose is not here: the engine cannot
+/// read prose for meaning, and the skill tells the author.
+pub fn lint(root: &Path, ids: &[String]) -> Result<Value> {
+    use crate::domain::lint;
+    let store = Store::open_existing(root)?;
+    let personas = store.personas()?;
+    for id in ids {
+        if !personas.iter().any(|p| &p.id == id) {
+            return Err(AppError::NotFound(format!("no persona {id}")));
+        }
+    }
+    let named = |p: &str| ids.is_empty() || ids.iter().any(|i| i == p);
+    let defs = store.trait_map()?;
+    let mut warnings: Vec<Value> = Vec::new();
+    for (a, b) in lint::near_copies(&personas) {
+        if named(&a) || named(&b) {
+            warnings.push(json!({"code": "near_copy", "a": a, "b": b}));
+        }
+    }
+    for (t, tag, band) in lint::confounded(&personas, &defs) {
+        let holders = personas.iter().filter(|p| {
+            p.tags.contains(&tag)
+                && p.traits
+                    .as_ref()
+                    .and_then(|m| m.get(&t))
+                    .is_some_and(|v| defs.get(&t).map_or(v.show() == band, |d| d.bands_held(v).join("+") == band))
+        });
+        if holders.into_iter().any(|p| named(&p.id)) {
+            warnings.push(json!({"code": "confounded", "trait": t, "tag": tag, "band": band}));
+        }
+    }
+    Ok(json!({"personas": personas.len(), "warnings": warnings}))
+}

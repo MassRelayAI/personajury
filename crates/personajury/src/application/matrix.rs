@@ -49,6 +49,10 @@ pub fn show(
     let mut human_declared: BTreeMap<String, BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
     // the persona version each run briefed: a slice reads the traits the juror was briefed with
     let mut versions: BTreeMap<String, i64> = BTreeMap::new();
+    // D36: label echoes of the jury's first word, per stratum; the traits each persona version carried
+    let mut echoes: BTreeMap<Stake, usize> = BTreeMap::new();
+    let mut carried: BTreeMap<(String, i64), BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
+    let trait_defs = store.trait_map()?;
     for id in runs {
         let run = load_run(&store, *id)?;
         for b in &run.briefs {
@@ -111,6 +115,23 @@ pub fn show(
             lenses.push(lens);
         }
         let initial = store.verdict_rows(*id, false)?;
+        for r in initial.iter().filter(|r| !super::verdict::is_human(&r.persona)) {
+            let Some(stake) = run.stakes.get(&r.persona) else { continue };
+            let held = match carried.get(&(r.persona.clone(), r.persona_version)) {
+                Some(h) => h.clone(),
+                None => {
+                    let h = store.persona_at(&r.persona, r.persona_version)?.and_then(|p| p.traits).unwrap_or_default();
+                    carried.insert((r.persona.clone(), r.persona_version), h.clone());
+                    h
+                }
+            };
+            let mut texts: Vec<&str> = r.blockers.iter().map(String::as_str).collect();
+            texts.extend(r.note.as_deref());
+            let n = held.keys().filter(|t| trait_defs.get(*t).is_some_and(|d| crate::domain::lint::label_echo(d, &texts))).count();
+            if n > 0 {
+                *echoes.entry(*stake).or_default() += n;
+            }
+        }
         answered.insert(*id, initial.iter().filter(|r| !super::verdict::is_human(&r.persona)).map(|r| r.persona.clone()).collect());
         if let Some(terms) = store.run_panel_terms(*id)? {
             for t in terms.as_array().into_iter().flatten() {
@@ -195,6 +216,12 @@ pub fn show(
     // strata that disagree on a cell (D13): beside the strata, never inside one
     let splits = apply::splits(&rows, &stakes);
     let mut out = json!({ "runs": runs, "strata": strata_json(&m, &shifts), "splits": splits, "usage": usage, "cost": cost });
+    // D36: the label echoes of the jury's lines, a count per stratum, only where there is one
+    for (stake, n) in &echoes {
+        if let Some(s) = out["strata"].as_array_mut().into_iter().flatten().find(|s| s["stake"] == stake.name()) {
+            s["warnings"] = json!({"label_echo": n});
+        }
+    }
     if !panel_match.is_empty() {
         out["panel_match"] = json!(panel_match);
     }

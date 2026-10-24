@@ -9,6 +9,7 @@ pub mod decision;
 pub mod delta;
 pub mod graphlayout;
 pub mod hash;
+pub mod lint;
 pub mod matrix;
 pub mod metrics;
 pub mod model;

@@ -29,6 +29,15 @@ approver=secondary, 1 others=bystander"`. Keep the pool bigger than the seats wh
 (six `others` for one bystander seat): the engine draws the seats from the subject's name, and the same subject keeps them
 between rounds. A panel is 12 seats or fewer unless you pass `--allow-large`.
 
+## Traits, as the persona's summary
+After the prose, a persona may carry `traits`: at most 8 entries, trait id to value, written as the summary of what the prose already says
+(`"trust.marketing_skepticism": 4`, `"choice.decision_style": "rational"`). Run `personajury trait install` once per workspace, then
+`personajury trait list` for the ids; a value the trait cannot hold, or an id the store lacks, is refused. A trait is a tendency, not a type:
+never write a personality label, and these ids are refused: `mbti`, `enneagram`, `disc`, `learning_style`, `generation`, `age`, `gender`,
+`ethnicity`, `race`, `religion`, `disability`, `nationality`, `beauty`, `fame`, `outcast` (the juror's sensitivity to looks, fame or being an
+outsider is a trait, a persona's own is not). `access.need` says what the page must do for this reader (a screen reader, captions), not who
+the person is. Add `serves` (tags such as `["docs"]`) when the persona should sit in `--seats auto` juries. See `docs/traits.md`.
+
 ## Add it
 ```
 personajury persona add --file personas/builder-ana.json

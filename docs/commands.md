@@ -8,21 +8,25 @@ the version.
 | verb | arguments and flags | what it does |
 |---|---|---|
 | `persona add` | `--file F` `[--generated-from HASH]` | add one persona from the fixed JSON |
-| `persona generate` | `--from PATH` `[--count N]` (default 7) | write the brief that asks your agent to write personas from material |
+| `persona generate` | `--from PATH` `[--count N]` (default 7) `[--traits SET]` | write the brief that asks your agent to write personas from material; with `--traits` it also lists the set's traits and a Latin-square row of cover bands per persona (see [`traits.md`](traits.md)) |
+| `trait install` | | add every embedded catalog trait and trait set the store lacks; answers `{installed, skipped, versions_added}` |
+| `trait add` | `--file F` `[--generated-from HASH]` | add one trait file; validated (`invalid_trait_file`, `refused_trait_id`) |
+| `trait list` / `trait show` | `[ID]` | the traits the store holds (`data.traits`), or one in full |
+| `trait set add` / `trait set list` | `--file F` | a trait set: at most 8 traits and a cover of at most 4 (`trait_set_too_large`, `cover_too_large`, `unknown_trait`; a correlated pair is a warning) |
 | `persona list` | | list personas |
-| `panel add` | `NAME` `--query Q` `[--allow-large]` | save a query over persona tags with a stake per term, e.g. `"3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 1 others=bystander"`; more than 12 seats is refused (`panel_too_large`) unless `--allow-large`, and more than 1000 always |
-| `panel resolve` | `NAME` `[--subject S]` | the personas the query resolves to now; with `--subject` the seats a draw gives that subject (`draw.seed`), without it the first by id (`draw: "none (no subject)"`) |
+| `panel add` | `NAME` `--query Q` `[--cover a,b,c]` `[--allow-large]` | save a query over persona tags with a stake per term, e.g. `"3 builder=primary, 1 newcomer=primary, 2 approver=secondary, 1 others=bystander"`; more than 12 seats is refused (`panel_too_large`) unless `--allow-large`, and more than 1000 always; a term may filter by trait (`3 builder[expertise.domain>=4]`) and `--cover` (at most 4 traits) makes the draw cover band cells (D30) |
+| `panel resolve` | `NAME` `[--subject S]` | the personas the query resolves to now; with `--subject` the seats a draw gives that subject (`draw.seed`), without it the first by id (`draw: "none (no subject)"`); a panel with a cover also answers `coverage` |
 | `lens add` | `--file F` | add a lens (TOML) |
 | `lens generate` | `--from PATH` `[--dimensions N]` (default 4, at most 12) | write the brief that asks your agent to draft a lens from a standard, a handbook or examples (see below) |
 | `lens list` | | list lenses; four ship (a 1 to 10 `site` lens is fixture data: `lens add --file fixtures/lenses/site.toml`) |
-| `subject add` | `NAME` `--kind K` `--attach FILE...` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu` or `prices` |
+| `subject add` | `NAME` `--kind K` `--attach FILE...` `[--audience tag,...]` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu` or `prices` |
 | `comparator add` | same as `subject add` | a comparator, stored the same way and flagged |
-| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--effort low\|medium\|high\|max]` `[--independence independent\|sequential]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed` |
+| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--effort low\|medium\|high\|max]` `[--independence independent\|sequential]` `[--traits SET\|all\|off]` `[--seats auto]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed`; `--traits` renders the personas' traits as "you tend to" lines (D31), `--seats auto` seats the personas that serve the subject's audience plus one control (see below) |
 | `verdict` | `--run N` and `--file F` or `--json J` `[--by-human "NAME, CREDENTIAL"]` | ingest one persona's verdict, or with `--by-human` a person's (see Experts); refused without evidence; may carry `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed) |
-| `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` | scores per stratum, and `usage {reported, estimate}`; `--across-strata` exists only so the refusal is explicit |
+| `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` `[--slice TRAIT]` | scores per stratum, and `usage {reported, estimate}`; `--slice` adds `slices`, each stratum's scores grouped by a trait's bands (counts, never a mean); `--across-strata` exists only so the refusal is explicit |
 | `graph` | `RUN...` `--svg` `[--out F]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
-| `summary` | `RUN...` `[--md F]` `[--html F]` `[--save]` `[--width N]` | the answer for a person: plain sentences, a numbers table "for checking" (medians primary·secondary·bystander), then Next; no pooled number; `--save` writes into `report_dir` |
+| `summary` | `RUN...` `[--md F]` `[--html F]` `[--save]` `[--width N]` `[--slice TRAIT]` | the answer for a person: plain sentences, a numbers table "for checking" (medians primary·secondary·bystander), then Next; no pooled number; `--save` writes into `report_dir` |
 | `calibrate` | `JURY_RUN HUMAN_RUN` `[--out F]` | the jury's rank order per stratum beside a human run's (`verdict --by-human` batches); `calibrated` when every primary cell is within one rank |
 | `delta` | `A B` | what moved between two runs on the same subject and lens |
 | `apply-check` | `RUN...` or `--latest [--subject S]`, `[--rule CLASS]` `[--calibration F]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
@@ -187,3 +191,13 @@ A text attachment whose label ends `.csv` can be cited by cell: `prices.csv#R2C3
 `R01C1`, `R+1C1`, lowercase `r9c9`, `R1c1` and `RC1` are refused like `L01`. A quote opens a quoted field only at the start of a
 field; in the middle of an unquoted field (`27" screen`) it is a literal character (RFC 4180 leaves that case malformed; PersonaJury
 reads it the lenient way). `#L<n>` keeps working.
+
+### `--seats auto`
+A persona may carry `serves`, tags for the audiences or subject kinds it speaks for; a subject may be added with `--audience docs,developers`.
+`brief --subject S --seats auto` seats every persona whose `serves` meets the subject's audience (at most the effort's seats, else 11;
+a seeded draw, or the trait set's cover when `--traits` names a set that has one), plus exactly one control persona whose `serves` does not
+(a seeded draw). Serving seats are primary and the control a bystander unless `--stake` says otherwise. The answer prints
+`seats: [{persona, why: "serves docs" | "control: unrelated"}]`, and the run records them. `audience_unknown` when the subject has no
+audience, `no_matching_personas` when nobody serves it; with no unrelated persona the answer warns `no_control_persona`. It takes no
+`--panel` or `--query`; under a rule it departs from the rule's panel and needs `--reason`. A fixed panel of 8 to 14 seats is the main
+token waste: this is the default way to seat a jury.

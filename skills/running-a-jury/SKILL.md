@@ -76,6 +76,15 @@ correlated jury; `apply-check` notes `single_model` when there was only one.
 **If you cannot dispatch one subagent per brief, brief with `--independence sequential`.** A sequential run advises; it never
 applies. Claiming `independent` from one window is a false record.
 
+### Seats from the audience, traits in the brief
+Default to `--seats auto` rather than a fixed panel of 8 to 14: add the subject with `--audience docs,developers`, and the brief seats the
+personas whose `serves` meets it plus exactly one control that does not, which is far fewer tokens. For a persona's tendencies use
+`--traits <set>` (or `trait_set` in the rule): the brief gets "you tend to" lines, and **a trait is told, not seen**: a line that leans on one
+is `told` evidence and a line about the subject still needs its citation. Install the catalog once (`personajury trait install`). With a
+panel `--cover`, read `coverage` and especially `balance` before you brief: a band no seat holds is a question the jury cannot answer.
+After the matrix, `--slice <trait>` groups each stratum's scores by that trait (counts; `thin` means fewer than two, `separates` counts the
+cells where groups do not overlap); say "in this jury", never "people like this".
+
 ### Large juries: run in waves
 Every brief answers `waves`, the persona ids in groups of 30 (`--wave N` changes it; up to 12 seats it is one wave). **Run
 one wave at a time:** give its personas to subagents, ingest their verdicts, and only then start the next wave. A jury of a

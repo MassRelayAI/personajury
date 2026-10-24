@@ -72,3 +72,7 @@ handbook or examples, with `standard = "material:<hash>"`; `lens add` validates 
 fixture data: `fixtures/lenses/consulting-deck.toml`, `investor-pitch.toml` and `financial-model.toml` (four dimensions each).
 A lens's `standard` is shown in every brief and in the matrix header; an anchor set claimed as a named standard should carry the
 expert's name there.
+
+## Lenses and traits
+A lens says what is judged; a persona's traits say how the juror tends to decide. They are separate on purpose: the brief prints the
+traits as told tendencies ("you tend to ...") before the lens, and a line that leans on one is `told` evidence. See [`traits.md`](traits.md).

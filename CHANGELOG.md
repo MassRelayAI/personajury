@@ -7,6 +7,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.6.0] - unreleased
+### Added (v0.6-A, D29-D31)
+- Traits as data: 49 traits in 14 families and eight trait sets ship embedded (`traits/`, `trait-sets/`); `trait install | add | list | show`
+  and `trait set add | list`; every anchor is our own words, no questionnaire item is copied (D29).
+- Schema v5 (one migration for the v0.6 lanes, idempotent): persona `traits` and `serves`, panel cover, run traits and seats, subject
+  audience, and the `trait` and `trait_set` tables (D29).
+- The persona key `traits` (at most 8) with `unknown_trait`, `trait_value_off_scale`, `trait_option_unknown`, `traits_too_many` and the
+  refused list (`refused_trait_id`: typologies, protected attributes, the persona's own beauty, fame or outsider status) (D29).
+- `brief --traits <set>|all|off` and a rule's `trait_set`: the block "How this reader tends to decide (told)", rendered as "you tend to";
+  `trait_set_incomplete`; `persona generate --traits` (D31).
+- Panels: `[trait>=4]` filters on a term, `panel add --cover`, `coverage` (one-way, pairs, balance, collinear, confounded) and the
+  cover-aware draw (D30).
+- `matrix --slice TRAIT` and `summary --slice TRAIT`: groups per stratum, counted, never averaged (D31).
+- `brief --seats auto`, persona `serves`, `subject add --audience`: the personas that serve the audience plus one control.
+- The MCP tool `personajury_trait_list`; `traits`, `seats` on brief, `slice` on matrix and summary.
+
 ## [0.5.1] - 2026-10-24
 ### Added
 - The fairness rules in the skills (short rules with a one-line reason each) and the naming guidance in

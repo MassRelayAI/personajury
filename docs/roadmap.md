@@ -22,6 +22,12 @@ The split rule and `apply-check` (D13), `lens generate` (D14), a model per panel
 Calibration (D20), CSV cell locators (D21), the GitHub Action (D22), the Claude Agent SDK recipe (D23), and the answer display `summary`
 (D24). See `../CHANGELOG.md`.
 
+## v0.6 (in progress, three lanes)
+- **A, traits as data (D29 to D31):** the trait catalog and sets, schema v5, the persona `traits` key, `brief --traits`, panels with
+  cover and quotas, slices and `summary --slice`, `--seats auto`. Built.
+- **C, options, deliberation and honest metrics:** not built here.
+- **B, traits proven (calibrate per trait, `trait observed`):** not built here.
+
 ## After v0.5 (what is left)
 - **Calibration with real people.** `calibrate` ships; it needs a person's verdicts (`verdict --by-human`) on a real subject to say anything.
 - **Listings:** the official Claude plugin marketplace and the Codex plugin directory, after a first published result.

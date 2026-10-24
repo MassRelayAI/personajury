@@ -349,6 +349,17 @@ pub enum TraitCmd {
         #[arg(long, default_value_t = 3)]
         count: usize,
     },
+    /// From a juror's own words: write the brief (--persona), or verify the answer (--check FILE); no model is called (D35)
+    Suggest {
+        #[arg(long)]
+        persona: Option<String>,
+        /// the candidates are this trait set's traits; without it, every trait in the store
+        #[arg(long)]
+        set: Option<String>,
+        /// verify an answer file; writes nothing, answers the merged persona file as data
+        #[arg(long)]
+        check: Option<PathBuf>,
+    },
     /// Trait sets: up to 8 traits an audience is judged by, up to 4 of them the cover of a panel
     Set {
         #[command(subcommand)]
@@ -426,6 +437,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Trait { what: TraitCmd::List } => "trait list",
         Cmd::Trait { what: TraitCmd::Show { .. } } => "trait show",
         Cmd::Trait { what: TraitCmd::Generate { .. } } => "trait generate",
+        Cmd::Trait { what: TraitCmd::Suggest { .. } } => "trait suggest",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::Add { .. } } } => "trait set add",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::List } } => "trait set list",
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
@@ -504,6 +516,10 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::List => app::traits::list(root),
             TraitCmd::Show { id } => app::traits::show(root, id),
             TraitCmd::Generate { from, count } => app::traits::generate(root, from, *count),
+            TraitCmd::Suggest { persona, set, check } => match check {
+                Some(f) => app::trait_reverse::suggest_check(root, f, persona.as_deref()),
+                None => app::trait_reverse::suggest(root, persona.as_deref(), set.as_deref()),
+            },
             TraitCmd::Set { what: TraitSetCmd::Add { file } } => app::traits::set_add(root, file),
             TraitCmd::Set { what: TraitSetCmd::List } => app::traits::set_list(root),
         },

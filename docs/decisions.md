@@ -234,7 +234,9 @@ Closes open question 3 of `docs/reports/2026-10-23-v0-1-measured.md` (what count
     `overridden_down` (the run's recorded override lowers `spend` below the rule's, drops a rule lens, or sets `detail` below
     it; or replaces the rule's panel, stakes or draw, which is not proven equal; or the run's effort is below the toml's
     `effort`, `medium` when unset; or the run was briefed with no rule while a rule holds the subject); `effort_below_quorum`
-    (D17); `independence_sequential` (D18); `stale_run` (the subject moved since the run, or a later run of the same subject and
+    (D17); `independence_sequential` (D18); `thin_primary` (added after the v0.6-A review: a judged run whose primary stratum
+    has fewer than two judged seats; one reader is not a jury, so a `--seats auto` run with one serving persona never applies);
+    `stale_run` (the subject moved since the run, or a later run of the same subject and
     lens supersedes it); `delta_unavailable` (a previous round of the same subject and lens exists but the delta cannot be
     computed: another lens version, or cells the previous round does not have).
   - Raising seats, lenses, effort or detail above the rule is fine. `apply`: none of the above. `single_model` is informational.
@@ -444,11 +446,13 @@ A trait is a tendency or a standing fact that makes one reader decide differentl
 never a score, never averaged, never a probability. **The catalog** is data: 49 files in `traits/<family>/<trait>.toml` (band 1 to 5 with
 anchors at 1, 3 and 5, a category with options, or words) and eight sets in `trait-sets/<name>.toml` (at most 8 traits, a cover of at most
 4). They are embedded with `include_str!` (`domain/catalog.rs`, a test keeps the list and the files equal both ways) and installed by
-`trait install`, never seeded at store creation: the same hash is skipped, a changed one is a new version, origin `catalog`. Every anchor
+`trait install`, never seeded at store creation: the same hash is skipped, an earlier catalog version is updated (origin `catalog`),
+and a trait the user edited (`trait add` of a shipped id with other text, origin `edited`) is never overwritten: it is listed in
+`kept_local`, and `--force --reason TEXT` overwrites it, recording the reason in `trait.reason` (amended after the review, I4). Every anchor
 is our own words describing a construct and follows "You tend to" (lower case, 40 to 400 characters, no "I ", no "agree"); each file says
 `items_copied = false`, because published questionnaire items are copyrighted or academic-use. **Schema v5** is one migration for the three
 v0.6 lanes, idempotent (`pragma_table_info` before each `ALTER`): `persona.traits_json` and `persona.serves_json`, `panel.cover_json`,
-`run.traits_json` and `run.seats_json`, `subject.audience_json`, and the tables `trait` and `trait_set`; lane C adds `run.options_mode`,
+`run.traits_json` and `run.seats_json`, `subject.audience_json`, and the tables `trait` (with `reason`, the fix round) and `trait_set`; lane C adds `run.options_mode`,
 `verdict.phase` and the `deliberation` table, lane B `human_batch.traits_json`. A v4 store becomes v5 on open. **The key** `traits` on a
 persona file (at most 8, `deny_unknown_fields` stays) is checked against the store at `persona add`; the persona hash is over the whole
 file, so a persona without the key keeps its hash. The design jury of 9 (primary, secondary and bystander seats) voted 7 of 9 to adopt the
@@ -458,12 +462,27 @@ number or a label; so the brief says "you tend to", never "you are", and never p
 9·9·8 for personas written from real material against 7·4·4 for the trait; a split in which the approving stratum calls it unsafe means do
 not ship. A market's view comes from `persona generate --from` material. **The ceilings** are 8 traits a persona, 8 a set and 4 in a
 cover: more traits dilute the brief and make every band pair unreachable (4 traits at 3 bands is 54 pairs, 9 seats cover them; 5 is 90);
-a saturation run (does a ninth trait move a verdict?) would change them. `access.need` ships in this lane because a need is a fact the page
+a saturation run (does a ninth trait move a verdict?) would change them. **The brief budget, measured** (the fix round, builder-ana's
+critical brief on the fixture site, `--traits all`; the design's "eight traits stay under 15%" was wrong): 5 traits add 754 bytes,
++14.7% compact (5120 to 5874) and +9.6% full (7887 to 8641); 8 traits add 1225 bytes, +23.9% compact (5120 to 6345) and +15.5% full
+(7887 to 9112). The budget is 15% for a typical 5-trait persona, and it holds. Eight traits stay above it, at compact and at full:
+that is a documented cost of a persona that carries the ceiling, not a reason to lower it. `set` mode pays less (D31): builder-ana
+under `developer-tool` renders 3 lines (+11.8%), under `b2b-purchase` 5 (+15.5%). `access.need` ships in this lane because a need is a fact the page
 must serve, not a disposition, and it is the cheapest slice that finds a page failure. **Refused ids** (`refused_trait_id`, last segment of
 the id or the whole id, checked before the store lookup): typologies without predictive validity (`mbti`, `myers_briggs`, `enneagram`, `disc`,
 `learning_style`, `generation`, `astrology`, `zodiac`, `blood_type`); protected attributes that are not mechanisms (`age`, `gender`, `sex`,
 `ethnicity`, `race`, `religion`, `disability`, `political_affiliation`, `political_lean`, `minority`, `nationality`); attributes of the persona
-rather than sensitivities of the juror (`appearance`, `attractiveness`, `beauty`, `fame`, `celebrity`, `outcast`, `outsider`). The catalog's
+rather than sensitivities of the juror (`appearance`, `attractiveness`, `beauty`, `fame`, `celebrity`, `outcast`, `outsider`).
+**A whitelist, not a blacklist** (the maintainer's ruling after the v0.6-A review, I2): a persona trait id is accepted only if the
+store's catalog holds it, shipped or added with `trait add` (generated from material or not); every trait added that way, and every
+persona trait id that is not shipped, passes a protected-attribute screen: refused (`refused_trait_id`) when its family is `demo`,
+`culture` or `protected` (as `project.<f>` too, so "no country-dimension trait" holds for project traits), or when a word of its id
+or title starts with a stem of `PROTECTED_STEMS` (`domain/traits.rs`, the one table, documented in `traits.md` and tested stem by
+stem): age, gender, sex, sexual, orientation, race, racial, ethnic, religion, religio, faith, caste, nationality, national,
+citizenship, country, pregnan, marital, disab (not under `access.*`, the assistive needs), politic, union, health, genetic, skin,
+color, colour, tribe, tribal. The shipped catalog's own id and title are reviewed words and are not screened again
+(`risk.health_safety`, "in good faith"). A free-text value (`situation.job`, a words trait) is at most 80 characters, holds no
+digit, does not start "You are" or "I am", and passes the same stems, else `trait_text_refused` (I3). The catalog's
 social family has eight traits (the lane brief said seven; the report's table is the authority and the total is 49). Two columns beyond the
 brief's list serve `--seats auto`: `persona.serves_json` and `subject.audience_json`, with `run.seats_json`.
 
@@ -490,14 +509,21 @@ mid 3, high 4 to 5. Strata are never pooled; the pair count is panel-wide by des
 replay stays byte-identical: it adds the personas (after `trait install`) and briefs without a rule or `--traits`, and nothing in the replay
 pins a persona hash. The block "How this reader tends to decide (told)" sits between the persona list and the stake: trait ids sorted, band
 1, 3, 5 as "You tend to: <anchor>", band 2 and 4 as "You tend to lean this way: <anchor of 1 or 5>", a category's option sentence, words as
-"want to <job>", and the derived route last when involvement and need for cognition are both rendered (central when both are 4 or more).
-Value, id and title are never printed; the block has no digit and no "You are". `set` mode renders the set's traits the persona has and
-reports `trait_set_incomplete` (a warning; `apply-check` adds the informational reason). The run records `{mode, set, versions, draw}` (the
+"Your work: <job>" (a words value, screened at `persona add`; never "You are", the fix round I3), and the derived route last when involvement and need for cognition are both rendered (central when both are 4 or more).
+Value, id and title are never printed; the block has no digit and no "You are"; it closes with "Told, not seen: a line leaning on
+one is `told`; a line about the subject still cites it." (shortened in the fix round: it is paid once per brief). `set` mode renders
+the set's cover traits the persona has, and its other set traits unless they sit at 3, the middle of a band and the default reading
+(the fix round, for the 15% budget of D29), and reports `trait_set_incomplete` (a warning; `apply-check` adds the informational reason). The run records `{mode, set, versions, draw}` (the
 draw is `cover` or `seeded`), plus `incomplete`. **Slices** are counts: `matrix --slice TRAIT` adds `slices` beside `strata`, per stratum the
 groups by band with their cells (lower-middle median, min, max, blockers), `thin` below two personas, `unset`, `separates` (cells where two
 groups' `anchor_met` ranges do not overlap, the D13 rule applied to groups within a stratum) and collinearity warnings; no key is a mean, a
 share, a rate or a probability. `summary --slice` adds one fixed-template sentence per stratum, ending "In this jury, not a claim about
 people." The golden summaries are produced without `--slice` and do not change. **`--seats auto`** (adopter feedback: fixed panels of 8
 to 14 seats are the main token waste): personas carry `serves`, subjects an `--audience`; the seats are every persona that serves the
-audience (capped by effort; a seeded draw, or the trait set's cover) plus exactly one control that does not (a seeded draw), recorded on the
-run as `seats [{persona, why}]`; refusals `audience_unknown` and `no_matching_personas`.
+audience (a seeded draw, or the trait set's cover) plus exactly one control that does not (a seeded draw), recorded on the
+run as `seats [{persona, why}]`; refusals `audience_unknown` and `no_matching_personas`. Amended after the review: the control counts
+**inside** the effort's cap (low 3 = 2 serving + 1 control, medium 7, high 12, max 12 as before), so a refusal never fires on a seat
+the engine added (I1); under a rule, `--seats auto` replaces the rule's panel without an override, because the seats follow the
+subject's audience the same way every time; what else the caller changes (lenses, effort, traits, spend) is an override as before
+(I5). A rule may therefore leave its panel to `--seats auto`; the guard is `apply-check`'s `thin_primary` (D13): a primary stratum
+of fewer than two judged seats advises.

@@ -9,7 +9,7 @@ the version.
 |---|---|---|
 | `persona add` | `--file F` `[--generated-from HASH]` | add one persona from the fixed JSON |
 | `persona generate` | `--from PATH` `[--count N]` (default 7) `[--traits SET]` | write the brief that asks your agent to write personas from material; with `--traits` it also lists the set's traits and a Latin-square row of cover bands per persona (see [`traits.md`](traits.md)) |
-| `trait install` | | add every embedded catalog trait and trait set the store lacks; answers `{installed, skipped, versions_added}` |
+| `trait install` | `[--force --reason TEXT]` | add every embedded catalog trait and trait set the store lacks, and update an earlier catalog version; a trait the user edited is kept and listed in `kept_local`, unless `--force` overwrites it with the recorded reason (`forced`); answers `{installed, skipped, versions_added, kept_local}` |
 | `trait add` | `--file F` `[--generated-from HASH]` | add one trait file; validated (`invalid_trait_file`, `refused_trait_id`) |
 | `trait list` / `trait show` | `[ID]` | the traits the store holds (`data.traits`), or one in full |
 | `trait set add` / `trait set list` | `--file F` | a trait set: at most 8 traits and a cover of at most 4 (`trait_set_too_large`, `cover_too_large`, `unknown_trait`; a correlated pair is a warning) |
@@ -110,6 +110,7 @@ named here, and the rules the subject's recorded sources fall under.
 | `check_failed` | escalate | a finding of any run of this subject has no decision, or a fix did not land |
 | `delta_not_landed` | escalate | the delta against the previous round of the same subject and lens did not land |
 | `human_blocker` | escalate | a person's batch (`--by-human`) raised a blocker no `decide --by-human` has closed, in any stratum |
+| `thin_primary` | advise | a judged run's primary stratum has fewer than two judged seats: one reader's view, not a jury's |
 | `incomplete_jury` | advise | a briefed seat of a given run has no accepted verdict; `missing` lists them per run |
 | `quorum_unknown` | advise | no rule recorded on the run, none named, and no rule holds the subject's sources |
 | `rule_below_sources` | advise | the `--rule` named here, or the run's recorded rule, has a lower quorum than the sources' |
@@ -194,10 +195,13 @@ reads it the lenient way). `#L<n>` keeps working.
 
 ### `--seats auto`
 A persona may carry `serves`, tags for the audiences or subject kinds it speaks for; a subject may be added with `--audience docs,developers`.
-`brief --subject S --seats auto` seats every persona whose `serves` meets the subject's audience (at most the effort's seats, else 11;
+`brief --subject S --seats auto` seats every persona whose `serves` meets the subject's audience (the jury, control included, is at most the effort's seats:
+low 3 = 2 serving + 1 control, medium 7, high 12; at max, or with no effort, 12;
 a seeded draw, or the trait set's cover when `--traits` names a set that has one), plus exactly one control persona whose `serves` does not
 (a seeded draw). Serving seats are primary and the control a bystander unless `--stake` says otherwise. The answer prints
 `seats: [{persona, why: "serves docs" | "control: unrelated"}]`, and the run records them. `audience_unknown` when the subject has no
 audience, `no_matching_personas` when nobody serves it; with no unrelated persona the answer warns `no_control_persona`. It takes no
-`--panel` or `--query`; under a rule it departs from the rule's panel and needs `--reason`. A fixed panel of 8 to 14 seats is the main
+`--panel` or `--query`. Under a rule it replaces the rule's panel without an override (the seats follow the subject's audience the
+same way every time); anything else that differs from the rule (lenses, effort, traits, spend) still needs `--reason`. A run whose
+primary stratum has fewer than two judged seats answers `advise` at `apply-check` (`thin_primary`). A fixed panel of 8 to 14 seats is the main
 token waste: this is the default way to seat a jury.

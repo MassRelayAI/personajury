@@ -9,7 +9,10 @@ persona reads it as "you tend to ...". Decisions: D29 (the catalog), D30 (cover 
 
 49 traits in 14 families ship in the binary as data (`traits/<family>/<trait>.toml`) and eight trait sets
 (`trait-sets/<name>.toml`). Nothing is seeded at store creation: `personajury trait install` adds every trait and set the store
-lacks (the same hash is skipped; a changed one becomes a new version), and answers `{installed, skipped, versions_added}`.
+lacks (the same hash is skipped; an earlier catalog version is updated to the catalog's text), and answers
+`{installed, skipped, versions_added, kept_local}`. It never overwrites a trait you edited: `trait add` of a shipped id with other
+text records origin `edited`, and `trait install` then keeps it and lists it in `kept_local`. `trait install --force --reason TEXT`
+overwrites them with the catalog's text and records the reason on the new version (`trait list` shows it); it is idempotent after.
 
 Licence: every anchor is our own words describing a construct. Published questionnaire items are copyrighted or restricted to
 academic use, so none is reproduced, paraphrased item by item or scored; each file says `items_copied = false`, and the source is
@@ -101,7 +104,10 @@ A persona file may carry `traits`: a map of trait id to value, **at most 8**, wr
 "traits": {"trust.marketing_skepticism": 4, "choice.decision_style": "rational", "access.need": ["screen_reader"]}
 ```
 
-Refusals at `persona add`: `unknown_trait` (the store has no such trait; `culture.*` ids included), `trait_value_off_scale`,
+A persona trait is accepted only if the store's catalog holds it: shipped and installed, or added with `trait add` (generated
+from material or not) after passing the protected-attribute screen below. Refusals at `persona add`: `unknown_trait` (the store
+has no such trait), `refused_trait_id` (the screen, checked first), `trait_text_refused` (a words value: at most 80 characters,
+no digit, not starting "You are" or "I am", no protected stem), `trait_value_off_scale`,
 `trait_option_unknown` (an option the trait lacks, or a list on a trait that holds one), `traits_too_many` above 8, and
 `refused_trait_id` (see below). A persona with no `traits` keeps the hash it had. `persona list` shows `traits: n`.
 
@@ -115,15 +121,17 @@ changes. Otherwise each brief gets, between the persona and the stake, a block:
 ```
 ## How this reader tends to decide (told)
 
-- You tend to: <the anchor at 1, 3 or 5, or the option's sentence, or: want to <job>>
+- You tend to: <the anchor at 1, 3 or 5, or the option's sentence>
 - You tend to lean this way: <the anchor at 1 for a 2, at 5 for a 4>
+- Your work: <situation.job, the words value>
 - You tend to: <the derived route, last, when both of its inputs are rendered>
 
-These tendencies are told, not seen: a line that leans on one is `told` evidence; a line about the subject still needs its citation.
+Told, not seen: a line leaning on one is `told`; a line about the subject still cites it.
 ```
 
 Trait ids in sorted order. The value, the id and the title are never printed; no digit and no "You are" appears in the block.
-`set` mode renders only the set's traits the persona has, and the answer lists what is missing as `trait_set_incomplete`
+`set` mode renders the set's cover traits the persona has, and its other set traits unless they sit at the middle of a band (3,
+the default reading); the answer lists what is missing as `trait_set_incomplete`
 (`apply-check` adds the informational reason of the same name). A `--traits` that differs from the rule's is an override and
 needs `--reason` (`override_without_reason`); an unknown set is `trait_set_unknown`. The run records
 `traits_json = {mode, set, versions, draw}` (and `incomplete`, the seats lacking set traits).
@@ -167,6 +175,29 @@ Attributes of the persona rather than sensitivities of the juror: `appearance`, 
 `outcast`, `outsider`. Beauty, fame and outsider status are the juror's sensitivities (`aesthetics.sensitivity`,
 `social.influence_susceptibility`, `social.stigma_consciousness`), never the persona's attributes. The check looks at the last
 segment of the id, so `culture.gender` is refused too.
+
+**The protected-attribute screen** (after the v0.6-A review) runs on every trait `trait add` takes and on every persona trait id
+that is not shipped. It refuses (`refused_trait_id`, "protected attribute, not a mechanism") a trait whose family is `demo`,
+`culture` or `protected` (`project.demo` and the rest included), and a trait whose id (its words split on `.` and `_`) or title
+(its words) has a word that starts with one of these stems (`PROTECTED_STEMS` in `domain/traits.rs`, the one table):
+
+| stem | attribute | stem | attribute |
+|---|---|---|---|
+| `age` | age | `country` | country as an identity |
+| `gender` | gender | `pregnan` | pregnancy |
+| `sex`, `sexual`, `orientation` | sex, sexual orientation | `marital` | marital status |
+| `race`, `racial` | race | `disab` | disability (not under `access.*`, the assistive needs) |
+| `ethnic` | ethnicity | `politic` | political opinion |
+| `religion`, `religio`, `faith` | religion | `union` | union membership |
+| `caste` | caste | `health` | health |
+| `nationality`, `national` | nationality, national origin | `genetic` | genetic data |
+| `citizenship` | citizenship | `skin`, `color`, `colour` | skin colour |
+| `tribe`, `tribal` | tribe | | |
+
+It errs safe (`colorful` is refused); `agent`, `agency` and `agenda` are not `age`. The shipped catalog's own id and title are
+reviewed words and are not screened again (`risk.health_safety`, "in good faith"); an edited title is. A words value
+(`situation.job`) passes the same stems, at most 80 characters, no digit, and may not start "You are" or "I am"
+(`trait_text_refused`); the brief prints it as "Your work: ...".
 
 ## Culture
 

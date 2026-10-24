@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Panels: `[trait>=4]` filters on a term, `panel add --cover`, `coverage` (one-way, pairs, balance, collinear, confounded) and the
   cover-aware draw (D30).
 - `matrix --slice TRAIT` and `summary --slice TRAIT`: groups per stratum, counted, never averaged (D31).
+- Fix round after the review: the protected-attribute screen on every added trait (refused families and stems, D29);
+  `trait_text_refused` for free-text values, rendered "Your work: ..."; `trait install` keeps local edits (`kept_local`,
+  `--force --reason`); `--seats auto` counts the control inside the effort's cap and is no override by itself; `apply-check`
+  reason `thin_primary` (D13); a shorter closing line and a leaner `set` mode in the trait block (D31).
 - `brief --seats auto`, persona `serves`, `subject add --audience`: the personas that serve the audience plus one control.
 - The MCP tool `personajury_trait_list`; `traits`, `seats` on brief, `slice` on matrix and summary.
 

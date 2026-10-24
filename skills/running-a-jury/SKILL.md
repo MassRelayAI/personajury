@@ -78,7 +78,9 @@ applies. Claiming `independent` from one window is a false record.
 
 ### Seats from the audience, traits in the brief
 Default to `--seats auto` rather than a fixed panel of 8 to 14: add the subject with `--audience docs,developers`, and the brief seats the
-personas whose `serves` meets it plus exactly one control that does not, which is far fewer tokens. For a persona's tendencies use
+personas whose `serves` meets it plus exactly one control that does not, which is far fewer tokens. The control counts inside the
+effort's seats (low is 2 serving + 1 control). Give each audience at least two serving personas: a primary stratum of one is
+`thin_primary` and never applies. For a persona's tendencies use
 `--traits <set>` (or `trait_set` in the rule): the brief gets "you tend to" lines, and **a trait is told, not seen**: a line that leans on one
 is `told` evidence and a line about the subject still needs its citation. Install the catalog once (`personajury trait install`). With a
 panel `--cover`, read `coverage` and especially `balance` before you brief: a band no seat holds is a question the jury cannot answer.

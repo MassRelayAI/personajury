@@ -13,6 +13,10 @@ Contact us instead of a price, and a price I…" (no decision yet); builder-mei
 (primary) on blocks: "The main Get started button is white text on pale blue
 and…" (no decision yet); builder-ravi (primary) on blocks: "The 'Sign up free'
 link points to '#' so the one path to…" (no decision yet) and 23 more.
+Primary jurors agree within one anchor on 21 of 21 scores; Secondary jurors
+agree within one anchor on 21 of 21 scores; Bystander jurors agree within one
+anchor on 21 of 21 scores.
+Of 147 verdict lines, 147 were seen, 0 told and 0 recalled.
 
 Numbers, for checking (medians primary·secondary·bystander; - = nobody):
                    works  blocks  missing  clarity  price  trust
@@ -22,5 +26,8 @@ pricing.walk.json  -      -       -        3·2·3    3·2·3  2·2·3
 lantern-site       2·2·2  2·2·2   2·2·2    2·1·2    2·2·2  2·2·2
 home.png           -      -       -        2·1·2    1·1·1  2·2·2
 (1 more not shown)
+panel: asked 3 builder, seated 3, answered 3; asked 2 company, seated 2,
+answered 2; asked 2 others, seated 2, answered 2
 
 Next: run the high quorum with these reasons in hand before applying anything.
+cost: reported — (estimate 210000)

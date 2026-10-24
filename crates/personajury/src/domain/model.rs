@@ -690,6 +690,8 @@ pub struct Cell {
     pub min: i64,
     pub max: i64,
     pub blockers: usize,
+    /// how many scores sit within one point of the median (D34): a count, so the cell's spread reads without a mean
+    pub within_one: usize,
     /// how many of the cell's scores stand on each evidence class (I4)
     pub evidence: EvidenceCounts,
     /// persona → evidence class of its score; drives the table's suffixes, never serialised

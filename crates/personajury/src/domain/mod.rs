@@ -9,6 +9,7 @@ pub mod delta;
 pub mod graphlayout;
 pub mod hash;
 pub mod matrix;
+pub mod metrics;
 pub mod model;
 pub mod query;
 pub mod rng;

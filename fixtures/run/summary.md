@@ -13,6 +13,10 @@ The weakest dimension is works for primary (median 2), clarity for secondary (me
 
 Blockers, in the jurors' words: builder-ana (primary) on blocks: "Team shows Contact us instead of a price, and a price I…" (no decision yet); builder-mei (primary) on blocks: "The main Get started button is white text on pale blue and…" (no decision yet); builder-ravi (primary) on blocks: "The 'Sign up free' link points to '#' so the one path to…" (no decision yet) and 23 more.
 
+Primary jurors agree within one anchor on 21 of 21 scores; Secondary jurors agree within one anchor on 21 of 21 scores; Bystander jurors agree within one anchor on 21 of 21 scores.
+
+Of 147 verdict lines, 147 were seen, 0 told and 0 recalled.
+
 ## Numbers, for checking
 
 Medians as primary·secondary·bystander; a dash is a stratum nobody judged.
@@ -78,3 +82,8 @@ Medians as primary·secondary·bystander; a dash is a stratum nobody judged.
 | 2 | investor-claire | compare | f4cada25998c80b387f5ff5df3dd59a61279f52ca9a273697ed6f405c5705eb2 |
 
 Next: run the high quorum with these reasons in hand before applying anything.
+
+panel: asked 3 builder, seated 3, answered 3; asked 2 company, seated 2, answered 2; asked 2 others, seated 2, answered 2
+
+cost: reported — (estimate 210000)
+

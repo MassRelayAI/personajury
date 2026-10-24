@@ -23,6 +23,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -44,6 +45,7 @@
         "min": 1,
         "max": 2,
         "blockers": 9,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -65,6 +67,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -86,6 +89,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -107,6 +111,7 @@
         "min": 4,
         "max": 5,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -128,6 +133,7 @@
         "min": 1,
         "max": 2,
         "blockers": 1,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -149,6 +155,7 @@
         "min": 1,
         "max": 3,
         "blockers": 1,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -170,6 +177,7 @@
         "min": 3,
         "max": 4,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -191,6 +199,7 @@
         "min": 3,
         "max": 4,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -212,6 +221,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -233,6 +243,7 @@
         "min": 4,
         "max": 5,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -254,6 +265,7 @@
         "min": 1,
         "max": 2,
         "blockers": 2,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -275,6 +287,7 @@
         "min": 1,
         "max": 2,
         "blockers": 2,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -296,6 +309,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -317,6 +331,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -338,6 +353,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -359,6 +375,7 @@
         "min": 3,
         "max": 4,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -380,6 +397,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -401,6 +419,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -422,6 +441,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
@@ -443,13 +463,23 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 4,
         "evidence": {
           "seen": 4,
           "told": 0,
           "recalled": 0
         }
       }
-    ]
+    ],
+    "agreement": {
+      "cells": 21,
+      "cells_all_within_one": 21
+    },
+    "evidence": {
+      "seen": 84,
+      "told": 0,
+      "recalled": 0
+    }
   },
   {
     "stake": "secondary",
@@ -471,6 +501,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -490,6 +521,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -509,6 +541,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -528,6 +561,7 @@
         "min": 1,
         "max": 2,
         "blockers": 1,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -547,6 +581,7 @@
         "min": 4,
         "max": 5,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -566,6 +601,7 @@
         "min": 1,
         "max": 2,
         "blockers": 1,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -585,6 +621,7 @@
         "min": 1,
         "max": 2,
         "blockers": 1,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -604,6 +641,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -623,6 +661,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -642,6 +681,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -661,6 +701,7 @@
         "min": 5,
         "max": 5,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -680,6 +721,7 @@
         "min": 1,
         "max": 1,
         "blockers": 2,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -699,6 +741,7 @@
         "min": 1,
         "max": 1,
         "blockers": 2,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -718,6 +761,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -737,6 +781,7 @@
         "min": 2,
         "max": 3,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -756,6 +801,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -775,6 +821,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -794,6 +841,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -813,6 +861,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -832,6 +881,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
@@ -851,13 +901,23 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 2,
         "evidence": {
           "seen": 2,
           "told": 0,
           "recalled": 0
         }
       }
-    ]
+    ],
+    "agreement": {
+      "cells": 21,
+      "cells_all_within_one": 21
+    },
+    "evidence": {
+      "seen": 42,
+      "told": 0,
+      "recalled": 0
+    }
   },
   {
     "stake": "bystander",
@@ -877,6 +937,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -895,6 +956,7 @@
         "min": 2,
         "max": 2,
         "blockers": 2,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -913,6 +975,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -931,6 +994,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -949,6 +1013,7 @@
         "min": 4,
         "max": 4,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -967,6 +1032,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -985,6 +1051,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1003,6 +1070,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1021,6 +1089,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1039,6 +1108,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1057,6 +1127,7 @@
         "min": 5,
         "max": 5,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1075,6 +1146,7 @@
         "min": 1,
         "max": 1,
         "blockers": 1,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1093,6 +1165,7 @@
         "min": 1,
         "max": 1,
         "blockers": 1,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1111,6 +1184,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1129,6 +1203,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1147,6 +1222,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1165,6 +1241,7 @@
         "min": 4,
         "max": 4,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1183,6 +1260,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1201,6 +1279,7 @@
         "min": 2,
         "max": 2,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1219,6 +1298,7 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
@@ -1237,12 +1317,22 @@
         "min": 3,
         "max": 3,
         "blockers": 0,
+        "within_one": 1,
         "evidence": {
           "seen": 1,
           "told": 0,
           "recalled": 0
         }
       }
-    ]
+    ],
+    "agreement": {
+      "cells": 21,
+      "cells_all_within_one": 21
+    },
+    "evidence": {
+      "seen": 21,
+      "told": 0,
+      "recalled": 0
+    }
   }
 ]

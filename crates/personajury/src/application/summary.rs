@@ -3,6 +3,7 @@
 //! only when asked (`--html`, `--md`, or `--save` into the toml's `report_dir`).
 use super::verdict::{findings_of, load_run, open};
 use super::{apply_check, delta, graph, matrix, pick, AppError, Result};
+use crate::domain::metrics;
 use crate::domain::summary::{self as sm, Facts};
 use crate::domain::*;
 use serde_json::{json, Value};
@@ -65,6 +66,7 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     // the numbers: a P·S·B median per (option or subject) × dimension, from the matrix, never combined
     let m = matrix::show(root, &f.runs, false, false, false, Detail::Compact, None, "initial")?;
     let strata = m["strata"].as_array().cloned().unwrap_or_default();
+    metrics_of(root, &m, &given, &mut f)?;
     let mut cols: Vec<(String, String)> = Vec::new(); // (lens, dimension), first seen
     for s in &strata {
         for c in s["cells"].as_array().into_iter().flatten() {
@@ -176,6 +178,68 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
         }
     }
     Ok((f, given))
+}
+
+/// The counted metrics (D34) as fixed-template sentences and footer lines, from what the matrix already counted.
+fn metrics_of(root: &Path, m: &Value, given: &[RunRow], f: &mut Facts) -> Result<()> {
+    let strata = m["strata"].as_array().cloned().unwrap_or_default();
+    let mut agree: Vec<String> = Vec::new();
+    let (mut seen, mut told, mut rec) = (0u64, 0u64, 0u64);
+    for s in &strata {
+        let name = s["stake"].as_str().unwrap_or("");
+        let cap = format!("{}{}", name[..1].to_uppercase(), &name[1..]);
+        agree.push(format!("{cap} jurors agree within one anchor on {} of {} scores", s["agreement"]["cells_all_within_one"], s["agreement"]["cells"]));
+        seen += s["evidence"]["seen"].as_u64().unwrap_or(0);
+        told += s["evidence"]["told"].as_u64().unwrap_or(0);
+        rec += s["evidence"]["recalled"].as_u64().unwrap_or(0);
+    }
+    if !agree.is_empty() {
+        f.agreement = Some(format!("{}.", agree.join("; ")));
+        f.evidence_line = Some(format!("Of {} verdict lines, {seen} were seen, {told} told and {rec} recalled.", seen + told + rec));
+    }
+    if let Some(s) = strata.iter().find(|s| s["stake"] == "primary" && s.get("shift").is_some()) {
+        let sh = &s["shift"];
+        f.shift_line = Some(format!(
+            "After deliberation, {} primary scores moved up, {} down and {} held; {} moved toward the group's first median.",
+            sh["moved_up"], sh["moved_down"], sh["held"], sh["toward_first_median"]
+        ));
+    }
+    f.panel_lines = metrics::panel_lines(&m["panel_match"]);
+    // cost: per run and per seat when they carry a number, the total last (nothing is divided)
+    let cost = &m["cost"];
+    let per = super::verdict::tokens_per_brief(root)?;
+    let jurors = cost["per_juror"].as_array().cloned().unwrap_or_default();
+    let mut lines: Vec<String> = Vec::new();
+    // a run line only when some juror reported: with nothing reported the total line says it once
+    if given.len() > 1 && !jurors.is_empty() {
+        for r in given {
+            let mine: Vec<&Value> = jurors.iter().filter(|j| j["run"].as_i64() == Some(r.id)).collect();
+            let reported = if mine.is_empty() {
+                "reported \u{2014}".to_string()
+            } else {
+                let sum = |k: &str| mine.iter().map(|j| j[k].as_u64().unwrap_or(0)).sum::<u64>();
+                format!("reported {} in, {} out", sum("input_tokens"), sum("output_tokens"))
+            };
+            lines.push(format!(
+                "cost, run {}: estimate {} tokens for {} briefs ({per} a seat); {reported}",
+                r.id,
+                r.briefs.len() as u64 * per,
+                r.briefs.len()
+            ));
+        }
+    }
+    for j in &jurors {
+        lines.push(format!(
+            "cost, seat {} (run {}): {} in, {} out",
+            j["persona"].as_str().unwrap_or(""),
+            j["run"],
+            j["input_tokens"],
+            j["output_tokens"]
+        ));
+    }
+    lines.push(metrics::cost_line(cost));
+    f.cost_lines = lines;
+    Ok(())
 }
 
 /// One fixed-template sentence per stratum present (D31): who, by one trait, scored the weakest dimension how. Nothing here

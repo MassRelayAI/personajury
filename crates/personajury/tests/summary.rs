@@ -21,7 +21,8 @@ fn the_fixture_run_summary_is_the_golden_file_byte_for_byte() {
         std::fs::write(&golden, &got).unwrap();
     }
     assert_eq!(got, std::fs::read_to_string(&golden).unwrap(), "the summary moved");
-    assert!(got.lines().count() <= 30, "under about thirty lines:\n{got}");
+    // about thirty lines, and the counted metrics of D34 add four sentences, a panel line and a cost line
+    assert!(got.lines().count() <= 34, "under about thirty lines:\n{got}");
 }
 
 #[test]
@@ -35,7 +36,9 @@ fn the_layout_is_sentences_then_the_table_then_next_and_has_no_bars() {
     let table = t.find("for checking").expect(&t);
     let next = t.find("Next:").expect(&t);
     assert!(table > 0 && next > table, "{t}");
-    assert!(t.trim_end().lines().last().unwrap().starts_with("Next:"), "{t}");
+    // the cost line closes the summary (D34), after Next
+    let last = t.trim_end().lines().last().unwrap();
+    assert!(last.starts_with("cost: ") && t.find("cost: ").unwrap() > next, "{t}");
     // the table holds P·S·B medians
     assert!(t.lines().any(|l| l.matches('·').count() >= 2), "{t}");
 }

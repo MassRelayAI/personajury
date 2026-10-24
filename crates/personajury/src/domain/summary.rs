@@ -78,6 +78,14 @@ pub struct Facts {
     pub briefs: Vec<(i64, String, String, String)>,
     /// `--slice`: one fixed-template sentence per stratum present (D31), after the other sentences
     pub slice: Vec<String>,
+    /// the counted metrics (D34), as fixed-template sentences and footer lines, written by the application from the matrix
+    pub agreement: Option<String>,
+    pub evidence_line: Option<String>,
+    pub shift_line: Option<String>,
+    /// `panel: asked 3 builder=primary, seated 3, answered 3; …`
+    pub panel_lines: Vec<String>,
+    /// per run and per seat when they carry a number, then the total `cost:` line last
+    pub cost_lines: Vec<String>,
 }
 pub const TOP_ROWS: usize = 5;
 const SHOWN_BLOCKERS: usize = 3;
@@ -218,6 +226,7 @@ fn reason_words(f: &Facts) -> Vec<(String, String)> {
             "independence_sequential" => "one context played every juror".to_string(),
             "stale_run" => "the subject changed after the jury ran".to_string(),
             "delta_unavailable" => "the last two rounds cannot be compared".to_string(),
+            "deliberated" => "the jurors saw each other's verdicts in a second round, so only their first word was independent".to_string(),
             "uncalibrated" => "the jury does not rank like the people it was checked against".to_string(),
             other => other.replace('_', " "),
         };
@@ -341,6 +350,9 @@ pub fn sentences(f: &Facts) -> Vec<String> {
         s.push(format!("Blockers, in the jurors' words: {}{tail}.", shown.join("; ")));
     }
     s.extend(f.slice.iter().cloned());
+    s.extend(f.agreement.iter().cloned());
+    s.extend(f.evidence_line.iter().cloned());
+    s.extend(f.shift_line.iter().cloned());
     s
 }
 /// The blockers in turns across jurors: primary first, then secondary, then bystander; each juror's first blocker before
@@ -448,9 +460,15 @@ pub fn text(f: &Facts, width: usize) -> String {
         out.push(String::new());
         out.extend(wrap("Numbers, for checking (medians primary·secondary·bystander; - = nobody):", width));
         out.extend(t);
+        for l in &f.panel_lines {
+            out.extend(wrap(l, width));
+        }
     }
     out.push(String::new());
     out.extend(wrap(&format!("Next: {}", next(f)), width));
+    for l in &f.cost_lines {
+        out.extend(wrap(l, width));
+    }
     safe(&(out.join("\n") + "\n"))
 }
 
@@ -539,7 +557,11 @@ pub fn html(f: &Facts, svg: &str) -> String {
             let _ = writeln!(o, "<blockquote>{} ({}) on {}: “{}” <span class=\"muted\">({dec})</span></blockquote>", esc(&b.persona), b.stake.name(), esc(&b.dimension), esc(&b.text));
         }
     }
-    let _ = writeln!(o, "<h2>Next</h2>\n<p class=\"next\">{}</p>\n</main></body></html>", esc(&next(f)));
+    let _ = writeln!(o, "<h2>Next</h2>\n<p class=\"next\">{}</p>", esc(&next(f)));
+    for l in f.panel_lines.iter().chain(&f.cost_lines) {
+        let _ = writeln!(o, "<p class=\"muted\">{}</p>", esc(l));
+    }
+    o.push_str("</main></body></html>\n");
     o
 }
 
@@ -602,5 +624,11 @@ pub fn markdown(f: &Facts) -> String {
         o.push('\n');
     }
     let _ = writeln!(o, "Next: {}", next(f));
+    if !f.panel_lines.is_empty() || !f.cost_lines.is_empty() {
+        o.push('\n');
+        for l in f.panel_lines.iter().chain(&f.cost_lines) {
+            let _ = writeln!(o, "{l}\n");
+        }
+    }
     safe(&o)
 }

@@ -66,6 +66,7 @@ pub fn build(
                         min: vals[0],
                         max: vals[n - 1],
                         blockers: by_persona.values().map(|r| r.blockers.len()).sum(),
+                        within_one: super::metrics::within_one(&vals, median),
                         evidence,
                         classes: by_persona
                             .iter()

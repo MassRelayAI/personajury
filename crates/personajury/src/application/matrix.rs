@@ -2,6 +2,7 @@
 use super::verdict::{load_lens, load_run, open, score_rows, usage_line, usage_summary};
 use super::{AppError, Result};
 use crate::domain::apply;
+use crate::domain::metrics;
 use crate::domain::traits;
 use crate::domain::*;
 use serde_json::{json, Value};
@@ -27,6 +28,9 @@ pub fn show(
     let store = open(root)?;
     let mut rows_i = Vec::new();
     let mut rows_d = Vec::new();
+    // per run: the personas with an accepted initial verdict (D34, panel match)
+    let mut answered: BTreeMap<i64, std::collections::BTreeSet<String>> = BTreeMap::new();
+    let mut panel_match: Vec<Value> = Vec::new();
     let mut stakes: BTreeMap<String, Stake> = BTreeMap::new();
     let mut lenses: Vec<Lens> = Vec::new();
     let mut all = Vec::new();
@@ -103,7 +107,17 @@ pub fn show(
         {
             lenses.push(lens);
         }
-        rows_i.extend(score_rows(&run, &store.verdict_rows(*id, false)?));
+        let initial = store.verdict_rows(*id, false)?;
+        answered.insert(*id, initial.iter().filter(|r| !super::verdict::is_human(&r.persona)).map(|r| r.persona.clone()).collect());
+        if let Some(terms) = store.run_panel_terms(*id)? {
+            for t in terms.as_array().into_iter().flatten() {
+                let seated: Vec<&str> = t["personas"].as_array().into_iter().flatten().filter_map(Value::as_str).collect();
+                let got = seated.iter().filter(|p| answered[id].contains(**p)).count();
+                panel_match.push(json!({"run": id, "term": t["term"], "tag": t["tag"], "stake": t["stake"],
+                                        "asked": t["asked"], "seated": t["seated"], "answered": got}));
+            }
+        }
+        rows_i.extend(score_rows(&run, &initial));
         rows_d.extend(score_rows(&run, &store.deliberated_rows(*id)?));
         if history {
             all.extend(store.verdict_rows(*id, true)?);
@@ -129,6 +143,26 @@ pub fn show(
     // what people entered by hand stands beside the jury's cells, never in them (D19)
     let humans = humans_of(&rows, &stakes, &human_batches)?;
     let usage = usage_summary(root, &store, runs)?;
+    // cost (D34): what each juror's verdict reported, listed; nothing is divided
+    let cost = {
+        let rows = store.usage_rows(runs)?;
+        let (i, o) = rows.iter().fold((0u64, 0u64), |(i, o), r| (i.saturating_add(r.3), o.saturating_add(r.4)));
+        let jurors: std::collections::BTreeSet<(i64, &String)> = rows.iter().map(|r| (r.0, &r.1)).collect();
+        json!({
+            "per_juror": rows.iter().map(|r| json!({"run": r.0, "persona": r.1, "batch": r.2, "input_tokens": r.3, "output_tokens": r.4})).collect::<Vec<_>>(),
+            "reported_total": {"input_tokens": i, "output_tokens": o},
+            "jurors_reporting": jurors.len(),
+            "estimate": usage["estimate"].clone(),
+        })
+    };
+    // the persuasion shift needs the first word's cells; an initial matrix is built again when this one is another phase
+    let shifts = if rows_d.is_empty() {
+        BTreeMap::new()
+    } else if phase == "initial" {
+        metrics::shift(&m, &rows_d, &lenses)
+    } else {
+        metrics::shift(&matrix::build(&rows_i, &stakes, &lenses, Aggregate::PerStratum)?, &rows_d, &lenses)
+    };
     let sliced = match slice {
         Some(t) => Some(slices(&store, t, &rows, &stakes, &lenses, &versions, &m)?),
         None => None,
@@ -149,12 +183,15 @@ pub fn show(
     }
     // strata that disagree on a cell (D13): beside the strata, never inside one
     let splits = apply::splits(&rows, &stakes);
-    let mut out = json!({ "runs": runs, "strata": m.strata, "splits": splits, "usage": usage });
+    let mut out = json!({ "runs": runs, "strata": strata_json(&m, &shifts), "splits": splits, "usage": usage, "cost": cost });
+    if !panel_match.is_empty() {
+        out["panel_match"] = json!(panel_match);
+    }
     if let Some((v, _)) = sliced {
         out["slices"] = Value::Array(v);
     }
     if let Some(d) = both {
-        out["phases"] = json!({"initial": m.strata, "deliberated": d.strata});
+        out["phases"] = json!({"initial": strata_json(&m, &shifts), "deliberated": strata_json(&d, &shifts)});
     }
     out["models"] = json!(models.iter().map(|(s, m)| (s.name(), m)).collect::<BTreeMap<_, _>>());
     out["models_distinct"] = json!(models.values().flatten().collect::<std::collections::BTreeSet<_>>().len());
@@ -207,6 +244,23 @@ pub fn show(
         out["history"] = serde_json::to_value(all).expect("rows serialise");
     }
     Ok(out)
+}
+
+/// The strata as data, each with its counts (D34): agreement, evidence totals and, once a deliberation was answered, the shift.
+fn strata_json(m: &Matrix, shifts: &BTreeMap<Stake, Value>) -> Value {
+    let mut v = serde_json::to_value(&m.strata).expect("strata serialise");
+    for (s, o) in m.strata.iter().zip(v.as_array_mut().into_iter().flatten()) {
+        o["agreement"] = json!({
+            "cells": s.cells.len(),
+            "cells_all_within_one": s.cells.iter().filter(|c| c.within_one == c.n).count(),
+        });
+        let sum = |f: fn(&EvidenceCounts) -> usize| s.cells.iter().map(|c| f(&c.evidence)).sum::<usize>();
+        o["evidence"] = json!({"seen": sum(|e| e.seen), "told": sum(|e| e.told), "recalled": sum(|e| e.recalled)});
+        if let Some(sh) = shifts.get(&s.stake) {
+            o["shift"] = sh.clone();
+        }
+    }
+    v
 }
 
 /// A person's verdict, beside the jury (D19).

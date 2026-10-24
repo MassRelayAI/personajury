@@ -23,7 +23,7 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
 /// and subject audience.
 /// A stored trait's latest version: the definition, its origin, its hash and the reason a forced install recorded.
 pub type TraitRow = (TraitDef, String, String, Option<String>);
-const V5_COLUMNS: [(&str, &str, &str); 10] = [
+const V5_COLUMNS: [(&str, &str, &str); 11] = [
     ("trait", "reason", "TEXT"),
     ("persona", "traits_json", "TEXT"),
     ("persona", "serves_json", "TEXT"),
@@ -35,6 +35,7 @@ const V5_COLUMNS: [(&str, &str, &str); 10] = [
     ("run", "options_mode", "TEXT"),
     ("verdict", "phase", "TEXT"),
     ("pick", "about", "TEXT"),
+    ("run", "panel_terms_json", "TEXT"),
 ];
 pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
@@ -699,6 +700,33 @@ impl Store {
             .query_row("SELECT options_mode FROM run WHERE id = ?1", params![id], |r| r.get::<_, Option<String>>(0))
             .optional()?
             .flatten())
+    }
+    /// The panel terms a run was seated from (D34): `[{term, tag, stake, asked, seated, personas}]`; none for an older run.
+    pub fn run_panel_terms(&self, id: i64) -> Result<Option<serde_json::Value>> {
+        let t: Option<String> = self
+            .conn
+            .query_row("SELECT panel_terms_json FROM run WHERE id = ?1", params![id], |r| r.get::<_, Option<String>>(0))
+            .optional()?
+            .flatten();
+        t.map(|t| json_vec("panel terms", &t)).transpose()
+    }
+    pub fn set_run_panel_terms(&self, id: i64, terms: &serde_json::Value) -> Result<()> {
+        self.conn.execute("UPDATE run SET panel_terms_json = ?2 WHERE id = ?1", params![id, to_json(terms)])?;
+        Ok(())
+    }
+    /// What the agent reported for each verdict of these runs, in the order stored: `(run, persona, batch, input, output)`.
+    pub fn usage_rows(&self, run_ids: &[i64]) -> Result<Vec<(i64, String, i64, u64, u64)>> {
+        let mut st = self
+            .conn
+            .prepare("SELECT run_id, persona_id, batch, input_tokens, output_tokens FROM usage ORDER BY id")?;
+        let rows = st
+            .query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?, r.get::<_, i64>(2)?, r.get::<_, i64>(3)?, r.get::<_, i64>(4)?)))?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        Ok(rows
+            .into_iter()
+            .filter(|(run, ..)| run_ids.is_empty() || run_ids.contains(run))
+            .map(|(r, p, b, i, o)| (r, p, b, i.max(0) as u64, o.max(0) as u64))
+            .collect())
     }
     pub fn set_run_options_mode(&self, id: i64, mode: &str) -> Result<()> {
         self.conn.execute("UPDATE run SET options_mode = ?2 WHERE id = ?1", params![id, mode])?;

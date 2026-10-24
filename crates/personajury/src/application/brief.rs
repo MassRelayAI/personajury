@@ -696,6 +696,21 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         store.set_run_traits(run_id, traits_json.as_ref(), sh.seats)?;
     }
     store.set_run_options_mode(run_id, sh.options_mode)?;
+    // the terms the seats were drawn for, with who sits under each, so `matrix` can count who answered (D34)
+    let mut at = 0usize;
+    let mut term_rows: Vec<Value> = Vec::new();
+    for (t, got) in &sh.resolved.terms {
+        let ids = sh.resolved.ids.get(at..at + got).unwrap_or(&[]);
+        at += got;
+        let seated: Vec<&String> = ids.iter().filter(|i| sh.selected.contains(i)).collect();
+        let text = match t.stake {
+            Some(s) => format!("{} {}={}", t.count, t.tag, s.name()),
+            None => format!("{} {}", t.count, t.tag),
+        };
+        term_rows.push(json!({"term": text, "tag": t.tag, "stake": t.stake.map(|s| s.name()), "asked": t.count,
+                              "seated": seated.len(), "personas": seated}));
+    }
+    store.set_run_panel_terms(run_id, &json!(term_rows))?;
     let dir_rel = format!(".personajury/runs/{run_id}");
     let dir = root.join(&dir_rel);
     // a write that fails leaves no orphan run (final review: an orphan clears nothing and confuses check)

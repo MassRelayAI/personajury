@@ -76,6 +76,8 @@ pub struct Facts {
     pub date: String,
     /// (run, persona, lens, brief sha256): what the jurors read
     pub briefs: Vec<(i64, String, String, String)>,
+    /// `--slice`: one fixed-template sentence per stratum present (D31), after the other sentences
+    pub slice: Vec<String>,
 }
 pub const TOP_ROWS: usize = 5;
 const SHOWN_BLOCKERS: usize = 3;
@@ -338,6 +340,7 @@ pub fn sentences(f: &Facts) -> Vec<String> {
         let tail = if more > 0 { format!(" and {more} more") } else { String::new() };
         s.push(format!("Blockers, in the jurors' words: {}{tail}.", shown.join("; ")));
     }
+    s.extend(f.slice.iter().cloned());
     s
 }
 /// The blockers in turns across jurors: primary first, then secondary, then bystander; each juror's first blocker before

@@ -142,6 +142,9 @@ pub enum Cmd {
         table: bool,
         #[arg(long, default_value = "compact")]
         detail: String,
+        /// also group each stratum's scores by this trait's bands (counts per group, never a mean, never across strata)
+        #[arg(long)]
+        slice: Option<String>,
     },
     /// The forced choices of a run, per stratum, with reasons
     Pick { run: i64 },
@@ -206,6 +209,9 @@ pub enum Cmd {
         /// set by the MCP adapter: --html/--md must be relative paths inside the root (I2); a typed CLI path may be anywhere
         #[arg(skip)]
         confined: bool,
+        /// after the sentences, one sentence per stratum on how the jurors of each band of this trait scored the weakest dimension
+        #[arg(long)]
+        slice: Option<String>,
     },
     /// A person's word on a finding: fixed, dismissed (with --why) or row (with --row)
     Decide {
@@ -494,8 +500,8 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             };
             app::verdict::ingest_by(root, *run, &input, by_human.as_deref())
         }
-        Cmd::Matrix { runs, across_strata, history, table, detail: d } => {
-            app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?)
+        Cmd::Matrix { runs, across_strata, history, table, detail: d, slice } => {
+            app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref())
         }
         Cmd::Graph { runs, svg, out } => app::graph::show(root, runs, *svg, out.as_deref()),
         Cmd::Pick { run } => app::pick::show(root, *run),
@@ -510,8 +516,8 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             }
         }
         Cmd::Calibrate { jury_run, human_run, out } => app::calibrate::show(root, *jury_run, *human_run, out.as_deref()),
-        Cmd::Summary { runs, html, md, save, width, confined } => {
-            app::summary::show(root, runs, html.as_deref(), md.as_deref(), *save, *width, *confined)
+        Cmd::Summary { runs, html, md, save, width, confined, slice } => {
+            app::summary::show(root, runs, html.as_deref(), md.as_deref(), *save, *width, *confined, slice.as_deref())
         }
         Cmd::Decide { finding, outcome, why, row, by, by_human } => app::decide::record(
             root,

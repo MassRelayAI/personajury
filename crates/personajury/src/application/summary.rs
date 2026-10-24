@@ -23,7 +23,7 @@ fn seat_of(persona: &str) -> &str {
     }
 }
 
-fn gather(root: &Path, runs: &[i64]) -> Result<(Facts, Vec<RunRow>)> {
+fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<RunRow>)> {
     let store = open(root)?;
     let mut given: Vec<RunRow> = Vec::new();
     for id in runs {
@@ -63,7 +63,7 @@ fn gather(root: &Path, runs: &[i64]) -> Result<(Facts, Vec<RunRow>)> {
     }
 
     // the numbers: a P·S·B median per (option or subject) × dimension, from the matrix, never combined
-    let m = matrix::show(root, &f.runs, false, false, false, Detail::Compact)?;
+    let m = matrix::show(root, &f.runs, false, false, false, Detail::Compact, None)?;
     let strata = m["strata"].as_array().cloned().unwrap_or_default();
     let mut cols: Vec<(String, String)> = Vec::new(); // (lens, dimension), first seen
     for s in &strata {
@@ -157,6 +157,9 @@ fn gather(root: &Path, runs: &[i64]) -> Result<(Facts, Vec<RunRow>)> {
     }
     blockers.sort_by_key(|b| b.stake);
     f.blockers = blockers;
+    if let Some(t) = slice {
+        f.slice = slice_sentences(root, &f, t)?;
+    }
 
     // two rounds of one lens: the blockers before → after, per stratum
     for lens in &f.lenses.clone() {
@@ -173,6 +176,54 @@ fn gather(root: &Path, runs: &[i64]) -> Result<(Facts, Vec<RunRow>)> {
         }
     }
     Ok((f, given))
+}
+
+/// One fixed-template sentence per stratum present (D31): who, by one trait, scored the weakest dimension how. Nothing here
+/// is a claim about people: the sentence says so.
+fn slice_sentences(root: &Path, f: &Facts, trait_id: &str) -> Result<Vec<String>> {
+    let m = matrix::show(root, &f.runs, false, false, false, Detail::Full, Some(trait_id))?;
+    let store = open(root)?;
+    let def = store.trait_def(trait_id)?.ok_or_else(|| AppError::from(Refusal::UnknownTrait { id: trait_id.to_string() }))?;
+    let mut out = Vec::new();
+    for sl in m["slices"].as_array().into_iter().flatten() {
+        let stratum = sl["stratum"].as_str().unwrap_or("");
+        // the weakest dimension of the primary stratum, else of the first stratum that has one
+        let Some((_, dim, _)) = f.weakest.iter().find(|(k, _, _)| k.name() == "primary").or_else(|| f.weakest.first()) else { continue };
+        let mut groups: Vec<&Value> = sl["groups"].as_array().into_iter().flatten().collect();
+        if def.shape == "band" {
+            groups.reverse();
+        }
+        let mut clauses = Vec::new();
+        for g in groups {
+            let n = g["n"].as_u64().unwrap_or(0);
+            if n == 0 {
+                continue;
+            }
+            let cell = g["cells"].as_array().into_iter().flatten().find(|c| c["dimension"] == json!(dim) && c["about"].is_null());
+            let scores: Vec<String> = cell
+                .and_then(|c| c["scores"].as_object())
+                .map(|o| o.values().map(|v| v.to_string()).collect())
+                .unwrap_or_default();
+            if scores.is_empty() {
+                continue;
+            }
+            let band = g["band"].as_str().unwrap_or("");
+            let ids: Vec<&str> = g["personas"].as_array().into_iter().flatten().filter_map(Value::as_str).collect();
+            let first = clauses.is_empty();
+            let who = if def.shape == "band" {
+                if first { format!("those {band} on \"{}\"", def.title) } else { format!("those {band}") }
+            } else {
+                format!("those who {}", def.option_title(band).unwrap_or(band).to_lowercase())
+            };
+            let count = if first { format!("({n}: {})", ids.join(", ")) } else { format!("({n})") };
+            let verb = if first { format!("scored {dim}") } else { "scored it".to_string() };
+            clauses.push(format!("{who} {count} {verb} {}", scores.join(", ")));
+        }
+        if !clauses.is_empty() {
+            out.push(format!("Among {stratum} jurors, {}. In this jury, not a claim about people.", clauses.join("; ")));
+        }
+    }
+    Ok(out)
 }
 
 fn report_dir(root: &Path) -> Result<Option<String>> {
@@ -218,6 +269,7 @@ fn write(p: &Path, s: &str) -> Result<()> {
     std::fs::write(p, s.as_bytes()).map_err(|e| AppError::Io(p.to_path_buf(), e))
 }
 
+#[allow(clippy::too_many_arguments)]
 /// `confined` (the MCP adapter): `html` and `md` are checked like `report_dir`. A path typed at the CLI may be anywhere.
 pub fn show(
     root: &Path,
@@ -227,6 +279,7 @@ pub fn show(
     save: bool,
     width: Option<usize>,
     confined: bool,
+    slice: Option<&str>,
 ) -> Result<Value> {
     let width = width.unwrap_or(80);
     if !(30..=200).contains(&width) {
@@ -249,7 +302,7 @@ pub fn show(
         }
     };
     let (html, md) = (target(html, "html")?, target(md, "md")?);
-    let (f, _) = gather(root, runs)?;
+    let (f, _) = gather(root, runs, slice)?;
     let mut out = json!({ "runs": f.runs, "answer": f.answer, "text": sm::text(&f, width) });
     if let Some(p) = html {
         write(&p, &sm::html(&f, &graph::render(root, &f.runs)?))?;

@@ -69,6 +69,7 @@ pub fn tools() -> Vec<Value> {
             "Scores per stratum for one or more runs: every score, the median, min and max within a stratum; never a mean, never averaged across strata. Returns a compact envelope; table=true adds the markdown table as data.table.",
             schema(
                 json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1},
+                        "slice": {"type":"string","description":"a trait id: also group each stratum's scores by that trait's bands or options (data.slices: groups, cells, thin, unset, separates), counted per stratum, never averaged"},
                         "table": {"type":"boolean"}, "history": {"type":"boolean","description":"include superseded batches"},
                         "detail": detail_prop() }),
                 &["runs"],
@@ -106,6 +107,7 @@ pub fn tools() -> Vec<Value> {
             "The answer display for the person: plain sentences (the apply-check answer in words, who won with counts per stratum, the weakest dimension, the top blockers in the jurors' own words), a numbers table \"for checking\" (medians as primary·secondary·bystander, never pooled), then a fixed Next sentence. Returns the text in data.text; paste it as is. No bars. With `md` or `html` it also writes that file, at a relative path inside the project root (else invalid_report_dir).",
             schema(
                 json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids of one subject; two rounds of a lens show the change"},
+                        "slice": {"type":"string","description":"a trait id: after the sentences, one sentence per stratum on how the jurors of each band of that trait scored the weakest dimension (counts, never a claim about people)"},
                         "width": {"type":"integer","minimum":30,"maximum":200,"description":"characters per line, default 80"},
                         "md": {"type":"string","description":"write the markdown summary here: a relative path inside the project root"},
                         "html": {"type":"string","description":"write the self-contained html here: a relative path inside the project root"} }),
@@ -235,11 +237,11 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             "seats",
         ],
         "personajury_verdict" => &["run", "verdict"],
-        "personajury_matrix" => &["runs", "table", "history", "detail"],
+        "personajury_matrix" => &["runs", "table", "history", "detail", "slice"],
         "personajury_delta" => &["a", "b"],
         "personajury_graph" => &["runs"],
         "personajury_apply_check" => &["runs", "rule", "calibration"],
-        "personajury_summary" => &["runs", "width", "md", "html"],
+        "personajury_summary" => &["runs", "width", "md", "html", "slice"],
         "personajury_should_run" => &["diff", "paths", "config", "subject"],
         _ => return Err(format!("unknown tool {name}")),
     };
@@ -312,6 +314,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                 history: bool_arg(a, "history")?,
                 table: bool_arg(a, "table")?,
                 detail: detail()?,
+                slice: str_arg(a, "slice")?,
             }
         }
         "personajury_graph" => Cmd::Graph {
@@ -332,6 +335,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             md: str_arg(a, "md")?.map(PathBuf::from),
             save: false,
             confined: true,
+            slice: str_arg(a, "slice")?,
             width: match a.get("width") {
                 None | Some(Value::Null) => None,
                 Some(v) => match v.as_u64() {

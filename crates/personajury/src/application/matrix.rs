@@ -2,6 +2,7 @@
 use super::verdict::{load_lens, load_run, open, score_rows, usage_line, usage_summary};
 use super::{AppError, Result};
 use crate::domain::apply;
+use crate::domain::traits;
 use crate::domain::*;
 use serde_json::{json, Value};
 use std::collections::BTreeMap;
@@ -14,6 +15,7 @@ pub fn show(
     history: bool,
     table: bool,
     detail: Detail,
+    slice: Option<&str>,
 ) -> Result<Value> {
     if across_strata {
         return Err(Refusal::StrataAverageRefused.into());
@@ -34,8 +36,13 @@ pub fn show(
     let mut models: BTreeMap<Stake, std::collections::BTreeSet<String>> = BTreeMap::new();
     // who entered each human batch (D19)
     let mut human_batches: BTreeMap<String, String> = BTreeMap::new();
+    // the persona version each run briefed: a slice reads the traits the juror was briefed with
+    let mut versions: BTreeMap<String, i64> = BTreeMap::new();
     for id in runs {
         let run = load_run(&store, *id)?;
+        for b in &run.briefs {
+            versions.insert(b.persona.clone(), b.persona_version);
+        }
         independence.push((*id, run.independence.clone()));
         for b in &run.briefs {
             models.entry(b.stake).or_default().insert(b.model.clone());
@@ -113,11 +120,16 @@ pub fn show(
     // what people entered by hand stands beside the jury's cells, never in them (D19)
     let humans = humans_of(&rows, &stakes, &human_batches)?;
     let usage = usage_summary(root, &store, runs)?;
+    let sliced = match slice {
+        Some(t) => Some(slices(&store, t, &rows, &stakes, &lenses, &versions, &m)?),
+        None => None,
+    };
     let table_text = table.then(|| {
         standard_header(&standards) + &independence_header(&independence) + &effort_header(&efforts, runs.len()) + &override_header(&overrides, runs.len())
             + &matrix::render_table_with(&m, &credentials)
             + &usage_line(&usage).unwrap_or_default()
             + &human_block(&humans)
+            + &sliced.as_ref().map(|(_, t)| format!("\n{t}")).unwrap_or_default()
     });
     if detail == Detail::Compact {
         for s in &mut m.strata {
@@ -129,6 +141,9 @@ pub fn show(
     // strata that disagree on a cell (D13): beside the strata, never inside one
     let splits = apply::splits(&rows, &stakes);
     let mut out = json!({ "runs": runs, "strata": m.strata, "splits": splits, "usage": usage });
+    if let Some((v, _)) = sliced {
+        out["slices"] = Value::Array(v);
+    }
     out["models"] = json!(models.iter().map(|(s, m)| (s.name(), m)).collect::<BTreeMap<_, _>>());
     out["models_distinct"] = json!(models.values().flatten().collect::<std::collections::BTreeSet<_>>().len());
     if !credentials.is_empty() {
@@ -370,4 +385,134 @@ fn override_header(overrides: &[(Value, Vec<i64>)], total_runs: usize) -> String
         ));
     }
     out
+}
+
+type CellKey = (String, String, Option<String>);
+
+/// How the slice's trait sorts the personas of one stratum into groups, as a key per persona: the bands it holds, or `unset`.
+fn partition_of(def: Option<&traits::TraitDef>, v: Option<&traits::TraitValue>) -> String {
+    match (def, v) {
+        (_, None) => "unset".into(),
+        (Some(d), Some(v)) => {
+            let h = d.bands_held(v);
+            if h.is_empty() {
+                "unset".into()
+            } else {
+                h.join("+")
+            }
+        }
+        (None, Some(v)) => v.show(),
+    }
+}
+
+/// A trait's groups in each stratum of the matrix (D31): the personas holding each band, their cells, who has none, and the
+/// cells on which two groups' `anchor_met` ranges do not overlap. Counts and the lower middle only: no mean, no share, and
+/// no group is ever pooled with another stratum's.
+fn slices(
+    store: &crate::store::Store,
+    trait_id: &str,
+    rows: &[ScoreRow],
+    stakes: &BTreeMap<String, Stake>,
+    lenses: &[Lens],
+    versions: &BTreeMap<String, i64>,
+    m: &Matrix,
+) -> Result<(Vec<Value>, String)> {
+    let defs = store.trait_map()?;
+    let def = defs.get(trait_id).ok_or_else(|| Refusal::UnknownTrait { id: trait_id.to_string() })?;
+    if def.shape == "words" {
+        return Err(AppError::InvalidArguments(format!("{trait_id} holds words; a slice groups by band or option")));
+    }
+    let mut held: BTreeMap<String, BTreeMap<String, traits::TraitValue>> = BTreeMap::new();
+    for id in stakes.keys() {
+        let p = match versions.get(id) {
+            Some(v) => store.persona_at(id, *v)?,
+            None => store.persona(id)?,
+        };
+        if let Some(t) = p.and_then(|p| p.traits) {
+            held.insert(id.clone(), t);
+        }
+    }
+    let mut out = Vec::new();
+    let mut table = String::new();
+    for st in &m.strata {
+        let mine = |p: &String| held.get(p).and_then(|t| t.get(trait_id));
+        let mut groups = Vec::new();
+        let mut unset: Vec<String> = Vec::new();
+        let mut table_blocks = String::new();
+        for band in def.bands() {
+            let members: Vec<String> =
+                st.personas.iter().filter(|p| mine(p).is_some_and(|v| def.bands_held(v).contains(&band))).cloned().collect();
+            if members.is_empty() {
+                table_blocks.push_str(&format!("slice {trait_id}: {}, {band}: \u{2014}\n\n", st.stake.name()));
+                continue;
+            }
+            let gr: Vec<ScoreRow> = rows.iter().filter(|r| members.contains(&r.persona)).cloned().collect();
+            let gm = matrix::build(&gr, stakes, lenses, Aggregate::PerStratum)?;
+            let gstratum = gm.strata.into_iter().find(|s| s.stake == st.stake).unwrap_or(Stratum {
+                stake: st.stake,
+                personas: members.clone(),
+                cells: vec![],
+            });
+            table_blocks.push_str(&format!(
+                "slice {trait_id}: {}, {band} (n {}: {})\n\n{}\n",
+                st.stake.name(),
+                members.len(),
+                members.join(", "),
+                matrix::render_table(&Matrix { strata: vec![gstratum.clone()] })
+            ));
+            groups.push((band, members, gstratum));
+        }
+        for p in &st.personas {
+            if mine(p).is_none_or(|v| def.bands_held(v).is_empty()) {
+                unset.push(p.clone());
+            }
+        }
+        // separates: per cell, each group's own range of anchor_met; two disjoint ranges are a cell the trait separates
+        let mut per_group: BTreeMap<CellKey, Vec<(i64, i64)>> = BTreeMap::new();
+        for (_, members, _) in &groups {
+            let mut cell: BTreeMap<CellKey, (i64, i64)> = BTreeMap::new();
+            for r in rows.iter().filter(|r| members.contains(&r.persona)) {
+                let e = cell.entry((r.lens.clone(), r.dimension.clone(), r.about.clone())).or_insert((r.anchor_met, r.anchor_met));
+                e.0 = e.0.min(r.anchor_met);
+                e.1 = e.1.max(r.anchor_met);
+            }
+            for (k, v) in cell {
+                per_group.entry(k).or_default().push(v);
+            }
+        }
+        let separated = per_group
+            .values()
+            .filter(|rs| rs.iter().enumerate().any(|(i, a)| rs[i + 1..].iter().any(|b| a.1 < b.0 || b.1 < a.0)))
+            .count();
+        // collinear: another trait the stratum's personas hold that sorts them exactly as this one does
+        let mut warnings: Vec<String> = Vec::new();
+        let mut others: Vec<&String> = held.values().flat_map(|t| t.keys()).filter(|k| *k != trait_id).collect();
+        others.sort();
+        others.dedup();
+        for o in others {
+            let a: Vec<String> = st.personas.iter().map(|p| partition_of(Some(def), mine(p))).collect();
+            let b: Vec<String> = st.personas.iter().map(|p| partition_of(defs.get(o), held.get(p).and_then(|t| t.get(o)))).collect();
+            let blocks = a.iter().collect::<std::collections::BTreeSet<_>>().len();
+            let same = (0..a.len()).all(|i| (0..a.len()).all(|j| (a[i] == a[j]) == (b[i] == b[j])));
+            if blocks >= 2 && same {
+                warnings.push(format!("collinear with {o}"));
+            }
+        }
+        out.push(json!({
+            "trait": trait_id,
+            "shape": def.shape,
+            "stratum": st.stake.name(),
+            "groups": groups.iter().map(|(band, members, g)| json!({
+                "band": band, "personas": members, "n": members.len(), "thin": members.len() < 2, "cells": g.cells,
+            })).collect::<Vec<_>>(),
+            "unset": unset,
+            "separates": {"cells": separated, "total": st.cells.len()},
+            "warnings": warnings,
+        }));
+        table.push_str(&table_blocks);
+        if !unset.is_empty() {
+            table.push_str(&format!("slice {trait_id}: {}, unset: {}\n\n", st.stake.name(), unset.join(", ")));
+        }
+    }
+    Ok((out, table))
 }

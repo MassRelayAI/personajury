@@ -1482,9 +1482,11 @@ pub fn run(root: &Path, a: &SetupArgs) -> Result<Value> {
                     "detail": format!("{} {} ({}): {}", r.client, r.kind, r.path.display(), r.note.as_deref().unwrap_or("")) })
         })
         .collect();
+    // the starter config (D38): a plan by default, written with --apply, never over a project's own
+    let project_config = super::init::write(root, a.apply)?;
     Ok(json!({
         "apply": a.apply, "force": a.force, "scope": scope.name(), "bin": ctx.bin, "workspace": ctx.workspace,
-        "dry_run": !a.apply,
+        "dry_run": !a.apply, "project_config": project_config,
         "clients": rows.iter().map(|r| r.to_json(true)).collect::<Vec<_>>(),
         "limitation_items": limitations,
     }))

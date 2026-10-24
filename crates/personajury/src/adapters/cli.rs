@@ -274,6 +274,8 @@ pub enum Cmd {
         #[arg(long)]
         no_hook: bool,
     },
+    /// Write a commented starter personajury.toml (no jury for code paths, a surface class for screens, pages and docs); never overwrites
+    Init,
     /// Report the store, the counts and each agent client's registration
     Doctor {
         #[arg(long)]
@@ -426,6 +428,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Decide { .. } => "decide",
         Cmd::ShouldRun { .. } => "should-run",
         Cmd::Setup { .. } => "setup",
+        Cmd::Init => "init",
         Cmd::Doctor { .. } => "doctor",
         Cmd::Mcp => "mcp",
     }
@@ -576,6 +579,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 no_hook: *no_hook,
             },
         ),
+        Cmd::Init => app::init::run(root),
         Cmd::Doctor { bin, .. } => app::doctor::report(root, bin.as_deref()),
         Cmd::Mcp => unreachable!("mcp is served by run()"),
     }

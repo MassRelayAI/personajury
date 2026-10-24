@@ -10,6 +10,7 @@ pub mod deliberate;
 pub mod delta;
 pub mod doctor;
 pub mod graph;
+pub mod init;
 pub mod lens;
 pub mod matrix;
 pub mod panel;

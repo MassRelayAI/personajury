@@ -1,0 +1,26 @@
+id = "choice.regulatory_focus"
+version = 1
+family = "choice"
+title = "Pursues gains or guards against losses"
+shape = "category"
+moves = ["buy", "trust_a_claim", "read_docs"]
+evidence = "moderate"
+source = "Higgins 1997; Higgins et al. 2001 (regulatory focus questionnaire)"
+items_copied = false
+correlates_with = []
+caveats = "Message framing effects replicate; the trait measure is moderate."
+
+[[option]]
+id = "promotion"
+title = "Chases gains"
+sentence = "look for what you could gain and win; a page about growth, speed and possibility draws you, and one about avoiding risk leaves you cold."
+
+[[option]]
+id = "prevention"
+title = "Guards against losses"
+sentence = "look for what could go wrong and how to avoid it; a page about safety, reliability and protection draws you, and one about big upside makes you wary."
+
+[[option]]
+id = "balanced"
+title = "Weighs both"
+sentence = "weigh what could be gained against what could be lost, and take a message about either one at its merit."

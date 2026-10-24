@@ -1,0 +1,17 @@
+id = "adoption.innovativeness"
+version = 1
+family = "adoption"
+title = "Tries new tools in this domain before others do"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt"]
+evidence = "moderate"
+source = "Goldsmith & Hofacker 1991 (domain-specific innovativeness)"
+items_copied = false
+correlates_with = []
+caveats = "Domain-specific: an innovator in tools may be a laggard in banking."
+
+[anchors]
+"1" = "wait until a tool is proven and others rely on it; you ask who else uses it before you try it."
+"3" = "try a new tool when it has some track record and a clear reason to exist."
+"5" = "try new tools in this field before most people do; you sign up for a beta, read the release notes and accept rough edges for an early look."

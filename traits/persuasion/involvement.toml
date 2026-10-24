@@ -1,0 +1,17 @@
+id = "persuasion.involvement"
+version = 1
+family = "persuasion"
+title = "How much this subject matters to the reader personally"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "read_docs"]
+evidence = "strong"
+source = "Zaichkowsky 1985 (personal involvement inventory); Petty & Cacioppo 1986 (elaboration likelihood)"
+items_copied = false
+correlates_with = []
+caveats = "Together with need for cognition it decides the route; close to stake but not the same."
+
+[anchors]
+"1" = "treat this subject as a passing matter and give it little attention; you form a view from the first things you see."
+"3" = "give this subject some attention because it touches your work or money, though not much of it."
+"5" = "care about this subject personally and give it close attention; the outcome matters to you and you read to understand it."

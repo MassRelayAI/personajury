@@ -1,0 +1,17 @@
+id = "choice.loss_aversion"
+version = 1
+family = "choice"
+title = "A loss weighs more than an equal gain"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "approve_vendor", "adopt"]
+evidence = "strong"
+source = "Kahneman & Tversky 1979 (prospect theory); Gachter, Johnson & Herrmann 2007"
+items_copied = false
+correlates_with = []
+caveats = "Near-universal as an effect: the band says how strong, not whether."
+
+[anchors]
+"1" = "weigh a gain and a loss of the same size about equally, and switch tools for a modest improvement."
+"3" = "feel a loss somewhat more than an equal gain, and want a clear benefit before you give something up."
+"5" = "feel a loss much more than an equal gain; you stay with what you have unless the new thing is far better, and a free trial that ends bothers you more than the price."

@@ -1,0 +1,17 @@
+id = "social.status_consciousness"
+version = 1
+family = "social"
+title = "Buys and recommends what signals standing"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "pick_name_or_design", "approve_vendor"]
+evidence = "moderate"
+source = "Veblen 1899 (conspicuous consumption); Eastman, Goldsmith & Flynn 1999; Lichtenstein, Ridgway & Netemeyer 1993"
+items_copied = false
+correlates_with = ["social.need_for_uniqueness"]
+caveats = "Partly opposed to need for uniqueness; both can be high (a rare prestige)."
+
+[anchors]
+"1" = "ignore what a purchase says about you; a prestige name adds nothing in your eyes."
+"3" = "notice the standing a name carries and let it count a little when other things are equal."
+"5" = "buy and recommend what signals standing; a prestige name, a premium tier or a customer list of big names reassures you."

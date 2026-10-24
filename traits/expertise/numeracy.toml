@@ -1,0 +1,17 @@
+id = "expertise.numeracy"
+version = 1
+family = "expertise"
+title = "Comfort reading numbers, rates and tables"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "approve_vendor"]
+evidence = "strong"
+source = "Fagerlin et al. 2007 (subjective numeracy); Cokely et al. 2012 (Berlin numeracy)"
+items_copied = false
+correlates_with = ["cognition.reflection"]
+caveats = "Moves financial-model and pricing verdicts."
+
+[anchors]
+"1" = "find numbers, rates and tables hard to read and prefer a sentence; a table of percentages makes you stop."
+"3" = "read a simple table or a percentage and need help with anything that compounds."
+"5" = "read tables, rates and ratios with ease and check the arithmetic; you notice when a total does not add up or a base is missing."

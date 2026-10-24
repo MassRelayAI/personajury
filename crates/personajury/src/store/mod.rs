@@ -1,5 +1,6 @@
 //! adapted from comparegraph crates/comparegraph/src/store/mod.rs (error type, now_iso, open/open_existing)
 //! The SQLite store at `<root>/.personajury/store.db`. Verdicts, picks and decisions are append-only (triggers in schema.sql).
+use crate::domain::traits::{TraitDef, TraitSetDef};
 use crate::domain::*;
 use rusqlite::{params, Connection, OptionalExtension};
 use sha2::{Digest, Sha256};
@@ -7,7 +8,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 const SCHEMA: &str = include_str!("schema.sql");
-pub const SCHEMA_VERSION: i64 = 4;
+pub const SCHEMA_VERSION: i64 = 5;
 /// The columns schema v4 added to `run`; a v3 store (or an early v4 one) gains them on open (idempotent
 /// `ALTER TABLE`, D17, D18, D13: the rule class a run was briefed under and its effective quorum).
 const V4_RUN_COLUMNS: [(&str, &str); 5] = [
@@ -16,6 +17,17 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
     ("independence", "TEXT NOT NULL DEFAULT 'independent'"),
     ("rule_class", "TEXT"),
     ("quorum", "TEXT"),
+];
+/// The columns schema v5 added to existing tables (idempotent `ALTER TABLE`, checked with `pragma_table_info`):
+/// (table, column, declaration). D29 persona traits and `serves`; D30 panel cover; D31 run traits; `--seats auto` run seats
+/// and subject audience.
+const V5_COLUMNS: [(&str, &str, &str); 6] = [
+    ("persona", "traits_json", "TEXT"),
+    ("persona", "serves_json", "TEXT"),
+    ("panel", "cover_json", "TEXT"),
+    ("run", "traits_json", "TEXT"),
+    ("run", "seats_json", "TEXT"),
+    ("subject", "audience_json", "TEXT"),
 ];
 pub const DIR: &str = ".personajury";
 pub const DB: &str = "store.db";
@@ -80,6 +92,20 @@ fn iso_from_secs(secs: u64) -> String {
     let mo = if mp < 10 { mp + 3 } else { mp - 9 };
     let y = if mo <= 2 { y + 1 } else { y };
     format!("{y:04}-{mo:02}-{d:02}T{h:02}:{m:02}:{s:02}Z")
+}
+
+/// Add the v5 columns an older store lacks. Idempotent: a column already there is left alone.
+fn upgrade_v4(conn: &Connection) -> rusqlite::Result<()> {
+    for (table, col, decl) in V5_COLUMNS {
+        let have: Vec<String> = conn
+            .prepare(&format!("SELECT name FROM pragma_table_info('{table}')"))?
+            .query_map([], |r| r.get::<_, String>(0))?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        if !have.iter().any(|h| h == col) {
+            conn.execute(&format!("ALTER TABLE {table} ADD COLUMN {col} {decl}"), [])?;
+        }
+    }
+    Ok(())
 }
 
 /// Add the v4 columns a v3 `run` table lacks. Idempotent: a column already there is left alone.
@@ -197,7 +223,7 @@ fn row_to_run(r: &rusqlite::Row) -> rusqlite::Result<RunRow> {
     })
 }
 
-const PERSONA_COLS: &str = "id, version, name, tags_json, stake_rules, profile_json, origin, hash";
+const PERSONA_COLS: &str = "id, version, name, tags_json, stake_rules, profile_json, origin, hash, traits_json, serves_json";
 fn row_to_persona(r: &rusqlite::Row) -> rusqlite::Result<Persona> {
     let tags: String = r.get(3)?;
     Ok(Persona {
@@ -209,6 +235,13 @@ fn row_to_persona(r: &rusqlite::Row) -> rusqlite::Result<Persona> {
         profile_json: r.get(5)?,
         origin: Origin::from_db(&r.get::<_, String>(6)?),
         hash: r.get(7)?,
+        traits: r
+            .get::<_, Option<String>>(8)?
+            .and_then(|t| serde_json::from_str(&t).ok()),
+        serves: r
+            .get::<_, Option<String>>(9)?
+            .and_then(|t| serde_json::from_str(&t).ok())
+            .unwrap_or_default(),
     })
 }
 
@@ -290,7 +323,7 @@ impl Store {
                 .query_row("SELECT value FROM meta WHERE key = 'schema_version'", [], |r| r.get(0))
                 .optional()?;
             // a v3 store is upgraded below; anything else is another binary's
-            if let Some(v) = v.filter(|v| !matches!(v.parse::<i64>().ok(), Some(3) | Some(4))) {
+            if let Some(v) = v.filter(|v| !matches!(v.parse::<i64>().ok(), Some(3) | Some(4) | Some(5))) {
                 return Err(StoreError::Schema(format!(
                     "{} has schema_version {v}, this binary needs {SCHEMA_VERSION}",
                     path.display()
@@ -303,6 +336,7 @@ impl Store {
         .map_err(open_err)?;
         conn.execute_batch(SCHEMA).map_err(open_err)?;
         upgrade_v3(&conn).map_err(open_err)?;
+        upgrade_v4(&conn).map_err(open_err)?;
         let existing: Option<String> = conn
             .query_row(
                 "SELECT value FROM meta WHERE key = 'schema_version'",
@@ -318,7 +352,7 @@ impl Store {
                 )?;
             }
             Some(Ok(v)) if v == SCHEMA_VERSION => {}
-            Some(Ok(3)) => {
+            Some(Ok(3)) | Some(Ok(4)) => {
                 conn.execute(
                     "UPDATE meta SET value = ?1 WHERE key = 'schema_version'",
                     params![SCHEMA_VERSION.to_string()],
@@ -403,8 +437,9 @@ impl Store {
             Ok(v) => v,
         };
         self.conn.execute(
-            "INSERT INTO persona(id, version, name, tags_json, stake_rules, profile_json, origin, hash, created_at) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9)",
-            params![p.id, version, p.name, to_json(&p.tags), p.stake_rules, p.profile_json, p.origin.to_db(), p.hash, now_iso()],
+            "INSERT INTO persona(id, version, name, tags_json, stake_rules, profile_json, origin, hash, created_at, traits_json, serves_json) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11)",
+            params![p.id, version, p.name, to_json(&p.tags), p.stake_rules, p.profile_json, p.origin.to_db(), p.hash, now_iso(),
+                p.traits.as_ref().map(to_json), (!p.serves.is_empty()).then(|| to_json(&p.serves))],
         )?;
         Ok(version)
     }
@@ -466,6 +501,21 @@ impl Store {
         )?;
         Ok(())
     }
+    /// The traits a panel's draw covers (D30); an empty list clears it.
+    pub fn set_panel_cover(&self, name: &str, cover: &[String]) -> Result<()> {
+        self.conn.execute(
+            "UPDATE panel SET cover_json = ?2 WHERE name = ?1",
+            params![name, (!cover.is_empty()).then(|| to_json(&cover))],
+        )?;
+        Ok(())
+    }
+    pub fn panel_cover(&self, name: &str) -> Result<Vec<String>> {
+        let t: Option<Option<String>> = self
+            .conn
+            .query_row("SELECT cover_json FROM panel WHERE name = ?1", params![name], |r| r.get(0))
+            .optional()?;
+        Ok(t.flatten().map(|t| json_vec("panel cover", &t)).transpose()?.unwrap_or_default())
+    }
     pub fn set_panel_resolution(&self, name: &str, ids: &[String], hash: &str) -> Result<()> {
         let n = self.conn.execute(
             "UPDATE panel SET persona_ids_json = ?2, hash = ?3 WHERE name = ?1",
@@ -510,6 +560,129 @@ impl Store {
             .query_map([], Self::panel_from)?
             .collect::<std::result::Result<Vec<_>, _>>()?;
         rows.into_iter().map(Self::finish_panel).collect()
+    }
+
+    // ---- traits and trait sets (D29) ----
+    /// Same rule as lenses, by the hash of the body with `version` 0. `Err(version)`: the latest already has this hash.
+    pub fn insert_trait(&self, t: &TraitDef, origin: &str) -> Result<std::result::Result<i64, i64>> {
+        let (body, hash) = t.body_and_hash();
+        let version = match self.next_version("trait", "id", &t.id, &hash)? {
+            Err(existing) => return Ok(Err(existing)),
+            Ok(v) => v,
+        };
+        self.conn.execute(
+            "INSERT INTO trait(id, version, family, body_json, hash, origin, created_at) VALUES (?1,?2,?3,?4,?5,?6,?7)",
+            params![t.id, version, t.family, body, hash, origin, now_iso()],
+        )?;
+        Ok(Ok(version))
+    }
+    fn trait_from(version: i64, body: &str) -> Result<TraitDef> {
+        let mut t: TraitDef = json_vec("trait", body)?;
+        t.version = version;
+        Ok(t)
+    }
+    pub fn trait_def(&self, id: &str) -> Result<Option<TraitDef>> {
+        self.conn
+            .query_row(
+                "SELECT version, body_json FROM trait WHERE id = ?1 ORDER BY version DESC LIMIT 1",
+                params![id],
+                |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)),
+            )
+            .optional()?
+            .map(|(v, b)| Self::trait_from(v, &b))
+            .transpose()
+    }
+    /// Latest version of each trait, by id, with its origin and hash.
+    pub fn traits(&self) -> Result<Vec<(TraitDef, String, String)>> {
+        let mut st = self.conn.prepare(
+            "SELECT version, body_json, origin, hash FROM trait t WHERE version = (SELECT max(version) FROM trait u WHERE u.id = t.id) ORDER BY id",
+        )?;
+        let rows = st
+            .query_map([], |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?, r.get::<_, String>(2)?, r.get::<_, String>(3)?)))?
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        rows.into_iter().map(|(v, b, o, h)| Ok((Self::trait_from(v, &b)?, o, h))).collect()
+    }
+    /// The latest trait definitions by id.
+    pub fn trait_map(&self) -> Result<BTreeMap<String, TraitDef>> {
+        Ok(self.traits()?.into_iter().map(|(t, _, _)| (t.id.clone(), t)).collect())
+    }
+    pub fn insert_trait_set(&self, s: &TraitSetDef) -> Result<std::result::Result<i64, i64>> {
+        let (body, hash) = s.body_and_hash();
+        let version = match self.next_version("trait_set", "name", &s.name, &hash)? {
+            Err(existing) => return Ok(Err(existing)),
+            Ok(v) => v,
+        };
+        self.conn.execute(
+            "INSERT INTO trait_set(name, version, body_json, hash, created_at) VALUES (?1,?2,?3,?4,?5)",
+            params![s.name, version, body, hash, now_iso()],
+        )?;
+        Ok(Ok(version))
+    }
+    pub fn trait_set(&self, name: &str) -> Result<Option<TraitSetDef>> {
+        self.conn
+            .query_row(
+                "SELECT version, body_json FROM trait_set WHERE name = ?1 ORDER BY version DESC LIMIT 1",
+                params![name],
+                |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)),
+            )
+            .optional()?
+            .map(|(v, b)| {
+                let mut s: TraitSetDef = json_vec("trait set", &b)?;
+                s.version = v;
+                Ok(s)
+            })
+            .transpose()
+    }
+    pub fn trait_sets(&self) -> Result<Vec<TraitSetDef>> {
+        let mut st = self.conn.prepare(
+            "SELECT name FROM trait_set t WHERE version = (SELECT max(version) FROM trait_set u WHERE u.name = t.name) ORDER BY name",
+        )?;
+        let names = st.query_map([], |r| r.get::<_, String>(0))?.collect::<std::result::Result<Vec<_>, _>>()?;
+        let mut out = Vec::new();
+        for n in names {
+            if let Some(s) = self.trait_set(&n)? {
+                out.push(s);
+            }
+        }
+        Ok(out)
+    }
+    /// Record what a run rendered: `{"mode","set","versions","draw"}` (D31) and the seats `--seats auto` chose.
+    pub fn set_run_traits(&self, id: i64, traits: Option<&serde_json::Value>, seats: Option<&serde_json::Value>) -> Result<()> {
+        self.conn.execute(
+            "UPDATE run SET traits_json = ?2, seats_json = ?3 WHERE id = ?1",
+            params![id, traits.map(to_json), seats.map(to_json)],
+        )?;
+        Ok(())
+    }
+    pub fn run_traits(&self, id: i64) -> Result<(Option<serde_json::Value>, Option<serde_json::Value>)> {
+        let (t, s): (Option<String>, Option<String>) = self.conn.query_row(
+            "SELECT traits_json, seats_json FROM run WHERE id = ?1",
+            params![id],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )?;
+        Ok((
+            t.map(|t| json_vec("run traits", &t)).transpose()?,
+            s.map(|t| json_vec("run seats", &t)).transpose()?,
+        ))
+    }
+    /// The audience tags a subject was added with (`subject add --audience`).
+    pub fn subject_audience(&self, name: &str) -> Result<Vec<String>> {
+        let t: Option<Option<String>> = self
+            .conn
+            .query_row(
+                "SELECT audience_json FROM subject WHERE name = ?1 ORDER BY version DESC LIMIT 1",
+                params![name],
+                |r| r.get(0),
+            )
+            .optional()?;
+        Ok(t.flatten().map(|t| json_vec("subject audience", &t)).transpose()?.unwrap_or_default())
+    }
+    pub fn set_subject_audience(&self, name: &str, audience: &[String]) -> Result<()> {
+        self.conn.execute(
+            "UPDATE subject SET audience_json = ?2 WHERE name = ?1 AND version = (SELECT max(version) FROM subject m WHERE m.name = ?1)",
+            params![name, to_json(&audience)],
+        )?;
+        Ok(())
     }
 
     // ---- lenses ----

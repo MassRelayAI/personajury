@@ -29,6 +29,23 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
         }
     }
     let store = Store::open(root)?;
+    // traits (D29): the refused list and the ceiling first, so the refusal names the reason; then the store's catalog
+    let mut pf = pf;
+    if let Some(m) = &pf.traits {
+        crate::domain::traits::check_map_shape(m)?;
+        let defs = store.trait_map()?;
+        for (id, v) in m {
+            let def = defs.get(id).ok_or_else(|| Refusal::UnknownTrait { id: id.clone() })?;
+            def.check_value(v)?;
+        }
+        pf.traits = Some(m.iter().map(|(k, v)| (k.clone(), v.canonical())).collect());
+    }
+    pf.serves = {
+        let mut s: Vec<String> = pf.serves.iter().map(|t| t.trim().to_lowercase()).filter(|t| !t.is_empty()).collect();
+        s.sort();
+        s.dedup();
+        s
+    };
     let origin = match generated_from {
         None => Origin::Hand,
         Some(h) => {
@@ -62,6 +79,8 @@ pub fn add(root: &Path, file: &Path, generated_from: Option<&str>) -> Result<Val
         profile_json: canonical_json(&profile),
         origin: origin.clone(),
         hash: hash.clone(),
+        traits: pf.traits.clone(),
+        serves: pf.serves.clone(),
     };
     let version = store.insert_persona(&persona)?;
     Ok(json!({"id": pf.id, "version": version, "hash": hash, "origin": origin.to_db()}))
@@ -206,6 +225,12 @@ pub fn list(root: &Path) -> Result<Value> {
         .into_iter()
         .map(|p| {
             let mut item = json!({"id": p.id, "version": p.version, "name": p.name, "tags": p.tags, "origin": p.origin.to_db()});
+            if let Some(t) = &p.traits {
+                item["traits"] = json!(t.len());
+            }
+            if !p.serves.is_empty() {
+                item["serves"] = json!(p.serves);
+            }
             if let Some(c) = credential_of(&p) {
                 item["credential"] = json!(c);
             }

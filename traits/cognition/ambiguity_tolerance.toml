@@ -1,0 +1,17 @@
+id = "cognition.ambiguity_tolerance"
+version = 1
+family = "cognition"
+title = "Comfortable acting with incomplete information"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "approve_vendor"]
+evidence = "moderate"
+source = "Budner 1962; McLain 2009 (MSTAT-II)"
+items_copied = false
+correlates_with = ["cognition.need_for_closure"]
+caveats = "Close to need for closure; do not pair them."
+
+[anchors]
+"1" = "hold back until the facts are complete; an unfinished feature list, a missing price or a vague roadmap stops you."
+"3" = "act on partial information when the cost of a wrong move is small."
+"5" = "act with part of the picture and sort out the rest as you go; a young product with gaps does not put you off if the direction is clear."

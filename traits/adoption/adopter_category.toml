@@ -1,0 +1,36 @@
+id = "adoption.adopter_category"
+version = 1
+family = "adoption"
+title = "Where on a diffusion curve this reader usually sits"
+shape = "category"
+moves = ["adopt"]
+evidence = "weak"
+source = "Rogers 1962/2003 (diffusion of innovations)"
+items_copied = false
+correlates_with = []
+caveats = "Weak as an individual trait (retrospective and descriptive); use for panel mix, not as a cause. Prefer adoption.innovativeness."
+
+[[option]]
+id = "innovator"
+title = "Innovator"
+sentence = "try a tool as soon as it appears and accept that it may break."
+
+[[option]]
+id = "early_adopter"
+title = "Early adopter"
+sentence = "try a tool early when it solves a real problem for you, and tell others if it works."
+
+[[option]]
+id = "early_majority"
+title = "Early majority"
+sentence = "wait for a few people you know to use a tool and then adopt it with a deliberate look."
+
+[[option]]
+id = "late_majority"
+title = "Late majority"
+sentence = "adopt a tool only when most people around you already use it, and with some doubt."
+
+[[option]]
+id = "laggard"
+title = "Laggard"
+sentence = "stay with the old way until it stops working or someone makes you change."

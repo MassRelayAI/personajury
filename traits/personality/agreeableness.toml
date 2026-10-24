@@ -1,0 +1,17 @@
+id = "personality.agreeableness"
+version = 1
+family = "personality"
+title = "Avoids conflict and gives the benefit of the doubt"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim"]
+evidence = "moderate"
+source = "Costa & McCrae 1992 (NEO five-factor); Goldberg 1990/1999 (Big Five, IPIP)"
+items_copied = false
+correlates_with = ["trust.propensity"]
+caveats = "Correlates with the propensity to trust; do not pair the two in one set."
+
+[anchors]
+"1" = "challenge what you read and say so; you give no benefit of the doubt to a claim, a price or a promise."
+"3" = "give a claim a fair hearing and push back only when something looks off."
+"5" = "assume good faith and avoid friction; you accept a doubtful claim rather than make a fuss, and you dislike a page that sounds combative."

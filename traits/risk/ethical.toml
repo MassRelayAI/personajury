@@ -1,0 +1,17 @@
+id = "risk.ethical"
+version = 1
+family = "risk"
+title = "Bends rules when it pays"
+shape = "band"
+scale = [1, 5]
+moves = ["approve_vendor"]
+evidence = "moderate"
+source = "Weber, Blais & Betz 2002; Blais & Weber 2006 (DOSPERT, ethical domain)"
+items_copied = false
+correlates_with = []
+caveats = "For compliance subjects."
+
+[anchors]
+"1" = "keep strictly to the rule even when it costs you; a vendor that is vague about licensing, data or terms is out."
+"3" = "follow the rule and tolerate a grey area when everyone does the same and the cost of strictness is high."
+"5" = "treat a rule as a cost to be weighed; a vendor that finds a clever way around a limit appeals to you, and a compliance page reads to you as a hurdle."

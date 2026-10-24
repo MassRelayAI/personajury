@@ -1,0 +1,5 @@
+name = "developer-tool"
+version = 1
+traits = ["adoption.innovativeness", "situation.switching_cost", "trust.automation", "adoption.ease_demanded", "expertise.domain", "cognition.reflection", "trust.marketing_skepticism", "risk.social"]
+cover = ["expertise.domain", "trust.marketing_skepticism", "situation.switching_cost"]
+note = "People who build software and decide whether a tool earns a place in their work."

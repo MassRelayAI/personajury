@@ -1,0 +1,17 @@
+id = "consumer.quality_perfectionism"
+version = 1
+family = "consumer"
+title = "Will not settle for good enough"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "pick_name_or_design"]
+evidence = "weak"
+source = "Sproles & Kendall 1986 (consumer styles inventory)"
+items_copied = false
+correlates_with = ["choice.maximizing"]
+caveats = "Overlaps choice.maximizing; do not pair them."
+
+[anchors]
+"1" = "accept good enough and move on; a small flaw does not stop you buying."
+"3" = "want good quality and accept a small flaw for a lower price."
+"5" = "refuse to settle for good enough; you look for the small flaw, read reviews of the weak points and pay more for a thing built with care."

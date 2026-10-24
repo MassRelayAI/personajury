@@ -1,0 +1,5 @@
+name = "public-sector-legal"
+version = 1
+traits = ["trust.institutions", "risk.ethical", "cognition.need_for_closure", "choice.decision_style", "expertise.domain", "situation.budget_authority", "personality.conscientiousness", "access.need"]
+cover = ["trust.institutions", "choice.decision_style", "expertise.domain"]
+note = "Officials, lawyers and citizens who read a rule, a contract or a public service."

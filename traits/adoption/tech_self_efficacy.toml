@@ -1,0 +1,17 @@
+id = "adoption.tech_self_efficacy"
+version = 1
+family = "adoption"
+title = "Believes they can make an unfamiliar tool work"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "read_docs"]
+evidence = "moderate"
+source = "Compeau & Higgins 1995 (computer self-efficacy); Bandura 1977 (self-efficacy)"
+items_copied = false
+correlates_with = []
+caveats = "Predicts persistence past the first error."
+
+[anchors]
+"1" = "expect to get stuck with an unfamiliar tool and give up at the first error; you want someone to do it with you."
+"3" = "work through a first error or two with the docs open, and ask for help after that."
+"5" = "expect to work out an unfamiliar tool; an error message is a puzzle to solve and you keep going until it runs."

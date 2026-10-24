@@ -1,0 +1,17 @@
+id = "cognition.reflection"
+version = 1
+family = "cognition"
+title = "Overrides the first intuitive answer when it is wrong"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "approve_vendor"]
+evidence = "strong"
+source = "Frederick 2005 (cognitive reflection test); Thomson & Oppenheimer 2016 (CRT-2)"
+items_copied = false
+correlates_with = ["expertise.numeracy"]
+caveats = "Not a questionnaire: described as a habit; correlates with numeracy."
+
+[anchors]
+"1" = "go with the first answer that comes to mind and rarely stop to recheck it; a figure that looks right is taken as right."
+"3" = "recheck a figure when something feels off, and let a plausible one pass when busy."
+"5" = "stop and test the answer that comes first, especially a neat one; you recompute a percentage or a total before you trust it."

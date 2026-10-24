@@ -1,0 +1,5 @@
+name = "name-and-design"
+version = 1
+traits = ["aesthetics.sensitivity", "aesthetics.halo_susceptibility", "social.status_consciousness", "social.influence_susceptibility", "social.need_for_uniqueness", "social.self_monitoring", "personality.openness", "situation.time_pressure"]
+cover = ["aesthetics.sensitivity", "social.need_for_uniqueness", "social.self_monitoring"]
+note = "People who react to a name, a logo or a design before they read anything."

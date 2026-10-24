@@ -1,0 +1,17 @@
+id = "social.stigma_consciousness"
+version = 1
+family = "social"
+title = "Expects to be judged as an outsider in this field"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "adopt", "trust_a_claim"]
+evidence = "moderate"
+source = "Pinel 1999 (stigma consciousness)"
+items_copied = false
+correlates_with = ["social.rejection_sensitivity"]
+caveats = "The band says the reader expects to be treated as an outsider here, never which group they belong to; a persona that names the group is a protected attribute."
+
+[anchors]
+"1" = "assume you will be treated like anyone else in this field and read a page as written for you."
+"3" = "wonder now and then whether a page was written for people like you and look for a sign that it was."
+"5" = "expect to be judged as an outsider in this field and read a page as if it were written for insiders; an in-joke, an assumed background or a stock photo of one kind of person makes you leave."

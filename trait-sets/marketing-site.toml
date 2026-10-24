@@ -1,0 +1,5 @@
+name = "marketing-site"
+version = 1
+traits = ["trust.marketing_skepticism", "social.influence_susceptibility", "cognition.need_for_cognition", "persuasion.involvement", "social.self_monitoring", "choice.regulatory_focus", "situation.time_pressure", "aesthetics.halo_susceptibility"]
+cover = ["trust.marketing_skepticism", "cognition.need_for_cognition", "social.influence_susceptibility"]
+note = "Visitors who meet a product through its pages and decide what to believe."

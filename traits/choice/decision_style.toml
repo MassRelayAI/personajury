@@ -1,0 +1,36 @@
+id = "choice.decision_style"
+version = 1
+family = "choice"
+title = "The habitual way a choice gets made"
+shape = "category"
+moves = ["buy", "trust_a_claim", "adopt", "read_docs", "pick_name_or_design", "approve_vendor"]
+evidence = "moderate"
+source = "Scott & Bruce 1995 (general decision-making style)"
+items_copied = false
+correlates_with = []
+caveats = "Styles are habits, and a person can hold two; the option is the main one."
+
+[[option]]
+id = "rational"
+title = "Searches and weighs"
+sentence = "search for the alternatives and weigh them against each other before you choose."
+
+[[option]]
+id = "intuitive"
+title = "Goes by feel"
+sentence = "go by a feeling about what is right and pick fast, then look for reasons afterwards."
+
+[[option]]
+id = "dependent"
+title = "Asks others"
+sentence = "ask someone you trust before you choose and lean on what they say."
+
+[[option]]
+id = "avoidant"
+title = "Puts it off"
+sentence = "put a choice off for as long as you can and pick under pressure when you must."
+
+[[option]]
+id = "spontaneous"
+title = "Picks on impulse"
+sentence = "pick on impulse and as quickly as possible, and move on once it is done."

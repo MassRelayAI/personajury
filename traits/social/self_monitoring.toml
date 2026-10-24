@@ -1,0 +1,17 @@
+id = "social.self_monitoring"
+version = 1
+family = "social"
+title = "Adjusts choices to how they will look to others"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "pick_name_or_design", "trust_a_claim"]
+evidence = "moderate"
+source = "Snyder 1974 (self-monitoring); Lennox & Wolfe 1984; Snyder & DeBono 1985 (image versus quality appeals)"
+items_copied = false
+correlates_with = ["personality.extraversion"]
+caveats = "Correlated with extraversion; high self-monitors prefer image-led copy and low ones quality-led copy, a direct test for marketing pages."
+
+[anchors]
+"1" = "choose by what the thing is and does; how it looks to others hardly enters your mind."
+"3" = "think about how a choice will look to others when it is visible and not otherwise."
+"5" = "adjust your choices to how they will look to others; copy about the image you will project works on you, and you want a name you can say in front of your peers."

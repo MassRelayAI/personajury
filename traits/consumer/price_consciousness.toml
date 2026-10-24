@@ -1,0 +1,17 @@
+id = "consumer.price_consciousness"
+version = 1
+family = "consumer"
+title = "Price is read first and weighs most"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "approve_vendor"]
+evidence = "moderate"
+source = "Lichtenstein, Ridgway & Netemeyer 1993; Sproles & Kendall 1986 (price-value style)"
+items_copied = false
+correlates_with = []
+caveats = "The fixture personas Ana and Hanna already carry this in prose."
+
+[anchors]
+"1" = "pay for what looks right and read the price last; a higher price tells you the quality is higher."
+"3" = "look at the price early and weigh it against what you get."
+"5" = "look for the price before anything else and compare it with others; a hidden cost or a price that needs a click to find counts strongly against the page."

@@ -1,0 +1,17 @@
+id = "personality.openness"
+version = 1
+family = "personality"
+title = "Seeks new ideas and aesthetics, tolerates the unfamiliar"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "pick_name_or_design"]
+evidence = "moderate"
+source = "Costa & McCrae 1992 (NEO five-factor); Goldberg 1990/1999 (Big Five, IPIP)"
+items_copied = false
+correlates_with = ["aesthetics.sensitivity", "cognition.need_for_closure"]
+caveats = "Predicts novelty seeking; weak on buying. Overlaps aesthetics.sensitivity."
+
+[anchors]
+"1" = "stay with what you know and distrust a page that does something unusual; a familiar layout and familiar words put you at ease."
+"3" = "try something new if it is explained well, and fall back on the familiar when the new thing costs you effort."
+"5" = "go looking for the unusual idea or the odd design; a page that does what every other page does bores you and a fresh angle holds you."

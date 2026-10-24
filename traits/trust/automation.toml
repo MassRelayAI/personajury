@@ -1,0 +1,17 @@
+id = "trust.automation"
+version = 1
+family = "trust"
+title = "Relies on a system's output without checking it"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "trust_a_claim"]
+evidence = "moderate"
+source = "Lee & See 2004 (trust in automation); Jian, Bisantz & Drury 2000; Korber 2019"
+items_copied = false
+correlates_with = []
+caveats = "For AI and automation subjects; separate trust from distrust when it matters."
+
+[anchors]
+"1" = "check what a tool produces before you use it, line by line; a claim that the output is reliable makes you more careful, not less."
+"3" = "use the output after a spot check, and look harder the first few times and when the stakes rise."
+"5" = "take what the tool produces and move on; you check only when something looks plainly wrong, and a slow review step annoys you."

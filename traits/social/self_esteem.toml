@@ -1,0 +1,17 @@
+id = "social.self_esteem"
+version = 1
+family = "social"
+title = "Steadiness of self-worth under a page that talks down or over-promises"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "read_docs"]
+evidence = "moderate"
+source = "Rosenberg 1965 (self-esteem scale); Rhodes & Wood 1992 (self-esteem and persuasibility: an inverted U)"
+items_copied = false
+correlates_with = ["personality.neuroticism"]
+caveats = "Use only when a lens asks (onboarding, education, health); otherwise rejection sensitivity is the sharper tool."
+
+[anchors]
+"1" = "take a page that talks down to you or over-promises personally and doubt yourself afterwards."
+"3" = "shrug off a page that talks down to you, though it leaves a small sting."
+"5" = "stay steady when a page talks down to you or promises too much; you put the fault in the page and judge it on its content."

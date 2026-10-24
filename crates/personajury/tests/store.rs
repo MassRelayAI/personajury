@@ -18,6 +18,8 @@ fn persona(id: &str, hash: &str) -> Persona {
         profile_json: "{\"role\":\"r\"}".into(),
         origin: Origin::Hand,
         hash: hash.into(),
+        traits: None,
+        serves: vec![],
     }
 }
 
@@ -119,8 +121,8 @@ fn subject(name: &str, hash: &str) -> Subject {
 fn open_creates_store_and_schema_version() {
     let (d, s) = tmp();
     assert!(d.path().join(".personajury/store.db").exists());
-    assert_eq!(s.schema_version().unwrap(), 4);
-    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 4);
+    assert_eq!(s.schema_version().unwrap(), 5);
+    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 5);
     assert!(Store::open_existing(d.path()).is_ok());
 }
 
@@ -438,4 +440,38 @@ fn picks_follow_latest_verdict_batch() {
     let all = s.picks(run, true).unwrap();
     assert_eq!(all.len(), 1);
     assert_eq!(all[0].batch, 1);
+}
+
+#[test]
+fn a_v4_store_becomes_v5_once_and_gains_every_column() {
+    let d = tempfile::tempdir().unwrap();
+    // a v4 store: the v4 schema, with none of the v5 columns
+    {
+        let s = Store::open(d.path()).unwrap();
+        let c = s.conn();
+        for (t, col) in [("persona", "traits_json"), ("persona", "serves_json"), ("panel", "cover_json"), ("run", "traits_json"), ("run", "seats_json"), ("subject", "audience_json")] {
+            c.execute(&format!("ALTER TABLE {t} DROP COLUMN {col}"), []).unwrap();
+        }
+        c.execute("DROP TABLE trait", []).unwrap();
+        c.execute("DROP TABLE trait_set", []).unwrap();
+        c.execute("UPDATE meta SET value = '4' WHERE key = 'schema_version'", []).unwrap();
+    }
+    for _ in 0..2 {
+        let s = Store::open(d.path()).unwrap();
+        assert_eq!(s.schema_version().unwrap(), 5);
+        let cols = |t: &str| -> Vec<String> {
+            s.conn()
+                .prepare(&format!("SELECT name FROM pragma_table_info('{t}')"))
+                .unwrap()
+                .query_map([], |r| r.get::<_, String>(0))
+                .unwrap()
+                .map(|r| r.unwrap())
+                .collect()
+        };
+        assert!(cols("persona").contains(&"traits_json".to_string()) && cols("persona").contains(&"serves_json".to_string()));
+        assert!(cols("panel").contains(&"cover_json".to_string()));
+        assert!(cols("run").contains(&"traits_json".to_string()) && cols("run").contains(&"seats_json".to_string()));
+        assert!(cols("subject").contains(&"audience_json".to_string()));
+        assert!(!cols("trait").is_empty() && !cols("trait_set").is_empty());
+    }
 }

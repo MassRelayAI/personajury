@@ -1,0 +1,5 @@
+name = "docs"
+version = 1
+traits = ["expertise.domain", "expertise.numeracy", "cognition.need_for_cognition", "adoption.tech_self_efficacy", "situation.time_pressure", "access.need", "social.rejection_sensitivity", "personality.conscientiousness"]
+cover = ["expertise.domain", "access.need", "situation.time_pressure"]
+note = "Readers who come to documentation to get something working or to learn."

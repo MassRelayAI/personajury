@@ -1,0 +1,17 @@
+id = "expertise.domain"
+version = 1
+family = "expertise"
+title = "How well the reader knows this subject's field"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "trust_a_claim", "approve_vendor"]
+evidence = "strong"
+source = "Dreyfus & Dreyfus 1980 (novice to expert); Chi, Glaser & Farr 1988 (nature of expertise)"
+items_copied = false
+correlates_with = []
+caveats = "Pairs with the credential, which is words; the band is the level and the credential is the claim. 1 is a novice, 3 competent, 5 expert."
+
+[anchors]
+"1" = "are new to this field and miss the jargon; a term you do not know stops you, and you look for a plain-words explanation first."
+"3" = "know the basics of this field and follow most of the vocabulary, though you meet gaps in the detail."
+"5" = "know this field well and spot a weak claim at once; you skip the basics, go straight to specifics and notice what a page leaves out."

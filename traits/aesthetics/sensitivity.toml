@@ -1,0 +1,17 @@
+id = "aesthetics.sensitivity"
+version = 1
+family = "aesthetics"
+title = "How much the look of a thing weighs in the judgement of it"
+shape = "band"
+scale = [1, 5]
+moves = ["pick_name_or_design", "buy", "adopt"]
+evidence = "moderate"
+source = "Bloch, Brunel & Arnold 2003 (centrality of visual product aesthetics); openness facet aesthetics in Costa & McCrae 1992"
+items_copied = false
+correlates_with = ["personality.openness"]
+caveats = "Correlates with openness; the fixture persona Mei already carries this in prose. The juror's sensitivity, never the persona's looks."
+
+[anchors]
+"1" = "judge a thing by what it does; the look of a page counts for little if it works."
+"3" = "notice the look and let it tip a close choice."
+"5" = "let the look of a thing weigh heavily in your judgement; clumsy spacing, a dull palette or a cheap-looking logo puts you off however well it works."

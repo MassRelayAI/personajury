@@ -11,11 +11,12 @@ pub fn parse(q: &str) -> Result<Vec<Term>, Refusal> {
             "the panel query is empty; write e.g. \"5 builders, 2 others\"".into(),
         ));
     }
-    q.split(',')
+    split_terms(q)
+        .iter()
         .map(|raw| {
             let bad = || {
                 Refusal::InvalidQuery(format!(
-                    "query term {:?} is not \"<positive integer> <tag>[=<stake>]\"",
+                    "query term {:?} is not \"<positive integer> <tag>[=<stake>][@<model>][[<trait><op><value>,...]]\"",
                     raw.trim()
                 ))
             };
@@ -27,9 +28,17 @@ pub fn parse(q: &str) -> Result<Vec<Term>, Refusal> {
             if count == 0 {
                 return Err(bad());
             }
-            // `@model` closes the term (D15): letters, digits and `. _ : / -`, nothing else
-            let (spec, model) = match parts[1].split_once('@') {
-                None => (parts[1], None),
+            // a filter closes the term (D30): `[trait>=4,trait=x]`
+            let (head, filter) = match parts[1].find('[') {
+                None => (parts[1], vec![]),
+                Some(at) => {
+                    let inner = parts[1][at..].strip_prefix('[').and_then(|r| r.strip_suffix(']')).ok_or_else(bad)?;
+                    (&parts[1][..at], super::traits::parse_conds(raw.trim(), inner)?)
+                }
+            };
+            // `@model` follows the stake (D15): letters, digits and `. _ : / -`, nothing else
+            let (spec, model) = match head.split_once('@') {
+                None => (head, None),
                 Some((spec, m)) => {
                     let ok = !m.is_empty()
                         && m.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | ':' | '/' | '-'));
@@ -53,14 +62,44 @@ pub fn parse(q: &str) -> Result<Vec<Term>, Refusal> {
             if tag == "other" {
                 tag = "others".into();
             }
-            Ok(Term { count, tag, stake, model })
+            Ok(Term { count, tag, stake, model, filter })
         })
         .collect()
+}
+/// The query split at the commas outside `[...]`, with the blanks inside a filter removed.
+fn split_terms(q: &str) -> Vec<String> {
+    let mut out = vec![String::new()];
+    let mut depth = 0usize;
+    for c in q.chars() {
+        match c {
+            '[' => depth += 1,
+            ']' => depth = depth.saturating_sub(1),
+            _ => {}
+        }
+        if c == ',' && depth == 0 {
+            out.push(String::new());
+        } else if depth > 0 && c.is_whitespace() {
+        } else {
+            out.last_mut().expect("never empty").push(c);
+        }
+    }
+    out
 }
 /// The seats of each term, in query order, personas inside a term by id, each persona once; `others` = none of the
 /// query's other tags. With a seed, a term whose pool is bigger than its seats is drawn by a seeded shuffle of the
 /// pool (sorted by id, then Fisher-Yates); a pool no bigger than the seats is never shuffled.
 pub fn draw_terms(terms: &[Term], personas: &[Persona], seed: Option<[u8; 8]>) -> Vec<Vec<String>> {
+    draw_terms_cover(terms, personas, seed, &[])
+}
+/// `draw_terms` under a cover (D30): the pool is narrowed by the term's filter, then each seat is the persona that adds the
+/// most new band cells (see `cover::choose`). With an empty cover this is the v0.2 draw, byte for byte.
+pub fn draw_terms_cover(
+    terms: &[Term],
+    personas: &[Persona],
+    seed: Option<[u8; 8]>,
+    cover: &[super::cover::CoverTrait],
+) -> Vec<Vec<String>> {
+    let mut state = super::cover::State::default();
     let named: BTreeSet<&str> = terms
         .iter()
         .map(|t| t.tag.as_str())
@@ -75,6 +114,7 @@ pub fn draw_terms(terms: &[Term], personas: &[Persona], seed: Option<[u8; 8]>) -
             .iter()
             .copied()
             .filter(|p| !taken.contains(p.id.as_str()))
+            .filter(|p| t.filter.iter().all(|c| c.matches(p.traits.as_ref().and_then(|m| m.get(&c.trait_id)))))
             .filter(|p| {
                 if t.tag == "others" {
                     !p.tags.iter().any(|x| named.contains(x.as_str()))
@@ -89,11 +129,16 @@ pub fn draw_terms(terms: &[Term], personas: &[Persona], seed: Option<[u8; 8]>) -
                 SplitMix64::from_bytes(super::hash::term_seed(seed, &t.tag)).shuffle(&mut pool);
             }
         }
-        let seats: Vec<String> = pool.iter().take(t.count).map(|p| p.id.clone()).collect();
-        for p in pool.iter().take(t.count) {
+        let picked: Vec<&Persona> = if cover.is_empty() {
+            pool.iter().take(t.count).copied().collect()
+        } else {
+            let stratum = t.stake.map(Stake::name).unwrap_or("unstaked");
+            super::cover::choose(cover, &mut state, &pool, t.count, stratum)
+        };
+        for p in &picked {
             taken.insert(p.id.as_str());
         }
-        out.push(seats);
+        out.push(picked.iter().map(|p| p.id.clone()).collect());
     }
     out
 }
@@ -103,9 +148,14 @@ pub fn normalise(terms: &[Term]) -> String {
         .iter()
         .map(|t| {
             let at = t.model.as_ref().map(|m| format!("@{m}")).unwrap_or_default();
+            let f = if t.filter.is_empty() {
+                String::new()
+            } else {
+                format!("[{}]", t.filter.iter().map(|c| c.render()).collect::<Vec<_>>().join(","))
+            };
             match t.stake {
-                Some(s) => format!("{} {}={}{at}", t.count, t.tag, s.name()),
-                None => format!("{} {}{at}", t.count, t.tag),
+                Some(s) => format!("{} {}={}{at}{f}", t.count, t.tag, s.name()),
+                None => format!("{} {}{at}{f}", t.count, t.tag),
             }
         })
         .collect::<Vec<_>>()
@@ -139,6 +189,8 @@ mod tests {
             profile_json: "{}".into(),
             origin: Origin::Hand,
             hash: String::new(),
+            traits: None,
+            serves: vec![],
         }
     }
     #[test]
@@ -151,19 +203,22 @@ mod tests {
                     count: 5,
                     tag: "companies".into(),
                     stake: None,
-                    model: None
+                    model: None,
+                    filter: vec![]
                 },
                 Term {
                     count: 2,
                     tag: "builders".into(),
                     stake: None,
-                    model: None
+                    model: None,
+                    filter: vec![]
                 },
                 Term {
                     count: 1,
                     tag: "others".into(),
                     stake: None,
-                    model: None
+                    model: None,
+                    filter: vec![]
                 }
             ]
         );

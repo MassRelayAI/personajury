@@ -1,0 +1,17 @@
+id = "personality.neuroticism"
+version = 1
+family = "personality"
+title = "Worries and feels the downside first"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "approve_vendor"]
+evidence = "moderate"
+source = "Costa & McCrae 1992 (NEO five-factor); Goldberg 1990/1999 (Big Five, IPIP)"
+items_copied = false
+correlates_with = ["choice.maximizing", "risk.financial", "social.rejection_sensitivity", "social.self_esteem"]
+caveats = "Correlates with risk aversion, maximizing regret, social.rejection_sensitivity and, negatively, social.self_esteem."
+
+[anchors]
+"1" = "stay calm about a risk and move on; a missing guarantee or an unclear refund policy does not keep you awake."
+"3" = "notice what could go wrong and look for a sign that it has been thought of, then carry on."
+"5" = "picture what could go wrong first and keep returning to it; you look for the refund terms, the exit and the fine print before anything else."

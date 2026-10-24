@@ -1,0 +1,17 @@
+id = "trust.institutions"
+version = 1
+family = "trust"
+title = "Expects companies and authorities to act in good faith"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "approve_vendor"]
+evidence = "moderate"
+source = "Mayer et al. 1995 (ability, benevolence, integrity); institutional-confidence items in national surveys"
+items_copied = false
+correlates_with = []
+caveats = "Corporate trust and authority trust, as mock-jury products list them, are this one construct split in two."
+
+[anchors]
+"1" = "expect a company or an authority to put itself first; a certificate, a regulator's name or a big-company logo carries little weight with you."
+"3" = "give an established company the usual benefit of the doubt, and still ask what happens if it fails you."
+"5" = "expect established companies and authorities to act in good faith; a recognised body, a certification or an official seal settles most of your questions."

@@ -217,6 +217,8 @@ fn names_are_escaped() {
             profile_json: "{}".into(),
             origin: personajury::domain::Origin::Hand,
             hash: "h".into(),
+            traits: None,
+            serves: vec![],
         })
         .unwrap();
     let r = ws.run("critical", &AC, false);

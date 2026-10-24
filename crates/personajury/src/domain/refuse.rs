@@ -101,6 +101,30 @@ pub enum Refusal {
     NotHumanRun { run: i64 },
     #[error("the credential is {len} characters; keep it a line of at most {max}")]
     CredentialTooLong { len: usize, max: usize },
+    #[error("invalid trait file: {why}")]
+    InvalidTraitFile { why: String },
+    #[error("trait id {id}: {why}; it is not a trait")]
+    RefusedTraitId { id: String, why: String },
+    #[error("trait set {name} lists {traits} traits; a set holds at most 8")]
+    TraitSetTooLarge { name: String, traits: usize },
+    #[error("{name} names {cover} cover traits; a cover holds at most 4")]
+    CoverTooLarge { name: String, cover: usize },
+    #[error("the store has no trait {id}; install the catalog with `personajury trait install` or add the file")]
+    UnknownTrait { id: String },
+    #[error("trait {id}: {value} is not a value this trait can hold")]
+    TraitValueOffScale { id: String, value: String },
+    #[error("trait {id}: {value} is not an option of this trait (or a list on a trait that holds one)")]
+    TraitOptionUnknown { id: String, value: String },
+    #[error("a persona holds at most 8 traits, not {count}")]
+    TraitsTooMany { count: usize },
+    #[error("query term {term:?}: {why}")]
+    InvalidFilter { term: String, why: String },
+    #[error("no trait set named {name}; add it with `personajury trait set add` or install the catalog")]
+    TraitSetUnknown { name: String },
+    #[error("no persona serves the audience {audience}")]
+    NoMatchingPersonas { audience: String },
+    #[error("subject {subject} has no audience; add it with `subject add --audience tag,...`")]
+    AudienceUnknown { subject: String },
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -146,6 +170,18 @@ impl Refusal {
             Refusal::NotHumanRun { .. } => "not_human_run",
             Refusal::HumanDecisionRequired { .. } => "human_decision_required",
             Refusal::InvalidUsage(_) => "invalid_usage",
+            Refusal::InvalidTraitFile { .. } => "invalid_trait_file",
+            Refusal::RefusedTraitId { .. } => "refused_trait_id",
+            Refusal::TraitSetTooLarge { .. } => "trait_set_too_large",
+            Refusal::CoverTooLarge { .. } => "cover_too_large",
+            Refusal::UnknownTrait { .. } => "unknown_trait",
+            Refusal::TraitValueOffScale { .. } => "trait_value_off_scale",
+            Refusal::TraitOptionUnknown { .. } => "trait_option_unknown",
+            Refusal::TraitsTooMany { .. } => "traits_too_many",
+            Refusal::InvalidFilter { .. } => "invalid_filter",
+            Refusal::TraitSetUnknown { .. } => "trait_set_unknown",
+            Refusal::NoMatchingPersonas { .. } => "no_matching_personas",
+            Refusal::AudienceUnknown { .. } => "audience_unknown",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
@@ -166,6 +202,16 @@ impl Refusal {
             Refusal::OverBudget { needed, budget, minimum_plan } => Some(
                 serde_json::json!({"needed": needed, "budget": budget, "minimum_plan": minimum_plan}),
             ),
+            Refusal::RefusedTraitId { id, why } => Some(serde_json::json!({"id": id, "why": why})),
+            Refusal::TraitSetTooLarge { name, traits } => Some(serde_json::json!({"name": name, "traits": traits})),
+            Refusal::CoverTooLarge { name, cover } => Some(serde_json::json!({"name": name, "cover": cover})),
+            Refusal::UnknownTrait { id } => Some(serde_json::json!({"id": id})),
+            Refusal::TraitValueOffScale { id, value } | Refusal::TraitOptionUnknown { id, value } => {
+                Some(serde_json::json!({"id": id, "value": value}))
+            }
+            Refusal::TraitsTooMany { count } => Some(serde_json::json!({"count": count})),
+            Refusal::InvalidFilter { term, why } => Some(serde_json::json!({"term": term, "why": why})),
+            Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
             _ => None,
         }
     }

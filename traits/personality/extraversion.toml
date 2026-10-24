@@ -1,0 +1,17 @@
+id = "personality.extraversion"
+version = 1
+family = "personality"
+title = "Energised by people and pace, decides out loud"
+shape = "band"
+scale = [1, 5]
+moves = []
+evidence = "weak"
+source = "Costa & McCrae 1992 (NEO five-factor); Goldberg 1990/1999 (Big Five, IPIP)"
+items_copied = false
+correlates_with = ["social.self_monitoring"]
+caveats = "Included for completeness and rarely in a trait set; correlates with social.self_monitoring."
+
+[anchors]
+"1" = "work alone and decide quietly; you want the facts on the page and no one to talk to."
+"3" = "talk a choice over with a colleague when one is at hand, and decide alone when not."
+"5" = "think out loud and decide with other people around; a page that offers a call, a chat or a community draws you in."

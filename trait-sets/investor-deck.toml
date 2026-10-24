@@ -1,0 +1,5 @@
+name = "investor-deck"
+version = 1
+traits = ["choice.regulatory_focus", "choice.loss_aversion", "cognition.need_for_cognition", "trust.institutions", "expertise.numeracy", "situation.time_pressure", "risk.financial", "cognition.reflection"]
+cover = ["choice.regulatory_focus", "risk.financial", "expertise.numeracy"]
+note = "People who read a pitch or a financial document to decide whether to back it."

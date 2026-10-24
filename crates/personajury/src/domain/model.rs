@@ -219,6 +219,12 @@ pub struct PersonaFile {
     /// who this person is as an expert, in words (D19): shown, never checked; the tag `expert` is a convention
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub credential: Option<String>,
+    /// tendencies and standing facts the juror reads as "you tend to" (D29): trait id to band, option, words or options
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub traits: Option<BTreeMap<String, super::traits::TraitValue>>,
+    /// the audiences or subject kinds this persona speaks for (`--seats auto`)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub serves: Vec<String>,
 }
 /// The longest credential a persona file may carry: a line, not a biography (D19).
 pub const CREDENTIAL_MAX: usize = 500;
@@ -237,6 +243,10 @@ pub struct Persona {
     pub origin: Origin,
     /// sha256 of the canonical JSON of the whole PersonaFile
     pub hash: String,
+    /// the persona's traits (schema v5, D29); none for a persona that holds none
+    pub traits: Option<BTreeMap<String, super::traits::TraitValue>>,
+    /// lower-cased, sorted, unique (schema v5)
+    pub serves: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -455,6 +465,8 @@ pub struct Term {
     pub stake: Option<Stake>,
     /// the model these seats run on (D15): `3 builder=primary@claude-sonnet-5-5`
     pub model: Option<String>,
+    /// conditions on the persona's traits, sorted; the pool is narrowed by them before the draw (D30)
+    pub filter: Vec<super::traits::Cond>,
 }
 
 // ---- the verdict file the agent writes (ingested by `personajury verdict`) ----
@@ -778,6 +790,9 @@ pub struct TriggerRule {
     /// the weight of the briefs this rule asks for (D6 C)
     #[serde(default)]
     pub detail: Detail,
+    /// the trait set the briefs of this rule render (D31); none = no traits
+    #[serde(default)]
+    pub trait_set: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

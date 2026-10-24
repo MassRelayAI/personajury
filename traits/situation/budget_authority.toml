@@ -1,0 +1,31 @@
+id = "situation.budget_authority"
+version = 1
+family = "situation"
+title = "What this reader may spend without asking"
+shape = "category"
+moves = ["buy", "approve_vendor"]
+evidence = "strong"
+source = "Webster & Wind 1972; practitioner B2B qualification (budget, authority, need, timing)"
+items_copied = false
+correlates_with = []
+caveats = "With buying.role it covers most of what an economic buyer is."
+
+[[option]]
+id = "none"
+title = "No say"
+sentence = "have no say over spending and can only pass a request to someone who does."
+
+[[option]]
+id = "recommends"
+title = "Recommends"
+sentence = "recommend a purchase to the person who decides and must justify it to them."
+
+[[option]]
+id = "approves_to_limit"
+title = "Approves up to a limit"
+sentence = "approve a spend on your own up to a limit and ask above it."
+
+[[option]]
+id = "approves"
+title = "Approves"
+sentence = "approve a spend on your own and answer for it afterwards."

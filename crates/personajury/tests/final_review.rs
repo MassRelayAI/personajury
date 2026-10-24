@@ -394,6 +394,8 @@ fn i6_brief_checks_the_id_before_the_path_and_leaves_no_run() {
         profile_json: "{}".into(),
         origin: personajury::domain::Origin::Hand,
         hash: "h".into(),
+        traits: None,
+        serves: vec![],
     };
     ws.store.insert_persona(&evil).unwrap();
     ws.site();

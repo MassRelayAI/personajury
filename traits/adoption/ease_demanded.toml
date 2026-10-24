@@ -1,0 +1,17 @@
+id = "adoption.ease_demanded"
+version = 1
+family = "adoption"
+title = "How little effort the reader will tolerate before leaving"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "read_docs"]
+evidence = "strong"
+source = "Davis 1989 (technology acceptance, perceived ease of use); Venkatesh et al. 2003 (effort expectancy)"
+items_copied = false
+correlates_with = []
+caveats = "We store the reader's threshold; the jury supplies the belief about the tool."
+
+[anchors]
+"1" = "put in real effort to learn a tool that does what you need; a long setup does not drive you away."
+"3" = "accept a short setup if the first result comes soon, and leave if it drags."
+"5" = "leave at the first sign of effort; a form with many fields, a setup step you do not understand or a first result that takes long sends you away."

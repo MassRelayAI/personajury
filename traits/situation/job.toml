@@ -1,0 +1,12 @@
+id = "situation.job"
+version = 1
+family = "situation"
+title = "The job the reader has come to get done"
+shape = "words"
+max_chars = 200
+moves = ["buy", "trust_a_claim", "adopt", "read_docs", "pick_name_or_design", "approve_vendor"]
+evidence = "weak"
+source = "Christensen et al. 2016; Ulwick 2005 (jobs to be done)"
+items_copied = false
+correlates_with = []
+caveats = "Words, never a scale: it is already half of the context. Weak as research, strong as a brief."

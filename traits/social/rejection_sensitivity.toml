@@ -1,0 +1,17 @@
+id = "social.rejection_sensitivity"
+version = 1
+family = "social"
+title = "Expects to be turned away or laughed at"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "adopt", "trust_a_claim"]
+evidence = "moderate"
+source = "Downey & Feldman 1996 (rejection sensitivity questionnaire)"
+items_copied = false
+correlates_with = ["personality.neuroticism", "social.need_to_belong", "social.stigma_consciousness"]
+caveats = "Clinical and social origin; effects on consumer choice are indirect. A jargon-heavy page loses this reader first."
+
+[anchors]
+"1" = "ask a basic question in public without a second thought; a term you do not know is a gap to fill, not a threat."
+"3" = "hesitate to ask a basic question and look it up quietly if you can."
+"5" = "expect to be turned away or laughed at and read a page for signs of it; a term you cannot paraphrase makes you stop, and you leave rather than ask."

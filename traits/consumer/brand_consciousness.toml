@@ -1,0 +1,17 @@
+id = "consumer.brand_consciousness"
+version = 1
+family = "consumer"
+title = "Known names and logos reassure"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "trust_a_claim"]
+evidence = "weak"
+source = "Sproles & Kendall 1986 (consumer styles inventory)"
+items_copied = false
+correlates_with = []
+caveats = "A style, not a trait; include for consumer subjects only."
+
+[anchors]
+"1" = "pay no attention to the name on the box; you judge a thing by what it does and what it costs."
+"3" = "feel a little safer with a name you know, and still read what is offered."
+"5" = "feel safest with names and logos you recognise; an unknown maker needs a lot of other proof before you rely on it."

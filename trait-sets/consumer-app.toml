@@ -1,0 +1,5 @@
+name = "consumer-app"
+version = 1
+traits = ["consumer.price_consciousness", "consumer.choice_overload", "situation.time_pressure", "social.need_to_belong", "adoption.ease_demanded", "choice.decision_style", "aesthetics.halo_susceptibility", "social.need_for_uniqueness"]
+cover = ["consumer.price_consciousness", "situation.time_pressure", "choice.decision_style"]
+note = "Ordinary people choosing an app for themselves, often on a phone and in a hurry."

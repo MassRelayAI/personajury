@@ -1,0 +1,17 @@
+id = "risk.financial"
+version = 1
+family = "risk"
+title = "Willing to spend or lose money on an uncertain return"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "approve_vendor"]
+evidence = "strong"
+source = "Weber, Blais & Betz 2002; Blais & Weber 2006 (DOSPERT, financial domain)"
+items_copied = false
+correlates_with = ["personality.neuroticism"]
+caveats = "Domain-specific: a person bold with money may be careful with health; the questionnaire is academic-use, so only the tendency is described."
+
+[anchors]
+"1" = "avoid any spend that might not pay back; you want a trial, a guarantee and a low price before you commit a cent."
+"3" = "accept a modest bet on a good case, and want some proof before a large one."
+"5" = "back an uncertain idea with real money if the upside is large; a cheap plan with no ambition looks less attractive to you than a bold one."

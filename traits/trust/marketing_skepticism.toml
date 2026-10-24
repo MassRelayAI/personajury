@@ -1,0 +1,17 @@
+id = "trust.marketing_skepticism"
+version = 1
+family = "trust"
+title = "Disbelieves advertising and claims by default"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "buy", "read_docs"]
+evidence = "strong"
+source = "Obermiller & Spangenberg 1998, skepticism toward advertising (SKEP)"
+items_copied = false
+correlates_with = ["trust.propensity"]
+caveats = "Overlaps general trust only moderately; a skeptic of ads may trust a colleague completely."
+
+[anchors]
+"1" = "take a claim on the page at its word; a testimonial or a logo wall reassures you."
+"3" = "read a claim and look once for something that backs it; you move on if nothing turns up."
+"5" = "assume every claim is written to sell; you credit only what you can check yourself on the page."

@@ -1,0 +1,17 @@
+id = "situation.time_pressure"
+version = 1
+family = "situation"
+title = "How long before the tab is closed"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "trust_a_claim", "adopt", "read_docs", "pick_name_or_design", "approve_vendor"]
+evidence = "strong"
+source = "Svenson & Maule 1993 (time pressure in judgement); Payne, Bettman & Johnson 1993 (adaptive decision maker)"
+items_copied = false
+correlates_with = []
+caveats = "The fixture personas already carry this in prose ('one evening', 'twenty minutes')."
+
+[anchors]
+"1" = "have time and read at your pace; you open the second page and the docs before you decide."
+"3" = "have a limited slot and read the top of each page and the part that answers your question."
+"5" = "arrive with almost no time and leave when the answer is not in the first screen; you read headings and the first line and skip the rest."

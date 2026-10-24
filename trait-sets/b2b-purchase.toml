@@ -1,0 +1,5 @@
+name = "b2b-purchase"
+version = 1
+traits = ["buying.role", "situation.budget_authority", "risk.financial", "trust.marketing_skepticism", "choice.maximizing", "situation.switching_cost", "expertise.domain", "trust.institutions"]
+cover = ["buying.role", "risk.financial", "trust.marketing_skepticism"]
+note = "People in a company who recommend, check, approve or pay for a product."

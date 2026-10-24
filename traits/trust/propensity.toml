@@ -1,0 +1,17 @@
+id = "trust.propensity"
+version = 1
+family = "trust"
+title = "General readiness to rely on strangers before there is evidence"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "buy"]
+evidence = "strong"
+source = "Mayer, Davis & Schoorman 1995 (propensity to trust); Rotter 1967 (interpersonal trust)"
+items_copied = false
+correlates_with = ["personality.agreeableness", "trust.marketing_skepticism"]
+caveats = "Strong as a moderator of first impressions; correlated with agreeableness."
+
+[anchors]
+"1" = "expect a stranger to let you down until proven otherwise; you check who is behind a page before you read what it says."
+"3" = "give a stranger a little room and withdraw it quickly when the first signs are poor."
+"5" = "start from the belief that people mean what they say; you act on a first impression and revise only if something goes wrong."

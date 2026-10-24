@@ -1,0 +1,17 @@
+id = "personality.conscientiousness"
+version = 1
+family = "personality"
+title = "Plans, checks and finishes; dislikes mess and shortcuts"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "approve_vendor"]
+evidence = "moderate"
+source = "Costa & McCrae 1992 (NEO five-factor); Goldberg 1990/1999 (Big Five, IPIP)"
+items_copied = false
+correlates_with = []
+caveats = "Reads docs to the end; distrusts a sloppy page."
+
+[anchors]
+"1" = "skim, skip the setup steps and fix problems as they appear; a page with gaps does not bother you much."
+"3" = "follow the steps in order when they are clear, and cut a corner when time is short."
+"5" = "read to the end, tick off each step and check the result; a typo, a broken link or a missing step makes you doubt the whole thing."

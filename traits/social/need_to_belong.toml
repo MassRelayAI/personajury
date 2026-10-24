@@ -1,0 +1,17 @@
+id = "social.need_to_belong"
+version = 1
+family = "social"
+title = "Wants to use what their people use"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "pick_name_or_design"]
+evidence = "moderate"
+source = "Baumeister & Leary 1995 (need to belong); Leary et al. 2013"
+items_copied = false
+correlates_with = ["social.rejection_sensitivity"]
+caveats = "Correlated with rejection sensitivity."
+
+[anchors]
+"1" = "choose for yourself and do not mind being the only one in your circle to use something."
+"3" = "like to know that others like you use a thing, though it does not decide for you."
+"5" = "want to use what your people already use and fear being the odd one out; a page that shows people like you using it matters more than any feature."

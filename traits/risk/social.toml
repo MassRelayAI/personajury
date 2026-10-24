@@ -1,0 +1,17 @@
+id = "risk.social"
+version = 1
+family = "risk"
+title = "Willing to look wrong in front of others"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "pick_name_or_design"]
+evidence = "moderate"
+source = "Weber, Blais & Betz 2002; Blais & Weber 2006 (DOSPERT, social domain)"
+items_copied = false
+correlates_with = []
+caveats = "Drives whether the reader would recommend this to their team."
+
+[anchors]
+"1" = "avoid being the one who picked the wrong thing; you choose what others have chosen and want names you can point to if it goes badly."
+"3" = "pick something less common if you can defend the choice with a good reason."
+"5" = "back an unfashionable choice and defend it in public; being the first on your team to use something does not worry you."

@@ -1,0 +1,17 @@
+id = "cognition.need_for_cognition"
+version = 1
+family = "cognition"
+title = "Enjoys effortful thinking and reads the long version"
+shape = "band"
+scale = [1, 5]
+moves = ["read_docs", "trust_a_claim"]
+evidence = "strong"
+source = "Cacioppo & Petty 1982 (need for cognition)"
+items_copied = false
+correlates_with = []
+caveats = "The main driver of the central route in persuasion."
+
+[anchors]
+"1" = "want the answer in a line and skip the reasoning; a long explanation or a table of detail makes you leave."
+"3" = "read the detail when the question matters to you, and skim it when it does not."
+"5" = "like to work an argument through and read the long version; a page that gives you the reasoning, the data and the limits keeps you."

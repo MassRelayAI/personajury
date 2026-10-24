@@ -1,0 +1,17 @@
+id = "choice.maximizing"
+version = 1
+family = "choice"
+title = "Searches every alternative and regrets the one not taken"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "pick_name_or_design", "approve_vendor"]
+evidence = "moderate"
+source = "Schwartz et al. 2002 (maximization scale); Turner, Rim, Betz & Nygren 2012 (maximization inventory)"
+items_copied = false
+correlates_with = ["consumer.quality_perfectionism", "personality.neuroticism"]
+caveats = "The sub-factors move differently; the anchors describe alternative search. 1 is a satisficer."
+
+[anchors]
+"1" = "take the first option that is good enough and stop looking; a comparison table you did not ask for feels like a chore."
+"3" = "compare a few options and stop when one clearly fits."
+"5" = "search through every alternative and want to know you picked the best; you open other tabs, build a comparison and wonder afterwards whether another choice was better."

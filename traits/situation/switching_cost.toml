@@ -1,0 +1,17 @@
+id = "situation.switching_cost"
+version = 1
+family = "situation"
+title = "What leaving the current tool would cost"
+shape = "band"
+scale = [1, 5]
+moves = ["adopt", "buy"]
+evidence = "strong"
+source = "Burnham, Frels & Mahajan 2003 (switching costs); Samuelson & Zeckhauser 1988 (status quo bias)"
+items_copied = false
+correlates_with = []
+caveats = "Explains a good page that still loses."
+
+[anchors]
+"1" = "face little cost in leaving the tool you use; your data and habits move easily and you switch for a small gain."
+"3" = "face a real cost in switching and need a clear gain to make it worthwhile."
+"5" = "face a high cost in leaving the tool you use, in data, training and habit; a better alternative still loses unless it takes the pain of the move away."

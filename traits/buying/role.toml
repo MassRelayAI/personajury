@@ -1,0 +1,41 @@
+id = "buying.role"
+version = 1
+family = "buying"
+title = "The seat held in a purchase"
+shape = "category"
+moves = ["buy", "approve_vendor", "trust_a_claim"]
+evidence = "strong"
+source = "Webster & Wind 1972 (buying centre); Bonoma 1982; Miller & Heiman 1985"
+items_copied = false
+correlates_with = []
+caveats = "Kin to stake but not equal: a gatekeeper is secondary on a product page and primary on a security page."
+
+[[option]]
+id = "user"
+title = "User"
+sentence = "use the thing every day and judge it by how it fits into your work."
+
+[[option]]
+id = "influencer"
+title = "Influencer"
+sentence = "shape what others buy by advising them, and judge it by whether you can recommend it without regret."
+
+[[option]]
+id = "technical_buyer"
+title = "Technical buyer"
+sentence = "check that the thing meets the technical needs and can be integrated before it goes further."
+
+[[option]]
+id = "economic_buyer"
+title = "Economic buyer"
+sentence = "decide whether the money is worth spending and ask what it costs, what it returns and what the risk is."
+
+[[option]]
+id = "gatekeeper"
+title = "Gatekeeper"
+sentence = "control what reaches the decision makers and screen out whatever does not meet the rules."
+
+[[option]]
+id = "champion"
+title = "Champion"
+sentence = "push for the thing inside your organisation and want material that helps you make the case."

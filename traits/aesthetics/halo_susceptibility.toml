@@ -1,0 +1,17 @@
+id = "aesthetics.halo_susceptibility"
+version = 1
+family = "aesthetics"
+title = "Reads a good-looking page as true, usable and competent"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "adopt", "read_docs"]
+evidence = "strong"
+source = "Thorndike 1920 (halo); Dion, Berscheid & Walster 1972; Tractinsky, Katz & Ikar 2000; Lindgaard et al. 2006"
+items_copied = false
+correlates_with = []
+caveats = "Strong as an effect, moderate as an individual band; the seen rule is the antidote, since a trust score moved by looks must cite the screenshot."
+
+[anchors]
+"1" = "keep looks and substance apart; a handsome page earns no extra trust and a plain one loses none."
+"3" = "let a good-looking page lower your guard a little, and then check the substance."
+"5" = "read a good-looking page as true, usable and competent; polish makes you trust a claim you did not check, and a rough page makes you doubt a good one."

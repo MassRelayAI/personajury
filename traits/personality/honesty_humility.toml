@@ -1,0 +1,17 @@
+id = "personality.honesty_humility"
+version = 1
+family = "personality"
+title = "Sincere and unentitled, unmoved by status and flattery"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "pick_name_or_design"]
+evidence = "moderate"
+source = "Ashton & Lee 2007 (HEXACO honesty-humility factor)"
+items_copied = false
+correlates_with = []
+caveats = "The one factor the Big Five lack; the questionnaire items are licensed, so the construct is described only."
+
+[anchors]
+"1" = "like a page that flatters you or hints at standing; a premium tier, an exclusive badge or a special offer for people like you works on you."
+"3" = "notice flattery and a show of status and discount them a little, without taking offence."
+"5" = "distrust flattery, exclusivity and a show of status; a plain, modest statement of what the thing does earns your trust faster than a boast."

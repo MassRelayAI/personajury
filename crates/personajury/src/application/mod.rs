@@ -16,6 +16,7 @@ pub mod pick;
 pub mod setup;
 pub mod should_run;
 pub mod subject;
+pub mod traits;
 pub mod summary;
 pub mod verdict;
 use crate::domain::Refusal;

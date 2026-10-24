@@ -1,0 +1,17 @@
+id = "cognition.need_for_closure"
+version = 1
+family = "cognition"
+title = "Wants an answer now and dislikes ambiguity"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "adopt"]
+evidence = "moderate"
+source = "Webster & Kruglanski 1994; Roets & Van Hiel 2011 (need for closure)"
+items_copied = false
+correlates_with = ["cognition.ambiguity_tolerance", "personality.openness"]
+caveats = "Negatively related to openness; close to ambiguity tolerance, so do not pair them."
+
+[anchors]
+"1" = "keep a question open while you gather more; a page that says it depends sits well with you."
+"3" = "want a clear answer in the end and accept some open points on the way."
+"5" = "want a definite answer fast and dislike a page that says it depends; a clear recommendation pleases you and a list of options without a lead irritates you."

@@ -533,12 +533,12 @@ fn a_v3_store_upgrades_in_place_and_reads_its_old_runs_as_independent() {
         s.conn().execute("UPDATE meta SET value = '3' WHERE key = 'schema_version'", []).unwrap();
     }
     let s = Store::open_existing(w).unwrap();
-    assert_eq!(s.schema_version().unwrap(), 4);
+    assert_eq!(s.schema_version().unwrap(), 5);
     let row = s.run(id).unwrap().unwrap();
     assert_eq!(row.independence, "independent");
     assert_eq!(row.effort, None);
     // opening again changes nothing
-    assert_eq!(Store::open_existing(w).unwrap().schema_version().unwrap(), 4);
+    assert_eq!(Store::open_existing(w).unwrap().schema_version().unwrap(), 5);
 }
 
 // ---- item 8: independence, a word on the run (D18) ----

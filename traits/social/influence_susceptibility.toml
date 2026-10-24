@@ -1,0 +1,17 @@
+id = "social.influence_susceptibility"
+version = 1
+family = "social"
+title = "Weight given to endorsements, logos and counts of others"
+shape = "band"
+scale = [1, 5]
+moves = ["trust_a_claim", "buy", "adopt"]
+evidence = "strong"
+source = "Bearden, Netemeyer & Teel 1989; Cialdini 1984/2001 (social proof, authority); Goldstein, Cialdini & Griskevicius 2008"
+items_copied = false
+correlates_with = []
+caveats = "The juror's weight on fame and endorsement, never the persona's own. Strong for social-proof effects; the trait moderate."
+
+[anchors]
+"1" = "skip testimonials, logo walls and customer counts; what others say about a thing does not move you."
+"3" = "look at a testimonial or a customer count as a small sign and weigh it with the rest."
+"5" = "give heavy weight to endorsements, logos, testimonials and counts of users; a trusted-by strip or a well-known name decides a lot for you."

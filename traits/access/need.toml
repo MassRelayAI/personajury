@@ -1,0 +1,47 @@
+id = "access.need"
+version = 1
+family = "access"
+title = "An assistive need the subject must serve"
+shape = "category"
+multi = true
+moves = ["read_docs", "pick_name_or_design", "adopt"]
+evidence = "strong"
+source = "WCAG 2.2 success criteria; WHO ICF (functioning model); WebAIM screen-reader surveys"
+items_copied = false
+correlates_with = []
+caveats = "A slice, never a stereotype: the need says what the page must do, never who the person is; a seen claim about contrast must still cite the screenshot."
+
+[[option]]
+id = "screen_reader"
+title = "Screen reader"
+sentence = "reach every part of the page through a screen reader, which needs real headings, labels and text for images."
+
+[[option]]
+id = "low_vision_zoom"
+title = "Low vision, zoom"
+sentence = "enlarge the page a long way and need it to stay readable and usable at that size, with enough contrast."
+
+[[option]]
+id = "colour_vision"
+title = "Colour vision"
+sentence = "tell colours apart poorly and need meaning carried by more than colour."
+
+[[option]]
+id = "keyboard_only"
+title = "Keyboard only"
+sentence = "use the page with the keyboard alone and need a visible focus and a logical order."
+
+[[option]]
+id = "plain_language"
+title = "Plain language"
+sentence = "need short sentences and common words and lose the thread in jargon or long, packed paragraphs."
+
+[[option]]
+id = "captions"
+title = "Captions"
+sentence = "need captions or a transcript for anything spoken and miss a video that has neither."
+
+[[option]]
+id = "none_declared"
+title = "None declared"
+sentence = "have no assistive need that the page has to serve."

@@ -1,0 +1,17 @@
+id = "social.need_for_uniqueness"
+version = 1
+family = "social"
+title = "Prefers what few others have"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "pick_name_or_design", "adopt"]
+evidence = "moderate"
+source = "Snyder & Fromkin 1977; Tian, Bearden & Hunter 2001 (consumers' need for uniqueness)"
+items_copied = false
+correlates_with = ["social.status_consciousness"]
+caveats = "An outsider as a way of choosing, not a label; moves name and logo juries."
+
+[anchors]
+"1" = "prefer the common choice that everyone knows; a thing many people use feels proven."
+"3" = "like a choice that is a little different and still sensible."
+"5" = "prefer what few others have and avoid the obvious choice; a name or design that looks like everyone else's puts you off."

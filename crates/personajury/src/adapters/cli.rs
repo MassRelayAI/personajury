@@ -30,6 +30,11 @@ pub enum Cmd {
         #[command(subcommand)]
         what: PersonaCmd,
     },
+    /// Traits: the catalog of tendencies a persona may hold (49 ship, embedded; install them once), and trait sets
+    Trait {
+        #[command(subcommand)]
+        what: TraitCmd,
+    },
     /// Panels: a saved query over persona tags ("5 builder, 3 company, 2 others")
     Panel {
         #[command(subcommand)]
@@ -270,6 +275,34 @@ pub enum PersonaCmd {
     List,
 }
 #[derive(Subcommand, Debug)]
+pub enum TraitCmd {
+    /// Add every embedded catalog trait and set the store lacks; a changed one becomes a new version
+    Install,
+    /// Add one trait file (traits/<family>/<trait>.toml)
+    Add {
+        #[arg(long)]
+        file: PathBuf,
+        /// the material hash a generated trait came from
+        #[arg(long)]
+        generated_from: Option<String>,
+    },
+    List,
+    Show { id: String },
+    /// Trait sets: up to 8 traits an audience is judged by, up to 4 of them the cover of a panel
+    Set {
+        #[command(subcommand)]
+        what: TraitSetCmd,
+    },
+}
+#[derive(Subcommand, Debug)]
+pub enum TraitSetCmd {
+    Add {
+        #[arg(long)]
+        file: PathBuf,
+    },
+    List,
+}
+#[derive(Subcommand, Debug)]
 pub enum PanelCmd {
     Add {
         name: String,
@@ -321,6 +354,12 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Persona { what: PersonaCmd::Add { .. } } => "persona add",
         Cmd::Persona { what: PersonaCmd::Generate { .. } } => "persona generate",
         Cmd::Persona { what: PersonaCmd::List } => "persona list",
+        Cmd::Trait { what: TraitCmd::Install } => "trait install",
+        Cmd::Trait { what: TraitCmd::Add { .. } } => "trait add",
+        Cmd::Trait { what: TraitCmd::List } => "trait list",
+        Cmd::Trait { what: TraitCmd::Show { .. } } => "trait show",
+        Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::Add { .. } } } => "trait set add",
+        Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::List } } => "trait set list",
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
         Cmd::Panel { what: PanelCmd::Resolve { .. } } => "panel resolve",
         Cmd::Lens { what: LensCmd::Add { .. } } => "lens add",
@@ -388,6 +427,14 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             PersonaCmd::Add { file, generated_from } => app::persona::add(root, file, generated_from.as_deref()),
             PersonaCmd::Generate { from, count } => app::persona::generate(root, from, *count),
             PersonaCmd::List => app::persona::list(root),
+        },
+        Cmd::Trait { what } => match what {
+            TraitCmd::Install => app::traits::install(root),
+            TraitCmd::Add { file, generated_from } => app::traits::add(root, file, generated_from.as_deref()),
+            TraitCmd::List => app::traits::list(root),
+            TraitCmd::Show { id } => app::traits::show(root, id),
+            TraitCmd::Set { what: TraitSetCmd::Add { file } } => app::traits::set_add(root, file),
+            TraitCmd::Set { what: TraitSetCmd::List } => app::traits::set_list(root),
         },
         Cmd::Panel { what } => match what {
             PanelCmd::Add { name, query, allow_large } => app::panel::add(root, name, query, *allow_large),

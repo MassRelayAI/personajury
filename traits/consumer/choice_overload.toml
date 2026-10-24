@@ -1,0 +1,17 @@
+id = "consumer.choice_overload"
+version = 1
+family = "consumer"
+title = "Many options confuse rather than help"
+shape = "band"
+scale = [1, 5]
+moves = ["buy", "read_docs"]
+evidence = "moderate"
+source = "Sproles & Kendall 1986 (confused by overchoice); Iyengar & Lepper 2000"
+items_copied = false
+correlates_with = []
+caveats = "The overload effect is contested (Scheibehenne et al. 2010); it moves pricing-page and plan-table verdicts."
+
+[anchors]
+"1" = "like a wide choice and enjoy sorting through it; a page with only one option makes you suspect something is hidden."
+"3" = "cope with a handful of options and slow down when there are more."
+"5" = "freeze or leave when a page offers many plans or options; you want it narrowed down for you and a clear recommended choice."

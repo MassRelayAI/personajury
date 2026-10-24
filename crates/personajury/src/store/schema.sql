@@ -1,3 +1,4 @@
+-- PersonaJury store, schema v5 (D29-D31: traits, trait sets, panel cover, run traits and seats; lanes B and C add their columns here too)
 -- PersonaJury store, schema v4 (D17 adds run.effort and run.trimmed_json, D18 run.independence, D13 run.rule_class and run.quorum)
 -- PersonaJury store, schema v3 (report §4; plan docs/plans/2026-10-23-v0-1-the-engine.md; D8; D9 adds run.draw_seed and run.override_json). Verdicts, picks and decisions are append-only.
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -58,3 +59,10 @@ CREATE TRIGGER IF NOT EXISTS usage_no_update BEFORE UPDATE ON usage BEGIN SELECT
 CREATE TRIGGER IF NOT EXISTS usage_no_delete BEFORE DELETE ON usage BEGIN SELECT RAISE(ABORT, 'usage is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS decision_no_update BEFORE UPDATE ON decision BEGIN SELECT RAISE(ABORT, 'decision is append-only'); END;
 CREATE TRIGGER IF NOT EXISTS decision_no_delete BEFORE DELETE ON decision BEGIN SELECT RAISE(ABORT, 'decision is append-only'); END;
+-- D29 (v0.6): the trait catalog and project traits, one row per version; trait sets likewise. Installed by `trait install`, never seeded.
+CREATE TABLE IF NOT EXISTS trait (
+  id TEXT NOT NULL, version INTEGER NOT NULL, family TEXT NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL,
+  origin TEXT NOT NULL, created_at TEXT NOT NULL, PRIMARY KEY (id, version));
+CREATE TABLE IF NOT EXISTS trait_set (
+  name TEXT NOT NULL, version INTEGER NOT NULL, body_json TEXT NOT NULL, hash TEXT NOT NULL, created_at TEXT NOT NULL,
+  PRIMARY KEY (name, version));

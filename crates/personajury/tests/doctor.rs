@@ -53,6 +53,8 @@ fn doctor_counts() {
             profile_json: "{}".into(),
             origin: Origin::Hand,
             hash: hash.into(),
+            traits: None,
+            serves: vec![],
         })
         .unwrap();
     }
@@ -64,7 +66,7 @@ fn doctor_counts() {
         .as_str()
         .unwrap()
         .ends_with(".personajury/store.db"));
-    assert_eq!(d["schema_version"], 4);
+    assert_eq!(d["schema_version"], 5);
     let c = &d["counts"];
     assert_eq!(
         (

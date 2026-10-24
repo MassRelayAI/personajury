@@ -1,0 +1,17 @@
+id = "risk.health_safety"
+version = 1
+family = "risk"
+title = "Accepts physical or safety exposure"
+shape = "band"
+scale = [1, 5]
+moves = []
+evidence = "moderate"
+source = "Weber, Blais & Betz 2002; Blais & Weber 2006 (DOSPERT, health and safety domain)"
+items_copied = false
+correlates_with = []
+caveats = "For subjects in medical, safety or physical-product areas; leave it out otherwise."
+
+[anchors]
+"1" = "avoid any physical or safety exposure; a missing safety statement or a vague warning makes you walk away."
+"3" = "accept a small, well-explained exposure and look for the standard that covers it."
+"5" = "accept a physical or safety risk if the payoff is clear; a long list of warnings strikes you as noise."

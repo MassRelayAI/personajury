@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Ten tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Twelve tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -130,6 +130,25 @@ pub fn tools() -> Vec<Value> {
             "personajury_trait_list",
             "The trait catalog the store holds: each trait's id, version, family, title, shape (band, category or words), evidence and origin; with sets=true the trait sets instead (name, traits, cover, note). A trait is a tendency or a standing fact that makes one reader decide differently from another, never a type or a diagnosis; a brief renders it as \"you tend to\", it is told and never seen. Install the catalog once with the CLI (`personajury trait install`). Reads only.",
             schema(json!({ "sets": {"type":"boolean","description":"list the trait sets instead of the traits"} }), &[]),
+        ),
+        tool(
+            "personajury_trait_observed",
+            "What a persona did in its accepted initial verdicts, as counts (no model): its score in each (lens, dimension) cell below, at or above its stratum's median, its blockers and bottom scores against the stratum's, its evidence classes, its picks against the stratum's majority; then, for each trait the persona declares, consistent, contradicted, mixed or no_signal against the mapping table (a bearing, not a measurement: a contradicted trait is a question for the author, not a verdict on the persona). Several personas answer {personas: [...]}. It writes nothing; any change to a persona goes through `persona add`. Reads only.",
+            schema(
+                json!({ "persona": {"description":"a persona id, or an array of them",
+                                    "oneOf": [{"type":"string"},{"type":"array","items":{"type":"string"},"minItems":1}]},
+                        "runs": {"type":"array","items":{"type":"integer","minimum":1},"description":"only these runs; default every run the persona sat in"} }),
+                &["persona"],
+            ),
+        ),
+        tool(
+            "personajury_trait_suggest_check",
+            "Verify a trait suggestion for an existing persona, without a model and without writing anything: an object {persona, traits: {trait id: value}, evidence: {trait id: quote}}. Ids and values are checked as persona add would (unknown_trait, trait_value_off_scale, trait_option_unknown, traits_too_many, refused_trait_id); every trait needs a quote (suggestion_without_quote) that is a verbatim substring of the persona's prose, whitespace folded (quote_not_in_prose). Answers data.persona_file, the stored persona with its traits set to the suggestion (traits not suggested are kept), and data.evidence; the caller saves the file and runs persona add for a new version. Prose first, traits as its summary, each with its line of evidence.",
+            schema(
+                json!({ "suggestion": {"type":"object","description":"the agent's answer to the brief that `personajury trait suggest --persona` wrote"},
+                        "persona": {"type":"string","description":"the persona the suggestion must be for"} }),
+                &["suggestion"],
+            ),
         ),
         tool(
             "personajury_should_run",
@@ -263,6 +282,8 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "personajury_summary" => &["runs", "width", "md", "html", "slice"],
         "personajury_should_run" => &["diff", "paths", "config", "subject"],
         "personajury_trait_list" => &["sets"],
+        "personajury_trait_observed" => &["persona", "runs"],
+        "personajury_trait_suggest_check" => &["suggestion", "persona"],
         _ => return Err(format!("unknown tool {name}")),
     };
     if let Some(k) = a
@@ -390,6 +411,33 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                 crate::adapters::cli::TraitCmd::Set { what: crate::adapters::cli::TraitSetCmd::List }
             } else {
                 crate::adapters::cli::TraitCmd::List
+            },
+        },
+        "personajury_trait_observed" => Cmd::Trait {
+            what: crate::adapters::cli::TraitCmd::Observed {
+                persona: match a.get("persona") {
+                    Some(Value::String(s)) => vec![s.clone()],
+                    Some(Value::Array(_)) => strings_arg(a, "persona")?,
+                    None | Some(Value::Null) => return Err("missing required argument persona".into()),
+                    Some(_) => return Err("persona must be a string or an array of strings".into()),
+                },
+                runs: match a.get("runs") {
+                    None | Some(Value::Null) => None,
+                    Some(Value::Array(v)) => Some(v.iter().map(|x| id_of(x, "runs[]").map(|n| n.to_string())).collect::<Result<Vec<_>, _>>()?.join(",")),
+                    Some(_) => return Err("runs must be an array of run ids".into()),
+                },
+            },
+        },
+        "personajury_trait_suggest_check" => Cmd::Trait {
+            what: crate::adapters::cli::TraitCmd::Suggest {
+                persona: str_arg(a, "persona")?,
+                set: None,
+                check: None,
+                check_json: match a.get("suggestion") {
+                    Some(v @ Value::Object(_)) => Some(v.to_string()),
+                    None | Some(Value::Null) => return Err("missing required argument suggestion".into()),
+                    Some(_) => return Err("suggestion must be an object".into()),
+                },
             },
         },
         _ => Cmd::ShouldRun {

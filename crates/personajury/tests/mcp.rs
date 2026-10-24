@@ -82,6 +82,8 @@ fn initialize_and_list_the_tools() {
             "personajury_should_run",
             "personajury_summary",
             "personajury_trait_list",
+            "personajury_trait_observed",
+            "personajury_trait_suggest_check",
             "personajury_verdict"
         ]
     );
@@ -111,6 +113,58 @@ fn the_trait_list_tool_answers_the_catalog_and_takes_no_arguments_but_a_set_flag
     let (_, out) = session(ws.path(), &[call(1, "personajury_trait_list", json!({"sets": true}))]);
     let env: Value = serde_json::from_str(out[0]["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
     assert_eq!(env["data"]["sets"].as_array().unwrap().len(), 8);
+}
+
+/// A workspace with the catalog and one persona whose prose can be quoted.
+fn prose_ws() -> tempfile::TempDir {
+    let ws = tempfile::tempdir().unwrap();
+    let cli = |args: &[&str]| {
+        std::process::Command::new(assert_cmd::cargo::cargo_bin("personajury")).arg("--root").arg(ws.path()).args(args).output().unwrap()
+    };
+    cli(&["trait", "install"]);
+    let f = ws.path().join("p.json");
+    std::fs::write(
+        &f,
+        json!({"id": "ravi", "name": "Ravi", "tags": ["builder"], "role": "An engineer who reads the pricing page first", "context": "c",
+               "daily_tasks": "d", "fears": "f", "never_reads": "n", "decides_by": "b", "stake_rules": "s"})
+        .to_string(),
+    )
+    .unwrap();
+    cli(&["persona", "add", "--file", f.to_str().unwrap()]);
+    ws
+}
+
+#[test]
+fn the_trait_observed_tool_reads_and_takes_a_persona_and_runs() {
+    let ws = prose_ws();
+    let t = tools_list().into_iter().find(|t| t["name"] == "personajury_trait_observed").unwrap();
+    assert_eq!(t["inputSchema"]["required"], json!(["persona"]));
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_observed", json!({"persona": "ravi"}))]);
+    let env = tool_env(&out[0]);
+    assert_eq!(env["ok"], true, "{env}");
+    assert_eq!(env["data"]["persona"], "ravi");
+    assert_eq!(env["data"]["traits"], json!([]));
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_observed", json!({"persona": ["ravi"], "runs": [1]}))]);
+    assert_eq!(tool_env(&out[0])["ok"], false, "run 1 does not exist");
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_observed", json!({"persona": "ravi", "bogus": 1}))]);
+    assert!(out[0]["error"].is_object() || out[0]["result"]["isError"] == true, "{}", out[0]);
+}
+
+#[test]
+fn the_trait_suggest_check_tool_answers_the_merged_file_and_writes_nothing() {
+    let ws = prose_ws();
+    let t = tools_list().into_iter().find(|t| t["name"] == "personajury_trait_suggest_check").unwrap();
+    assert_eq!(t["inputSchema"]["required"], json!(["suggestion"]));
+    let sug = json!({"persona": "ravi", "traits": {"consumer.price_consciousness": 5},
+                     "evidence": {"consumer.price_consciousness": "reads the pricing page first"}});
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_suggest_check", json!({"suggestion": sug}))]);
+    let env = tool_env(&out[0]);
+    assert_eq!(env["ok"], true, "{env}");
+    assert_eq!(env["data"]["persona_file"]["traits"]["consumer.price_consciousness"], 5);
+    let bad = json!({"persona": "ravi", "traits": {"consumer.price_consciousness": 5}, "evidence": {"consumer.price_consciousness": "made up"}});
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_suggest_check", json!({"suggestion": bad}))]);
+    assert_eq!(tool_env(&out[0])["error"]["code"], "quote_not_in_prose");
+    assert!(!ws.path().join(".personajury/generate").exists(), "nothing was written");
 }
 
 #[test]

@@ -370,6 +370,9 @@ pub enum TraitCmd {
         /// verify an answer file; writes nothing, answers the merged persona file as data
         #[arg(long)]
         check: Option<PathBuf>,
+        /// the answer as text instead of a file (the MCP tool's way in)
+        #[arg(long, hide = true, conflicts_with = "check")]
+        check_json: Option<String>,
     },
     /// What a persona did in its accepted initial verdicts, counted, and what that bears on the traits it declares (D35)
     Observed {
@@ -546,9 +549,10 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::Generate { from, count } => app::traits::generate(root, from, *count),
             TraitCmd::Report { calibration } => app::calibrate::report(calibration),
             TraitCmd::Observed { persona, runs } => app::trait_reverse::observed(root, persona, runs.as_deref()),
-            TraitCmd::Suggest { persona, set, check } => match check {
-                Some(f) => app::trait_reverse::suggest_check(root, f, persona.as_deref()),
-                None => app::trait_reverse::suggest(root, persona.as_deref(), set.as_deref()),
+            TraitCmd::Suggest { persona, set, check, check_json } => match (check, check_json) {
+                (Some(f), _) => app::trait_reverse::suggest_check(root, f, persona.as_deref()),
+                (None, Some(t)) => app::trait_reverse::suggest_check_text(root, t, "the suggestion", persona.as_deref()),
+                (None, None) => app::trait_reverse::suggest(root, persona.as_deref(), set.as_deref()),
             },
             TraitCmd::Set { what: TraitSetCmd::Add { file } } => app::traits::set_add(root, file),
             TraitCmd::Set { what: TraitSetCmd::List } => app::traits::set_list(root),

@@ -108,9 +108,13 @@ the traits set. Save that file and run `personajury persona add --file <file>`: 
 /// It writes nothing: the caller saves the file and runs `persona add`.
 pub fn suggest_check(root: &Path, file: &Path, persona: Option<&str>) -> Result<Value> {
     let text = super::read_text(file)?;
-    let v: Value = serde_json::from_str(&text)
-        .map_err(|e| AppError::InvalidArguments(format!("{} is not a suggestion: {e}", file.display())))?;
-    let bad = |why: &str| AppError::InvalidArguments(format!("{} is not a suggestion: {why}", file.display()));
+    suggest_check_text(root, &text, &file.display().to_string(), persona)
+}
+/// `suggest_check` over the answer's text (the MCP tool gives it inline); `label` names it in a refusal.
+pub fn suggest_check_text(root: &Path, text: &str, label: &str, persona: Option<&str>) -> Result<Value> {
+    let v: Value =
+        serde_json::from_str(text).map_err(|e| AppError::InvalidArguments(format!("{label} is not a suggestion: {e}")))?;
+    let bad = |why: &str| AppError::InvalidArguments(format!("{label} is not a suggestion: {why}"));
     let id = v.get("persona").and_then(Value::as_str).ok_or_else(|| bad("`persona` is missing"))?;
     if let Some(want) = persona {
         if want != id {

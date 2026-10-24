@@ -9,7 +9,7 @@ own, replay the recorded one ([README, Try it](../README.md#try-it)). Every comm
 to read it, and `personajury summary RUN --html jury.html` writes a page you open in a browser.
 
 ```bash
-# 0. a workspace (any folder) and the four shipped lenses, seeded on first write: critical, taste, compare, recall
+# 0. a workspace (any folder) and the five shipped lenses, seeded on first write: critical, taste, compare, recall, decide
 cd my-project
 
 # 1. personas: the fixed JSON (see skills/writing-a-persona); tags feed panel queries

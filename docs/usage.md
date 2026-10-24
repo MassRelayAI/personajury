@@ -33,7 +33,7 @@ One JSON per persona, in the shape the brief shows:
                "citations": ["cmp:acme-pricing/pricing#btn-signup"], "blockers": ["the signup link goes nowhere"], "note": "..." } ],
   "pick": { "choice": "cmp:acme-pricing", "reason": "..." } }
 ```
-`about` is optional: one of the subject's attachment labels or `cmp:<name>`. A verdict has one line per (dimension, `about`) and
+`about` is optional: the subject's name (the whole subject) or `cmp:<name>`; a design or logo subject's attachment labels too (`brief --options` says which, see `commands.md`). A verdict has one line per (dimension, `about`) and
 at least one line for every dimension of the lens; scoring the same dimension twice for the same option, or leaving one out, is
 refused (`duplicate_dimension`, `missing_dimension`). The table of codes is in [`troubleshooting.md`](troubleshooting.md).
 
@@ -127,6 +127,12 @@ personajury persona generate --from fixtures/material/usecases.csv --count 5
 The engine hashes the file it is given and filters nothing: cut the rows you want into a file first. A sensitivity column
 (`data_sensitivity`, `clearance_note`) is material for your personas and for your own `personajury.toml`, where the paths of sensitive
 surfaces belong under the human classes; the engine never learns a sector.
+
+## Deliberation is advise-only
+`personajury deliberate RUN` shows each juror what the others saw and lets it change its verdict. That breaks independence on purpose, so
+it can only measure persuasion: how many scores moved, which way, toward or away from the group's first median. The initial batch stays
+the jury's word; `matrix`, `summary` and `apply-check` read it by default, and a run with a deliberated verdict answers at most `advise`
+(reason `deliberated`). Run it to learn how persuadable the jury was, never to change the verdict.
 
 ## The dial: what you decide, what needs a reason, what a person decides
 The default is the fast one. You move freely inside the rule and the effort; to leave the rule you give a reason that is

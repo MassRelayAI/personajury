@@ -18,22 +18,24 @@ the version.
 | `panel resolve` | `NAME` `[--subject S]` | the personas the query resolves to now; with `--subject` the seats a draw gives that subject (`draw.seed`), without it the first by id (`draw: "none (no subject)"`); a panel with a cover also answers `coverage` |
 | `lens add` | `--file F` | add a lens (TOML) |
 | `lens generate` | `--from PATH` `[--dimensions N]` (default 4, at most 12) | write the brief that asks your agent to draft a lens from a standard, a handbook or examples (see below) |
-| `lens list` | | list lenses; four ship (a 1 to 10 `site` lens is fixture data: `lens add --file fixtures/lenses/site.toml`) |
-| `subject add` | `NAME` `--kind K` `--attach FILE...` `[--audience tag,...]` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu` or `prices` |
+| `lens list` | | list lenses; five ship (critical, taste, compare, recall and `decide` for decision juries; a 1 to 10 `site` lens is fixture data: `lens add --file fixtures/lenses/site.toml`) |
+| `subject add` | `NAME` `--kind K` `--attach FILE...` `[--audience tag,...]` | a subject as attached files; kind is `page`, `diff`, `design`, `logo`, `document`, `menu`, `prices` or `decision` (a `questions.md` plus the files a point of view is read from, see Decision juries) |
 | `comparator add` | same as `subject add` | a comparator, stored the same way and flagged |
-| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--effort low\|medium\|high\|max]` `[--independence independent\|sequential]` `[--traits SET\|all\|off]` `[--seats auto]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed`; `--traits` renders the personas' traits as "you tend to" lines (D31), `--seats auto` seats the personas that serve the subject's audience plus one control (see below) |
-| `verdict` | `--run N` and `--file F` or `--json J` `[--by-human "NAME, CREDENTIAL"]` | ingest one persona's verdict, or with `--by-human` a person's (see Experts); refused without evidence; may carry `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed) |
-| `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` `[--slice TRAIT]` | scores per stratum, and `usage {reported, estimate}`; `--slice` adds `slices`, each stratum's scores grouped by a trait's bands (counts, never a mean); `--across-strata` exists only so the refusal is explicit |
-| `graph` | `RUN...` `--svg` `[--out F]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
+| `brief` | `--subject S` `--model M` and `--panel P` or `--query Q` or `--rule R`; `[--lens L,...]` `[--stake p=stake,...]` `[--spend N]` `[--comparator C]...` `[--detail compact\|full]` `[--draw HEX]` `[--wave N]` `[--effort low\|medium\|high\|max]` `[--independence independent\|sequential]` `[--traits SET\|all\|off]` `[--seats auto]` `[--options subject\|attachments]` `[--allow-large` `--reason W` `--by WHO]` | one deterministic, hashed brief per persona, one run per lens; `--lens` and `--comparator` take a comma list or repeat; the answer carries `waves`, `estimate {briefs, tokens}` and `draw.seed`; `--traits` renders the personas' traits as "you tend to" lines (D31), `--seats auto` seats the personas that serve the subject's audience plus one control (see below); `--options` says what a juror may score `about` and pick (see Options by kind) |
+| `deliberate` | `RUN` `[--wave N]` | one advise-only round after the first verdicts: a file per seat with its own first verdict and what the others said, anonymised (see Deliberation); refusals `incomplete_jury_for_deliberation`, `already_deliberated` |
+| `verdict` | `--run N` and `--file F` or `--json J` `[--by-human "NAME, CREDENTIAL"]` `[--deliberated]` | ingest one persona's verdict, or with `--by-human` a person's (see Experts); refused without evidence; may carry `usage {input_tokens, output_tokens}` (`invalid_usage` when malformed) |
+| `matrix` | `RUN...` `[--history]` `[--table]` `[--detail compact\|full]` `[--slice TRAIT]` `[--phase initial\|deliberated\|both]` | scores per stratum, with the counted metrics of D34 (`agreement`, `evidence`, `shift`, `panel_match`, `cost`, see below), and `usage {reported, estimate}`; `--slice` adds `slices`, each stratum's scores grouped by a trait's bands (counts, never a mean); `--across-strata` exists only so the refusal is explicit |
+| `graph` | `RUN...` `--svg` `[--out F]` `[--phase P]` | the jury as one static SVG (see below); several runs of one subject draw each finding's life; answers `data.svg`, or writes `--out` |
 | `pick` | `RUN` | the forced choices of a run, per stratum, with reasons |
 | `summary` | `RUN...` `[--md F]` `[--html F]` `[--save]` `[--width N]` `[--slice TRAIT]` | the answer for a person: plain sentences, a numbers table "for checking" (medians primary·secondary·bystander), then Next; no pooled number; `--save` writes into `report_dir` |
-| `calibrate` | `JURY_RUN HUMAN_RUN` `[--out F]` | the jury's rank order per stratum beside a human run's (`verdict --by-human` batches); `calibrated` when every primary cell is within one rank |
-| `delta` | `A B` | what moved between two runs on the same subject and lens |
+| `calibrate` | `JURY_RUN HUMAN_RUN` `[--out F]` `[--phase P]` | the jury's rank order per stratum beside a human run's (`verdict --by-human` batches); `calibrated` when every primary cell is within one rank |
+| `delta` | `A B` `[--phase P]` | what moved between two runs on the same subject and lens |
 | `apply-check` | `RUN...` or `--latest [--subject S]`, `[--rule CLASS]` `[--calibration F]` | the verdict to obey last: `apply`, `escalate`, `human` or `advise`, with the reasons as data (see below); applies nothing itself |
 | `check` | `[--history]` | stale runs (source changed or a newer subject version), `fixed_unverified`, and findings with no decision from any batch or fixed and raised again (`fix_not_landed`); exits 1 with `check_failed` listing `unresolved`; `--history` adds `decisions` and `lives`, each finding's life across the runs (`raised`, `raised_again`, `fixed`, `unjudged`, `absent`) |
 | `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` or `--by-human NAME` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`); a finding a human batch raised needs `--by-human` (`human_decision_required`) |
 | `should-run` | `[--diff F]` `[--paths a,b]` `[--subject S]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend; `--subject` classifies the subject's recorded source paths (a page added by hand has no diff); `warnings` names a rule's panel or lens the store lacks |
-| `setup` | `[--client C]` `[--scope S]` `[--apply]` `[--force]` `[--bin B]` `[--no-rules]` `[--no-hook]` | register the MCP server; a plan unless `--apply` |
+| `setup` | `[--client C]` `[--scope S]` `[--apply]` `[--force]` `[--bin B]` `[--no-rules]` `[--no-hook]` | register the MCP server; a plan unless `--apply`; the answer's `project_config` is the starter `personajury.toml` (`planned`, `written`, or `present` and left alone) |
+| `init` | | write the commented starter `personajury.toml` (no jury for code paths, a `surface` class for screens, pages and docs); never overwrites one |
 | `doctor` | `[--bin B]` `[--brief]` | the store, counts and registrations; `--brief` is two plain lines for a hook |
 | `mcp` | | serve MCP over stdio |
 
@@ -119,6 +121,7 @@ named here, and the rules the subject's recorded sources fall under.
 | `independence_sequential` | advise | one context read every brief |
 | `stale_run` | advise | the subject moved since the run, or a later run of the same subject and lens supersedes it |
 | `delta_unavailable` | advise | a previous round exists but the delta cannot be computed: another lens version, or cells it does not have |
+| `deliberated` | advise | a judged run holds a deliberated verdict: the initial batch is the jury's independent word, so the run advises and never applies; `escalate` and `human` still take precedence |
 | `single_model` | info | one model judged every seat; changes no answer |
 
 Raising seats, lenses, effort or detail above the rule is fine. `human` beats `escalate` beats `advise` beats `apply`. It reads the
@@ -205,3 +208,52 @@ audience, `no_matching_personas` when nobody serves it; with no unrelated person
 same way every time); anything else that differs from the rule (lenses, effort, traits, spend) still needs `--reason`. A run whose
 primary stratum has fewer than two judged seats answers `advise` at `apply-check` (`thin_primary`). A fixed panel of 8 to 14 seats is the main
 token waste: this is the default way to seat a jury.
+
+### Options by kind
+`brief --options subject|attachments` says what a juror may score `about` and `pick` (D32). The default follows the subject's kind:
+`design` and `logo` give `attachments` (each board is a candidate); `page`, `diff`, `document`, `menu` and `prices` give `subject`; a
+`decision` gives its questions (`questions`, not settable). In `subject` mode the options are the subject's name and each
+`cmp:<name>`; a line `about: "<subject name>"` is stored as the whole subject (`about: null`), so a cell stays keyed as it always was
+and both forms on one dimension are `duplicate_dimension`. In `attachments` mode the options are the subject's labels and each
+`cmp:<name>`. The mode is recorded on the run (`run.options_mode`; a run with none, made before v0.6, keeps `attachments`). An unknown
+word is `invalid_options_mode`. The brief's answer carries `options {mode, list}`. Briefs made with `attachments` are byte-identical to
+those made before D32.
+
+### Deliberation
+`personajury deliberate RUN [--wave N]` (MCP `personajury_deliberate`) is one advise-only round (D33). It needs an accepted initial
+verdict for every briefed seat (`incomplete_jury_for_deliberation {missing}`), runs once per run (`already_deliberated {run}`), and
+writes `.personajury/runs/<run>/deliberate-<persona>--<lens>.md` per seat: the persona and stake blocks (and the trait block when
+the run renders one) as in the brief, `## Your first verdict`, and `## What the other jurors said` as "Juror 1 (stratum)", "Juror 2 ..."
+in persona-id order, with no name, no model and no citation. The answer lists each file's path, hash and size, and `waves`. The jurors
+answer with `"phase": "deliberated"`; `verdict --deliberated` ingests it (`deliberated_without_phase`, `phase_without_flag`,
+`no_deliberation`, `deliberated_without_initial`; the evidence refusals are the same). A deliberated batch is stored with
+`verdict.phase = 'deliberated'` and never replaces the initial one: `matrix`, `pick`, `summary`, `delta`, `graph` and `calibrate` read
+the initial batch unless `--phase deliberated`; `matrix --phase both` answers both under `phases`. `check --history` lists every batch with
+its phase under `batches`. `apply-check` answers at most `advise` (reason `deliberated`) for a run with a deliberated verdict.
+
+### The counted metrics
+`matrix` adds, as counts and never pooled (D34): per cell `within_one` (scores within one point of the lower-middle median); per stratum
+`agreement {cells, cells_all_within_one}`, `evidence {seen, told, recalled}` and, once a deliberation was answered, `shift {moved_up,
+moved_down, held, toward_first_median, away_from_first_median, cells}` (per cell and persona `{before, after, step}`, `step` the change in
+anchors at or below the score); and at the top `panel_match [{run, term, tag, stake, asked, seated, answered}]` and `cost {per_juror,
+reported_total, jurors_reporting, estimate}` (each juror's own reported numbers, nothing divided). No key is a mean, an average, a share,
+a rate, a percent or a probability. `summary` writes them as fixed sentences after the blockers ("Primary jurors agree within one anchor
+on 21 of 21 scores; ...", "Of 147 verdict lines, ...", after a deliberation "After deliberation, ... moved toward the group's first
+median."), a `panel:` line under the numbers table, and ends with `cost:` lines (a line per run and per seat only when verdicts reported
+usage; `cost: reported — (estimate N)` when none did).
+
+### Decision juries
+A subject of kind `decision` is a `questions.md` (`## Q<n> <question>`, then `- option` lines, at least two each; `invalid_questions`
+otherwise) plus the files a point of view is read from (rules, decisions, reports), all attached. Brief it under the shipped `decide`
+lens (one dimension, `confidence`; a lens that asks no pick is refused). A verdict carries lines `about: "Q<n>"` and `picks`, one
+`{about, choice, reason}` per question with the option verbatim (`question_pick_invalid`). `pick RUN` answers `questions`, each with its
+strata and choices; `summary` shows each question's picks per stratum and a `Needs a person:` list. A question needs a person when its
+text or options fall in a human class (public price, public words, legal, spending, irreversible: the keyword lists in
+`domain/decision.rs`), when its sources fall under a human rule of `personajury.toml`, or when the jurors of one stratum split on it
+and it is about money or trust. `apply-check` answers `human` for those (reason `human_class`, `via` `question`, `picks` or `sources`).
+
+### Starter config
+`personajury init` writes `personajury.toml` when the project has none: `internals` (`crates/**`, `migrations/**`, `tools/**`,
+`.github/**`, `router/rules/**`, `scripts/**`, `tests/**`) at quorum `none`, a `surface` class (`screens/**`, `pages/**`, `docs/**`) at
+quorum `low` naming a panel `default` you create, and the human classes as commented examples. It is a starting point; `setup --apply`
+writes it too and neither ever overwrites an existing file.

@@ -527,3 +527,78 @@ the engine added (I1); under a rule, `--seats auto` replaces the rule's panel wi
 subject's audience the same way every time; what else the caller changes (lenses, effort, traits, spend) is an override as before
 (I5). A rule may therefore leave its panel to `--seats auto`; the guard is `apply-check`'s `thin_primary` (D13): a primary stratum
 of fewer than two judged seats advises.
+
+## D32 — options by subject kind (2026-10-24, the maintainer, adopter feedback)
+*Built in v0.6-C. Reference: [`commands.md`](commands.md), Options by kind.*
+What a juror may score `about` and `pick` was the subject's attachment labels plus `cmp:<name>`, so a juror briefed on a page "picked"
+`pricing.png`. `brief --options subject|attachments` (MCP `options`) fixes it: by default `design` and `logo` give `attachments` (each
+board is a candidate) and every other kind gives `subject` (the options are the subject's name and each `cmp:<name>`). Ingest normalises
+a line `about: "<subject name>"` to `about: null` before validation, so cells stay keyed as they always were, and a verdict with both
+forms on one dimension is `duplicate_dimension`; a `pick.choice` of the subject name is valid. The mode is stored on the run
+(`run.options_mode`, a column added on open like the other v5 columns); a run with none (made before v0.6) validates as `attachments`,
+so old stores keep working. An unknown word is `invalid_options_mode`. **The fixture and the pinned hash stay byte-identical because they
+pass `--options attachments`**: the recorded verdicts score `about: pricing.png`, and the option list text is identical in that mode, so
+`fixtures/run/setup.sh`, `tests/fixture_replay.rs` (and the other helpers that rebuild the fixture jury) and
+`compare_brief_unchanged_by_about_scope` carry that flag and a comment that they were recorded before D32; `COMPARE_BRIEF_SHA256` is not
+re-recorded. What would change it: a regenerated fixture jury whose verdicts score `about: lantern-site`. The `a-technical-decision`
+playbook, whose options are files, now says `--options attachments` in its command; `pick-a-name-or-logo` is a `design` subject and
+is unchanged. A decision subject (D37) takes the third word, `questions`, and refuses `--options`.
+
+## D33 — deliberation: one advise-only round (2026-10-24, the maintainer)
+*Built in v0.6-C. Reference: [`commands.md`](commands.md), Deliberation.*
+A second round in which each juror reads what the others saw and may change its verdict. It breaks independence by design, so it only
+advises: it exists to measure persuasion, not to reach a verdict. `personajury deliberate RUN` (MCP `personajury_deliberate`) is
+refused unless every briefed seat has an accepted initial verdict (`incomplete_jury_for_deliberation`) and runs once (`already_deliberated`;
+one round in v0.6). It writes one deterministic file per seat: the persona, stake and (when the run renders traits) trait blocks as in the
+brief, the juror's own first verdict, and the others' lines as "Juror 1 (stratum)", "Juror 2 (stratum)" in persona-id order with no
+name, no model, no citation, so a juror cannot weigh a colleague by who it is. The answer is a verdict with `"phase": "deliberated"`,
+ingested with `verdict --deliberated` (`deliberated_without_phase`, `phase_without_flag`, `no_deliberation`,
+`deliberated_without_initial`); the evidence refusals are those of any verdict, and a score changed because of another juror is `told`
+unless the juror cites what it saw itself. It is a new batch with `verdict.phase = 'deliberated'` (a column; a `deliberation` table
+holds the files). The latest **initial** batch is what every read uses by default (`matrix`, `pick`, `summary`, `delta`, `graph`,
+`calibrate`, `apply-check`); `--phase deliberated` reads the other batch and `matrix --phase both` answers both under `phases`.
+`check --history` lists each batch with its phase. `apply-check` answers at most `advise` for a run with a deliberated verdict (reason
+`deliberated`); `escalate` and `human` take precedence. Rejected: letting a deliberated batch replace the first (it would turn a
+measure of persuasion into the verdict) and several rounds (a second round measures the first round's anchoring).
+
+## D34 — the honest metrics: counts per stratum, never pooled, never a mean (2026-10-24, the maintainer)
+*Built in v0.6-C. Source: the metrics note, 2026-10-24. Reference: [`commands.md`](commands.md), The counted metrics.*
+Adopted, as counts inside a stratum: **agreement** (per cell `within_one`, the scores within one point of the lower-middle median;
+per stratum `agreement {cells, cells_all_within_one}`); **persuasion shift** (once a deliberation was answered: per cell and persona
+`{before, after, step}`, and `moved_up`, `moved_down`, `held`, `toward_first_median`, `away_from_first_median`, direction by the score,
+`step` in anchors at or below the score, the first median being the initial batch's); **evidence totals** (`seen`, `told`, `recalled`
+summed over a stratum's cells); **panel match** (per panel term: `asked`, `seated`, `answered`, from the terms the run was seated from,
+now recorded on the run as `panel_terms_json`); **cost** (each juror's own reported tokens listed, their sum, how many jurors reported,
+the estimate; nothing divided; the summary ends with a `cost:` line, a dash where nothing was reported). No key anywhere is named
+`mean`, `average`, `share`, `rate`, `percent` or `probability` (a test walks the JSON). `summary` writes them as fixed sentences after
+the blockers and before the table, a `panel:` line under the table and the `cost:` line last. **The goldens moved, additively**:
+`fixtures/run/summary.txt` and `summary.md` gained lines only (`diff <(git show HEAD:fixtures/run/summary.txt) fixtures/run/summary.txt |
+grep -c '^<'` is 0), `matrix.json` gained `within_one`, `agreement` and a stratum `evidence` and is otherwise the previous file
+(`jq -S 'del(.. | .within_one?, .agreement?, .evidence?)'` of the new file equals the previous with `.evidence?` deleted, the per-cell
+`evidence` existing since v0.5); `briefs.json`, `picks.json` and `matrix.md` did not change (a `--table` carries no new footer, so the
+recorded table and its `ends_with` legend test stand; the footers live in the summary). The summary's line budget went from about thirty
+to thirty-four for the four new sentences and lines. **Rejected**: win probability, average damages, pooled indexes, emotion signals
+and simulated-time curves. A guessed number has no evidence behind it, and a pooled one breaks the strata law.
+
+## D37 — decision juries (2026-10-24, the maintainer, adopter feedback from a build terminal)
+*Built in v0.6-C. Numbered D37 because lane B holds D35 and D36. Reference: [`commands.md`](commands.md), Decision juries.*
+The adopter replaced owner questions with a small jury: a list of questions plus the owner's point of view written in files, three
+personas, and "still needs the human" for the questions that are the owner's. The walk-centred design did not cover it. A subject of
+kind `decision` is a `questions.md` (`## Q<n> <question>`, `- option` lines; `invalid_questions`) plus the point-of-view files, the shipped
+lens `decide` (one dimension, `confidence`, `asks_pick`) is the fifth in every store, lines are `about: "Q<n>"` and `picks` holds one
+`{about, choice, reason}` per question from that question's own options (`question_pick_invalid`; the `pick` table gained `about`).
+`pick` and `summary` show each question's picks per stratum. **The escalation rule is code, not judgement**: a question needs a person when its text or
+options fall in one of five classes (public price, public words, legal, spending, irreversible or outward; whole-word lists in
+`domain/decision.rs`), when the point-of-view files fall under a human rule of `personajury.toml`, or when the jurors of one stratum split
+on it and it is about money or trust; the summary lists them and `apply-check` answers `human` (reason `human_class`, `via` `question`,
+`picks` or `sources`). The lists are a first cut and miss words; a miss is a question the jury answers and a person still reads, and a
+false hit costs a person a minute, so the lists lean wide.
+
+## D38 — the starter config and cost by default (2026-10-24, the maintainer, adopter feedback)
+*Built in v0.6-C.*
+`personajury init` and `setup --apply` write a commented `personajury.toml` when the project has none, never over one: the code paths
+(`crates/**`, `migrations/**`, `tools/**`, `.github/**`, `router/rules/**`, `scripts/**`, `tests/**`) at quorum `none` ("no jury"), a
+`surface` class for `screens/**`, `pages/**` and `docs/**` ("a jury, surface class": the adopter made surfaces the critical class), and
+the human classes as comments. It is a starting point, said so in its first line; setup reports it under `project_config`. **Cost by
+default**: `summary` always ends with a cost line (estimate and reported tokens per run and per seat; reported only when verdicts carry
+usage), the adopter tracking a weekly budget. No new dependency.

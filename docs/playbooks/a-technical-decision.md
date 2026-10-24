@@ -1,5 +1,7 @@
 # Choose between three libraries (or two API shapes)
 
+> D32 (options by kind): the playbook's behaviour is unchanged, and it says so in the command: a `document` subject now defaults to the subject itself as its one option, so this playbook, whose options are the files, briefs with `--options attachments`. For a set of questions to settle from a point of view written in files, see the decision jury in `docs/commands.md`.
+
 **The job:** the team must pick a queue library, or decide between two shapes for a public API. A benchmark cannot settle it,
 and everyone has a favourite. A jury will not tell you which one is correct; it tells you who is comfortable with which
 trade-off, and where they disagree.
@@ -27,7 +29,7 @@ personajury subject add queue-choice --kind document --attach option-a.md option
 
 Briefed with the tradeoffs lens, each juror scores every option on five dimensions (a line per option with `about`) and picks one.
 ```
-personajury brief --subject queue-choice --panel tech-choice --lens tradeoffs --model <model>
+personajury brief --subject queue-choice --panel tech-choice --lens tradeoffs --options attachments --model <model>
 ```
 
 ## 3. Read the disagreement

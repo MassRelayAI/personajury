@@ -52,16 +52,17 @@ across changed anchors says nothing about the subject. To use a changed lens, bu
 | `taste` | look, type, motion, voice | against the project's `standard`, or the persona's own taste if empty |
 | `compare` | clarity, price, trust | `asks_pick`; against comparators held as snapshots |
 | `recall` | first-read, would-return | `recalled` only; a cheap first impression from memory |
+| `decide` | confidence | `asks_pick`; for a decision jury: a pick per question, how sure the sources let the juror be |
 
-All four are 1 to 5 and are present in every new store.
+All five are 1 to 5 and are present in every new store.
 
 ## A fixture lens: `site`
 `fixtures/lenses/site.toml` is a 1 to 10 `site` lens, kept as fixture data to show a different scale. It is **not seeded**:
 load it yourself with `personajury lens add --file fixtures/lenses/site.toml`. It exists for the held-out check on the fixture
-site and for tests, not as a fifth shipped lens.
+site and for tests, not as a sixth shipped lens.
 
 ## Proposing a lens
-Open a feature request with the file, the question it asks that the four above do not, and one run that shows it separates
+Open a feature request with the file, the question it asks that the five above do not, and one run that shows it separates
 good from bad (`GOVERNANCE.md`). A contributed lens has anchors in words at every anchor score, a public and citable
 `standard` if it measures against one, and a new version on every anchor change. A lens that only renames a shipped dimension
 is declined.

@@ -2,6 +2,8 @@
 
 # Pick a name or a logo
 
+> D32 (options by kind): this playbook's subject is a `design` (or a `logo`), whose attachments are the candidates, so its behaviour is unchanged. A subject of another kind, a `page` say, has itself as its option unless you pass `--options attachments`.
+
 When you have a few candidates and must choose one, ask for a **forced pick**. Each persona scores every candidate, then
 names one, with a reason. You read the picks per group.
 

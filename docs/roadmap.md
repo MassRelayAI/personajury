@@ -25,7 +25,7 @@ Calibration (D20), CSV cell locators (D21), the GitHub Action (D22), the Claude 
 ## v0.6 (in progress, three lanes)
 - **A, traits as data (D29 to D31):** the trait catalog and sets, schema v5, the persona `traits` key, `brief --traits`, panels with
   cover and quotas, slices and `summary --slice`, `--seats auto`. Built.
-- **C, options, deliberation and honest metrics:** not built here.
+- **C, options, deliberation and honest metrics (D32 to D34), and the adopter asks (D37, D38):** options by subject kind, the advise-only `deliberate` round, the counted metrics in `matrix` and `summary`, decision juries with the `decide` lens, the starter `personajury.toml`, cost by default. Built.
 - **B, traits proven (calibrate per trait, `trait observed`):** not built here.
 
 ## After v0.5 (what is left)

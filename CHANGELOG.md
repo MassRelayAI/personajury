@@ -25,6 +25,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `brief --seats auto`, persona `serves`, `subject add --audience`: the personas that serve the audience plus one control.
 - The MCP tool `personajury_trait_list`; `traits`, `seats` on brief, `slice` on matrix and summary.
 
+### Added (v0.6-C, D32-D34, D37, D38)
+- `brief --options subject|attachments`: what a juror may score `about` and pick, by subject kind (D32); `about: "<subject name>"` is the
+  whole subject; `invalid_options_mode`; the fixture and the pinned compare-brief test pass `--options attachments`.
+- `personajury deliberate RUN`, `verdict --deliberated`, `verdict.phase`, `matrix --phase initial|deliberated|both`, `--phase` on
+  `delta`, `graph` and `calibrate`, `check --history` batches with their phase, and the `apply-check` reason `deliberated` (D33). The
+  MCP tool `personajury_deliberate` (ten tools now).
+- The counted metrics: `within_one`, `agreement`, `evidence`, `shift` per stratum, `panel_match` and `cost` in `matrix`, and their
+  sentences, a `panel:` line and a closing `cost:` line in `summary`; the fixture goldens `summary.txt`, `summary.md` and `matrix.json`
+  gained lines and keys, nothing else (D34).
+- Decision juries: subject kind `decision` (a `questions.md` and point-of-view files), the shipped `decide` lens, `picks` per question,
+  the "Needs a person" list and `human` from `apply-check` (D37).
+- `personajury init` and `setup` write a commented starter `personajury.toml` (D38).
+
 ## [0.5.1] - 2026-10-24
 ### Added
 - The fairness rules in the skills (short rules with a one-line reason each) and the naming guidance in

@@ -115,7 +115,9 @@ In the fixture run two of seven did exactly that; both were re-run.
 
 `about` names the option a line scores, and the score is that option's own. A line without `about` scores the subject
 (under `compare`: the subject against the comparators). Never put a comparator in `about` to score the subject against it.
-`about` is optional: one of the subject's attachment labels or `cmp:<name>`, and there is one line per (dimension, `about`);
+`about` names the subject by its name or a comparator (`cmp:<name>`); attachment labels are options only for a design or logo subject
+(`brief --options attachments` makes them options for any kind). `about: "<subject name>"` is stored as the whole subject.
+`about` is optional, and there is one line per (dimension, `about`);
 every lens dimension needs at least one line, which is how a persona picks one option and scores all. `pick` only when the
 lens asks for one. Citations are `<label>[#locator]` or `cmp:<name>/<label>[#locator]`. Run
 personas in parallel; Sonnet per persona is enough.
@@ -159,6 +161,26 @@ personajury check            # stale runs (the subject moved) and findings with 
 A dismissed point (same persona, same dimension, same citation hash; an uncited one is matched by its finding id) cannot
 return without new evidence. `check` also lists `fixed_unverified`: findings marked fixed that no later run of the same lens has judged with the persona who raised them. A fixed finding raised again is unresolved (`fix_not_landed`). `delta` lands only when every cell of the earlier run is judged again, no stratum's blockers rose, blockers went down (or stayed at zero) and no dimension fell by more than one anchor.
 
+## 5b. Deliberate (optional, advise-only)
+```
+personajury deliberate <run>                              # a file per seat: its own first verdict and the others', anonymised
+personajury verdict --run <run> --file v.json --deliberated   # the answer, "phase": "deliberated"
+```
+Run it only to learn how persuadable the jury was: how many scores moved, which way, toward or away from the group's first median
+(`matrix` shows `shift`, `summary` says it in one sentence). Never use it to change the verdict: the jurors read each other, so the run
+now answers at most `advise` (`deliberated`) and every table you show is the initial batch unless you pass `--phase deliberated`. One
+round per run; give each seat's file to a fresh subagent, as in step 2.
+
+## 5c. A decision jury (questions, not a surface)
+When the thing to settle is a list of questions and a point of view written in files, not a page: write `questions.md`
+(`## Q1 <question>` then one `- option` line per option, at least two), attach it with the files the view is read from
+(`subject add d --kind decision --attach questions.md rules.md decisions.md`), seat the personas (`--seats auto` with an `--audience`,
+or a panel), and `brief --subject d --lens decide ...`. Each juror answers every question: lines `about: "Q1"` and one `picks` entry
+per question (`{about, choice, reason}`, the option verbatim). `pick` and `summary` show each question's picks per stratum and a
+"Needs a person" list: a question about a public price or words, legal, spending or something irreversible, one whose sources fall
+under a human rule, or one the jurors split on over money or trust. `apply-check` answers `human` for those; the jury advises on
+them, a person decides.
+
 ## 6. Next round
 After the fixes, attach the changed subject, `brief` again, ingest, then:
 ```
@@ -198,7 +220,7 @@ The last step of every run: paste the `text` it returns to the person **as it is
 `Next:`), and offer the `--html` file (one offline page with the jury graph and every per-stratum table). Show it in chat first, then
 offer to save it as markdown (`--md`). When `personajury.toml` sets `report_dir = "docs/juries"`, save without asking: `--save` writes
 `<report_dir>/<date>-<subject>.md`. Without a `report_dir`, `--save` is refused (`no_report_dir`) and nothing is written; a `report_dir`
-outside the project root is refused (`invalid_report_dir`). The MCP tool `personajury_summary` returns the same text, and writes `md` or
+outside the project root is refused (`invalid_report_dir`). The text now also carries the counted metrics: how many scores each stratum's jurors agree on within one anchor, how many verdict lines were seen, told and recalled, a `panel:` line (asked, seated and answered per term), and, last, a `cost:` line (what the verdicts reported, beside the estimate; a dash when nothing was reported). Paste them as they are. The MCP tool `personajury_summary` returns the same text, and writes `md` or
 `html` only at a relative path inside the project root.
 
 ## Display is free, the verdict is not

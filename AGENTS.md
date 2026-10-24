@@ -13,7 +13,7 @@ crates/personajury/src/
   application/  one module per verb: persona, panel, lens, subject, brief, verdict, matrix, pick, delta, check, decide,
                 should-run, apply-check, setup, doctor
   adapters/     cli (clap, one-shot), mcp (stdio), the envelope - thin
-lenses/   the four shipped lenses as data      skills/  the agent's method      fixtures/  the fixture site and its recorded run
+lenses/   the five shipped lenses as data      skills/  the agent's method      fixtures/  the fixture site and its recorded run
 docs/     plans, decisions, reports, quickstart
 ```
 A module never imports outward. `domain` has no I/O; `adapters` are thin.

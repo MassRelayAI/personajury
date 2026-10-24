@@ -28,6 +28,9 @@ Read `error.code` in the envelope (`--pretty`). Codes are the contract in the pl
 | `human_decision_required` | `decide` on a finding a human batch (`verdict --by-human`) raised, without `--by-human` | a person decides it: `decide <finding> ... --by-human "<name>"`; the agent and the foreman never do |
 | `invalid_query`, `invalid_config` | a panel query or a `personajury.toml` is malformed | fix the text; the message says where |
 | `check_failed` | `check` found findings with no decision (exit 1); `data.unresolved` lists them, a fixed finding raised again is listed with `fix_not_landed`; `fixed_unverified` lists fixes no later run of that lens and persona has judged | `personajury decide` each; run the next round |
+| `chat_answer_incomplete` | `verdict --from-chat`: some jurors of the saved chat answer were refused or are missing (exit 1); the others are ingested; `data` lists `ingested`, `refused` and `missing` | ask the chat again for the named jurors only (`### <persona-id>` and one json block each), save that reply and run the verb again |
+| `chat_block_malformed` | a juror's part of a chat answer has no json block, two, an unclosed one, text that is not json, or a second heading | one heading and one ```` ```json ```` block per juror |
+| `chat_block_persona_mismatch` | the block under `### ana` names another persona | each juror's block sits under its own heading |
 
 Never edit a verdict's evidence, citation or score by hand to make it pass.
 

@@ -3,12 +3,14 @@
 pub mod apply_check;
 pub mod brief;
 pub mod calibrate;
+pub mod chat;
 pub mod check;
 pub mod decide;
 pub mod decision;
 pub mod deliberate;
 pub mod delta;
 pub mod doctor;
+pub mod export;
 pub mod graph;
 pub mod init;
 pub mod lens;
@@ -41,6 +43,9 @@ pub enum AppError {
     /// a gate that failed with data to show (check: unresolved findings)
     #[error("{0}")]
     CheckFailed(String, Value),
+    /// a chat answer some of whose jurors were refused or are missing; the data lists `ingested`, `refused`, `missing` (D41)
+    #[error("{0}")]
+    ChatIncomplete(String, Value),
     #[error("{0}: {1}")]
     Io(PathBuf, std::io::Error),
     #[error("summary --save needs report_dir in personajury.toml (for example report_dir = \"docs/juries\"); nothing is written by default")]
@@ -64,6 +69,7 @@ impl AppError {
             AppError::NotFound(_) => "not_found",
             AppError::InvalidArguments(_) => "invalid_arguments",
             AppError::CheckFailed(..) => "check_failed",
+            AppError::ChatIncomplete(..) => "chat_answer_incomplete",
             AppError::Io(..) => "io_error",
             AppError::NotImplemented(_) => "not_implemented",
             AppError::NoReportDir => "no_report_dir",
@@ -74,7 +80,7 @@ impl AppError {
     /// Data carried by a failing gate, shown in the envelope beside the error.
     pub fn data(&self) -> Option<Value> {
         match self {
-            AppError::CheckFailed(_, v) => Some(v.clone()),
+            AppError::CheckFailed(_, v) | AppError::ChatIncomplete(_, v) => Some(v.clone()),
             AppError::Refused(r) => r.data(),
             _ => None,
         }

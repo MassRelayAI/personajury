@@ -12,3 +12,4 @@
 *.png binary
 # Lock file: do not show in diffs by default.
 Cargo.lock -diff
+fixtures/run/export.csv -text

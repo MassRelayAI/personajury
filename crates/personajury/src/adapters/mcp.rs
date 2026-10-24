@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Twelve tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Thirteen tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -123,6 +123,15 @@ pub fn tools() -> Vec<Value> {
                         "width": {"type":"integer","minimum":30,"maximum":200,"description":"characters per line, default 80"},
                         "md": {"type":"string","description":"write the markdown summary here: a relative path inside the project root"},
                         "html": {"type":"string","description":"write the self-contained html here: a relative path inside the project root"} }),
+                &["runs"],
+            ),
+        ),
+        tool(
+            "personajury_export",
+            "The raw verdict rows of runs, one per verdict line, as ndjson in data.ndjson: run, subject, subject_version, lens, lens_version, persona, stratum, model, dimension, about, score, anchor_met, evidence, citations, blockers (a count), phase, by_human, the persona's traits as trait.<id> keys and its sensitive labels (D39). Never a pooled or derived number: the rows are the stored facts, in a fixed order (run, stratum, persona, lens, dimension, about), the jury's first word by default. At most 10,000 rows ride in the answer; past that data.truncated is true and data.rows still says the total (use the CLI, which has csv and no cap). Reads only.",
+            schema(
+                json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1,"description":"the run ids; each is exported once"},
+                        "phase": {"type":"string","enum":["initial","deliberated","all"],"description":"initial (default): the jury's first word; deliberated: the advise-only round; all: both, each row labelled" } }),
                 &["runs"],
             ),
         ),
@@ -278,6 +287,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "personajury_matrix" => &["runs", "table", "history", "detail", "slice", "phase"],
         "personajury_delta" => &["a", "b"],
         "personajury_graph" => &["runs"],
+        "personajury_export" => &["runs", "phase"],
         "personajury_apply_check" => &["runs", "rule", "calibration"],
         "personajury_summary" => &["runs", "width", "md", "html", "slice"],
         "personajury_should_run" => &["diff", "paths", "config", "subject"],
@@ -327,6 +337,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             traits: str_arg(a, "traits")?,
             seats: str_arg(a, "seats")?,
             options: str_arg(a, "options")?,
+            chat_pack: None,
             wave: match a.get("wave") {
                 None | Some(Value::Null) => None,
                 Some(v) => match v.as_u64() {
@@ -345,6 +356,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                     by_human: None,
                     traits: None,
                     deliberated: bool_arg(a, "deliberated")?,
+                    from_chat: None,
                 },
                 None | Some(Value::Null) => return Err("missing required argument verdict".into()),
                 Some(_) => return Err("verdict must be an object".into()),
@@ -371,6 +383,13 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                     _ => return Err("wave must be an integer >= 1".into()),
                 },
             },
+        },
+        "personajury_export" => Cmd::Export {
+            runs: runs_arg(a)?,
+            format: "ndjson".into(),
+            out: None,
+            phase: str_arg(a, "phase")?.unwrap_or_else(|| "initial".into()),
+            capped: true,
         },
         "personajury_graph" => Cmd::Graph {
             runs: runs_arg(a)?,

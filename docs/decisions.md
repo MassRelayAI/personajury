@@ -757,3 +757,41 @@ that names an age, a gender or a religion is a study design, and refusing the wo
 - **The other fix-round rulings stand.** A `suggest --check` quote is at least 3 words and 12 characters and stands verbatim inside one
   prose field (`quote_too_short`, `quote_not_found`, which replaces `quote_not_in_prose`); `label_echo` reads only the traits the brief
   rendered (none when the run rendered none); the three-juror rule and the initial-batch filter of `trait observed` are held by tests.
+
+## D40 — export: the raw rows, nothing derived (2026-10-24, the maintainer: "export feature is cheap as well")
+*Built in v0.6-E. Reference: [`commands.md`](commands.md), [`usage.md`](usage.md#export).*
+`personajury export RUN... [--format csv|ndjson] [--out F] [--phase initial|deliberated|all]` prints one row per verdict line, as stored:
+run, subject and version, lens and version, persona, stratum, model, dimension, `about`, score, `anchor_met`, evidence, citations,
+the number of blockers, phase, `by_human`, the persona's traits (`trait.<id>`) and its `sensitive` labels (D39). Decided:
+- **No pooled or derived number, ever.** The export is the way out of the strata-never-averaged rule for people who want a spreadsheet,
+  so it adds nothing to compute with: a mean, a rank or a share is the reader's, per stratum, from the rows. A test fails on a column
+  named like one.
+- **The default phase is `initial`**, as in every verb: the jury's independent word. `deliberated` and `all` are asked for; every row
+  names its phase, and inside a cell the initial row comes first. Only the latest batch of each persona per phase is exported (the
+  history stays in `matrix --history`). A person's rows (`--by-human`) are included with `by_human` set, their declared traits and no model.
+- **A fixed order**: run, stratum (primary, secondary, bystander), persona, lens, dimension, `about`, then phase. The runs may be
+  given in any order and twice; the same store gives the same bytes. Golden files `fixtures/run/export.ndjson` and `export.csv`
+  (`.gitattributes`: `export.csv -text`, because RFC 4180 ends records with CRLF).
+- **Shapes.** ndjson keys are in the column order with `trait.<id>` only for traits the persona holds; csv is RFC 4180 with the union of
+  trait ids, sorted, as columns (empty where absent) and `;` joining citations, list values and labels.
+- **CLI prints rows, not an envelope** when `--out` is not given (a pipeline reads it; a refusal is still an envelope and exit 1);
+  with `--out` it writes the file and answers `{format, rows, out}`.
+- **MCP**: `personajury_export` (thirteen tools now) takes `runs` and `phase`, answers the ndjson in `data.ndjson` with `rows` (the
+  total) and `truncated`, capped at 10,000 rows (`MCP_ROW_CAP`); the CLI has no cap.
+No new dependency, no schema change.
+
+## D41 — the chat pack: a jury in one file for a web chat (2026-10-24, the maintainer)
+*Built in v0.6-E. Reference: [`usage.md`](usage.md#web-chat).*
+A web chat has no subagents, so the manual route (one brief per chat, one verdict file per juror) was tedious enough to go unused.
+- `brief ... --chat-pack F` also writes one markdown file: an instruction block (answer each juror separately; a heading
+  `### <persona-id>` and one fenced json block per juror; the `--from-chat` line) and then every brief in the answer's order. It records
+  the run `independence = sequential` by itself (so it only advises, D18); `--independence independent` is refused, and so are two
+  lenses, before any run is made (a chat answer names a juror once). CLI only.
+- `verdict --run N --from-chat F` reads a saved answer: `### <persona-id>` (the first word, emphasis and backticks tolerated; headings
+  that name no persona of the run are prose, and a fence hides its inside) and the json block under it, and ingests each through the
+  ordinary `verdict` path: every refusal of the standard applies. Jurors are taken in the run's order. A block that is not json, is
+  missing, doubled, or sits under another persona's heading (`chat_block_malformed`, `chat_block_persona_mismatch`), or that the checks
+  refuse (its own code), is **named** under `refused` and the others still land; a juror absent from the answer is under `missing`. Any
+  of those makes the verb exit 1 with `chat_answer_incomplete` carrying the same lists, so a partial ingest is never a silent success.
+  An answer with no juror at all is `invalid_arguments`. Not combined with `--by-human`, `--traits`, `--deliberated`.
+- The engine reads a file; it calls no model and no network. No new dependency, no schema change.

@@ -118,15 +118,21 @@ pub enum Cmd {
         /// files and each comparator); default by kind: design and logo attachments, every other kind subject
         #[arg(long)]
         options: Option<String>,
+        /// also write ONE markdown file for a web chat: how to answer, then every brief; the run is sequential (D41)
+        #[arg(long)]
+        chat_pack: Option<PathBuf>,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
         #[arg(long)]
         run: i64,
-        #[arg(long, conflicts_with = "json")]
+        #[arg(long, conflicts_with_all = ["json", "from_chat"])]
         file: Option<PathBuf>,
-        #[arg(long)]
+        #[arg(long, conflicts_with = "from_chat")]
         json: Option<String>,
+        /// a saved chat answer (`### <persona-id>` and a json block per juror): each block is ingested as that persona's verdict (D41)
+        #[arg(long, conflicts_with_all = ["by_human", "traits", "deliberated"])]
+        from_chat: Option<PathBuf>,
         /// a person entered this verdict: "<name>, <credential>". The file's persona is the seat whose stratum the
         /// person speaks in; the rows stand beside the jury's, never in its cells. Only a person enters one.
         #[arg(long)]
@@ -168,6 +174,23 @@ pub enum Cmd {
     },
     /// The forced choices of a run, per stratum, with reasons
     Pick { run: i64 },
+    /// Raw verdict rows, one per line, as ndjson (default, to stdout) or csv: no pooled or derived number (D40)
+    Export {
+        #[arg(required = true)]
+        runs: Vec<i64>,
+        /// ndjson (default) or csv
+        #[arg(long, default_value = "ndjson")]
+        format: String,
+        /// write the rows to this file and answer an envelope, instead of printing them
+        #[arg(long)]
+        out: Option<PathBuf>,
+        /// initial (default: the jury's first word), deliberated or all
+        #[arg(long, default_value = "initial")]
+        phase: String,
+        /// set by the MCP adapter: the rows ride in the envelope, cut at 10,000
+        #[arg(skip)]
+        capped: bool,
+    },
     /// Draw the jury as one static SVG: personas by stake, the dimensions they scored, the findings; several runs draw each finding's life
     Graph {
         #[arg(required = true)]
@@ -483,6 +506,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Matrix { .. } => "matrix",
         Cmd::Graph { .. } => "graph",
         Cmd::Pick { .. } => "pick",
+        Cmd::Export { .. } => "export",
         Cmd::Delta { .. } => "delta",
         Cmd::Check { .. } => "check",
         Cmd::ApplyCheck { .. } => "apply-check",
@@ -573,34 +597,56 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             app::subject::add(root, name, kind(k)?, attach, true, audience)
         }
         Cmd::Brief {
-            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats, options,
-        } => app::brief::compose(
-            root,
-            &app::brief::BriefArgs {
-                subject: subject.clone(),
-                panel: panel.clone(),
-                query: query.clone(),
-                lenses: lens.clone(),
-                spend: *spend,
-                stakes: parse_stakes(stakes)?,
-                model: model.clone(),
-                comparators: comparators.clone(),
-                detail: d.as_deref().map(detail).transpose()?,
-                rule: rule.clone(),
-                draw: draw.clone(),
-                allow_large: *allow_large,
-                reason: reason.clone(),
-                by: by.clone(),
-                wave: *wave,
-                effort: effort.as_deref().map(parse_effort).transpose()?,
-                independence: independence.as_deref().map(parse_independence).transpose()?.unwrap_or_default(),
-                traits: traits.clone(),
-                seats: seats.clone(),
-                options: options.clone(),
-            },
-        ),
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats, options, chat_pack,
+        } => {
+            // D41: one chat reads every brief, so the run is sequential; a lens per pack, checked before anything is made
+            let independence = independence.as_deref().map(parse_independence).transpose()?;
+            if chat_pack.is_some() {
+                if independence == Some(Independence::Independent) {
+                    return Err(AppError::InvalidArguments(
+                        "--chat-pack: one chat reads every brief, so the run is sequential; drop --independence independent".into(),
+                    ));
+                }
+                if lens.len() > 1 {
+                    return Err(AppError::InvalidArguments("--chat-pack takes one lens: a chat answer names a juror once".into()));
+                }
+            }
+            let mut out = app::brief::compose(
+                root,
+                &app::brief::BriefArgs {
+                    subject: subject.clone(),
+                    panel: panel.clone(),
+                    query: query.clone(),
+                    lenses: lens.clone(),
+                    spend: *spend,
+                    stakes: parse_stakes(stakes)?,
+                    model: model.clone(),
+                    comparators: comparators.clone(),
+                    detail: d.as_deref().map(detail).transpose()?,
+                    rule: rule.clone(),
+                    draw: draw.clone(),
+                    allow_large: *allow_large,
+                    reason: reason.clone(),
+                    by: by.clone(),
+                    wave: *wave,
+                    effort: effort.as_deref().map(parse_effort).transpose()?,
+                    independence: if chat_pack.is_some() { Independence::Sequential } else { independence.unwrap_or_default() },
+                    traits: traits.clone(),
+                    seats: seats.clone(),
+                    options: options.clone(),
+                },
+            )?;
+            if let Some(p) = chat_pack {
+                app::chat::write_pack(root, &out, p)?;
+                out["chat_pack"] = serde_json::json!(p.to_string_lossy());
+            }
+            Ok(out)
+        }
         Cmd::Deliberate { run, wave } => app::deliberate::run(root, *run, *wave),
-        Cmd::Verdict { run, file, json, by_human, traits, deliberated } => {
+        Cmd::Verdict { run, file, json, by_human, traits, deliberated, from_chat } => {
+            if let Some(f) = from_chat {
+                return app::chat::ingest(root, *run, f);
+            }
             let input = match (file, json) {
                 (Some(f), None) => app::read_text(f)?,
                 (None, Some(j)) => j.clone(),
@@ -620,6 +666,14 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
         }
         Cmd::Graph { runs, svg, out, phase, slice } => app::graph::show(root, runs, *svg, out.as_deref(), phase, slice.as_deref()),
         Cmd::Pick { run } => app::pick::show(root, *run),
+        Cmd::Export { runs, format, out, phase, capped } => app::export::show(
+            root,
+            runs,
+            format,
+            phase,
+            out.as_deref(),
+            capped.then_some(crate::domain::export::MCP_ROW_CAP),
+        ),
         Cmd::Delta { a, b, phase } => app::delta::show_phase(root, *a, *b, phase),
         Cmd::Check { history } => app::check::run(root, *history),
         Cmd::ApplyCheck { runs, latest, subject, rule, calibration } => {
@@ -684,6 +738,19 @@ pub fn run() -> i32 {
     if let Cmd::Doctor { bin, brief: true } = &cli.cmd {
         print!("{}", app::doctor::brief_lines(&cli.root, bin.as_deref()));
         return 0;
+    }
+    // `export` without --out prints the rows themselves (D40); a refusal is still an envelope
+    if let Cmd::Export { runs, format, out: None, phase, .. } = &cli.cmd {
+        match app::export::raw(&cli.root, runs, format, phase) {
+            Ok(text) => {
+                print!("{text}");
+                return 0;
+            }
+            Err(e) => {
+                println!("{}", Envelope::err("export", &e).to_json());
+                return 1;
+            }
+        }
     }
     let env = envelope_for(&cli);
     let json = env.to_json();

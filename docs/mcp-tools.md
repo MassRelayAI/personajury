@@ -1,7 +1,7 @@
 <!-- shape follows comparegraph docs/mcp-tools.md -->
 # MCP tools
 
-`personajury mcp` serves MCP over stdio. Twelve tools, each the same call as its CLI verb and answering with the same envelope
+`personajury mcp` serves MCP over stdio. Thirteen tools, each the same call as its CLI verb and answering with the same envelope
 (including the same refusals). Their arguments carry the CLI flags' names. This is the v0.1 contract in the plan; the server
 is built in plan Task 6.
 
@@ -11,6 +11,7 @@ is built in plan Task 6.
 | `personajury_verdict` | `verdict` | takes `run` and `verdict` as an object (lines carry `about`, as in [`usage.md`](usage.md)); a verdict without evidence is refused exactly as on the CLI; it may carry `usage {input_tokens, output_tokens}` (`invalid_usage`); `deliberated: true` ingests the advise-only round's batch (the verdict carries `"phase": "deliberated"`); a decision run's verdict carries `picks`, one per question |
 | `personajury_deliberate` | `deliberate` | `run` and `wave`; writes one deliberation file per seat (the seat's first verdict and the others', anonymised) and answers their paths, hashes and `waves`; advise-only, one round per run (`incomplete_jury_for_deliberation`, `already_deliberated`) |
 | `personajury_matrix` | `matrix` | takes `detail` (`compact` default, `full`) and `slice` (a trait id: `data.slices`, per stratum, counted) and `phase` (`initial`, `deliberated`, `both`); each stratum carries `agreement`, `evidence` and `shift`, the answer `panel_match` and `cost` (D34); scores per stratum and `usage {reported, estimate}` |
+| `personajury_export` | `export` | `runs` and `phase` (`initial` default, `deliberated`, `all`); answers the raw verdict rows as ndjson in `data.ndjson`, `data.rows` (the total) and `data.truncated` (true past 10,000 rows; the CLI has csv, `--out` and no cap); never a pooled or derived number; reads only (D40) |
 | `personajury_graph` | `graph` | `runs` (one or more runs of one subject); answers the SVG text in `data.svg`; reads only, writes no file |
 | `personajury_delta` | `delta` | two runs |
 | `personajury_apply_check` | `apply-check` | `runs`, `rule` and `calibration` (a file from `calibrate --out`); answers `apply`, `escalate`, `human` or `advise` with the reasons as data; reads only |
@@ -20,6 +21,6 @@ is built in plan Task 6.
 | `personajury_summary` | `summary` | `runs`, `width`, `slice` (one sentence per stratum on a trait), and optional `md` / `html` (relative paths inside the project root, else `invalid_report_dir`); answers the text in `data.text` (sentences, numbers for checking, Next); writes a file only when `md` or `html` is given |
 | `personajury_should_run` | `should-run` | classifies a diff, a list of paths or a subject's recorded source paths (`subject`) |
 
-There is no tool that enters a person's verdict (`--by-human`, and so no `--traits` of a person's own) or records a decision: a person does that. `trait generate`, `trait suggest` (the brief), `trait report`, `persona lint` and `calibrate` are CLI only. Everything else (adding personas, panels, lenses and subjects, `lens generate`, `pick`, `check`, `decide`) is CLI only. Register the
+There is no tool that enters a person's verdict (`--by-human`, and so no `--traits` of a person's own) or records a decision: a person does that. `trait generate`, `trait suggest` (the brief), `trait report`, `persona lint` and `calibrate` are CLI only, and so is the chat pack (`brief --chat-pack`, `verdict --from-chat`, D41). Everything else (adding personas, panels, lenses and subjects, `lens generate`, `pick`, `check`, `decide`) is CLI only. Register the
 server with `personajury setup --apply`; `personajury doctor` shows each client's registration. The engine makes no model call
 and no network call whichever way it is driven.

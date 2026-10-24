@@ -1,12 +1,14 @@
 //! The standard: personas, lenses, subjects, verdicts and the refusals. Pure, no I/O.
 pub mod apply;
 pub mod catalog;
+pub mod chat;
 pub mod cover;
 pub mod calibrate;
 pub mod citation;
 pub mod csv;
 pub mod decision;
 pub mod delta;
+pub mod export;
 pub mod graphlayout;
 pub mod hash;
 pub mod lint;

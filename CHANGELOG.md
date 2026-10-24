@@ -61,6 +61,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   the "Needs a person" list and `human` from `apply-check` (D37).
 - `personajury init` and `setup` write a starter `personajury.toml` (D38).
 
+### Added (v0.6-E, D40-D41)
+- `personajury export RUN... [--format csv|ndjson] [--out F] [--phase initial|deliberated|all]`: the verdict rows as stored (persona traits as
+  `trait.<id>`, `sensitive` labels, `by_human`), in a fixed order, RFC 4180 csv or ndjson, never a pooled or derived number; the MCP tool
+  `personajury_export` (thirteen tools now, capped at 10,000 rows with `truncated`) (D40).
+- The chat pack: `brief --chat-pack F` writes one markdown file for a web chat (instructions, then every brief; the run is `sequential`),
+  `verdict --run N --from-chat F` ingests a saved chat answer juror by juror through the normal checks, naming the refused and the
+  missing (`chat_answer_incomplete`, `chat_block_malformed`, `chat_block_persona_mismatch`); docs/usage.md "Web chat" (D41).
+- The release workflow attaches the four `.mcpb` bundles and their checksums (in `SHA256SUMS` and the attestation) when the bundle job runs;
+  `release` needs `build` and `bundle` and runs when the bundle job succeeded or was skipped. `ENABLE_MCPB=true` is set.
+
 ### Fixed (the v0.6-C review)
 - Once a run has a deliberation round, an initial verdict is refused (`initial_closed`) and `apply-check` advises with or without a
   deliberated verdict (D33).

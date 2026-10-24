@@ -108,15 +108,37 @@ it. Colour and layout reach the jury only through screenshots.
 ## Where it runs
 - **Claude Code, Codex, Cursor, Gemini CLI and the rest:** `personajury setup --apply`, or the plugin of your harness. Where the
   harness has subagents, one per brief is a strong jury.
-- **Claude Desktop:** drop a `.mcpb` bundle on the app and pick the project folder that holds `.personajury/`. The release does
-  not carry the bundles yet (they are opt-in in `release.yml`), so build one as below. Desktop has no subagents, so one context plays every juror: brief with `--independence sequential`.
+- **Claude Desktop:** drop a `.mcpb` bundle (attached to each release) on the app and pick the project folder that holds `.personajury/`.
+  Desktop has no subagents, so one context plays every juror: brief with `--independence sequential`, or use the chat pack below.
   Those runs advise and never apply. This route is unverified against Claude Desktop until a maintainer installs one by hand.
-  Build a bundle with `scripts/build-mcpb.sh <platform> <binary>`.
-- **The chat route (claude.ai, ChatGPT, any chat window):** no server, files only. Run `personajury brief` in a terminal, paste one
-  brief file per chat (one chat per brief keeps the jurors independent), have the chat answer with the verdict JSON, save it and run
-  `personajury verdict --run N --file v.json`. Many briefs in one chat is `--independence sequential`.
+  Build a bundle yourself with `scripts/build-mcpb.sh <platform> <binary>`.
+- **The chat route (claude.ai, ChatGPT, any chat window):** no server, files only; see [Web chat](#web-chat) below.
 - **CI and SDKs:** the JSON envelope over the CLI and MCP is the API; there is no stable Rust API and no runner in the tree. The
   composite GitHub Action is `action.yml` (see `ci.md`); the Claude Agent SDK recipe is `agent-sdk.md`.
+
+## Web chat
+A chat window has no subagents and no server. The chat pack puts a whole jury into one file:
+1. `personajury brief --subject S --panel P --lens critical --model M --chat-pack pack.md` composes the briefs as usual and also writes
+   `pack.md`: a short instruction block, then every brief in order. The run is recorded `independence = sequential` by itself, so it
+   only advises (a pack takes one lens; ask for `--independence independent` and it is refused).
+2. Paste `pack.md` into one chat. It plays each juror in turn and answers with a heading `### <persona-id>` and, under it, one fenced
+   ```` ```json ```` block per juror, in the shape the brief gives. Save the whole answer as a file.
+3. `personajury verdict --run N --from-chat answer.md` reads each heading and block and ingests it as that persona's verdict through
+   the normal checks (evidence, citations, anchors). The answer lists `ingested`; a juror whose block is malformed, sits under another
+   persona's heading or is refused for the usual reason is named under `refused` (`chat_block_malformed`,
+   `chat_block_persona_mismatch`, or the verdict's own code), a juror the chat left out under `missing`, and the others still land. Such an
+   answer ends with the error `chat_answer_incomplete` (exit 1) and the same data; paste the refusals to the chat, save its reply for those
+   jurors only and run the verb again.
+
+One chat reads all the briefs, so the jurors are not independent; one chat per brief with `verdict --file` keeps them separate.
+
+## Export
+`personajury export RUN... [--format csv|ndjson] [--out F] [--phase initial|deliberated|all]` prints the verdict rows as they are stored,
+one per verdict line, for a spreadsheet or a script (ndjson to stdout by default; the first word of the jury, `initial`, unless
+`--phase`). The columns are the run, subject and lens with their versions, persona, stratum, model, dimension, `about`, score,
+`anchor_met`, evidence, citations (a list; joined with `;` in csv), the number of blockers, phase, `by_human`, the persona's traits as
+`trait.<id>` columns and its `sensitive` labels. It never adds a pooled or derived number: any mean or rank is yours to compute, per
+stratum, from the rows (D40).
 
 ## Personas from a use-case table
 A table of jobs and triggers answers what the persona brief's first step asks for (roles, sectors, objections). The example
@@ -144,7 +166,7 @@ recorded; four things stay with a person.
 | persona count | the rule's seats, trimmed by effort | `--spend` above the rule; 13 to 1000 seats with `--allow-large` | above 1000 seats: nobody |
 | lens choice | any of the rule's lenses; the first under effort `low` | `--lens` that the rule does not name | |
 | dimensions and anchors | `lens generate` drafts them, you accept with `lens add` | editing a shipped lens's anchors (a new version) | an anchor set claimed as a named standard carries the expert's name in `standard` |
-| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence` | `--detail`, `--draw` and `--traits` under a rule | |
+| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence`, `--chat-pack` (a web chat; it implies sequential) | `--detail`, `--draw` and `--traits` under a rule | |
 | effort and tokens | effort at or below the toml's; `budget_tokens` trims | `--effort` above the toml's | |
 | quorum | you never set it; the rule's paths do; `--rule` names the rule (recorded on the run with its quorum) | a bigger jury than the rule asks; a rule below the sources' quorum (then `apply-check` advises, `rule_below_sources`) | lowering a quorum is a toml edit, a person's commit; a human class under a persona quorum is refused whoever edits |
 | findings | the foreman decides `fixed`, `dismissed` or `row` with `--by foreman` | a `dismissed` needs `--why` | a finding raised by a human batch is decided by a person (`decide --by-human`; a plain --by is refused, `human_decision_required`) |

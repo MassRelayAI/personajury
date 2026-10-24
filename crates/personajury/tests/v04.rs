@@ -1080,13 +1080,14 @@ fn the_three_example_lenses_are_accepted_by_lens_add() {
 
 /// (flag, column): `free` needs no reason, `reason` needs a recorded one. A flag added to `brief` without a row here, or
 /// without a cell in the table of the skill and `docs/usage.md`, turns this red.
-const DIAL: [(&str, &str); 20] = [
+const DIAL: [(&str, &str); 21] = [
     ("--subject", "free"),
     ("--options", "free"),
     ("--model", "free"),
     ("--comparator", "free"),
     ("--wave", "free"),
     ("--independence", "free"),
+    ("--chat-pack", "free"),
     ("--rule", "free"),
     ("--panel", "reason"),
     ("--query", "reason"),

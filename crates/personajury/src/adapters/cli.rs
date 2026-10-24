@@ -131,6 +131,16 @@ pub enum Cmd {
         /// person speaks in; the rows stand beside the jury's, never in its cells. Only a person enters one.
         #[arg(long)]
         by_human: Option<String>,
+        /// the advise-only round (D33): the file carries "phase": "deliberated"; needs `deliberate` first
+        #[arg(long)]
+        deliberated: bool,
+    },
+    /// One advise-only round after the first verdicts: each juror reads what the others saw and may change its verdict (measures persuasion, decides nothing)
+    Deliberate {
+        run: i64,
+        /// seats per wave in the answer's `waves` (default 30)
+        #[arg(long)]
+        wave: Option<usize>,
     },
     /// Scores per stratum for one or more runs; never averaged across strata
     Matrix {
@@ -149,6 +159,9 @@ pub enum Cmd {
         /// also group each stratum's scores by this trait's bands (counts per group, never a mean, never across strata)
         #[arg(long)]
         slice: Option<String>,
+        /// initial (default: the jury's first word), deliberated (the advise-only round) or both (under `phases`)
+        #[arg(long, default_value = "initial")]
+        phase: String,
     },
     /// The forced choices of a run, per stratum, with reasons
     Pick { run: i64 },
@@ -401,6 +414,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Comparator { .. } => "comparator add",
         Cmd::Brief { .. } => "brief",
         Cmd::Verdict { .. } => "verdict",
+        Cmd::Deliberate { .. } => "deliberate",
         Cmd::Matrix { .. } => "matrix",
         Cmd::Graph { .. } => "graph",
         Cmd::Pick { .. } => "pick",
@@ -510,16 +524,17 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                 options: options.clone(),
             },
         ),
-        Cmd::Verdict { run, file, json, by_human } => {
+        Cmd::Deliberate { run, wave } => app::deliberate::run(root, *run, *wave),
+        Cmd::Verdict { run, file, json, by_human, deliberated } => {
             let input = match (file, json) {
                 (Some(f), None) => app::read_text(f)?,
                 (None, Some(j)) => j.clone(),
                 _ => return Err(AppError::InvalidArguments("give the verdict as --file <path> or --json <text>".into())),
             };
-            app::verdict::ingest_by(root, *run, &input, by_human.as_deref())
+            app::verdict::ingest_with(root, *run, &input, by_human.as_deref(), *deliberated)
         }
-        Cmd::Matrix { runs, across_strata, history, table, detail: d, slice } => {
-            app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref())
+        Cmd::Matrix { runs, across_strata, history, table, detail: d, slice, phase } => {
+            app::matrix::show(root, runs, *across_strata, *history, *table, detail(d)?, slice.as_deref(), phase)
         }
         Cmd::Graph { runs, svg, out } => app::graph::show(root, runs, *svg, out.as_deref()),
         Cmd::Pick { run } => app::pick::show(root, *run),

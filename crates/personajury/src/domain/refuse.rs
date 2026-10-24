@@ -129,6 +129,18 @@ pub enum Refusal {
     AudienceUnknown { subject: String },
     #[error("--options {given:?}: the words are subject and attachments")]
     InvalidOptionsMode { given: String },
+    #[error("seats without an accepted initial verdict: {}; a deliberation needs the whole jury's first word", missing.join(", "))]
+    IncompleteJuryForDeliberation { missing: Vec<String> },
+    #[error("run {run} was already deliberated; v0.6 runs one round")]
+    AlreadyDeliberated { run: i64 },
+    #[error("run {run} has no deliberation; run `personajury deliberate {run}` first")]
+    NoDeliberation { run: i64 },
+    #[error("persona {persona} has no accepted initial verdict in this run; a deliberated verdict answers one")]
+    DeliberatedWithoutInitial { persona: String },
+    #[error("--deliberated needs the file to carry \"phase\": \"deliberated\"")]
+    DeliberatedWithoutPhase,
+    #[error("the file says \"phase\": \"deliberated\"; ingest it with --deliberated")]
+    PhaseWithoutFlag,
     #[error("{0}")]
     InvalidQuery(String),
     #[error("{0}")]
@@ -188,6 +200,12 @@ impl Refusal {
             Refusal::NoMatchingPersonas { .. } => "no_matching_personas",
             Refusal::AudienceUnknown { .. } => "audience_unknown",
             Refusal::InvalidOptionsMode { .. } => "invalid_options_mode",
+            Refusal::IncompleteJuryForDeliberation { .. } => "incomplete_jury_for_deliberation",
+            Refusal::AlreadyDeliberated { .. } => "already_deliberated",
+            Refusal::NoDeliberation { .. } => "no_deliberation",
+            Refusal::DeliberatedWithoutInitial { .. } => "deliberated_without_initial",
+            Refusal::DeliberatedWithoutPhase => "deliberated_without_phase",
+            Refusal::PhaseWithoutFlag => "phase_without_flag",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
             Refusal::InvalidDiff(_) => "invalid_diff",
@@ -220,6 +238,8 @@ impl Refusal {
             Refusal::TraitsTooMany { count } => Some(serde_json::json!({"count": count})),
             Refusal::InvalidFilter { term, why } => Some(serde_json::json!({"term": term, "why": why})),
             Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
+            Refusal::IncompleteJuryForDeliberation { missing } => Some(serde_json::json!({"missing": missing})),
+            Refusal::AlreadyDeliberated { run } | Refusal::NoDeliberation { run } => Some(serde_json::json!({"run": run})),
             Refusal::InvalidOptionsMode { given } => Some(serde_json::json!({"given": given})),
             _ => None,
         }
@@ -529,6 +549,7 @@ mod tests {
             lines,
             pick: None,
             usage: None,
+            phase: None,
         }
     }
     fn code(v: &VerdictInput, cx: &VerdictContext) -> &'static str {

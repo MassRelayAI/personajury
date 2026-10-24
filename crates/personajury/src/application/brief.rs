@@ -54,6 +54,21 @@ pub(crate) struct TraitCtx {
     defs: BTreeMap<String, TraitDef>,
 }
 impl TraitCtx {
+    /// The context a run rendered its briefs under, from the `traits_json` the run recorded (D31); none when it rendered nothing.
+    pub(crate) fn for_run(store: &Store, recorded: Option<&Value>) -> Result<Option<TraitCtx>> {
+        let Some(t) = recorded else { return Ok(None) };
+        Ok(match t["mode"].as_str() {
+            Some("all") => Some(TraitCtx { mode: "all", set: None, defs: store.trait_map()? }),
+            Some("set") => match t["set"].as_str() {
+                Some(name) => store.trait_set(name)?.map(|set| TraitCtx { mode: "set", set: Some(set), defs: store.trait_map().unwrap_or_default() }),
+                None => None,
+            },
+            _ => None,
+        })
+    }
+    pub(crate) fn block_for(&self, p: &Persona) -> Option<String> {
+        self.block(p).map(|(b, _)| b)
+    }
     /// The block of one persona and the trait ids it renders; none when the mode renders nothing for it.
     fn block(&self, p: &Persona) -> Option<(String, Vec<String>)> {
         let held = p.traits.as_ref()?;
@@ -210,6 +225,39 @@ struct Cmp {
     subject: Subject,
 }
 
+/// The persona block of a brief (and of its deliberation file): the profile bullets, then the trait block when the run renders one.
+pub(crate) fn persona_section(persona: &Persona, traits_block: Option<&str>) -> String {
+    let mut t = String::from("## Persona\n\n");
+    if let Ok(Value::Object(m)) = serde_json::from_str::<Value>(&persona.profile_json) {
+        for (k, label) in [
+            ("role", "Role"),
+            ("credential", "Credential"),
+            ("context", "Context"),
+            ("daily_tasks", "Daily tasks"),
+            ("fears", "Fears"),
+            ("never_reads", "Never reads"),
+            ("decides_by", "Decides by"),
+        ] {
+            if let Some(v) = m.get(k).and_then(Value::as_str) {
+                t.push_str(&format!("- {label}: {v}\n"));
+            }
+        }
+    }
+    if let Some(b) = traits_block {
+        t.push_str(b);
+    }
+    t
+}
+/// The stake block: what the persona's stake is in this run and the rules it follows.
+pub(crate) fn stake_section(persona: &Persona, stake: Stake) -> String {
+    format!(
+        "\n## Your stake in this run\n\n{}: {}.\n\nStake rules: {}\n\n",
+        stake.name(),
+        stake_meaning(stake),
+        persona.stake_rules
+    )
+}
+
 #[allow(clippy::too_many_arguments)]
 fn compose_text(
     root: &Path,
@@ -234,31 +282,8 @@ fn compose_text(
 The engine that wrote this brief calls no model; you are the judge, and your answer is checked line by line against the rules at the end.\n\n",
         persona.name, persona.id
     ));
-    t.push_str("## Persona\n\n");
-    if let Ok(Value::Object(m)) = serde_json::from_str::<Value>(&persona.profile_json) {
-        for (k, label) in [
-            ("role", "Role"),
-            ("credential", "Credential"),
-            ("context", "Context"),
-            ("daily_tasks", "Daily tasks"),
-            ("fears", "Fears"),
-            ("never_reads", "Never reads"),
-            ("decides_by", "Decides by"),
-        ] {
-            if let Some(v) = m.get(k).and_then(Value::as_str) {
-                t.push_str(&format!("- {label}: {v}\n"));
-            }
-        }
-    }
-    if let Some(b) = traits_block {
-        t.push_str(b);
-    }
-    t.push_str(&format!(
-        "\n## Your stake in this run\n\n{}: {}.\n\nStake rules: {}\n\n",
-        stake.name(),
-        stake_meaning(stake),
-        persona.stake_rules
-    ));
+    t.push_str(&persona_section(persona, traits_block));
+    t.push_str(&stake_section(persona, stake));
     // D15: a run whose panel terms name models says, in every brief, which one this brief is for
     if let Some(m) = run_on {
         t.push_str(&format!("## Model\n\nRun this brief on the model `{m}`.\n\n"));

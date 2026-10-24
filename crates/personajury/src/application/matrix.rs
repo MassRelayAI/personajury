@@ -16,12 +16,17 @@ pub fn show(
     table: bool,
     detail: Detail,
     slice: Option<&str>,
+    phase: &str,
 ) -> Result<Value> {
     if across_strata {
         return Err(Refusal::StrataAverageRefused.into());
     }
+    if !matches!(phase, "initial" | "deliberated" | "both") {
+        return Err(AppError::InvalidArguments(format!("--phase {phase:?}: the words are initial, deliberated and both")));
+    }
     let store = open(root)?;
-    let mut rows = Vec::new();
+    let mut rows_i = Vec::new();
+    let mut rows_d = Vec::new();
     let mut stakes: BTreeMap<String, Stake> = BTreeMap::new();
     let mut lenses: Vec<Lens> = Vec::new();
     let mut all = Vec::new();
@@ -98,12 +103,16 @@ pub fn show(
         {
             lenses.push(lens);
         }
-        rows.extend(score_rows(&run, &store.verdict_rows(*id, false)?));
+        rows_i.extend(score_rows(&run, &store.verdict_rows(*id, false)?));
+        rows_d.extend(score_rows(&run, &store.deliberated_rows(*id)?));
         if history {
             all.extend(store.verdict_rows(*id, true)?);
         }
     }
+    // D33: the default reads the jury's first word; the advise-only round is read only when asked
+    let rows = if phase == "deliberated" { rows_d.clone() } else { rows_i.clone() };
     let mut m = matrix::build(&rows, &stakes, &lenses, Aggregate::PerStratum)?;
+    let mut both = if phase == "both" { Some(matrix::build(&rows_d, &stakes, &lenses, Aggregate::PerStratum)?) } else { None };
     // a persona with a credential is badged inside its stratum (D19)
     let mut credentials: BTreeMap<String, String> = BTreeMap::new();
     for id in stakes.keys() {
@@ -132,7 +141,7 @@ pub fn show(
             + &sliced.as_ref().map(|(_, t)| format!("\n{t}")).unwrap_or_default()
     });
     if detail == Detail::Compact {
-        for s in &mut m.strata {
+        for s in m.strata.iter_mut().chain(both.iter_mut().flat_map(|b| b.strata.iter_mut())) {
             for c in &mut s.cells {
                 c.scores.clear();
             }
@@ -143,6 +152,9 @@ pub fn show(
     let mut out = json!({ "runs": runs, "strata": m.strata, "splits": splits, "usage": usage });
     if let Some((v, _)) = sliced {
         out["slices"] = Value::Array(v);
+    }
+    if let Some(d) = both {
+        out["phases"] = json!({"initial": m.strata, "deliberated": d.strata});
     }
     out["models"] = json!(models.iter().map(|(s, m)| (s.name(), m)).collect::<BTreeMap<_, _>>());
     out["models_distinct"] = json!(models.values().flatten().collect::<std::collections::BTreeSet<_>>().len());

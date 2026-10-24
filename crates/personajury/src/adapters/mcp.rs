@@ -1,5 +1,5 @@
 //! adapted from comparegraph crates/comparegraph/src/adapters/mcp.rs
-//! MCP stdio server: JSON-RPC 2.0, one object per line. Eight tools run the same verbs as the CLI and return the same envelope.
+//! MCP stdio server: JSON-RPC 2.0, one object per line. Ten tools run the same verbs as the CLI and return the same envelope.
 //! There is no tool for `setup`, `doctor`, `check` or `decide` (a person decides), and no tool can ask the matrix to
 //! average across strata: the property does not exist.
 use crate::adapters::cli::{envelope_for, Cli, Cmd};
@@ -61,8 +61,18 @@ pub fn tools() -> Vec<Value> {
             "Ingest one persona's verdict for a run: an object with the persona, its batch of lines (dimension, about, score, anchor_met, evidence kind, citations, blockers) and picks. Returns the stored lines. Append-only. Refusals, by error code: seen_without_citation, citation_unresolved, comparator_not_snapshotted, score_out_of_range, unknown_dimension, unknown_about, bad_anchor, bottom_score_without_blocker, evidence_not_allowed, seen_compare_without_comparator, duplicate_dimension, missing_dimension, dismissed_point_repeated, subject_moved, pick_without_reason, pick_unknown_option, pick_missing, invalid_usage, not_found, invalid_arguments; the message names the line. The verdict may carry usage {input_tokens, output_tokens} (the tokens you spent on it, non-negative integers): matrix and doctor show it beside the estimate, labelled as reported by the agent.",
             schema(
                 json!({ "run": {"type":"integer","minimum":1,"description":"the run id a brief returned"},
-                        "verdict": {"type":"object","description":"the persona's verdict JSON, as the brief asked for it"} }),
+                        "verdict": {"type":"object","description":"the persona's verdict JSON, as the brief asked for it"},
+                        "deliberated": {"type":"boolean","description":"the advise-only round (after personajury_deliberate): the verdict must carry \"phase\": \"deliberated\" and the persona an accepted initial verdict. Refusals: deliberated_without_phase, phase_without_flag, no_deliberation, deliberated_without_initial. Stored with phase deliberated; the initial batch stays the jury's independent word."} }),
                 &["run", "verdict"],
+            ),
+        ),
+        tool(
+            "personajury_deliberate",
+            "One advise-only round after the jury's first verdicts: writes one file per seat (deliberate-<persona>--<lens>.md) holding the persona's own first verdict and what the other jurors said, anonymised (Juror 1, Juror 2 and their stratum), so each juror may change its verdict where another's evidence persuades it. It breaks independence by design, so it only measures persuasion: apply-check never answers apply for a run with a deliberated verdict. Give each file to one subagent, then ingest each answer with personajury_verdict deliberated=true. Refusals: incomplete_jury_for_deliberation (a seat has no accepted initial verdict), already_deliberated (one round in v0.6).",
+            schema(
+                json!({ "run": {"type":"integer","minimum":1,"description":"the run id"},
+                        "wave": {"type":"integer","minimum":1,"description":"seats per wave in the answer's waves (default 30)"} }),
+                &["run"],
             ),
         ),
         tool(
@@ -70,6 +80,7 @@ pub fn tools() -> Vec<Value> {
             "Scores per stratum for one or more runs: every score, the median, min and max within a stratum; never a mean, never averaged across strata. Returns a compact envelope; table=true adds the markdown table as data.table.",
             schema(
                 json!({ "runs": {"type":"array","items":{"type":"integer","minimum":1},"minItems":1},
+                        "phase": {"type":"string","enum":["initial","deliberated","both"],"description":"initial (default): the jury's first word; deliberated: the advise-only round's batch; both: each under data.phases"},
                         "slice": {"type":"string","description":"a trait id: also group each stratum's scores by that trait's bands or options (data.slices: groups, cells, thin, unset, separates), counted per stratum, never averaged"},
                         "table": {"type":"boolean"}, "history": {"type":"boolean","description":"include superseded batches"},
                         "detail": detail_prop() }),
@@ -243,8 +254,9 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             "seats",
             "options",
         ],
-        "personajury_verdict" => &["run", "verdict"],
-        "personajury_matrix" => &["runs", "table", "history", "detail", "slice"],
+        "personajury_verdict" => &["run", "verdict", "deliberated"],
+        "personajury_deliberate" => &["run", "wave"],
+        "personajury_matrix" => &["runs", "table", "history", "detail", "slice", "phase"],
         "personajury_delta" => &["a", "b"],
         "personajury_graph" => &["runs"],
         "personajury_apply_check" => &["runs", "rule", "calibration"],
@@ -310,6 +322,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                     file: None,
                     json: Some(v.to_string()),
                     by_human: None,
+                    deliberated: bool_arg(a, "deliberated")?,
                 },
                 None | Some(Value::Null) => return Err("missing required argument verdict".into()),
                 Some(_) => return Err("verdict must be an object".into()),
@@ -324,8 +337,19 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
                 table: bool_arg(a, "table")?,
                 detail: detail()?,
                 slice: str_arg(a, "slice")?,
+                phase: str_arg(a, "phase")?.unwrap_or_else(|| "initial".into()),
             }
         }
+        "personajury_deliberate" => Cmd::Deliberate {
+            run: id_arg(a, "run")?,
+            wave: match a.get("wave") {
+                None | Some(Value::Null) => None,
+                Some(v) => match v.as_u64() {
+                    Some(n) if n >= 1 => Some(n as usize),
+                    _ => return Err("wave must be an integer >= 1".into()),
+                },
+            },
+        },
         "personajury_graph" => Cmd::Graph {
             runs: runs_arg(a)?,
             svg: true,

@@ -223,6 +223,12 @@ pub(crate) fn is_human(persona: &str) -> bool {
 /// Ingest a verdict. With `by_human` ("<name, credential>") the batch is a person's (D19): the same refusals, stored
 /// under `human:<name>:<seat>` beside the jury's rows, never merged with a persona's cell.
 pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> Result<Value> {
+    ingest_with(root, run, input, by_human, false)
+}
+
+/// `ingest_by`, and with `deliberated` the advise-only round's batch (D33): the file carries `"phase": "deliberated"`,
+/// the run holds a deliberation, and the persona has an accepted initial verdict; the same evidence refusals apply.
+pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, deliberated: bool) -> Result<Value> {
     let store = open(root)?;
     let run = load_run(&store, run)?;
     if let Some(why) = moved_why(&store, &run)? {
@@ -254,6 +260,25 @@ pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> 
     options.extend(run.comparators.iter().map(|(n, _)| format!("cmp:{n}")));
     let mut input: VerdictInput = serde_json::from_str(input)
         .map_err(|e| AppError::InvalidArguments(format!("verdict JSON: {e}")))?;
+    match (input.phase.as_deref(), deliberated) {
+        (Some("deliberated"), false) => return Err(Refusal::PhaseWithoutFlag.into()),
+        (p, true) if p != Some("deliberated") => return Err(Refusal::DeliberatedWithoutPhase.into()),
+        (Some(other), _) if other != "deliberated" && other != "initial" => {
+            return Err(AppError::InvalidArguments(format!("phase {other:?}: the words are initial and deliberated")));
+        }
+        _ => {}
+    }
+    if deliberated {
+        if by_human.is_some() {
+            return Err(AppError::InvalidArguments("a person's verdict is never deliberated; --by-human and --deliberated do not mix".into()));
+        }
+        if store.deliberation(run.id)?.is_none() {
+            return Err(Refusal::NoDeliberation { run: run.id }.into());
+        }
+        if !store.verdict_rows(run.id, false)?.iter().any(|r| r.persona == input.persona) {
+            return Err(Refusal::DeliberatedWithoutInitial { persona: input.persona.clone() }.into());
+        }
+    }
     if subject_mode {
         // `about` the subject by its name is the whole subject (D32): the cell stays keyed as it always was
         for l in &mut input.lines {
@@ -311,7 +336,15 @@ pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> 
             ))
         })?;
     let batch = store.next_batch(run.id, &valid.persona)?;
-    store.insert_verdict_by(run.id, batch, persona_version, &run.subject_name, &valid, by_human.map(str::trim))?;
+    store.insert_verdict_phase(
+        run.id,
+        batch,
+        persona_version,
+        &run.subject_name,
+        &valid,
+        by_human.map(str::trim),
+        deliberated.then_some("deliberated"),
+    )?;
     let mut ids: Vec<&str> = Vec::new();
     for f in &valid.findings {
         if !ids.contains(&f.id.as_str()) {
@@ -326,6 +359,9 @@ pub fn ingest_by(root: &Path, run: i64, input: &str, by_human: Option<&str>) -> 
         "lines": valid.lines.len(),
         "findings": ids,
     });
+    if deliberated {
+        out["phase"] = json!("deliberated");
+    }
     if let Some(by) = by_human {
         out["by_human"] = json!(by.trim());
         out["seat"] = json!(seat);

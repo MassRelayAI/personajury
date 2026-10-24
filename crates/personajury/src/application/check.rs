@@ -202,6 +202,14 @@ pub fn run(root: &Path, history: bool) -> Result<Value> {
         "runs": runs.len(), "stale": stale, "unresolved": unresolved, "fixed_unverified": fixed_unverified,
     });
     if history {
+        // every batch with its phase (D33): a deliberated batch is labelled, never mistaken for a re-run
+        let mut batches = Vec::new();
+        for r in &runs {
+            for ((persona, batch), phase) in store.batch_phases(r.id)? {
+                batches.push(json!({"run": r.id, "persona": persona, "batch": batch, "phase": phase}));
+            }
+        }
+        data["batches"] = json!(batches);
         data["lives"] = json!(lives(&store, &runs)?
             .iter()
             .map(|l| json!({

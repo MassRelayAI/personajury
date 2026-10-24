@@ -430,6 +430,23 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
     if !incomplete.is_empty() {
         reasons.push(reason("trait_set_incomplete", "info", json!({"seats": incomplete, "note": "some seats lack traits of the set the briefs rendered; their briefs say less about how they decide"})));
     }
+    // D33: a deliberated verdict broke the jury's independence; the run advises, it never applies
+    let deliberated: Vec<i64> = {
+        let mut v = Vec::new();
+        for r in &judged {
+            if !store.deliberated_rows(r.id)?.is_empty() {
+                v.push(r.id);
+            }
+        }
+        v
+    };
+    if !deliberated.is_empty() {
+        reasons.push(reason(
+            "deliberated",
+            "advise",
+            json!({"runs": deliberated, "remedy": "the initial batch is the jury's independent word; deliberation measures persuasion, so ask apply-check on a run that was not deliberated"}),
+        ));
+    }
     // D18: one context read every brief: it advises, it never applies
     let sequential: Vec<i64> = given.iter().filter(|r| r.independence == "sequential").map(|r| r.id).collect();
     if !sequential.is_empty() {

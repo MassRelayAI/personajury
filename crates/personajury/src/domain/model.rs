@@ -490,6 +490,9 @@ pub struct VerdictInput {
     /// measures nothing; `validate` refuses a shape it cannot read as `invalid_usage`.
     #[serde(default)]
     pub usage: Option<serde_json::Value>,
+    /// `deliberated` for the advise-only round (D33); none or `initial` for the jury's first word
+    #[serde(default)]
+    pub phase: Option<String>,
 }
 
 /// Tokens an agent reported for one verdict (D12).
@@ -615,6 +618,8 @@ pub struct VerdictRow {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct PickRow {
+    /// the question a decision pick answers (`Q1`); none for a pick among options
+    pub about: Option<String>,
     pub run_id: i64,
     pub batch: i64,
     pub persona: String,

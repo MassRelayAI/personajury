@@ -253,8 +253,10 @@ fn row_to_persona(r: &rusqlite::Row) -> rusqlite::Result<Persona> {
 }
 
 const VERDICT_COLS: &str = "v.run_id, v.batch, v.persona_id, v.persona_version, v.dimension, v.score, v.anchor_met, v.evidence, v.about, v.citations_json, v.citation_hash, v.blockers_json, v.note, v.created_at";
-/// `v` rows of the latest batch of each persona in the run.
-const LATEST_V: &str = "v.batch = (SELECT max(v2.batch) FROM verdict v2 WHERE v2.run_id = v.run_id AND v2.persona_id = v.persona_id)";
+/// `v` rows of the latest initial batch of each persona in the run (D33: a deliberated batch never replaces it).
+const LATEST_V: &str = "COALESCE(v.phase,'initial') = 'initial' AND v.batch = (SELECT max(v2.batch) FROM verdict v2 WHERE v2.run_id = v.run_id AND v2.persona_id = v.persona_id AND COALESCE(v2.phase,'initial') = 'initial')";
+/// `v` rows of the latest deliberated batch of each persona in the run.
+const LATEST_D: &str = "v.phase = 'deliberated' AND v.batch = (SELECT max(v2.batch) FROM verdict v2 WHERE v2.run_id = v.run_id AND v2.persona_id = v.persona_id AND v2.phase = 'deliberated')";
 
 fn row_to_finding(r: &rusqlite::Row) -> rusqlite::Result<FindingRow> {
     Ok(FindingRow {
@@ -950,11 +952,25 @@ impl Store {
         v: &ValidVerdict,
         by_human: Option<&str>,
     ) -> Result<()> {
+        self.insert_verdict_phase(run_id, batch, persona_version, subject_name, v, by_human, None)
+    }
+    /// `insert_verdict_by`, in a phase: `deliberated` for the advise-only round (D33), none for an initial batch.
+    #[allow(clippy::too_many_arguments)]
+    pub fn insert_verdict_phase(
+        &self,
+        run_id: i64,
+        batch: i64,
+        persona_version: i64,
+        subject_name: &str,
+        v: &ValidVerdict,
+        by_human: Option<&str>,
+        phase: Option<&str>,
+    ) -> Result<()> {
         let tx = self.conn.unchecked_transaction()?;
         let now = now_iso();
         for l in &v.lines {
             tx.execute(
-                "INSERT INTO verdict(run_id, batch, persona_id, persona_version, dimension, score, anchor_met, evidence, about, citations_json, citation_hash, blockers_json, note, created_at) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14)",
+                "INSERT INTO verdict(run_id, batch, persona_id, persona_version, dimension, score, anchor_met, evidence, about, citations_json, citation_hash, blockers_json, note, created_at, phase) VALUES (?1,?2,?3,?4,?5,?6,?7,?8,?9,?10,?11,?12,?13,?14,?15)",
                 params![
                     run_id,
                     batch,
@@ -969,7 +985,8 @@ impl Store {
                     l.citation_hash,
                     to_json(&l.line.blockers),
                     l.line.note,
-                    now
+                    now,
+                    phase
                 ],
             )?;
         }
@@ -1005,10 +1022,21 @@ impl Store {
     }
     /// history=false: the latest batch of each persona only. Ordered by persona, batch, insertion.
     pub fn verdict_rows(&self, run_id: i64, history: bool) -> Result<Vec<VerdictRow>> {
-        let filter = if history { "" } else { LATEST_V };
+        self.verdict_rows_in(run_id, if history { None } else { Some(false) })
+    }
+    /// The latest deliberated batch of each persona (D33).
+    pub fn deliberated_rows(&self, run_id: i64) -> Result<Vec<VerdictRow>> {
+        self.verdict_rows_in(run_id, Some(true))
+    }
+    /// `None`: every batch; `Some(false)`: the latest initial batch of each persona; `Some(true)`: the latest deliberated.
+    fn verdict_rows_in(&self, run_id: i64, only: Option<bool>) -> Result<Vec<VerdictRow>> {
         let sql = format!(
             "SELECT {VERDICT_COLS} FROM verdict v WHERE v.run_id = ?1 {} ORDER BY v.persona_id, v.batch, v.id",
-            if history { String::new() } else { format!("AND {filter}") }
+            match only {
+                None => String::new(),
+                Some(false) => format!("AND {LATEST_V}"),
+                Some(true) => format!("AND {LATEST_D}"),
+            }
         );
         let mut st = self.conn.prepare(&sql)?;
         let raw = st
@@ -1044,6 +1072,31 @@ impl Store {
                 Ok(row)
             })
             .collect()
+    }
+    /// The phase of every batch of a run: `(persona, batch)` to `initial` or `deliberated`.
+    pub fn batch_phases(&self, run_id: i64) -> Result<BTreeMap<(String, i64), String>> {
+        let mut st = self.conn.prepare(
+            "SELECT DISTINCT persona_id, batch, COALESCE(phase,'initial') FROM verdict WHERE run_id = ?1",
+        )?;
+        let rows = st
+            .query_map(params![run_id], |r| Ok(((r.get::<_, String>(0)?, r.get::<_, i64>(1)?), r.get::<_, String>(2)?)))?
+            .collect::<std::result::Result<BTreeMap<_, _>, _>>()?;
+        Ok(rows)
+    }
+    /// The deliberation round of a run (D33): the files written, as stored; none before `deliberate`.
+    pub fn deliberation(&self, run_id: i64) -> Result<Option<serde_json::Value>> {
+        let t: Option<String> = self
+            .conn
+            .query_row("SELECT briefs_json FROM deliberation WHERE run_id = ?1", params![run_id], |r| r.get(0))
+            .optional()?;
+        t.map(|t| json_vec("deliberation", &t)).transpose()
+    }
+    pub fn insert_deliberation(&self, run_id: i64, briefs: &serde_json::Value) -> Result<()> {
+        self.conn.execute(
+            "INSERT INTO deliberation(run_id, briefs_json, created_at) VALUES (?1,?2,?3)",
+            params![run_id, to_json(briefs), now_iso()],
+        )?;
+        Ok(())
     }
     /// The tokens the agent reported over every verdict of these runs (all batches: a re-run was spent too), and how
     /// many verdicts reported. None when nothing was reported. `run_ids` empty = every run.
@@ -1090,14 +1143,21 @@ impl Store {
         Ok((n > 0).then_some((input, output, n)))
     }
     pub fn picks(&self, run_id: i64, history: bool) -> Result<Vec<PickRow>> {
-        // "latest" is the persona's latest verdict batch: a later batch without a pick shows no pick
-        let filter = if history {
-            ""
-        } else {
-            "AND v.batch = (SELECT max(p2.batch) FROM verdict p2 WHERE p2.run_id = v.run_id AND p2.persona_id = v.persona_id)"
+        self.picks_in(run_id, if history { None } else { Some(false) })
+    }
+    /// The picks of each persona's latest deliberated batch (D33).
+    pub fn deliberated_picks(&self, run_id: i64) -> Result<Vec<PickRow>> {
+        self.picks_in(run_id, Some(true))
+    }
+    fn picks_in(&self, run_id: i64, only: Option<bool>) -> Result<Vec<PickRow>> {
+        // "latest" is the persona's latest verdict batch of the phase: a later batch without a pick shows no pick
+        let filter = match only {
+            None => "",
+            Some(false) => "AND v.batch = (SELECT max(p2.batch) FROM verdict p2 WHERE p2.run_id = v.run_id AND p2.persona_id = v.persona_id AND COALESCE(p2.phase,'initial') = 'initial')",
+            Some(true) => "AND v.batch = (SELECT max(p2.batch) FROM verdict p2 WHERE p2.run_id = v.run_id AND p2.persona_id = v.persona_id AND p2.phase = 'deliberated') AND EXISTS (SELECT 1 FROM verdict p3 WHERE p3.run_id = v.run_id AND p3.persona_id = v.persona_id AND p3.batch = v.batch AND p3.phase = 'deliberated')",
         };
         let mut st = self.conn.prepare(&format!(
-            "SELECT v.run_id, v.batch, v.persona_id, v.choice, v.reason, v.created_at FROM pick v WHERE v.run_id = ?1 {filter} ORDER BY v.persona_id, v.batch, v.id"
+            "SELECT v.run_id, v.batch, v.persona_id, v.choice, v.reason, v.created_at, v.about FROM pick v WHERE v.run_id = ?1 {filter} ORDER BY v.persona_id, v.batch, v.id"
         ))?;
         let rows = st
             .query_map(params![run_id], |r| {
@@ -1108,6 +1168,7 @@ impl Store {
                     choice: r.get(3)?,
                     reason: r.get(4)?,
                     created_at: r.get(5)?,
+                    about: r.get(6)?,
                 })
             })?
             .collect::<std::result::Result<Vec<_>, _>>()?;

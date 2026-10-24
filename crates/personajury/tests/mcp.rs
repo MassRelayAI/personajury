@@ -75,6 +75,7 @@ fn initialize_and_list_the_tools() {
         [
             "personajury_apply_check",
             "personajury_brief",
+            "personajury_deliberate",
             "personajury_delta",
             "personajury_graph",
             "personajury_matrix",

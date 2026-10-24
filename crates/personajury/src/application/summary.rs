@@ -63,7 +63,7 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     }
 
     // the numbers: a P·S·B median per (option or subject) × dimension, from the matrix, never combined
-    let m = matrix::show(root, &f.runs, false, false, false, Detail::Compact, None)?;
+    let m = matrix::show(root, &f.runs, false, false, false, Detail::Compact, None, "initial")?;
     let strata = m["strata"].as_array().cloned().unwrap_or_default();
     let mut cols: Vec<(String, String)> = Vec::new(); // (lens, dimension), first seen
     for s in &strata {
@@ -181,7 +181,7 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
 /// One fixed-template sentence per stratum present (D31): who, by one trait, scored the weakest dimension how. Nothing here
 /// is a claim about people: the sentence says so.
 fn slice_sentences(root: &Path, f: &Facts, trait_id: &str) -> Result<Vec<String>> {
-    let m = matrix::show(root, &f.runs, false, false, false, Detail::Full, Some(trait_id))?;
+    let m = matrix::show(root, &f.runs, false, false, false, Detail::Full, Some(trait_id), "initial")?;
     let store = open(root)?;
     let def = store.trait_def(trait_id)?.ok_or_else(|| AppError::from(Refusal::UnknownTrait { id: trait_id.to_string() }))?;
     let mut out = Vec::new();

@@ -397,6 +397,18 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
             json!({"model": models.iter().next(), "note": "one model judged every seat; a second model makes the jury less correlated"}),
         ));
     }
+    // D31: seats that lack traits of the set the run rendered; informational, it changes no answer
+    let mut incomplete: Vec<Value> = Vec::new();
+    for r in &judged {
+        if let Some(t) = store.run_traits(r.id)?.0 {
+            for i in t["incomplete"].as_array().into_iter().flatten() {
+                incomplete.push(json!({"run": r.id, "persona": i["persona"], "missing": i["missing"]}));
+            }
+        }
+    }
+    if !incomplete.is_empty() {
+        reasons.push(reason("trait_set_incomplete", "info", json!({"seats": incomplete, "note": "some seats lack traits of the set the briefs rendered; their briefs say less about how they decide"})));
+    }
     // D18: one context read every brief: it advises, it never applies
     let sequential: Vec<i64> = given.iter().filter(|r| r.independence == "sequential").map(|r| r.id).collect();
     if !sequential.is_empty() {

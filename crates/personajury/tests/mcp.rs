@@ -48,7 +48,7 @@ fn tools_list() -> Vec<Value> {
 }
 
 #[test]
-fn initialize_and_list_seven_tools() {
+fn initialize_and_list_the_tools() {
     let ws = tempfile::tempdir().unwrap();
     let (ok, out) = session(
         ws.path(),
@@ -80,6 +80,7 @@ fn initialize_and_list_seven_tools() {
             "personajury_matrix",
             "personajury_should_run",
             "personajury_summary",
+            "personajury_trait_list",
             "personajury_verdict"
         ]
     );
@@ -92,6 +93,23 @@ fn initialize_and_list_seven_tools() {
         assert!(!t["description"].as_str().unwrap().is_empty());
     }
     assert_eq!(out[2]["id"], 3);
+}
+
+#[test]
+fn the_trait_list_tool_answers_the_catalog_and_takes_no_arguments_but_a_set_flag() {
+    let ws = tempfile::tempdir().unwrap();
+    let _ = std::process::Command::new(assert_cmd::cargo::cargo_bin("personajury"))
+        .args(["--root", ws.path().to_str().unwrap(), "trait", "install"])
+        .output()
+        .unwrap();
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_list", json!({}))]);
+    let text = out[0]["result"]["content"][0]["text"].as_str().unwrap();
+    let env: Value = serde_json::from_str(text).unwrap();
+    assert_eq!(env["ok"], true, "{env}");
+    assert_eq!(env["data"]["traits"].as_array().unwrap().len(), 49);
+    let (_, out) = session(ws.path(), &[call(1, "personajury_trait_list", json!({"sets": true}))]);
+    let env: Value = serde_json::from_str(out[0]["result"]["content"][0]["text"].as_str().unwrap()).unwrap();
+    assert_eq!(env["data"]["sets"].as_array().unwrap().len(), 8);
 }
 
 #[test]

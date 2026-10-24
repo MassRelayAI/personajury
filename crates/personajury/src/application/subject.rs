@@ -35,6 +35,7 @@ pub fn add(
     kind: SubjectKind,
     attach: &[PathBuf],
     comparator: bool,
+    audience: &[String],
 ) -> Result<Value> {
     super::slug(
         if comparator {
@@ -119,12 +120,24 @@ pub fn add(
         attachments: atts.clone(),
     };
     let version = store.insert_subject(&subject)?;
+    // the audience the subject speaks to (`--seats auto`): tags, lower-cased; none given keeps what the subject had
+    let mut aud: Vec<String> = audience.iter().map(|t| t.trim().to_lowercase()).filter(|t| !t.is_empty()).collect();
+    aud.sort();
+    aud.dedup();
+    if !aud.is_empty() {
+        store.set_subject_audience(name, &aud)?;
+    }
+    let aud = store.subject_audience(name)?;
     let attachments: Vec<Value> = atts
         .iter()
         .map(|a| json!({"label": a.label, "media": a.media, "hash": a.hash}))
         .collect();
-    Ok(json!({
+    let mut out = json!({
         "name": name, "version": version, "kind": kind.name(), "comparator": comparator,
         "hash": hash, "attachments": attachments,
-    }))
+    });
+    if !aud.is_empty() {
+        out["audience"] = json!(aud);
+    }
+    Ok(out)
 }

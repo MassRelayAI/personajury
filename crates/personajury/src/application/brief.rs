@@ -470,6 +470,77 @@ fn example_verdict(
 enum PanelSrc {
     Saved(String),
     Adhoc(String),
+    /// `--seats auto`: the personas that serve the subject's audience, plus one control
+    Auto,
+}
+
+/// The seats `--seats auto` chose (see `seats_auto`).
+struct AutoSeats {
+    resolved: super::panel::Resolved,
+    /// persona → why it sits: `serves <tag>` or `control: unrelated`
+    why: BTreeMap<String, String>,
+    warnings: Vec<Value>,
+}
+
+/// `--seats auto`: every persona whose `serves` meets the subject's audience (at most `cap`; a seeded draw, or the cover
+/// of the trait set when it has one), then exactly one control persona that serves none of it (a seeded draw). Serving
+/// seats are primary and the control a bystander unless `--stake` says otherwise.
+fn seats_auto(
+    audience: &[String],
+    personas: &[Persona],
+    seed: [u8; 8],
+    cap: usize,
+    cover: &[crate::domain::cover::CoverTrait],
+) -> Result<AutoSeats> {
+    let meets = |p: &Persona| p.serves.iter().any(|t| audience.contains(t));
+    let mut serving: Vec<&Persona> = personas.iter().filter(|p| meets(p)).collect();
+    serving.sort_by(|a, b| a.id.cmp(&b.id));
+    if serving.is_empty() {
+        return Err(Refusal::NoMatchingPersonas { audience: audience.join(",") }.into());
+    }
+    let mut rng = crate::domain::rng::SplitMix64::from_bytes(hash::term_seed(seed, "serves"));
+    if serving.len() > cap {
+        rng.shuffle(&mut serving);
+    }
+    let seated: Vec<&Persona> = if serving.len() <= cap {
+        serving
+    } else if cover.is_empty() {
+        serving.into_iter().take(cap).collect()
+    } else {
+        crate::domain::cover::choose(cover, &mut crate::domain::cover::State::default(), &serving, cap, "primary")
+    };
+    let mut control: Vec<&Persona> = personas.iter().filter(|p| !meets(p)).collect();
+    control.sort_by(|a, b| a.id.cmp(&b.id));
+    if control.len() > 1 {
+        crate::domain::rng::SplitMix64::from_bytes(hash::term_seed(seed, "control")).shuffle(&mut control);
+    }
+    let mut warnings = Vec::new();
+    let mut why = BTreeMap::new();
+    let mut ids = Vec::new();
+    let mut stakes = Vec::new();
+    for p in &seated {
+        let tag = p.serves.iter().find(|t| audience.contains(t)).cloned().unwrap_or_default();
+        why.insert(p.id.clone(), format!("serves {tag}"));
+        ids.push(p.id.clone());
+        stakes.push(Some(Stake::Primary));
+    }
+    let mut terms = vec![(
+        Term { count: seated.len(), tag: format!("serves:{}", audience.join("+")), stake: Some(Stake::Primary), model: None, filter: vec![] },
+        seated.len(),
+    )];
+    match control.first() {
+        Some(c) => {
+            why.insert(c.id.clone(), "control: unrelated".into());
+            ids.push(c.id.clone());
+            stakes.push(Some(Stake::Bystander));
+            terms.push((Term { count: 1, tag: "control".into(), stake: Some(Stake::Bystander), model: None, filter: vec![] }, 1));
+        }
+        None => warnings.push(json!({"code": "no_control_persona", "note": "every persona serves this audience; no control sits"})),
+    }
+    let models = vec![None; ids.len()];
+    let query = format!("auto: serves {}", audience.join(","));
+    let hash = hash::panel_hash(&query, &ids);
+    Ok(AutoSeats { resolved: super::panel::Resolved { query, ids, stakes, models, hash, terms, seed: Some(seed) }, why, warnings })
 }
 
 /// Everything the runs of one brief invocation share.
@@ -800,7 +871,20 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             "give --panel (a saved panel) or --query (an ad-hoc one), not both".into(),
         ));
     }
+    let auto = match a.seats.as_deref() {
+        None => false,
+        Some("auto") => true,
+        Some(other) => {
+            return Err(AppError::InvalidArguments(format!("--seats {other:?}: the only value is auto")));
+        }
+    };
+    if auto && (a.panel.is_some() || a.query.is_some()) {
+        return Err(AppError::InvalidArguments(
+            "--seats auto picks its own seats from the subject's audience; give no --panel or --query".into(),
+        ));
+    }
     let panel_src = match (&a.query, &a.panel, rule) {
+        _ if auto => PanelSrc::Auto,
         (Some(q), _, _) => PanelSrc::Adhoc(q.clone()),
         (None, Some(p), _) => PanelSrc::Saved(p.clone()),
         (None, None, Some(r)) => PanelSrc::Saved(r.panel.clone().unwrap_or_default()),
@@ -905,6 +989,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
 
     // the draw: seeded from the subject's NAME and the panel's name, so a second round draws the same seats
     let (panel_name, seed_name) = match &panel_src {
+        PanelSrc::Auto => ("(auto)".to_string(), "auto".to_string()),
         PanelSrc::Saved(n) => (n.clone(), n.clone()),
         // seeded by the parsed, normalised terms: spacing and case in the query never change who sits
         PanelSrc::Adhoc(q) => ("(query)".to_string(), format!("query:{}", query::normalise(&query::parse(q)?))),
@@ -913,7 +998,27 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         Some(h) => super::panel::parse_seed(h)?,
         None => hash::draw_seed(&subject.name, &seed_name),
     };
+    let mut auto_seats: Option<AutoSeats> = None;
+    let mut auto_cover: Vec<String> = Vec::new();
     let resolved = match &panel_src {
+        PanelSrc::Auto => {
+            let audience = store.subject_audience(&subject.name)?;
+            if audience.is_empty() {
+                return Err(Refusal::AudienceUnknown { subject: subject.name.clone() }.into());
+            }
+            // the cap: the effort's seats (the control sits beside them), else the ceiling of D10 less the control
+            let e = a.effort.or(cfg.as_ref().and_then(|c| c.effort)).or(rule.map(|_| Effort::Medium));
+            let cap = e
+                .and_then(Effort::seat_cap)
+                .unwrap_or(if a.allow_large { SEAT_HARD_MAX - 1 } else { SEAT_CEILING - 1 });
+            auto_cover = trait_ctx.as_ref().and_then(|c| c.set.as_ref()).map(|s| s.cover.clone()).unwrap_or_default();
+            let defs = store.trait_map()?;
+            let cover = super::panel::cover_traits(&auto_cover, &defs)?;
+            let got = seats_auto(&audience, &store.personas()?, seed, cap, &cover)?;
+            let r = got.resolved.clone();
+            auto_seats = Some(got);
+            r
+        }
         PanelSrc::Saved(n) => super::panel::resolve_in(&store, n, Some(seed))?,
         PanelSrc::Adhoc(q) => {
             let terms = query::parse(q)?;
@@ -998,7 +1103,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
             trimmed.push(json!({"what": "lenses", "from": from, "to": [lenses[0].name], "why": why}));
         }
         // an explicit --spend is the caller's own choice (and a recorded override where it differs from the rule)
-        if a.spend.is_none() {
+        if a.spend.is_none() && !auto {
             let kept = match e.seat_cap() {
                 Some(c) if selected.len() > c => capped_seats(&selected, &stakes, c),
                 _ => selected.clone(),
@@ -1087,6 +1192,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
                     fields.insert("panel".into(), json!({"rule": r.panel, "given": p}));
                 }
                 PanelSrc::Saved(_) => {}
+                PanelSrc::Auto => {
+                    fields.insert("panel".into(), json!({"rule": r.panel, "given": "seats: auto"}));
+                }
             }
             let (mut given_l, mut rule_l) = (lens_names.clone(), r.lenses.clone());
             given_l.sort();
@@ -1188,7 +1296,15 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
     let cover_ids: Vec<String> = match &panel_src {
         PanelSrc::Saved(n) => store.panel_cover(n)?,
         PanelSrc::Adhoc(_) => vec![],
+        PanelSrc::Auto => auto_cover.clone(),
     };
+    // the seats `--seats auto` chose and why, for the seats that survived the effort and the budget
+    let seats_value: Option<Value> = auto_seats.as_ref().map(|g| {
+        json!(selected
+            .iter()
+            .map(|id| json!({"persona": id, "why": g.why.get(id).cloned().unwrap_or_default()}))
+            .collect::<Vec<_>>())
+    });
     let sh = Shared {
         subject: &subject,
         cmps: &cmps,
@@ -1209,7 +1325,7 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         quorum: quorum.map(quorum_word),
         traits: trait_ctx.as_ref(),
         cover: !cover_ids.is_empty(),
-        seats: None,
+        seats: seats_value.as_ref(),
     };
     let mut runs = Vec::new();
     for lens in &lenses {
@@ -1237,6 +1353,12 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         out["budget_tokens"] = json!(b);
     }
     out["independence"] = json!(a.independence.name());
+    if let (Some(v), Some(g)) = (&seats_value, &auto_seats) {
+        out["seats"] = v.clone();
+        if !g.warnings.is_empty() {
+            out["warnings"] = json!(g.warnings);
+        }
+    }
     // what the seated panel covers of the panel's traits, counted per stratum and panel-wide (D30)
     let seated: Vec<(String, String)> = selected.iter().map(|id| (id.clone(), stakes[id].name().to_string())).collect();
     if let Some(c) = super::panel::coverage(&store, &cover_ids, &seated)? {

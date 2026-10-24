@@ -115,6 +115,11 @@ pub fn tools() -> Vec<Value> {
             ),
         ),
         tool(
+            "personajury_trait_list",
+            "The trait catalog the store holds: each trait's id, version, family, title, shape (band, category or words), evidence and origin; with sets=true the trait sets instead (name, traits, cover, note). A trait is a tendency or a standing fact that makes one reader decide differently from another, never a type or a diagnosis; a brief renders it as \"you tend to\", it is told and never seen. Install the catalog once with the CLI (`personajury trait install`). Reads only.",
+            schema(json!({ "sets": {"type":"boolean","description":"list the trait sets instead of the traits"} }), &[]),
+        ),
+        tool(
             "personajury_should_run",
             "Classify a diff or a list of paths against personajury.toml: none, low, high or human, and the spend. Returns a compact envelope; reads only.",
             schema(
@@ -243,6 +248,7 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "personajury_apply_check" => &["runs", "rule", "calibration"],
         "personajury_summary" => &["runs", "width", "md", "html", "slice"],
         "personajury_should_run" => &["diff", "paths", "config", "subject"],
+        "personajury_trait_list" => &["sets"],
         _ => return Err(format!("unknown tool {name}")),
     };
     if let Some(k) = a
@@ -347,6 +353,13 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
         "personajury_delta" => Cmd::Delta {
             a: id_arg(a, "a")?,
             b: id_arg(a, "b")?,
+        },
+        "personajury_trait_list" => Cmd::Trait {
+            what: if bool_arg(a, "sets")? {
+                crate::adapters::cli::TraitCmd::Set { what: crate::adapters::cli::TraitSetCmd::List }
+            } else {
+                crate::adapters::cli::TraitCmd::List
+            },
         },
         _ => Cmd::ShouldRun {
             diff: str_arg(a, "diff")?.map(PathBuf::from),

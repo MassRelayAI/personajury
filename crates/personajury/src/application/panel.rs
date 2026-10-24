@@ -8,6 +8,7 @@ use crate::store::Store;
 use serde_json::{json, Value};
 use std::path::Path;
 
+#[derive(Clone)]
 pub struct Resolved {
     pub query: String,
     pub ids: Vec<String>,

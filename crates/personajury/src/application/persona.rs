@@ -1,6 +1,7 @@
 //! persona add | generate | list (plan Task 4)
 use super::{AppError, Result};
 use crate::domain::hash::{canonical_json, sha256_hex};
+use crate::domain::traits::{TraitDef, TraitSetDef};
 use crate::domain::*;
 use crate::store::Store;
 use serde_json::{json, Value};
@@ -148,14 +149,81 @@ pub(crate) fn material_of(root: &Path, from: &Path) -> Result<(String, Vec<Strin
     Ok((sha256_hex(lines.as_bytes()), sources))
 }
 
+/// The Step 3 of a generate brief written with `--traits` (D31): the set's traits with their anchors or options, and one
+/// row per persona. Row k gives each cover trait the band `(k + index of the trait) mod 3` (a category: its options in
+/// turn), a deterministic Latin-square start for pairwise coverage.
+fn traits_section(set: &TraitSetDef, defs: &std::collections::BTreeMap<String, TraitDef>, count: usize) -> String {
+    let mut t = format!(
+        "\n## Step 3: the traits (set `{}`, version {})\n\nA trait is a tendency or a standing fact that makes one reader decide differently from another, never a type or a diagnosis. \
+Each persona file gets a `traits` map: the trait id to a value. A band trait takes an integer from 1 to 5 (1, 3 and 5 are described; 2 and 4 lean toward their neighbour). \
+A category trait takes one option id{}. Write at most 8 traits per persona. These are the set's traits:\n\n",
+        set.name, set.version, " (a multi-category takes a list of ids)"
+    );
+    for id in &set.traits {
+        let Some(d) = defs.get(id) else { continue };
+        let cover = if set.cover.contains(id) { " (cover)" } else { "" };
+        t.push_str(&format!("- `{id}`{cover}, {}:\n", d.title));
+        match d.shape.as_str() {
+            "band" => {
+                for (k, a) in &d.anchors {
+                    t.push_str(&format!("  - {k}: {a}\n"));
+                }
+            }
+            "category" => {
+                for o in &d.options {
+                    t.push_str(&format!("  - `{}`: {}\n", o.id, o.sentence));
+                }
+            }
+            _ => t.push_str(&format!("  - a short phrase, at most {} characters, that completes \"want to ...\"\n", d.max_chars.unwrap_or(200))),
+        }
+    }
+    if set.cover.is_empty() {
+        t.push_str("\nThis set has no cover traits: choose the values from the material.\n");
+    } else {
+        t.push_str("\nGive each persona these values for the cover traits (a Latin square, so the personas together show every band against the others), and choose the other traits of the set from the material:\n\n");
+        t.push_str("| persona |");
+        for c in &set.cover {
+            t.push_str(&format!(" {c} |"));
+        }
+        t.push_str("\n|---|");
+        t.push_str(&"---|".repeat(set.cover.len()));
+        t.push('\n');
+        for k in 0..count {
+            t.push_str(&format!("| {} |", k + 1));
+            for (i, c) in set.cover.iter().enumerate() {
+                let cell = match defs.get(c) {
+                    Some(d) if d.shape == "category" => {
+                        let o = &d.options[(k + i) % d.options.len()];
+                        format!("`{}`", o.id)
+                    }
+                    _ => ["low (1 or 2)", "mid (3)", "high (4 or 5)"][(k + i) % 3].to_string(),
+                };
+                t.push_str(&format!(" {cell} |"));
+            }
+            t.push('\n');
+        }
+        t.push_str("\nRow k is the k-th persona you write.\n");
+    }
+    t
+}
+
 /// Hash the material, write `.personajury/generate/<hash>.md` (the brief asking the agent for `count` personas), record it.
-pub fn generate(root: &Path, from: &Path, count: usize) -> Result<Value> {
+pub fn generate(root: &Path, from: &Path, count: usize, traits: Option<&str>) -> Result<Value> {
     if count == 0 {
         return Err(AppError::InvalidArguments(
             "--count must be at least 1".into(),
         ));
     }
     let (hash, sources) = material_of(root, from)?;
+    // with --traits (D31) the brief also lists the set and a latin-square row per persona; the set must be in the store
+    let set: Option<(TraitSetDef, std::collections::BTreeMap<String, TraitDef>)> = match traits {
+        None => None,
+        Some(name) => {
+            let store = Store::open(root)?;
+            let set = store.trait_set(name)?.ok_or_else(|| Refusal::TraitSetUnknown { name: name.to_string() })?;
+            Some((set, store.trait_map()?))
+        }
+    };
     let mut t = String::new();
     t.push_str("personajury-generate 1\n\n");
     t.push_str(&format!(
@@ -194,6 +262,12 @@ Write one JSON file per persona, named `<id>.json`. Each file holds exactly thes
         ("stake_rules", "when this person is primary (would use it), secondary (buys, approves or supports it) or bystander (passes by)"),
     ] {
         t.push_str(&format!("- `{k}`: {m}\n"));
+    }
+    if set.is_some() {
+        t.push_str("- `traits`: an object of trait ids to values, at most 8, as Step 3 describes\n");
+    }
+    if let Some((set, defs)) = &set {
+        t.push_str(&traits_section(set, defs, count));
     }
     t.push_str(&format!(
         "\nBase every persona on the material above; do not invent facts it does not support. \

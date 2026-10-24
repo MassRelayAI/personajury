@@ -283,6 +283,9 @@ pub enum PersonaCmd {
         from: PathBuf,
         #[arg(long, default_value_t = 7)]
         count: usize,
+        /// a trait set: the brief also lists its traits and gives each persona a Latin-square row of cover bands
+        #[arg(long)]
+        traits: Option<String>,
     },
     List,
 }
@@ -361,6 +364,9 @@ pub enum SubjectCmd {
         kind: String,
         #[arg(long, num_args = 1.., required = true)]
         attach: Vec<PathBuf>,
+        /// who the subject speaks to, as tags (for `brief --seats auto`): "docs,developers"
+        #[arg(long, value_delimiter = ',')]
+        audience: Vec<String>,
     },
 }
 
@@ -440,7 +446,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
     match &cli.cmd {
         Cmd::Persona { what } => match what {
             PersonaCmd::Add { file, generated_from } => app::persona::add(root, file, generated_from.as_deref()),
-            PersonaCmd::Generate { from, count } => app::persona::generate(root, from, *count),
+            PersonaCmd::Generate { from, count, traits } => app::persona::generate(root, from, *count, traits.as_deref()),
             PersonaCmd::List => app::persona::list(root),
         },
         Cmd::Trait { what } => match what {
@@ -460,11 +466,11 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             LensCmd::Generate { from, dimensions } => app::lens::generate(root, from, *dimensions),
             LensCmd::List => app::lens::list(root),
         },
-        Cmd::Subject { what: SubjectCmd::Add { name, kind: k, attach } } => {
-            app::subject::add(root, name, kind(k)?, attach, false)
+        Cmd::Subject { what: SubjectCmd::Add { name, kind: k, attach, audience } } => {
+            app::subject::add(root, name, kind(k)?, attach, false, audience)
         }
-        Cmd::Comparator { what: SubjectCmd::Add { name, kind: k, attach } } => {
-            app::subject::add(root, name, kind(k)?, attach, true)
+        Cmd::Comparator { what: SubjectCmd::Add { name, kind: k, attach, audience } } => {
+            app::subject::add(root, name, kind(k)?, attach, true, audience)
         }
         Cmd::Brief {
             subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats,

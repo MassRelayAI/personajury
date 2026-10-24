@@ -194,3 +194,18 @@ fn a_rule_without_a_trait_set_renders_none_and_a_flag_is_an_override() {
     let v = jg(ws.path(), &["brief", "--subject", "site", "--rule", "docs", "--model", "m", "--traits", "all"]);
     assert_eq!(code(&v), "override_without_reason");
 }
+
+#[test]
+fn apply_check_notes_an_incomplete_set_without_changing_the_answer() {
+    let ws = world(json!({"expertise.domain": 4}));
+    let d = ok(brief(ws.path(), &["--traits", "docs"]));
+    let run = d["run"].to_string();
+    let a = ok(jg(ws.path(), &["apply-check", &run]));
+    let r = a["reasons"].as_array().unwrap().iter().find(|r| r["code"] == "trait_set_incomplete").expect("the reason");
+    assert_eq!(r["effect"], "info");
+    assert_eq!(r["seats"].as_array().unwrap().len(), 2);
+    // a run that rendered nothing says nothing of the kind
+    let d = ok(brief(ws.path(), &[]));
+    let a = ok(jg(ws.path(), &["apply-check", &d["run"].to_string()]));
+    assert!(a["reasons"].as_array().unwrap().iter().all(|r| r["code"] != "trait_set_incomplete"));
+}

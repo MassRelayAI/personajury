@@ -10,5 +10,14 @@
   "fears": "Being the person who recommended a tool that looks amateur to the client; low contrast she cannot read on a projector; copy that cannot be explained to a non-technical client.",
   "never_reads": "Long feature paragraphs. She reads headings and buttons, and zooms into the first button she is asked to press.",
   "decides_by": "Her eye first, then the words on the buttons. If the main button is hard to read she distrusts the rest. She decides by whether she would be comfortable showing the page to the client.",
-  "stake_rules": "Primary on a page she would use or show to a client. Secondary when the page is something a client approves. Bystander on a pure back-office page."
+  "stake_rules": "Primary on a page she would use or show to a client. Secondary when the page is something a client approves. Bystander on a pure back-office page.",
+  "traits": {
+    "aesthetics.sensitivity": 5,
+    "aesthetics.halo_susceptibility": 4,
+    "social.self_monitoring": 4,
+    "expertise.domain": 5,
+    "buying.role": "influencer",
+    "personality.conscientiousness": 4,
+    "situation.time_pressure": 3
+  }
 }

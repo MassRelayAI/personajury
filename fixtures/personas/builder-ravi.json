@@ -10,5 +10,15 @@
   "fears": "A link that goes nowhere; a form that loses his input; marketing that claims what the page cannot show; being sold to before being told what the thing is.",
   "never_reads": "Taglines, testimonials and the footer. He skips any paragraph whose first sentence has no concrete noun.",
   "decides_by": "Evidence in the page: a screenshot, a number, a working link. He tabs through the links and notes each dead end, then reads the pricing for limits and the plan boundary. He recommends only what he has seen work.",
-  "stake_rules": "Primary when the page is about a tool his team could adopt, including its sign-up path. Secondary when the page is about what his team's manager would approve. Bystander on a consumer promotion."
+  "stake_rules": "Primary when the page is about a tool his team could adopt, including its sign-up path. Secondary when the page is about what his team's manager would approve. Bystander on a consumer promotion.",
+  "traits": {
+    "trust.marketing_skepticism": 5,
+    "social.influence_susceptibility": 1,
+    "cognition.reflection": 5,
+    "expertise.domain": 5,
+    "buying.role": "technical_buyer",
+    "adoption.innovativeness": 2,
+    "cognition.need_for_cognition": 5,
+    "situation.time_pressure": 3
+  }
 }

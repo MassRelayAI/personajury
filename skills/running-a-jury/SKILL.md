@@ -217,11 +217,11 @@ recorded; four things stay with a person.
 
 | choice | you decide (no reason) | needs a recorded reason (`--reason`, `--by`) | a person only |
 |---|---|---|---|
-| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject` and `--comparator` are yours | `--panel`, `--query` or `--stake` that differ from the rule | |
+| persona mix | the panel the rule names; the seeded draw picks who sits; `--subject` and `--comparator` are yours | `--panel`, `--query`, `--seats` or `--stake` that differ from the rule | |
 | persona count | the rule's seats, trimmed by effort | `--spend` above the rule; 13 to 1000 seats with `--allow-large` | above 1000 seats: nobody |
 | lens choice | any of the rule's lenses; the first under effort `low` | `--lens` that the rule does not name | |
 | dimensions and anchors | `lens generate` drafts them, you accept with `lens add` | editing a shipped lens's anchors (a new version) | an anchor set claimed as a named standard carries the expert's name in `standard` |
-| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence` | `--detail` and `--draw` under a rule | |
+| detail, model, seed, independence | `--model` (also per panel term), `--wave`, `--independence` | `--detail`, `--draw` and `--traits` under a rule | |
 | effort and tokens | effort at or below the toml's; `budget_tokens` trims | `--effort` above the toml's | |
 | quorum | you never set it; the rule's paths do; `--rule` names the rule (recorded on the run with its quorum) | a bigger jury than the rule asks; a rule below the sources' quorum (then `apply-check` advises, `rule_below_sources`) | lowering a quorum is a toml edit, a person's commit; a human class under a persona quorum is refused whoever edits |
 | findings | the foreman decides `fixed`, `dismissed` or `row` with `--by foreman` | a `dismissed` needs `--why` | a finding raised by a human batch is decided by a person (`decide --by-human`; a plain --by is refused, `human_decision_required`) |

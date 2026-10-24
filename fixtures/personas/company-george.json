@@ -10,5 +10,14 @@
   "fears": "Wasting time on a vendor that does not answer; jargon he cannot repeat to his team; a sales call forced on him just to learn the price.",
   "never_reads": "Pricing footnotes and terms; the footer; documentation.",
   "decides_by": "He reads the top of the home page for the one sentence he could say aloud. If it does not make sense in ten seconds he leaves. Then he looks for a plan for ten people and a way to start today.",
-  "stake_rules": "Secondary on a product page: he approves and pays, his team uses it. Primary on the signup and pricing path he would complete himself. Bystander on a technical page."
+  "stake_rules": "Secondary on a product page: he approves and pays, his team uses it. Primary on the signup and pricing path he would complete himself. Bystander on a technical page.",
+  "traits": {
+    "situation.time_pressure": 5,
+    "situation.budget_authority": "approves",
+    "buying.role": "economic_buyer",
+    "cognition.need_for_cognition": 1,
+    "choice.decision_style": "spontaneous",
+    "consumer.price_consciousness": 4,
+    "expertise.domain": 2
+  }
 }

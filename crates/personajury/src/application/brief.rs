@@ -1,6 +1,7 @@
 //! brief: deterministic, hashed, one file per persona × lens; creates the run (plan Task 4)
 use super::{AppError, Result};
 use crate::domain::hash::{self, sha256_hex};
+use crate::domain::traits::{self, TraitDef, TraitSetDef};
 use crate::domain::*;
 use crate::store::{now_iso, Store};
 use serde_json::{json, Value};
@@ -38,6 +39,53 @@ pub struct BriefArgs {
     pub effort: Option<Effort>,
     /// whether the jurors are separate contexts (D18)
     pub independence: Independence,
+    /// `off`, `all` or the name of a trait set: which of the persona's traits the briefs render (D31)
+    pub traits: Option<String>,
+    /// `auto`: seat every persona that serves the subject's audience, plus one control (see `seats_auto`)
+    pub seats: Option<String>,
+}
+
+/// What the briefs of a run render of the personas' traits (D31).
+pub(crate) struct TraitCtx {
+    mode: &'static str,
+    set: Option<TraitSetDef>,
+    defs: BTreeMap<String, TraitDef>,
+}
+impl TraitCtx {
+    /// The block of one persona and the trait ids it renders; none when the mode renders nothing for it.
+    fn block(&self, p: &Persona) -> Option<(String, Vec<String>)> {
+        let held = p.traits.as_ref()?;
+        let mut ids: Vec<String> = Vec::new();
+        let mut bullets: Vec<String> = Vec::new();
+        for (id, v) in held {
+            if let Some(set) = &self.set {
+                if !set.traits.contains(id) {
+                    continue;
+                }
+            }
+            let Some(def) = self.defs.get(id) else { continue };
+            let b = def.bullets(v);
+            if !b.is_empty() {
+                ids.push(id.clone());
+                bullets.extend(b);
+            }
+        }
+        if ids.is_empty() {
+            return None;
+        }
+        if let (Some(a), Some(b)) = (held.get("persuasion.involvement"), held.get("cognition.need_for_cognition")) {
+            let both = ids.iter().any(|i| i == "persuasion.involvement") && ids.iter().any(|i| i == "cognition.need_for_cognition");
+            if let (true, Some(line)) = (both, traits::route_line(a, b)) {
+                bullets.push(line.to_string());
+            }
+        }
+        let mut t = String::from("\n## How this reader tends to decide (told)\n\n");
+        for b in &bullets {
+            t.push_str(&format!("- {b}\n"));
+        }
+        t.push_str("\nThese tendencies are told, not seen: a line that leans on one is `told` evidence; a line about the subject still needs its citation.\n");
+        Some((t, ids))
+    }
 }
 
 /// Seats per wave when the caller does not say (D12).
@@ -162,6 +210,7 @@ fn compose_text(
     options: &[String],
     detail: Detail,
     run_on: Option<&str>,
+    traits_block: Option<&str>,
 ) -> Result<String> {
     let mut t = String::new();
     t.push_str("personajury-brief 1\n\n");
@@ -189,6 +238,9 @@ The engine that wrote this brief calls no model; you are the judge, and your ans
                 t.push_str(&format!("- {label}: {v}\n"));
             }
         }
+    }
+    if let Some(b) = traits_block {
+        t.push_str(b);
     }
     t.push_str(&format!(
         "\n## Your stake in this run\n\n{}: {}.\n\nStake rules: {}\n\n",
@@ -441,6 +493,11 @@ struct Shared<'a> {
     /// the rule class and the effective quorum (the higher of the rule's and the sources'), recorded on the run (D13)
     rule: Option<&'a str>,
     quorum: Option<&'static str>,
+    traits: Option<&'a TraitCtx>,
+    /// whether the panel's draw covered traits (D30)
+    cover: bool,
+    /// the seats `--seats auto` chose, recorded on the run
+    seats: Option<&'a Value>,
 }
 
 /// Compose and write the briefs of one lens and create its run.
@@ -483,6 +540,8 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
     };
     // compose every brief first (the text names no run), so nothing can fail between the run row and its files
     let mut texts = Vec::new();
+    let mut versions: BTreeMap<String, i64> = BTreeMap::new();
+    let mut incomplete: Vec<Value> = Vec::new();
     for id in sh.selected {
         let persona = store
             .persona(id)?
@@ -491,12 +550,38 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         let model = sh.models.get(id).cloned().unwrap_or_else(|| sh.model.to_string());
         // every brief of a run with a model in its terms states its own; a run with none is as it always was
         let run_on = (!sh.models.is_empty()).then_some(model.as_str());
+        let block = sh.traits.and_then(|c| c.block(&persona));
+        if let (Some(c), Some((_, ids))) = (sh.traits, &block) {
+            for i in ids {
+                versions.insert(i.clone(), c.defs[i].version);
+            }
+        }
+        if let Some(missing) = sh.traits.and_then(|c| trait_set_missing(c, &persona)) {
+            incomplete.push(json!({"persona": id, "missing": missing}));
+        }
         let text = compose_text(
             root, &persona, stake, lens, sh.subject, sh.cmps, &options, sh.detail, run_on,
+            block.as_ref().map(|(b, _)| b.as_str()),
         )?;
         texts.push((id.clone(), persona.version, stake, text, model));
     }
     let run_id = store.insert_run(&run)?;
+    // what the run rendered and how it was drawn (D31); null when nothing was rendered and the panel has no cover
+    let traits_json = (sh.traits.is_some() || sh.cover).then(|| {
+        let mut v = json!({
+            "mode": sh.traits.map_or("off", |c| c.mode),
+            "set": sh.traits.and_then(|c| c.set.as_ref()).map(|s| s.name.clone()),
+            "versions": versions,
+            "draw": if sh.cover { "cover" } else { "seeded" },
+        });
+        if !incomplete.is_empty() {
+            v["incomplete"] = json!(incomplete);
+        }
+        v
+    });
+    if traits_json.is_some() || sh.seats.is_some() {
+        store.set_run_traits(run_id, traits_json.as_ref(), sh.seats)?;
+    }
     let dir_rel = format!(".personajury/runs/{run_id}");
     let dir = root.join(&dir_rel);
     // a write that fails leaves no orphan run (final review: an orphan clears nothing and confuses check)
@@ -561,6 +646,18 @@ fn one_run(root: &Path, store: &Store, sh: &Shared, lens: &Lens) -> Result<Value
         out["note"] = json!("one context will read all of these; the run is labelled sequential");
     }
     Ok(out)
+}
+
+/// The traits of the set a persona lacks, when the run renders a set and there are some.
+fn trait_set_missing(c: &TraitCtx, p: &Persona) -> Option<Vec<String>> {
+    let set = c.set.as_ref()?;
+    let missing: Vec<String> = set
+        .traits
+        .iter()
+        .filter(|t| !p.traits.as_ref().is_some_and(|m| m.contains_key(*t)))
+        .cloned()
+        .collect();
+    (!missing.is_empty()).then_some(missing)
 }
 
 /// An effort's seat cap (D17): one seat per stratum present first (primary first), then the next in the selection's
@@ -734,6 +831,18 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         .detail
         .or(rule.map(|r| r.detail))
         .unwrap_or(Detail::Compact);
+
+    // the trait mode (D31): the flag, else the rule's trait_set, else off; a set must exist
+    let rule_traits: String = rule.and_then(|r| r.trait_set.clone()).unwrap_or_else(|| "off".into());
+    let mode_word: String = a.traits.clone().map(|t| t.trim().to_string()).unwrap_or_else(|| rule_traits.clone());
+    let trait_ctx: Option<TraitCtx> = match mode_word.as_str() {
+        "off" => None,
+        "all" => Some(TraitCtx { mode: "all", set: None, defs: store.trait_map()? }),
+        name => {
+            let set = store.trait_set(name)?.ok_or_else(|| Refusal::TraitSetUnknown { name: name.to_string() })?;
+            Some(TraitCtx { mode: "set", set: Some(set), defs: store.trait_map()? })
+        }
+    };
 
     // a rule that names a panel or a lens the store lacks is its own refusal; a caller's own choice is a plain not_found
     let (panel_from_rule, rule_class) = (
@@ -1009,6 +1118,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
                     json!({"rule": Value::Object(pick("panel")), "given": Value::Object(pick("given"))}),
                 );
             }
+            if a.traits.is_some() && mode_word != rule_traits {
+                fields.insert("traits".into(), json!({"rule": rule_traits, "given": mode_word}));
+            }
             if a.draw.is_some() {
                 let derived = super::panel::hex_seed(hash::draw_seed(&subject.name, &seed_name));
                 if derived != super::panel::hex_seed(seed) {
@@ -1090,6 +1202,9 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         independence: a.independence,
         rule: rule.map(|r| r.class.as_str()),
         quorum: quorum.map(quorum_word),
+        traits: trait_ctx.as_ref(),
+        cover: false,
+        seats: None,
     };
     let mut runs = Vec::new();
     for lens in &lenses {
@@ -1117,6 +1232,18 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         out["budget_tokens"] = json!(b);
     }
     out["independence"] = json!(a.independence.name());
+    if let Some(c) = trait_ctx.as_ref().filter(|c| c.set.is_some()) {
+        let incomplete: Vec<Value> = selected
+            .iter()
+            .filter_map(|id| {
+                let p = store.persona(id).ok().flatten()?;
+                trait_set_missing(c, &p).map(|m| json!({"persona": id, "missing": m}))
+            })
+            .collect();
+        if !incomplete.is_empty() {
+            out["trait_set_incomplete"] = json!(incomplete);
+        }
+    }
     if large {
         out["large"] = json!(true);
     }

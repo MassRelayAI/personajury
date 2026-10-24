@@ -10,5 +10,15 @@
   "fears": "Looking stupid; installing something she cannot understand; a free trial that charges her card later.",
   "never_reads": "Anything with words she has to look up. She stops at the first sentence she cannot paraphrase.",
   "decides_by": "The first ten seconds. If the headline says what it is in plain words she scrolls; if not, she goes back to the chat and says 'no idea'. She picks what her friends already use.",
-  "stake_rules": "Primary on a home page that could become her tool. Secondary on a pricing page, only to see if it is free. Bystander on an enterprise or admin page."
+  "stake_rules": "Primary on a home page that could become her tool. Secondary on a pricing page, only to see if it is free. Bystander on an enterprise or admin page.",
+  "traits": {
+    "social.need_to_belong": 5,
+    "social.rejection_sensitivity": 4,
+    "expertise.domain": 1,
+    "consumer.price_consciousness": 5,
+    "situation.time_pressure": 5,
+    "adoption.ease_demanded": 5,
+    "situation.budget_authority": "none",
+    "choice.decision_style": "dependent"
+  }
 }

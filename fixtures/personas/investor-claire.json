@@ -10,5 +10,14 @@
   "fears": "Backing a company that cannot say what it sells or what it charges; a market so crowded that the page shows no reason to choose it.",
   "never_reads": "Feature lists, the footer, anything below the first screen unless the first screen interests her.",
   "decides_by": "A clear claim, a visible price and one reason this is different from the other tools she has seen. She decides on whether the page would convert a stranger, not on whether she would use it.",
-  "stake_rules": "Bystander on almost every page: she passes by. Secondary on a pricing page, where the model of the business shows. Never primary on a product page she would not use."
+  "stake_rules": "Bystander on almost every page: she passes by. Secondary on a pricing page, where the model of the business shows. Never primary on a product page she would not use.",
+  "traits": {
+    "situation.time_pressure": 5,
+    "expertise.domain": 4,
+    "persuasion.involvement": 2,
+    "trust.marketing_skepticism": 4,
+    "cognition.need_for_cognition": 3,
+    "choice.decision_style": "intuitive",
+    "risk.financial": 4
+  }
 }

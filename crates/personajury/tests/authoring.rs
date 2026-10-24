@@ -36,6 +36,7 @@ const PERSONAS: [&str; 7] = [
     "newcomer-sofia",
 ];
 fn add_personas(ws: &Path) {
+    ok(jg(ws, &["trait", "install"]));
     for p in PERSONAS {
         let f = s(fx(&format!("personas/{p}.json")));
         ok(jg(ws, &["persona", "add", "--file", &f]));
@@ -92,6 +93,7 @@ fn read(ws: &Path, rel: &str) -> String {
 fn persona_add_then_list() {
     let ws = tempfile::tempdir().unwrap();
     let f = s(fx("personas/builder-ana.json"));
+    ok(jg(ws.path(), &["trait", "install"]));
     let d = ok(jg(ws.path(), &["persona", "add", "--file", &f]));
     assert_eq!(d["id"], "builder-ana");
     assert_eq!(d["version"], 1);
@@ -143,6 +145,7 @@ fn generate_same_material_same_hash() {
     assert_eq!(x["sources"].as_array().unwrap().len(), 7);
     // the recorded material lets a persona carry its origin
     let f = s(fx("personas/builder-ana.json"));
+    ok(jg(a.path(), &["trait", "install"]));
     let d = ok(jg(
         a.path(),
         &["persona", "add", "--file", &f, "--generated-from", hash],

@@ -22,6 +22,7 @@ fn jg(ws: &Path, args: &[&str]) -> Value {
     serde_json::from_slice(&out.stdout).unwrap()
 }
 fn setup(ws: &Path) {
+    jg(ws, &["trait", "install"]);
     for p in ["builder-ana", "builder-mei", "company-george"] {
         let r = jg(
             ws,

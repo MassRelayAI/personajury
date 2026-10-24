@@ -167,6 +167,7 @@ fn fixture_ws(root: &Path, extra: &[&str]) -> (i64, i64) {
     let mut personas: Vec<_> =
         std::fs::read_dir(repo().join("fixtures/personas")).unwrap().map(|e| e.unwrap().path()).collect();
     personas.sort();
+    data(cli(root, &["trait", "install"]));
     for p in personas {
         data(cli(root, &["persona", "add", "--file", p.to_str().unwrap()]));
     }
@@ -1075,7 +1076,7 @@ fn the_three_example_lenses_are_accepted_by_lens_add() {
 
 /// (flag, column): `free` needs no reason, `reason` needs a recorded one. A flag added to `brief` without a row here, or
 /// without a cell in the table of the skill and `docs/usage.md`, turns this red.
-const DIAL: [(&str, &str); 17] = [
+const DIAL: [(&str, &str); 19] = [
     ("--subject", "free"),
     ("--model", "free"),
     ("--comparator", "free"),
@@ -1093,6 +1094,8 @@ const DIAL: [(&str, &str); 17] = [
     ("--reason", "reason"),
     ("--by", "reason"),
     ("--effort", "reason"),
+    ("--traits", "reason"),
+    ("--seats", "reason"),
 ];
 
 fn dial_table(file: &str) -> Vec<Vec<String>> {

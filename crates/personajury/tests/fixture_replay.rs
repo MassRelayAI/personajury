@@ -48,6 +48,7 @@ fn build(ws: &Path) -> (i64, i64) {
         .map(|e| e.unwrap().path())
         .collect();
     personas.sort();
+    j(ws, &["trait", "install"]);
     for p in personas {
         j(ws, &["persona", "add", "--file", p.to_str().unwrap()]);
     }

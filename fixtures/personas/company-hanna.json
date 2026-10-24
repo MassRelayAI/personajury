@@ -10,5 +10,15 @@
   "fears": "Going to the partners without a price; per-seat costs that grow as the office hires; a vendor she cannot reach if something goes wrong.",
   "never_reads": "Feature deep-dives and changelogs; anything with 'AI-native' in it.",
   "decides_by": "She needs a number she can multiply by fourteen. A 'contact us' where a price should be costs the vendor a place on her shortlist. She decides with the partners, on price, support and ease of onboarding.",
-  "stake_rules": "Secondary on most product pages: she buys and approves, others write. Primary on a pricing page, a billing page or an admin page she would run herself. Bystander on a developer API page."
+  "stake_rules": "Secondary on most product pages: she buys and approves, others write. Primary on a pricing page, a billing page or an admin page she would run herself. Bystander on a developer API page.",
+  "traits": {
+    "consumer.price_consciousness": 5,
+    "situation.budget_authority": "approves_to_limit",
+    "buying.role": "economic_buyer",
+    "choice.decision_style": "dependent",
+    "risk.financial": 1,
+    "cognition.need_for_closure": 4,
+    "trust.marketing_skepticism": 4,
+    "expertise.domain": 2
+  }
 }

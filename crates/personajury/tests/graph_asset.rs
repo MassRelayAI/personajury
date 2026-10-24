@@ -26,6 +26,7 @@ fn fixture(rel: &str) -> String {
 fn jury(ws: &Path) -> (i64, i64) {
     let mut personas: Vec<_> = std::fs::read_dir(repo().join("fixtures/personas")).unwrap().map(|e| e.unwrap().path()).collect();
     personas.sort();
+    j(ws, &["trait", "install"]);
     for p in personas {
         j(ws, &["persona", "add", "--file", p.to_str().unwrap()]);
     }

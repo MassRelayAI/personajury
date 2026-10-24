@@ -48,6 +48,8 @@ pub fn tools() -> Vec<Value> {
                     "reason": {"type":"string","description":"why this brief departs from its rule, or runs above 12 seats; recorded on the run"},
                     "by": {"type":"string","description":"who departed from the rule; default agent"},
                     "effort": {"type":"string","enum":["low","medium","high","max"],"description":"how much this run may spend, over personajury.toml's effort (default medium under a rule): low is 3 seats and the rule's first lens, medium up to 7, high up to 12, max the rule's panel (above 12 needs allow_large and reason). A cheap jury on a risky change advises, never applies. Recorded on the run."},
+                    "seats": {"type":"string","enum":["auto"],"description":"auto: seat every persona whose serves meets the subject's audience (capped by effort) plus exactly one control persona that does not, instead of a panel; the answer lists seats [{persona, why}] and the run records them. Refusals: audience_unknown, no_matching_personas."},
+                    "traits": {"type":"string","description":"render the personas' traits as \"you tend to\" lines: a trait set's name, all, or off (default: the rule's trait_set, else off). Under a rule, a value that differs from the rule's is an override and needs reason. Traits are told, never seen."},
                     "independence": {"type":"string","enum":["independent","sequential"],"description":"independent (default): one context per brief. sequential: one context will read all the briefs; the run is labelled so and apply-check never answers apply for it"},
                     "wave": {"type":"integer","minimum":1,"description":"seats per wave in the answer's waves (default 30): run one wave, ingest it, then the next"} }),
                 &["subject", "model"],
@@ -229,6 +231,8 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             "wave",
             "effort",
             "independence",
+            "traits",
+            "seats",
         ],
         "personajury_verdict" => &["run", "verdict"],
         "personajury_matrix" => &["runs", "table", "history", "detail"],
@@ -277,6 +281,8 @@ fn command(name: &str, a: &Value) -> Result<Cmd, String> {
             by: str_arg(a, "by")?,
             effort: str_arg(a, "effort")?,
             independence: str_arg(a, "independence")?,
+            traits: str_arg(a, "traits")?,
+            seats: str_arg(a, "seats")?,
             wave: match a.get("wave") {
                 None | Some(Value::Null) => None,
                 Some(v) => match v.as_u64() {

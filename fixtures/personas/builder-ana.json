@@ -10,5 +10,15 @@
   "fears": "Paying for a seat nobody uses; a tool that holds her notes hostage on export; a hidden price that turns up after she has moved her pages in.",
   "never_reads": "Marketing superlatives, anything that says 'solution' or 'platform', customer logos, a video before she has seen a screenshot.",
   "decides_by": "She reads the pricing page first, then the feature list, then tries it. A price she cannot see counts as a price she cannot afford. She decides alone and fast, on cost, export and search.",
-  "stake_rules": "Primary on a pricing page and on a home that claims what the product does: she would use it. Secondary on a legal or security page. Bystander on a careers page or a press page."
+  "stake_rules": "Primary on a pricing page and on a home that claims what the product does: she would use it. Secondary on a legal or security page. Bystander on a careers page or a press page.",
+  "traits": {
+    "consumer.price_consciousness": 5,
+    "choice.decision_style": "rational",
+    "situation.time_pressure": 4,
+    "trust.marketing_skepticism": 4,
+    "situation.budget_authority": "approves",
+    "expertise.domain": 4,
+    "situation.switching_cost": 4,
+    "buying.role": "economic_buyer"
+  }
 }

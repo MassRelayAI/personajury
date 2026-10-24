@@ -7,6 +7,7 @@ J="${1:?usage: readme-assets-data.sh <personajury binary>}"
 R="$(cd "$(dirname "$0")/.." && pwd)"
 W="$(mktemp -d)"; trap 'rm -rf "$W"' EXIT
 j() { "$J" --root "$W" "$@"; }
+j trait install >/dev/null
 for p in "$R"/fixtures/personas/*.json; do j persona add --file "$p" >/dev/null; done
 j panel add fixture --query "3 builder, 2 company, 2 others" >/dev/null
 j subject add lantern-site --kind page --attach "$R"/fixtures/site-walk/home.walk.json "$R"/fixtures/site-walk/home.png "$R"/fixtures/site-walk/pricing.walk.json "$R"/fixtures/site-walk/pricing.png >/dev/null

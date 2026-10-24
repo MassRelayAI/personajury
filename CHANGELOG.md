@@ -6,9 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-
-## [0.6.0] - unreleased
-### Added (v0.6-A, D29-D31)
+### Added (v0.6-A, D29-D31; becomes the 0.6.0 entry on release)
 - Traits as data: 49 traits in 14 families and eight trait sets ship embedded (`traits/`, `trait-sets/`); `trait install | add | list | show`
   and `trait set add | list`; every anchor is our own words, no questionnaire item is copied (D29).
 - Schema v5 (one migration for the v0.6 lanes, idempotent): persona `traits` and `serves`, panel cover, run traits and seats, subject

@@ -35,6 +35,20 @@ had. Scores are relative to the options in the room. Compare within one run.
 
 A name is harder than a logo: people judge it in context. So show each candidate where it will live.
 
+**Keep the jury honest.** A naming jury is easy to bias, and our own first one was. So:
+
+- **Neutral cards.** Each card carries only facts: the name, the same one-line pitch, and the registry facts
+  (domains, packages, existing repositories). Leave out your hunches, such as "people search for X". Jurors will repeat
+  your hints back to you as their reasons.
+- **Mixed models.** Seat jurors on more than one model (`"2 builder=primary@model-a, 2 builder=primary@model-b"`), so
+  that one model's taste does not look like agreement.
+- **A group outside your target.** Add a stratum of people you are *not* building for. If they read the name the
+  opposite way, you have learned something.
+- **A finer scale for close calls.** Between two near names, 1–5 bunches at 3. Use a 1–10 lens, or read the per-juror
+  scores, not only the medians.
+- **The name is still yours to decide.** Brand is a human class. The jury advises; the owner can override, and the
+  record should say so.
+
 1. **Make one small file per candidate.** For a hostname, a screenshot of a login page with that address in the bar, or
    a short text file: the address, the email it would send from, the line on a business card. Name each file after the
    candidate.

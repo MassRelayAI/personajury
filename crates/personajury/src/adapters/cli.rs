@@ -360,6 +360,14 @@ pub enum TraitCmd {
         #[arg(long)]
         check: Option<PathBuf>,
     },
+    /// What a persona did in its accepted initial verdicts, counted, and what that bears on the traits it declares (D35)
+    Observed {
+        #[arg(long = "persona", required = true)]
+        persona: Vec<String>,
+        /// run ids separated by commas; default every run the persona sat in
+        #[arg(long)]
+        runs: Option<String>,
+    },
     /// Trait sets: up to 8 traits an audience is judged by, up to 4 of them the cover of a panel
     Set {
         #[command(subcommand)]
@@ -438,6 +446,7 @@ pub fn verb(cmd: &Cmd) -> &'static str {
         Cmd::Trait { what: TraitCmd::Show { .. } } => "trait show",
         Cmd::Trait { what: TraitCmd::Generate { .. } } => "trait generate",
         Cmd::Trait { what: TraitCmd::Suggest { .. } } => "trait suggest",
+        Cmd::Trait { what: TraitCmd::Observed { .. } } => "trait observed",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::Add { .. } } } => "trait set add",
         Cmd::Trait { what: TraitCmd::Set { what: TraitSetCmd::List } } => "trait set list",
         Cmd::Panel { what: PanelCmd::Add { .. } } => "panel add",
@@ -516,6 +525,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             TraitCmd::List => app::traits::list(root),
             TraitCmd::Show { id } => app::traits::show(root, id),
             TraitCmd::Generate { from, count } => app::traits::generate(root, from, *count),
+            TraitCmd::Observed { persona, runs } => app::trait_reverse::observed(root, persona, runs.as_deref()),
             TraitCmd::Suggest { persona, set, check } => match check {
                 Some(f) => app::trait_reverse::suggest_check(root, f, persona.as_deref()),
                 None => app::trait_reverse::suggest(root, persona.as_deref(), set.as_deref()),

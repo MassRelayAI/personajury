@@ -61,6 +61,10 @@ pub const CATALOG: &[(&str, &str)] = &[
     ("trait-sets/public-sector-legal.toml", include_str!("../../../../trait-sets/public-sector-legal.toml")),
 ];
 
+/// The shipped mapping table of `trait observed` (D35): which observed signal bears on which declared trait. Data like the
+/// catalog, embedded with it; a project may add rows in `.personajury/observe-map.toml`.
+pub const OBSERVE_MAP: &str = include_str!("../../../../traits/observe-map.toml");
+
 /// Whether `id` is a trait the catalog ships (`traits/<family>/<trait>.toml` is the trait `<family>.<trait>`).
 pub fn is_shipped(id: &str) -> bool {
     shipped_text(id).is_some()

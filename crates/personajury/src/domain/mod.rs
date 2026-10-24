@@ -12,6 +12,7 @@ pub mod hash;
 pub mod matrix;
 pub mod metrics;
 pub mod model;
+pub mod observed;
 pub mod query;
 pub mod rng;
 pub mod summary;

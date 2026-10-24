@@ -2,6 +2,7 @@
 //! `trait observed` counts what a persona did in its verdicts. Neither calls a model and neither writes a trait back.
 use super::{AppError, Result};
 use crate::domain::hash::sha256_hex;
+use crate::domain::observed::{self, RunData};
 use crate::domain::traits::{check_map_shape, TraitDef, TraitValue, MAX_PERSONA_TRAITS};
 use crate::domain::*;
 use crate::store::Store;
@@ -172,4 +173,100 @@ pub fn suggest_check(root: &Path, file: &Path, persona: Option<&str>) -> Result<
         "evidence": quotes,
         "from_version": p.version,
     }))
+}
+
+/// The shipped mapping table, then the project's rows from `.personajury/observe-map.toml`. A project row adds a rule and
+/// overrides nothing: an id the table already holds is refused.
+pub fn rules(root: &Path) -> Result<Vec<observed::Rule>> {
+    let mut rules = observed::parse_rules(crate::domain::catalog::OBSERVE_MAP)
+        .map_err(|e| AppError::InvalidArguments(format!("embedded observe-map.toml: {e}")))?;
+    let mine = root.join(".personajury").join("observe-map.toml");
+    if mine.is_file() {
+        let extra = observed::parse_rules(&super::read_text(&mine)?)
+            .map_err(|e| AppError::InvalidArguments(format!("{}: {e}", mine.display())))?;
+        for r in extra {
+            if rules.iter().any(|x| x.id == r.id) {
+                return Err(AppError::InvalidArguments(format!(
+                    "{}: rule {} is already in the shipped table; a project row adds a rule and overrides none",
+                    mine.display(),
+                    r.id
+                )));
+            }
+            rules.push(r);
+        }
+    }
+    Ok(rules)
+}
+
+/// One run's accepted initial verdicts of every juror, as `observe` reads them.
+fn run_data(store: &Store, id: i64) -> Result<RunData> {
+    let run = super::verdict::load_run(store, id)?;
+    let lens = super::verdict::load_lens(store, &run)?;
+    let rows: Vec<VerdictRow> = store.verdict_rows(id, false)?.into_iter().filter(|r| !super::verdict::is_human(&r.persona)).collect();
+    let picks = store
+        .picks(id, false)?
+        .into_iter()
+        .filter(|p| p.about.is_none() && !super::verdict::is_human(&p.persona))
+        .map(|p| (p.persona, p.choice))
+        .collect();
+    Ok(RunData {
+        run: id,
+        stakes: run.stakes.clone(),
+        rows: super::verdict::score_rows(&run, &rows),
+        scale_min: lens.scale[0],
+        picks,
+        subject: run.subject_name.clone(),
+    })
+}
+
+/// `trait observed --persona ID [--persona ID ...] [--runs A,B,...]` (D35): counts of what the persona did in its accepted
+/// initial verdicts, and per declared trait `consistent`, `contradicted`, `mixed` or `no_signal` against the mapping table.
+/// No model, nothing written: any change to a persona goes through `persona add`. One persona answers its object; several
+/// answer `{"personas": [...]}`.
+pub fn observed(root: &Path, personas: &[String], runs: Option<&str>) -> Result<Value> {
+    if personas.is_empty() {
+        return Err(AppError::InvalidArguments("trait observed needs --persona ID".into()));
+    }
+    let wanted: Option<Vec<i64>> = match runs {
+        None => None,
+        Some(s) => Some(
+            s.split(',')
+                .map(|x| x.trim().parse::<i64>().map_err(|_| AppError::InvalidArguments(format!("--runs {s:?}: run ids separated by commas"))))
+                .collect::<Result<Vec<_>>>()?,
+        ),
+    };
+    let store = Store::open_existing(root)?;
+    let rules = rules(root)?;
+    let defs = store.trait_map()?;
+    let all = store.runs()?;
+    let mut cache: BTreeMap<i64, RunData> = BTreeMap::new();
+    let mut out = Vec::new();
+    for pid in personas {
+        let p = store.persona(pid)?.ok_or_else(|| AppError::NotFound(format!("no persona {pid}")))?;
+        let ids: Vec<i64> = match &wanted {
+            Some(w) => {
+                for id in w {
+                    let run = all.iter().find(|r| r.id == *id).ok_or_else(|| AppError::NotFound(format!("no run {id}")))?;
+                    if !run.personas.contains(pid) {
+                        return Err(AppError::InvalidArguments(format!("persona {pid} did not sit in run {id}")));
+                    }
+                }
+                w.clone()
+            }
+            None => all.iter().filter(|r| r.personas.contains(pid)).map(|r| r.id).collect(),
+        };
+        for id in &ids {
+            if !cache.contains_key(id) {
+                cache.insert(*id, run_data(&store, *id)?);
+            }
+        }
+        let data: Vec<RunData> = ids.iter().filter_map(|i| cache.get(i)).cloned().collect();
+        let signals = observed::observe(pid, &data);
+        let declared = p.traits.clone().unwrap_or_default();
+        out.push(json!({
+            "persona": pid, "runs": signals.runs, "signals": signals.to_json(),
+            "traits": observed::verdicts(&declared, &defs, &rules, &signals),
+        }));
+    }
+    Ok(if out.len() == 1 { out.remove(0) } else { json!({"personas": out}) })
 }

@@ -1,0 +1,155 @@
+# A bearing, not a measurement: which observed signal bears on which declared trait, at which pole.
+# `trait observed` counts what a persona did in its accepted initial verdicts and reads this table; it never writes a trait.
+# A contradicted trait is a question for the author, not a verdict on the persona.
+#   signal    severity | blockers | evidence | pick | bottom
+#   lens      severity only; "*" = any lens
+#   dimension severity only; "*" = any dimension
+#   direction severity: below|above; blockers/bottom: more|fewer; evidence: recalled_over_seen|seen_over_recalled;
+#             pick: against_majority|with_majority
+#   pole      high | low | an option id for a category trait
+
+[[rule]]
+id = "price-severity"
+signal = "severity"
+lens = "compare"
+dimension = "price"
+direction = "below"
+trait = "consumer.price_consciousness"
+pole = "high"
+
+[[rule]]
+id = "trust-severity-skeptic"
+signal = "severity"
+lens = "compare"
+dimension = "trust"
+direction = "below"
+trait = "trust.marketing_skepticism"
+pole = "high"
+
+[[rule]]
+id = "trust-severity-trusting"
+signal = "severity"
+lens = "compare"
+dimension = "trust"
+direction = "above"
+trait = "trust.propensity"
+pole = "high"
+
+[[rule]]
+id = "critical-severity"
+signal = "severity"
+lens = "critical"
+dimension = "*"
+direction = "below"
+trait = "adoption.ease_demanded"
+pole = "high"
+
+[[rule]]
+id = "taste-severity"
+signal = "severity"
+lens = "taste"
+dimension = "*"
+direction = "below"
+trait = "aesthetics.sensitivity"
+pole = "high"
+
+[[rule]]
+id = "clarity-severity-novice"
+signal = "severity"
+lens = "compare"
+dimension = "clarity"
+direction = "below"
+trait = "expertise.domain"
+pole = "low"
+
+[[rule]]
+id = "clarity-severity-rejection"
+signal = "severity"
+lens = "compare"
+dimension = "clarity"
+direction = "below"
+trait = "social.rejection_sensitivity"
+pole = "high"
+
+[[rule]]
+id = "risk-severity"
+signal = "severity"
+lens = "tradeoffs"
+dimension = "risk"
+direction = "below"
+trait = "risk.financial"
+pole = "low"
+
+[[rule]]
+id = "loss-severity"
+signal = "severity"
+lens = "tradeoffs"
+dimension = "risk"
+direction = "below"
+trait = "choice.loss_aversion"
+pole = "high"
+
+[[rule]]
+id = "numeracy-severity"
+signal = "severity"
+lens = "financial-model"
+dimension = "*"
+direction = "below"
+trait = "expertise.numeracy"
+pole = "high"
+
+[[rule]]
+id = "blockers-skeptic"
+signal = "blockers"
+direction = "more"
+trait = "trust.marketing_skepticism"
+pole = "high"
+
+[[rule]]
+id = "blockers-maximizer"
+signal = "blockers"
+direction = "more"
+trait = "choice.maximizing"
+pole = "high"
+
+[[rule]]
+id = "evidence-recalled"
+signal = "evidence"
+direction = "recalled_over_seen"
+trait = "cognition.need_for_cognition"
+pole = "low"
+
+[[rule]]
+id = "evidence-seen"
+signal = "evidence"
+direction = "seen_over_recalled"
+trait = "cognition.need_for_cognition"
+pole = "high"
+
+[[rule]]
+id = "evidence-seen-rational"
+signal = "evidence"
+direction = "seen_over_recalled"
+trait = "choice.decision_style"
+pole = "rational"
+
+[[rule]]
+id = "pick-unique"
+signal = "pick"
+direction = "against_majority"
+trait = "social.need_for_uniqueness"
+pole = "high"
+
+[[rule]]
+id = "pick-follows"
+signal = "pick"
+direction = "with_majority"
+trait = "social.influence_susceptibility"
+pole = "high"
+
+[[rule]]
+id = "bottom-harsh"
+signal = "bottom"
+direction = "more"
+trait = "personality.agreeableness"
+pole = "low"

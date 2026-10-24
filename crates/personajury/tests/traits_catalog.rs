@@ -15,7 +15,8 @@ fn on_disk() -> BTreeSet<String> {
                 let p = e.unwrap().path();
                 if p.is_dir() {
                     walk(&p, root, out);
-                } else if p.extension().is_some_and(|x| x == "toml") {
+                } else if p.extension().is_some_and(|x| x == "toml") && p.file_name().is_some_and(|n| n != "observe-map.toml") {
+                    // the observe map is data of its own (D35), embedded as OBSERVE_MAP, not a trait or a set
                     out.insert(p.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/"));
                 }
             }

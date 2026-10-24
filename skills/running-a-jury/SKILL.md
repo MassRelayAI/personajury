@@ -44,6 +44,8 @@ Subject, panel and lens exist already (`subject add`, `panel add`, `lens list`).
 its stake (`3 builder=primary, 2 approver=secondary, 1 others=bystander`), and where a term's pool is bigger than its seats
 the engine draws them, seeded from the subject's name: the same subject keeps its bystanders between rounds.
 
+Capture the walk with `node tools/walk.mjs --out shots/ name=URL` (add `--phone`); see docs/walks.md. Cite ids from the captured walk.
+
 When a rule matched, let it brief for you:
 ```
 personajury brief --subject home --rule public-surface --model sonnet

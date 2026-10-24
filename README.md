@@ -1,5 +1,5 @@
 <!-- adapted from comparegraph README.md (shape only) -->
-<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (graph alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size); docs/decisions.md D13 to D24 (apply-check, effort seats 3, 7, 12; 0 of 8 for bars); fixtures/run/summary.txt (the summary excerpt); fixtures/run/setup.sh and verdicts/ (the replay, run as written on 2026-10-24); docs/usage.md and docs/ci.md (results, display, Desktop, the Action); docs/playbooks/README-section.md (the gallery block); fixtures/lenses/*.toml (dimension counts); scripts/install.sh and .github/workflows/release.yml (five binaries, SHA256SUMS, the attestation; the .mcpb bundles are attached when ENABLE_MCPB is set); .claude-plugin/marketplace.json and plugin.json (personajury@personajury, needs the binary on PATH); crates/personajury/src/application/setup.rs (what setup writes, the .bak backups, the rules block only beside a store); crates/personajury/tests/guards.rs and deny.toml (the no-network checks) -->
+<!-- sources: docs/reports/2026-10-23-v0-1-measured.md (the fixture run); docs/reports/2026-10-24-logo-jury.md (the logo); the CompareGraph readme-jury report (linked); docs/assets/personajury-graph.svg <desc> (graph alt); docs/assets/spend.json and strata.json (figures); docs/commands.md (12, 1000, 30: the seat ceilings and the wave size); docs/decisions.md D13 to D24 (apply-check, effort seats 3, 7, 12; 0 of 8 for bars); fixtures/run/summary.txt (the summary excerpt); fixtures/run/setup.sh and verdicts/ (the replay, run as written on 2026-10-24); docs/usage.md and docs/ci.md (results, display, Desktop, the Action); docs/playbooks/README-section.md (the gallery block); fixtures/lenses/*.toml (dimension counts); scripts/install.sh and .github/workflows/release.yml (five binaries, SHA256SUMS, the attestation; the .mcpb bundles are attached when ENABLE_MCPB is set); .claude-plugin/marketplace.json and plugin.json (personajury@personajury, needs the binary on PATH); crates/personajury/src/application/setup.rs (what setup writes, the .bak backups, the rules block only beside a store); crates/personajury/tests/guards.rs and deny.toml (the no-network checks); the hero and the place of the 183-trillion line, picked by a persona jury and kept by the maintainer; docs/reports/2026-10-24-the-name-picked-by-a-persona-jury.md (8 of 11, the third run); docs/traits.md (49 traits, at most 8 per persona, the 183,098,881,048,896 count); docs/commands.md (1000 with --allow-large); docs/decisions.md D29 to D42 (the v0.6 lines); docs/walks.md; docs/own-metrics.md (the 14-line script) -->
 
 <p align="center">
   <picture>
@@ -8,9 +8,14 @@
   </picture>
 </p>
 
+<h3 align="center">Put your work on trial before your customers do.</h3>
+
 <p align="center">
-  <b>Let a panel of AI personas read your page, docs, deck or code change before real people do. Each one must point at what it saw.</b>
+  A jury of AI personas reads your page, docs, deck or code change; every juror must point at what it saw, or its verdict is thrown out; it runs inside Claude Code, Codex, Cursor and Gemini CLI, and the engine calls no model.
 </p>
+
+- **Blockers 15 → 6** on a real README in two rounds ([report](https://github.com/massrelay-ai/comparegraph/blob/main/docs/reports/2026-10-24-readme-jury.md)).
+- **Our own jury named the product:** 8 of 11 picked PersonaJury ([report](docs/reports/2026-10-24-the-name-picked-by-a-persona-jury.md#the-third-run-and-the-final-name)).
 
 <p align="center">
   <a href="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml"><img src="https://github.com/massrelay-ai/personajury/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
@@ -41,7 +46,7 @@ You give PersonaJury the files people would see: screenshots of a page, a docume
    ```bash
    curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
    ```
-   It downloads one file for your system from the [v0.5.1 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.5.1),
+   It downloads one file for your system from the [v0.6.0 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.6.0),
    checks it against `SHA256SUMS`, and puts it in `~/.local/bin`. No sudo, nothing else. To read it before running it,
    see [Install](#install). To remove everything later, see [Uninstall](#uninstall).
 2. **Connect your agent.** In Claude Code, type:
@@ -87,6 +92,7 @@ The report opens with "The jury says: escalate. Primary jurors raised 15 blocker
 
 - **Persona:** a made-up reader with a role, daily tasks and fears, written as a small JSON file. Personas are composites, never real people.
 - **Stake, or stratum:** how much the persona has riding on it. `primary` would use it, `secondary` buys, approves or supports it, `bystander` passes by. Each stratum is reported on its own.
+- **Trait:** a tendency a persona holds, such as price consciousness, on a scale of 1 to 5 or as a category. The juror is told it; it is not proven.
 - **Lens:** what the jury scores, with what a 1, a 3 and a 5 look like, in words. `critical` asks: does it work, what blocks me, what is missing.
 - **Brief and verdict:** the brief is one persona's instructions, written by PersonaJury; the verdict is that persona's answer, as JSON.
 - **Subagent:** a separate helper your agent starts, one per persona, so jurors do not read each other's answers.
@@ -100,10 +106,10 @@ Release binaries for Linux x64 and arm64, macOS arm64 and x64, and Windows x64, 
 The install script downloads one file, the `personajury` binary for your platform, checks it against `SHA256SUMS`, and copies it to `~/.local/bin` (`PERSONAJURY_INSTALL_DIR` moves it). It does not use `sudo` and changes nothing else. To read it before it runs:
 
 ```bash
-# the script as tagged for v0.5.1: download it, read it, run it pinned to that release
-curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/personajury/v0.5.1/scripts/install.sh
+# the script as tagged for v0.6.0: download it, read it, run it pinned to that release
+curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/personajury/v0.6.0/scripts/install.sh
 less install.sh
-PERSONAJURY_VERSION=v0.5.1 sh install.sh
+PERSONAJURY_VERSION=v0.6.0 sh install.sh
 ```
 
 - **By hand, and on Windows:** download your platform's file (`personajury-linux-x64`, `personajury-darwin-arm64`, `personajury-win32-x64.exe`, …) and `SHA256SUMS` from the [latest release](https://github.com/massrelay-ai/personajury/releases/latest). Check it with `sha256sum -c --ignore-missing SHA256SUMS` (macOS: `shasum -a 256 <file>`; Windows: `Get-FileHash <file>`) and compare with its line. Rename it `personajury` (`personajury.exe` on Windows) and put it on your `PATH`.
@@ -188,6 +194,10 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 
 `should-run` says whether a change needs a jury. `brief` writes one hashed brief per persona. Your agent's subagents answer, and `verdict` ingests or refuses each answer. `matrix` reports per stratum. `decide` closes each finding as `fixed`, `dismissed` (with a why) or `row` (an issue). `delta` says whether the next round landed. `apply-check` says, last, whether the agent may apply the fixes.
 
+**Any audience, from 183 trillion possible juror profiles.**<sup>[1](docs/traits.md#how-many-juror-profiles)</sup> 49 research-based traits, from risk appetite to corporate distrust, combine into the seats your change needs. Generate thousands; seat up to 1,000 in a run. Each trait cites its research; the catalog is in [`docs/traits.md`](docs/traits.md).
+
+<sub>1. 49 traits × 5 levels, up to 8 per persona.</sub>
+
 `personajury graph` draws the whole fixture jury as one picture. Read it left to right: the personas, grouped by stake; the dimensions they scored, each with one median per stratum; the findings they raised, outlined by what was decided.
 
 <p align="center"><img src="docs/assets/personajury-graph.svg" alt="PersonaJury · lantern-site, the fixture run on the Lantern Notes site, drawn by personajury graph: 7 personas in three strata (primary 4, secondary 2, bystander 1) on the left, the 6 dimensions they scored across 2 lenses in the middle, each with one median badge per stratum and never one number across strata, and the 26 findings on the right, coloured by their decision: 0 open, 0 fixed, 11 dismissed, 15 sent to a row." width="100%"></p>
@@ -205,6 +215,17 @@ An agent asked "is this page good?" answers with confidence and no evidence. One
 <p align="center"><img src="docs/assets/spend.svg" alt="Brief bytes on the fixture for the critical lens: spend 1 is 5,116 bytes compact and 7,879 full; spend 3 is 15,212 and 23,501; spend 7 is 34,934 and 54,275; the toml's own estimate is 15,000 tokens per brief." width="100%"></p>
 
 Measured by `scripts/readme-assets-data.sh` ([`docs/assets/spend.json`](docs/assets/spend.json)); the token figure is the project's own estimate, not a measurement.
+
+### New in v0.6
+
+- **Traits and trait sets.** A persona may hold up to 8 traits, such as price consciousness; a set picks the traits a kind of subject needs, and `brief --traits` tells each juror "you tend to ..." ([traits](docs/traits.md)).
+- **`--seats auto`.** The brief seats the personas who serve the subject's audience, plus one control who does not, and says why each one sits.
+- **Decision juries.** Give questions and options instead of a page; the jury picks per question, and a money or legal question goes to a person.
+- **Deliberation, advise only.** `personajury deliberate` lets jurors read each other once; the run can then only advise.
+- **Honest metrics.** Agreement, shift, panel match and cost, counted per stratum, never a mean.
+- **`trait suggest` and `trait observed`.** Traits read back from a persona's prose (with quotes) or from its verdicts (with counts). They show how a persona was played, not how real people are.
+- **Page walks:** `node tools/walk.mjs` captures an ARIA walk and screenshot of any page ([docs/walks.md](docs/walks.md)).
+- **Your own metrics.** `personajury export RUN --format csv` gives the raw rows; a 14-line script counts what you need, per stratum ([docs/own-metrics.md](docs/own-metrics.md)).
 
 ### The last word: `apply-check`
 

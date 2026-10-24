@@ -795,3 +795,14 @@ A web chat has no subagents, so the manual route (one brief per chat, one verdic
   of those makes the verb exit 1 with `chat_answer_incomplete` carrying the same lists, so a partial ingest is never a silent success.
   An answer with no juror at all is `invalid_arguments`. Not combined with `--by-human`, `--traits`, `--deliberated`.
 - The engine reads a file; it calls no model and no network. No new dependency, no schema change.
+
+## D42 — the walk exporter ships upstream (2026-10-24, the maintainer)
+*Built in v0.6-D. Reference: [`walks.md`](walks.md).*
+A `seen` line cites a node of an ARIA walk, and until now every user had to make that walk by hand.
+- `tools/walk.mjs` captures a walk (`<name>.walk.json`) and a full-height screenshot (`<name>.png`) of any page; `--phone` adds a
+  390x844 pass. It is an offline helper outside the engine: the engine never runs it, never calls it, and stays without a network.
+- No npm dependency. It speaks the Chrome DevTools Protocol over Node's global `WebSocket` (Node 22 or later; Node 20 has none
+  unflagged) to a headless Chrome it launches, or to one given with `--cdp ws://...`. No Chrome: exit 2.
+- The id rule is `<role>-<slug(name)>`, numbered `-2`, `-3` in document order, generic and ignored nodes dropped (docs/walks.md).
+  The same page gives byte-identical walks. The fixture's hand-written ids predate the tool, so re-cite from a captured walk.
+- Tests: `node --test tools/test/*.test.mjs` in CI; the capture tests skip without Chrome or `WebSocket`, the unit tests still run.

@@ -19,6 +19,8 @@ personajury panel add devs --query "2 builder, 1 others"   # "<N> <tag>, ..."; `
 personajury panel resolve devs
 
 # 2. the subject is what people see, as files: an ARIA walk, screenshots, a diff, a document. Never a live URL.
+#    capture a page: node tools/walk.mjs --out shots/ pricing=https://your.site/pricing --phone
+#    then subject add the .walk.json and .png (docs/walks.md)
 personajury subject add pricing --kind page --attach walk/pricing.walk.json shots/pricing.png
 personajury comparator add rival --kind prices --attach rival/pricing.walk.json rival/pricing.png   # optional
 

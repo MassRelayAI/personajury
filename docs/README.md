@@ -10,6 +10,8 @@
 | who decides, and what only a decision may change | [`../GOVERNANCE.md`](../GOVERNANCE.md) | the law of the tool, model and provider neutrality, the human classes |
 | personas | [`../PERSONAS.md`](../PERSONAS.md) | composites, never identifiable real people; generated ones record their material hash |
 | traits | [`traits.md`](traits.md) | the catalog of tendencies a persona may hold, embedded and installed; the brief block, cover, quotas and slices; what is refused |
+| page walks | [`walks.md`](walks.md) | `tools/walk.mjs` captures the ARIA walk and screenshots a `seen` line cites; a helper outside the engine (D42) |
+| your own metrics | [`own-metrics.md`](own-metrics.md) | a short script over `export`, counted per stratum; the columns that are stable to read; never write to the store |
 | lenses | [`lenses.md`](lenses.md) | a versioned standard; anchors in words, never edited in place; the four shipped and the fixture `site` lens |
 | publishing a result | [`publishing-results.md`](publishing-results.md) | date, declared model, four hashes and the per-stratum table, or it is prose |
 | privacy and vulnerabilities | [`../SECURITY.md`](../SECURITY.md) | the engine sends nothing; attachments stay in `.personajury/blobs` |

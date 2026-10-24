@@ -96,6 +96,13 @@ The eight trait sets: `developer-tool`, `consumer-app`, `b2b-purchase`, `marketi
 (`personajury trait set list`). Adding a trait file or a set of your own: `trait add --file F`, `trait set add --file F` (a trait
 whose family is not one of the fourteen is `project.<slug>`).
 
+### How many juror profiles
+
+The README says 183 trillion possible juror profiles. The count: 49 traits, 5 levels each, at most 8 traits per persona, so the sum
+over k = 0 to 8 of C(49, k) × 5^k = 183,098,881,048,896. It is an order of size, not an exact count: 42 traits are bands of 5, the
+category traits have their own number of options, and `situation.job` is free words. A run seats at most 12 without a reason and at
+most 1000 with `--allow-large` ([`commands.md`](commands.md)).
+
 ## On a persona
 
 A persona file may carry `traits`: a map of trait id to value, **at most 8**, written after the prose as its summary:

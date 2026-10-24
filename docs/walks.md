@@ -1,7 +1,7 @@
 # Page walks: `tools/walk.mjs`
 
 A walk is the ARIA tree of a page with stable node ids, the attachment a `seen` line cites (`pricing.walk.json#price-team`).
-`tools/walk.mjs` captures one. It is a helper you run before `subject add`; the engine never runs it, never calls it, and
+`tools/walk.mjs` captures one ([D42](decisions.md)). It is a helper you run before `subject add`; the engine never runs it, never calls it, and
 stays offline. No npm dependency: Node >= 22 (global `WebSocket`) and a local Chrome or Chromium.
 
 ```

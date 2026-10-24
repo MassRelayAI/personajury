@@ -553,3 +553,29 @@ fn the_mcp_tool_answers_ndjson_in_the_envelope() {
     // the tool has no csv: an unknown argument is refused like any other
     assert_eq!(env(2)["error"]["code"], "invalid_arguments");
 }
+
+/// `export 1 | head -1`: the reader closes the pipe after one line; the CLI must end quietly (0), never panic (101).
+#[test]
+fn a_closed_pipe_ends_export_quietly() {
+    use std::process::{Command as Std, Stdio};
+    let ws = world();
+    // make the output big enough that the writer is still writing when the reader leaves
+    for _ in 0..40 {
+        ws.ingest(1, &critical("bob", [3, 3, 3], &[], &["page.json#n1"]));
+    }
+    let bin = assert_cmd::cargo::cargo_bin("personajury");
+    let mut child = Std::new(bin)
+        .arg("--root")
+        .arg(ws.root())
+        .args(["export", "1", "2", "--phase", "all"])
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .unwrap();
+    // close the reading end before the CLI writes anything: every write meets a closed pipe
+    drop(child.stdout.take());
+    let out = child.wait_with_output().unwrap();
+    let err = String::from_utf8_lossy(&out.stderr);
+    assert!(!err.contains("panicked"), "panic on a closed pipe: {err}");
+    assert_ne!(out.status.code(), Some(101), "{err}");
+}

@@ -736,18 +736,18 @@ pub fn run() -> i32 {
         return 0;
     }
     if let Cmd::Doctor { bin, brief: true } = &cli.cmd {
-        print!("{}", app::doctor::brief_lines(&cli.root, bin.as_deref()));
+        emit(&app::doctor::brief_lines(&cli.root, bin.as_deref()));
         return 0;
     }
     // `export` without --out prints the rows themselves (D40); a refusal is still an envelope
     if let Cmd::Export { runs, format, out: None, phase, .. } = &cli.cmd {
         match app::export::raw(&cli.root, runs, format, phase) {
             Ok(text) => {
-                print!("{text}");
+                emit(&text);
                 return 0;
             }
             Err(e) => {
-                println!("{}", Envelope::err("export", &e).to_json());
+                emit(&format!("{}\n", Envelope::err("export", &e).to_json()));
                 return 1;
             }
         }
@@ -756,13 +756,21 @@ pub fn run() -> i32 {
     let json = env.to_json();
     if cli.pretty {
         let v: serde_json::Value = serde_json::from_str(&json).expect("envelope is JSON");
-        println!("{}", serde_json::to_string_pretty(&v).expect("serialises"));
+        emit(&format!("{}\n", serde_json::to_string_pretty(&v).expect("serialises")));
     } else {
-        println!("{json}");
+        emit(&format!("{json}\n"));
     }
     if env.ok {
         0
     } else {
         1
     }
+}
+
+/// Write the answer to stdout. A reader that closed the pipe (`personajury export 1 | head -1`) is a normal end, not a
+/// crash: the write error is swallowed and the exit code stays the command's own.
+fn emit(text: &str) {
+    use std::io::Write;
+    let mut out = std::io::stdout().lock();
+    let _ = out.write_all(text.as_bytes()).and_then(|()| out.flush());
 }

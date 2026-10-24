@@ -8,7 +8,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 const SCHEMA: &str = include_str!("schema.sql");
-pub const SCHEMA_VERSION: i64 = 5;
+pub const SCHEMA_VERSION: i64 = 6;
 /// The columns schema v4 added to `run`; a v3 store (or an early v4 one) gains them on open (idempotent
 /// `ALTER TABLE`, D17, D18, D13: the rule class a run was briefed under and its effective quorum).
 const V4_RUN_COLUMNS: [(&str, &str); 5] = [
@@ -23,7 +23,7 @@ const V4_RUN_COLUMNS: [(&str, &str); 5] = [
 /// and subject audience.
 /// A stored trait's latest version: the definition, its origin, its hash and the reason a forced install recorded.
 pub type TraitRow = (TraitDef, String, String, Option<String>);
-const V5_COLUMNS: [(&str, &str, &str); 11] = [
+const V5_COLUMNS: [(&str, &str, &str); 7] = [
     ("trait", "reason", "TEXT"),
     ("persona", "traits_json", "TEXT"),
     ("persona", "serves_json", "TEXT"),
@@ -31,7 +31,10 @@ const V5_COLUMNS: [(&str, &str, &str); 11] = [
     ("run", "traits_json", "TEXT"),
     ("run", "seats_json", "TEXT"),
     ("subject", "audience_json", "TEXT"),
-    // v0.6-C (D32, D33, D34)
+];
+/// The columns schema v6 added (v0.6-C: D32, D33, D34, D37). They change what a batch means (`verdict.phase`), so the
+/// version moved: a v0.5 binary refuses a v6 store by its version instead of reading a deliberated batch as the latest.
+const V6_COLUMNS: [(&str, &str, &str); 4] = [
     ("run", "options_mode", "TEXT"),
     ("verdict", "phase", "TEXT"),
     ("pick", "about", "TEXT"),
@@ -105,9 +108,10 @@ fn iso_from_secs(secs: u64) -> String {
     format!("{y:04}-{mo:02}-{d:02}T{h:02}:{m:02}:{s:02}Z")
 }
 
-/// Add the v5 columns an older store lacks. Idempotent: a column already there is left alone.
+/// Add the v5 and v6 columns an older store lacks. Idempotent: a column already there is left alone. (The v6
+/// `deliberation` table comes from `schema.sql`, `CREATE TABLE IF NOT EXISTS`.)
 fn upgrade_v4(conn: &Connection) -> rusqlite::Result<()> {
-    for (table, col, decl) in V5_COLUMNS {
+    for (table, col, decl) in V5_COLUMNS.into_iter().chain(V6_COLUMNS) {
         let have: Vec<String> = conn
             .prepare(&format!("SELECT name FROM pragma_table_info('{table}')"))?
             .query_map([], |r| r.get::<_, String>(0))?
@@ -335,8 +339,8 @@ impl Store {
             let v: Option<String> = conn
                 .query_row("SELECT value FROM meta WHERE key = 'schema_version'", [], |r| r.get(0))
                 .optional()?;
-            // a v3 store is upgraded below; anything else is another binary's
-            if let Some(v) = v.filter(|v| !matches!(v.parse::<i64>().ok(), Some(3) | Some(4) | Some(5))) {
+            // a v3, v4 or v5 store is upgraded below; anything else is another binary's
+            if let Some(v) = v.filter(|v| !matches!(v.parse::<i64>().ok(), Some(3..=6))) {
                 return Err(StoreError::Schema(format!(
                     "{} has schema_version {v}, this binary needs {SCHEMA_VERSION}",
                     path.display()
@@ -365,7 +369,7 @@ impl Store {
                 )?;
             }
             Some(Ok(v)) if v == SCHEMA_VERSION => {}
-            Some(Ok(3)) | Some(Ok(4)) => {
+            Some(Ok(3..=5)) => {
                 conn.execute(
                     "UPDATE meta SET value = ?1 WHERE key = 'schema_version'",
                     params![SCHEMA_VERSION.to_string()],

@@ -217,12 +217,33 @@ fn apply_check_answers_advise_deliberated_where_it_answered_apply() {
     assert!(r["remedy"].as_str().unwrap().contains("independent word"));
 }
 
+/// C1 (v0.6-C review): the deliberation round alone breaks independence: the files were written, a juror may have read them.
 #[test]
-fn deliberation_alone_without_a_deliberated_verdict_leaves_apply() {
+fn deliberation_alone_without_a_deliberated_verdict_answers_advise() {
     let (ws, run) = world();
     deliberate(&ws, run);
     let a = ws.cli(&["apply-check", &rs(run)])["data"].clone();
-    assert_eq!(a["answer"], "apply", "{a}");
+    assert_eq!(a["answer"], "advise", "{a}");
+    assert!(a["reasons"].as_array().unwrap().iter().any(|r| r["code"] == "deliberated" && r["effect"] == "advise"), "{a}");
+}
+
+/// C1: once the round starts, the independent batch is frozen; an initial verdict, with or without `"phase": "initial"`,
+/// is refused, so a juror who read the others cannot answer again as the jury's first word.
+#[test]
+fn an_initial_verdict_after_the_round_started_is_refused() {
+    let (ws, run) = world();
+    deliberate(&ws, run);
+    let again = critical("cara", [4, 4, 4], &[], &["page.json#n1"]);
+    let r = ws.cli(&["verdict", "--run", &rs(run), "--json", &again.to_string()]);
+    assert_eq!(code(&r), "initial_closed");
+    assert_eq!(r["data"]["run"], run);
+    let mut tagged = again.clone();
+    tagged["phase"] = json!("initial");
+    assert_eq!(code(&ws.cli(&["verdict", "--run", &rs(run), "--json", &tagged.to_string()])), "initial_closed");
+    // the frozen batch is what every read keeps: cara's first word still holds
+    let m = ws.cli(&["matrix", &rs(run), "--detail", "full"])["data"].clone();
+    assert_eq!(cells(&m)[0][0]["scores"]["cara"], 2);
+    assert_eq!(ws.cli(&["apply-check", &rs(run)])["data"]["answer"], "advise");
 }
 
 /// A second run of the same jury whose first word equals the first run's, deliberated too.

@@ -145,13 +145,24 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
         if let Some(sub) = store.subject_at(&r.subject_name, r.subject_version)?.filter(|s| s.kind == SubjectKind::Decision) {
             for n in super::decision::needs_person(root, &store, r, &sub)? {
                 let mut why: Vec<String> = Vec::new();
-                for w in n["why"].as_array().into_iter().flatten() {
-                    let c = w["class"].as_str().unwrap_or("").to_string();
+                for w in n["why"].as_array().into_iter().flatten().filter(|w| w["effect"] == "human") {
+                    let class = w["class"].as_str().unwrap_or("");
+                    let c = match w["code"].as_str() {
+                        Some("class_mismatch") => format!("{} ({})", w["group"].as_str().unwrap_or(""), w["stem"].as_str().unwrap_or("")),
+                        Some("split_on_sensitive") => format!("split on {class}"),
+                        _ => class.to_string(),
+                    };
                     if !why.contains(&c) {
                         why.push(c);
                     }
                 }
-                f.needs_person.push((n["question"].as_str().unwrap_or("").to_string(), why));
+                if !why.is_empty() {
+                    f.needs_person.push((n["question"].as_str().unwrap_or("").to_string(), why));
+                }
+            }
+            for m in super::decision::sources_mention(root, &sub)? {
+                let stems: Vec<String> = m["stems"].as_array().into_iter().flatten().map(|x| x["stem"].as_str().unwrap_or("").to_string()).collect();
+                f.sources_mention.push((m["path"].as_str().unwrap_or("").to_string(), stems));
             }
         }
         for s in p["strata"].as_array().into_iter().flatten() {
@@ -213,7 +224,8 @@ fn metrics_of(root: &Path, m: &Value, given: &[RunRow], f: &mut Facts) -> Result
     let (mut seen, mut told, mut rec) = (0u64, 0u64, 0u64);
     for s in &strata {
         let name = s["stake"].as_str().unwrap_or("");
-        let cap = format!("{}{}", name[..1].to_uppercase(), &name[1..]);
+        // M4: only the sentence's first word is capitalised; the strata after a semicolon stay lower case
+        let cap = if agree.is_empty() { format!("{}{}", name[..1].to_uppercase(), &name[1..]) } else { name.to_string() };
         agree.push(format!("{cap} jurors agree within one anchor on {} of {} scores", s["agreement"]["cells_all_within_one"], s["agreement"]["cells"]));
         seen += s["evidence"]["seen"].as_u64().unwrap_or(0);
         told += s["evidence"]["told"].as_u64().unwrap_or(0);

@@ -884,8 +884,17 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
         )));
     }
 
+    // M1 (v0.6-C review): with no --options, a subject briefed before keeps the mode of its latest run (NULL, a run made
+    // before v0.6, is `attachments`), so the next round's cells meet the previous round's and `delta` compares them
+    let previous_mode = match store.runs()?.iter().rev().find(|r| r.subject_name == subject.name) {
+        Some(r) if subject.kind != SubjectKind::Decision => match store.run_options_mode(r.id)?.as_deref() {
+            Some("subject") => Some("subject"),
+            _ => Some("attachments"),
+        },
+        _ => None,
+    };
     let options_mode: &'static str = match a.options.as_deref() {
-        None => subject.kind.default_options_mode(),
+        None => previous_mode.unwrap_or(subject.kind.default_options_mode()),
         Some("subject") => "subject",
         Some("attachments") => "attachments",
         Some(other) => return Err(Refusal::InvalidOptionsMode { given: other.to_string() }.into()),

@@ -177,9 +177,11 @@ fn the_summary_carries_the_agreement_evidence_panel_and_cost_sentences_on_the_fi
         .as_array()
         .unwrap()
         .iter()
-        .map(|s| {
+        .enumerate()
+        .map(|(i, s)| {
             let name = s["stake"].as_str().unwrap();
-            let name = format!("{}{}", name[..1].to_uppercase(), &name[1..]);
+            // M4: only the first stratum of the sentence is capitalised, the ones after a semicolon are not
+            let name = if i == 0 { format!("{}{}", name[..1].to_uppercase(), &name[1..]) } else { name.to_string() };
             format!("{name} jurors agree within one anchor on {} of {} scores", s["agreement"]["cells_all_within_one"], s["agreement"]["cells"])
         })
         .collect();
@@ -247,4 +249,23 @@ fn no_key_of_the_matrix_is_a_mean_an_average_a_share_a_rate_a_percent_or_a_proba
     let s = j(ws.path(), &["summary", &a.to_string(), &b.to_string()]);
     walk(&s["data"], &mut bad);
     assert!(bad.is_empty(), "{bad:?}");
+}
+
+/// M2 (v0.6-C review): `per_juror` lists each juror of a run once, its batches' reported tokens summed and its batches named.
+#[test]
+fn cost_lists_a_juror_with_two_batches_once() {
+    let ws = Ws::new();
+    ws.site();
+    let run = ws.run("critical", &TWO, false);
+    for (i, o) in [(1000, 200), (500, 100)] {
+        let mut a = critical("ana", [3, 3, 3], &[], &["page.json#n1"]);
+        a["usage"] = json!({"input_tokens": i, "output_tokens": o});
+        ws.ingest(run, &a);
+    }
+    let m = matrix(&ws, run);
+    let per = m["cost"]["per_juror"].as_array().unwrap();
+    assert_eq!(per.len(), 1, "{per:?}");
+    assert_eq!((per[0]["input_tokens"].as_i64(), per[0]["output_tokens"].as_i64()), (Some(1500), Some(300)));
+    assert_eq!(per[0]["batches"], json!([1, 2]));
+    assert_eq!(m["cost"]["jurors_reporting"], 1);
 }

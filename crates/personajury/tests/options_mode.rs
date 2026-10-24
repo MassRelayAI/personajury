@@ -153,3 +153,21 @@ fn a_run_with_no_recorded_mode_keeps_the_attachment_options_it_always_had() {
     let r = ingest(ws.path(), run, &verdict("p1", &[Some("a.md")], "a.md"));
     assert_eq!(r["ok"], true, "{r}");
 }
+
+/// M1 (v0.6-C review): a subject briefed before keeps its latest run's mode when `--options` is left out, so the next
+/// round's cells meet the previous round's; a run made before v0.6 (no recorded mode) counts as `attachments`.
+#[test]
+fn a_subject_briefed_before_keeps_its_previous_mode_by_default() {
+    let ws = world();
+    let first = ok(brief(ws.path(), "pg", &["--options", "attachments"]));
+    assert_eq!(first["options"]["mode"], "attachments");
+    let again = ok(brief(ws.path(), "pg", &[]));
+    assert_eq!(again["options"]["mode"], "attachments", "{again}");
+    // a pre-v0.6 run, its mode NULL, is attachments too
+    let st = personajury::store::Store::open(ws.path()).unwrap();
+    st.conn().execute("UPDATE run SET options_mode = NULL", []).unwrap();
+    assert_eq!(ok(brief(ws.path(), "pg", &[]))["options"]["mode"], "attachments");
+    // an explicit word still wins, and a subject never briefed takes its kind's default
+    assert_eq!(ok(brief(ws.path(), "pg", &["--options", "subject"]))["options"]["mode"], "subject");
+    assert_eq!(ok(brief(ws.path(), "pg", &[]))["options"]["mode"], "subject");
+}

@@ -38,9 +38,8 @@ fn init_writes_a_commented_starter_that_classifies_code_as_none_and_screens_as_a
     for p in ["crates/a/src/lib.rs", "migrations/001.sql", "tools/x.sh", ".github/workflows/ci.yml", "router/rules/a.toml"] {
         assert_eq!(quorum_of(&w, p), json!("none"), "{p}");
     }
-    for p in ["screens/home.tsx", "pages/pricing.html", "docs/guide.md"] {
-        let q = quorum_of(&w, p);
-        assert!(q == json!("low") || q == json!("high"), "{p}: {q}");
+    for p in ["screens/home.tsx", "pages/about.html", "docs/guide.md"] {
+        assert_eq!(quorum_of(&w, p), json!("high"), "{p}");
     }
     let hit = run(&w, &w, &["should-run", "--paths", "screens/home.tsx"])["data"]["hits"][0]["class"].clone();
     assert_eq!(hit, "surface");
@@ -74,4 +73,34 @@ fn setup_plans_then_writes_the_starter_and_leaves_an_existing_one() {
     assert!(w.join("personajury.toml").exists());
     let again = run(d.path(), &w, &apply);
     assert_eq!(again["data"]["project_config"]["state"], "present");
+}
+
+/// I2 (v0.6-C review): the starter ships the human rules active, so adopting it never makes `apply` reachable on prices,
+/// legal words, sign-in or secrets.
+#[test]
+fn the_starter_classifies_money_legal_auth_and_secret_paths_as_human() {
+    let d = tempfile::tempdir().unwrap();
+    let w = d.path().join("ws");
+    std::fs::create_dir_all(&w).unwrap();
+    assert_eq!(run(d.path(), &w, &["init"])["ok"], true);
+    for p in [
+        "site/pricing.html",
+        "pages/pricing/index.html",
+        "src/prices/table.ts",
+        "crates/billing/src/price.rs",
+        "web/checkout/pay.tsx",
+        "docs/legal/terms.md",
+        "site/terms.html",
+        "site/privacy.html",
+        "app/privacy-policy.md",
+        "src/auth/login.rs",
+        "config/secrets/prod.yaml",
+        ".env",
+        ".env.production",
+        "web/.env.local",
+    ] {
+        assert_eq!(quorum_of(&w, p), json!("human"), "{p}");
+    }
+    let text = std::fs::read_to_string(w.join("personajury.toml")).unwrap();
+    assert!(!text.contains("# [[rule]]"), "the human rules ship active:\n{text}");
 }

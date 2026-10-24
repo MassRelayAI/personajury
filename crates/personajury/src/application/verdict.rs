@@ -281,6 +281,11 @@ pub fn ingest_with(root: &Path, run: i64, input: &str, by_human: Option<&str>, d
         }
         _ => {}
     }
+    // C1: the round froze the independent batch when it started; a juror who may have read the others answers only
+    // as deliberated. A person's verdict (D19) is no juror's first word and is still taken.
+    if !deliberated && by_human.is_none() && store.deliberation(run.id)?.is_some() {
+        return Err(Refusal::InitialClosed { run: run.id }.into());
+    }
     if deliberated {
         if by_human.is_some() {
             return Err(AppError::InvalidArguments("a person's verdict is never deliberated; --by-human and --deliberated do not mix".into()));

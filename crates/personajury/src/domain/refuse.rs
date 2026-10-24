@@ -143,6 +143,10 @@ pub enum Refusal {
     PhaseWithoutFlag,
     #[error("the questions file: {why}")]
     InvalidQuestions { why: String },
+    #[error("the questions file: {why}")]
+    QuestionClassMissing { why: String },
+    #[error("run {run} has a deliberation round: its independent batch was frozen when the round started, so no initial verdict is taken after it")]
+    InitialClosed { run: i64 },
     #[error("{}", if question.is_empty() { format!("picks: {why}") } else { format!("pick for {question}: {why}") })]
     QuestionPickInvalid { question: String, why: String },
     #[error("{0}")]
@@ -211,6 +215,8 @@ impl Refusal {
             Refusal::DeliberatedWithoutPhase => "deliberated_without_phase",
             Refusal::PhaseWithoutFlag => "phase_without_flag",
             Refusal::InvalidQuestions { .. } => "invalid_questions",
+            Refusal::QuestionClassMissing { .. } => "question_class_missing",
+            Refusal::InitialClosed { .. } => "initial_closed",
             Refusal::QuestionPickInvalid { .. } => "question_pick_invalid",
             Refusal::InvalidQuery(_) => "invalid_query",
             Refusal::InvalidConfig(_) => "invalid_config",
@@ -245,7 +251,7 @@ impl Refusal {
             Refusal::InvalidFilter { term, why } => Some(serde_json::json!({"term": term, "why": why})),
             Refusal::TraitSetUnknown { name } => Some(serde_json::json!({"name": name})),
             Refusal::IncompleteJuryForDeliberation { missing } => Some(serde_json::json!({"missing": missing})),
-            Refusal::AlreadyDeliberated { run } | Refusal::NoDeliberation { run } => Some(serde_json::json!({"run": run})),
+            Refusal::AlreadyDeliberated { run } | Refusal::NoDeliberation { run } | Refusal::InitialClosed { run } => Some(serde_json::json!({"run": run})),
             Refusal::QuestionPickInvalid { question, why } => Some(serde_json::json!({"question": question, "why": why})),
             Refusal::InvalidOptionsMode { given } => Some(serde_json::json!({"given": given})),
             _ => None,

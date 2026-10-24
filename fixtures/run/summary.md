@@ -13,7 +13,7 @@ The weakest dimension is works for primary (median 2), clarity for secondary (me
 
 Blockers, in the jurors' words: builder-ana (primary) on blocks: "Team shows Contact us instead of a price, and a price I…" (no decision yet); builder-mei (primary) on blocks: "The main Get started button is white text on pale blue and…" (no decision yet); builder-ravi (primary) on blocks: "The 'Sign up free' link points to '#' so the one path to…" (no decision yet) and 23 more.
 
-Primary jurors agree within one anchor on 21 of 21 scores; Secondary jurors agree within one anchor on 21 of 21 scores; Bystander jurors agree within one anchor on 21 of 21 scores.
+Primary jurors agree within one anchor on 21 of 21 scores; secondary jurors agree within one anchor on 21 of 21 scores; bystander jurors agree within one anchor on 21 of 21 scores.
 
 Of 147 verdict lines, 147 were seen, 0 told and 0 recalled.
 

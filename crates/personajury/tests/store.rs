@@ -122,8 +122,8 @@ fn subject(name: &str, hash: &str) -> Subject {
 fn open_creates_store_and_schema_version() {
     let (d, s) = tmp();
     assert!(d.path().join(".personajury/store.db").exists());
-    assert_eq!(s.schema_version().unwrap(), 5);
-    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 5);
+    assert_eq!(s.schema_version().unwrap(), 6);
+    assert_eq!(Store::open(d.path()).unwrap().schema_version().unwrap(), 6);
     assert!(Store::open_existing(d.path()).is_ok());
 }
 
@@ -444,7 +444,7 @@ fn picks_follow_latest_verdict_batch() {
 }
 
 #[test]
-fn a_v4_store_becomes_v5_once_and_gains_every_column() {
+fn a_v4_store_becomes_current_once_and_gains_every_column() {
     let d = tempfile::tempdir().unwrap();
     // a v4 store: the v4 schema, with none of the v5 columns
     {
@@ -459,7 +459,7 @@ fn a_v4_store_becomes_v5_once_and_gains_every_column() {
     }
     for _ in 0..2 {
         let s = Store::open(d.path()).unwrap();
-        assert_eq!(s.schema_version().unwrap(), 5);
+        assert_eq!(s.schema_version().unwrap(), 6);
         let cols = |t: &str| -> Vec<String> {
             s.conn()
                 .prepare(&format!("SELECT name FROM pragma_table_info('{t}')"))
@@ -492,4 +492,48 @@ fn a_v5_store_made_before_the_fix_round_gains_trait_reason() {
             .unwrap();
         assert_eq!(has, 1);
     }
+}
+
+/// I3 (v0.6-C review): the v0.6 columns change what a batch means (`verdict.phase`), so the store is v6. A v5 store (made by
+/// a v0.5 binary: no v0.6 column, no deliberation table) becomes v6 once and gains them; opening again changes nothing.
+#[test]
+fn a_v5_store_becomes_v6_once_and_gains_the_v06_columns() {
+    let d = tempfile::tempdir().unwrap();
+    {
+        let s = Store::open(d.path()).unwrap();
+        let c = s.conn();
+        for (t, col) in [("run", "options_mode"), ("verdict", "phase"), ("pick", "about"), ("run", "panel_terms_json")] {
+            c.execute(&format!("ALTER TABLE {t} DROP COLUMN {col}"), []).unwrap();
+        }
+        c.execute_batch("DROP TRIGGER deliberation_no_update; DROP TRIGGER deliberation_no_delete; DROP TABLE deliberation;").unwrap();
+        c.execute("UPDATE meta SET value = '5' WHERE key = 'schema_version'", []).unwrap();
+    }
+    for _ in 0..2 {
+        let s = Store::open(d.path()).unwrap();
+        assert_eq!(s.schema_version().unwrap(), 6);
+        let cols = |t: &str| -> Vec<String> {
+            s.conn()
+                .prepare(&format!("SELECT name FROM pragma_table_info('{t}')"))
+                .unwrap()
+                .query_map([], |r| r.get::<_, String>(0))
+                .unwrap()
+                .map(|r| r.unwrap())
+                .collect()
+        };
+        assert!(cols("run").contains(&"options_mode".to_string()) && cols("run").contains(&"panel_terms_json".to_string()));
+        assert!(cols("verdict").contains(&"phase".to_string()) && cols("pick").contains(&"about".to_string()));
+        assert!(!cols("deliberation").is_empty());
+        let meta: i64 = s.conn().query_row("SELECT count(*) FROM meta WHERE key = 'schema_version'", [], |r| r.get(0)).unwrap();
+        assert_eq!(meta, 1);
+    }
+}
+
+/// I3: what a v0.5 binary does with a v6 store, it refuses by its version; this binary does the same with a v7 store, and
+/// writes nothing to it.
+#[test]
+fn a_store_of_a_later_version_is_refused_by_its_version() {
+    let d = tempfile::tempdir().unwrap();
+    Store::open(d.path()).unwrap().conn().execute("UPDATE meta SET value = '7' WHERE key = 'schema_version'", []).unwrap();
+    let Err(err) = Store::open(d.path()) else { panic!("a v7 store is refused") };
+    assert!(err.to_string().contains("schema_version 7") && err.to_string().contains("needs 6"), "{err}");
 }

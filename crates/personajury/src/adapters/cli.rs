@@ -286,7 +286,7 @@ pub enum Cmd {
         #[arg(long)]
         no_hook: bool,
     },
-    /// Write a commented starter personajury.toml (no jury for code paths, a surface class for screens, pages and docs); never overwrites
+    /// Write a starter personajury.toml (human rules active for prices, legal, auth and secrets; high for screens, pages and docs; no jury for code); never overwrites
     Init,
     /// Report the store, the counts and each agent client's registration
     Doctor {

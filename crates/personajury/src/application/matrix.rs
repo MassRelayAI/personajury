@@ -149,8 +149,16 @@ pub fn show(
         let rows = store.usage_rows(runs)?;
         let (i, o) = rows.iter().fold((0u64, 0u64), |(i, o), r| (i.saturating_add(r.3), o.saturating_add(r.4)));
         let jurors: std::collections::BTreeSet<(i64, &String)> = rows.iter().map(|r| (r.0, &r.1)).collect();
+        // M2: one entry per juror of a run, its batches' reported tokens summed (a juror with two batches is listed once)
+        let mut per: BTreeMap<(i64, &String), (Vec<i64>, u64, u64)> = BTreeMap::new();
+        for r in &rows {
+            let e = per.entry((r.0, &r.1)).or_default();
+            e.0.push(r.2);
+            e.1 = e.1.saturating_add(r.3);
+            e.2 = e.2.saturating_add(r.4);
+        }
         json!({
-            "per_juror": rows.iter().map(|r| json!({"run": r.0, "persona": r.1, "batch": r.2, "input_tokens": r.3, "output_tokens": r.4})).collect::<Vec<_>>(),
+            "per_juror": per.iter().map(|((run, p), (b, i, o))| json!({"run": run, "persona": p, "batches": b, "input_tokens": i, "output_tokens": o})).collect::<Vec<_>>(),
             "reported_total": {"input_tokens": i, "output_tokens": o},
             "jurors_reporting": jurors.len(),
             "estimate": usage["estimate"].clone(),

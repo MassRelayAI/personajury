@@ -8,7 +8,7 @@
       "anchor_met": 3,
       "evidence": "seen",
       "citations": [
-        "questions.md#L3",
+        "questions.md#L1",
         "owner-notes.md#L3"
       ],
       "blockers": [],
@@ -21,7 +21,7 @@
       "anchor_met": 3,
       "evidence": "seen",
       "citations": [
-        "questions.md#L7",
+        "questions.md#L5",
         "owner-notes.md#L7"
       ],
       "blockers": [],
@@ -34,7 +34,7 @@
       "anchor_met": 3,
       "evidence": "seen",
       "citations": [
-        "questions.md#L12",
+        "questions.md#L10",
         "owner-notes.md#L9"
       ],
       "blockers": [],

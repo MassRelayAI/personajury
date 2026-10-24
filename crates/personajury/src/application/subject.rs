@@ -95,7 +95,7 @@ pub fn add(
             return Err(AppError::InvalidArguments("a comparator is a thing to compare against; a decision has no comparator form".into()));
         }
         let at = atts.iter().position(|a| a.label == crate::domain::decision::QUESTIONS_LABEL).ok_or_else(|| {
-            Refusal::InvalidQuestions { why: format!("a decision subject attaches {} (## Q1 <question>, then - option lines)", crate::domain::decision::QUESTIONS_LABEL) }
+            Refusal::InvalidQuestions { why: format!("a decision subject attaches {} (## Q1 [class: <class>] <question>, then - option lines)", crate::domain::decision::QUESTIONS_LABEL) }
         })?;
         let bytes = &blobs.iter().find(|(h, _)| *h == atts[at].hash).expect("the blob was read above").1;
         super::decision::parse(bytes)?;

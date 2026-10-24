@@ -85,6 +85,8 @@ pub struct Facts {
     /// a decision jury's questions (D37): id, text and the picks of each stratum; and the ones that need a person
     pub questions: Vec<(String, String, Vec<PickLine>)>,
     pub needs_person: Vec<(String, Vec<String>)>,
+    /// the stems the point-of-view files hit (I1), per file: informational, they change no answer
+    pub sources_mention: Vec<(String, Vec<String>)>,
     /// `panel: asked 3 builder=primary, seated 3, answered 3; …`
     pub panel_lines: Vec<String>,
     /// per run and per seat when they carry a number, then the total `cost:` line last
@@ -333,6 +335,10 @@ pub fn sentences(f: &Facts) -> Vec<String> {
     if !f.needs_person.is_empty() {
         let items: Vec<String> = f.needs_person.iter().map(|(q, why)| format!("{q} ({})", why.join(", "))).collect();
         s.push(format!("Needs a person: {}.", list(&items, 8)));
+    }
+    if !f.sources_mention.is_empty() {
+        let items: Vec<String> = f.sources_mention.iter().map(|(p, stems)| format!("{} in {p}", stems.join(", "))).collect();
+        s.push(format!("Sources mention: {} (for the person to read; they change no answer).", list(&items, 8)));
     }
     // who won: the pick when a lens asked for one, else the best row by the primary stratum
     if !f.picks.is_empty() {

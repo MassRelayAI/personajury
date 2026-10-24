@@ -430,25 +430,41 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
     if !incomplete.is_empty() {
         reasons.push(reason("trait_set_incomplete", "info", json!({"seats": incomplete, "note": "some seats lack traits of the set the briefs rendered; their briefs say less about how they decide"})));
     }
-    // D37: a question of a decision jury that falls in a human class, or that the jurors split on over money or trust
+    // D37: a question of a decision jury declared in a human class, whose text hits the stem table (`class_mismatch`), or
+    // whose strata's top picks differ (`split_on_sensitive` on money, spending, trust, legal or public claims, else
+    // `split_on_question`, advise). Source paths under a human rule already raise the quorum; source text is listed only.
     if subject.kind == SubjectKind::Decision {
         for r in &judged {
             for n in super::decision::needs_person(root, &store, r, &subject)? {
                 for w in n["why"].as_array().into_iter().flatten().filter(|w| w["via"] != "sources") {
-                    reasons.push(reason(
-                        "human_class",
-                        "human",
-                        json!({"class": w["class"], "via": w["via"], "question": n["question"], "run": r.id}),
-                    ));
+                    let mut data = w.clone();
+                    let code = data["code"].as_str().unwrap_or("human_class").to_string();
+                    let effect = data["effect"].as_str().unwrap_or("human").to_string();
+                    if let Some(o) = data.as_object_mut() {
+                        o.remove("code");
+                        o.remove("effect");
+                        o.insert("question".into(), n["question"].clone());
+                        o.insert("run".into(), json!(r.id));
+                    }
+                    reasons.push(reason(&code, &effect, data));
                 }
+            }
+            let mention = super::decision::sources_mention(root, &subject)?;
+            if !mention.is_empty() {
+                reasons.push(reason(
+                    "sources_mention",
+                    "info",
+                    json!({"run": r.id, "sources": mention, "note": "the point-of-view files mention these stems; a person reads them, they change no answer"}),
+                ));
             }
         }
     }
-    // D33: a deliberated verdict broke the jury's independence; the run advises, it never applies
+    // D33: the deliberation round broke the jury's independence once it started (C1: the files exist, a juror may have
+    // read them), so the run advises, it never applies, with or without a deliberated verdict
     let deliberated: Vec<i64> = {
         let mut v = Vec::new();
         for r in &judged {
-            if !store.deliberated_rows(r.id)?.is_empty() {
+            if store.deliberation(r.id)?.is_some() || !store.deliberated_rows(r.id)?.is_empty() {
                 v.push(r.id);
             }
         }

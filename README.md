@@ -112,6 +112,7 @@ less install.sh
 PERSONAJURY_VERSION=v0.6.0 sh install.sh
 ```
 
+- **Homebrew,** macOS and Linux: `brew install massrelay-ai/tap/personajury` (one tap for all massrelay-ai tools; the formula follows each release).
 - **By hand, and on Windows:** download your platform's file (`personajury-linux-x64`, `personajury-darwin-arm64`, `personajury-win32-x64.exe`, …) and `SHA256SUMS` from the [latest release](https://github.com/massrelay-ai/personajury/releases/latest). Check it with `sha256sum -c --ignore-missing SHA256SUMS` (macOS: `shasum -a 256 <file>`; Windows: `Get-FileHash <file>`) and compare with its line. Rename it `personajury` (`personajury.exe` on Windows) and put it on your `PATH`.
 - **Provenance:** the release workflow signs a build-provenance attestation over the binaries and `SHA256SUMS`. The script checks the checksum only; check the attestation yourself with GitHub CLI 2.49 or later: `gh attestation verify personajury-linux-x64 -R massrelay-ai/personajury`.
 - **From source,** with Rust 1.85 or newer:

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Homebrew: `brew install massrelay-ai/tap/personajury`, from the shared massrelay-ai tap (the formula follows each release; installed, tested and audited on macOS arm and Intel and on Linux).
 
 ## [0.6.0] - 2026-10-24
 ### Added: traits, cover and slices (D29-D31)

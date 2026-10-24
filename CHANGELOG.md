@@ -36,7 +36,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   gained lines and keys, nothing else (D34).
 - Decision juries: subject kind `decision` (a `questions.md` and point-of-view files), the shipped `decide` lens, `picks` per question,
   the "Needs a person" list and `human` from `apply-check` (D37).
-- `personajury init` and `setup` write a commented starter `personajury.toml` (D38).
+- `personajury init` and `setup` write a starter `personajury.toml` (D38).
+
+### Fixed (the v0.6-C review)
+- Once a run has a deliberation round, an initial verdict is refused (`initial_closed`) and `apply-check` advises with or without a
+  deliberated verdict (D33).
+- `questions.md` has a strict grammar: every other line is `invalid_questions` naming it; every question declares a class
+  (`question_class_missing`); a jury class whose text hits the documented stem table answers `human` (`class_mismatch`); a split
+  between strata answers `human` on money, spending, trust, legal or public-claim (`split_on_sensitive`) and `advise` otherwise (D37).
+- Point-of-view source text is scanned and listed ("Sources mention"), informational only.
+- The starter config ships the human rules active and the surface class at `high`.
+- Store schema v6: a v0.5 binary refuses a v0.6 store by its version; a v5 store upgrades in place.
+- A subject briefed before keeps its previous options mode by default; `cost.per_juror` lists each juror once; the agreement
+  sentence no longer capitalises after a semicolon.
 
 ## [0.5.1] - 2026-10-24
 ### Added

@@ -35,7 +35,7 @@ the version.
 | `decide` | `FINDING OUTCOME` `[--why W]` `[--row R]` `--by WHO` or `--by-human NAME` | outcome is `fixed`, `dismissed` (with `--why`) or `row` (with `--row`); a finding a human batch raised needs `--by-human` (`human_decision_required`) |
 | `should-run` | `[--diff F]` `[--paths a,b]` `[--subject S]` `[--config F]` | classify a change: `none`, `low`, `high`, `human`, and the spend; `--subject` classifies the subject's recorded source paths (a page added by hand has no diff); `warnings` names a rule's panel or lens the store lacks |
 | `setup` | `[--client C]` `[--scope S]` `[--apply]` `[--force]` `[--bin B]` `[--no-rules]` `[--no-hook]` | register the MCP server; a plan unless `--apply`; the answer's `project_config` is the starter `personajury.toml` (`planned`, `written`, or `present` and left alone) |
-| `init` | | write the commented starter `personajury.toml` (no jury for code paths, a `surface` class for screens, pages and docs); never overwrites one |
+| `init` | | write the starter `personajury.toml` (human rules active for prices, billing, checkout, legal, terms, privacy, auth and secrets; `high` for screens, pages and docs; no jury for code); never overwrites one |
 | `doctor` | `[--bin B]` `[--brief]` | the store, counts and registrations; `--brief` is two plain lines for a hook |
 | `mcp` | | serve MCP over stdio |
 
@@ -121,7 +121,12 @@ named here, and the rules the subject's recorded sources fall under.
 | `independence_sequential` | advise | one context read every brief |
 | `stale_run` | advise | the subject moved since the run, or a later run of the same subject and lens supersedes it |
 | `delta_unavailable` | advise | a previous round exists but the delta cannot be computed: another lens version, or cells it does not have |
-| `deliberated` | advise | a judged run holds a deliberated verdict: the initial batch is the jury's independent word, so the run advises and never applies; `escalate` and `human` still take precedence |
+| `deliberated` | advise | a judged run has a deliberation round (the files were written, with or without a deliberated verdict): the initial batch, frozen when the round started, is the jury's independent word, so the run advises and never applies; `escalate` and `human` still take precedence |
+| `human_class` (`via: declared`) | human | a decision question declares a human class (D37) |
+| `class_mismatch` | human | a decision question declares a jury class but its text or options hit the stem table; `group` and `stem` name the hit |
+| `split_on_sensitive` | human | the strata's top picks on a decision question differ and the question is money, spending, trust, legal or public-claim (declared or matched); `class` names which |
+| `split_on_question` | advise | the strata's top picks on a decision question of another class differ (a stratum tied at the top counts) |
+| `sources_mention` | info | a decision subject's point-of-view files hit the stem table; listed for the person, changes no answer |
 | `single_model` | info | one model judged every seat; changes no answer |
 
 Raising seats, lenses, effort or detail above the rule is fine. `human` beats `escalate` beats `advise` beats `apply`. It reads the
@@ -226,34 +231,61 @@ writes `.personajury/runs/<run>/deliberate-<persona>--<lens>.md` per seat: the p
 the run renders one) as in the brief, `## Your first verdict`, and `## What the other jurors said` as "Juror 1 (stratum)", "Juror 2 ..."
 in persona-id order, with no name, no model and no citation. The answer lists each file's path, hash and size, and `waves`. The jurors
 answer with `"phase": "deliberated"`; `verdict --deliberated` ingests it (`deliberated_without_phase`, `phase_without_flag`,
-`no_deliberation`, `deliberated_without_initial`; the evidence refusals are the same). A deliberated batch is stored with
+`no_deliberation`, `deliberated_without_initial`; the evidence refusals are the same). Once the round starts the independent batch is
+frozen: an initial verdict for the run, with or without `"phase": "initial"`, is refused (`initial_closed {run}`); a person's
+`--by-human` verdict is still taken. A deliberated batch is stored with
 `verdict.phase = 'deliberated'` and never replaces the initial one: `matrix`, `pick`, `summary`, `delta`, `graph` and `calibrate` read
 the initial batch unless `--phase deliberated`; `matrix --phase both` answers both under `phases`. `check --history` lists every batch with
-its phase under `batches`. `apply-check` answers at most `advise` (reason `deliberated`) for a run with a deliberated verdict.
+its phase under `batches`. `apply-check` answers at most `advise` (reason `deliberated`) for any run with a deliberation round.
 
 ### The counted metrics
 `matrix` adds, as counts and never pooled (D34): per cell `within_one` (scores within one point of the lower-middle median); per stratum
 `agreement {cells, cells_all_within_one}`, `evidence {seen, told, recalled}` and, once a deliberation was answered, `shift {moved_up,
 moved_down, held, toward_first_median, away_from_first_median, cells}` (per cell and persona `{before, after, step}`, `step` the change in
 anchors at or below the score); and at the top `panel_match [{run, term, tag, stake, asked, seated, answered}]` and `cost {per_juror,
-reported_total, jurors_reporting, estimate}` (each juror's own reported numbers, nothing divided). No key is a mean, an average, a share,
+reported_total, jurors_reporting, estimate}` (`per_juror` is one entry per juror of a run, `{run, persona, batches, input_tokens,
+output_tokens}` summed over its batches; nothing divided). No key is a mean, an average, a share,
 a rate, a percent or a probability. `summary` writes them as fixed sentences after the blockers ("Primary jurors agree within one anchor
-on 21 of 21 scores; ...", "Of 147 verdict lines, ...", after a deliberation "After deliberation, ... moved toward the group's first
+on 21 of 21 scores; secondary jurors ...", "Of 147 verdict lines, ...", after a deliberation "After deliberation, ... moved toward the group's first
 median."), a `panel:` line under the numbers table, and ends with `cost:` lines (a line per run and per seat only when verdicts reported
 usage; `cost: reported — (estimate N)` when none did).
 
 ### Decision juries
-A subject of kind `decision` is a `questions.md` (`## Q<n> <question>`, then `- option` lines, at least two each; `invalid_questions`
-otherwise) plus the files a point of view is read from (rules, decisions, reports), all attached. Brief it under the shipped `decide`
-lens (one dimension, `confidence`; a lens that asks no pick is refused). A verdict carries lines `about: "Q<n>"` and `picks`, one
-`{about, choice, reason}` per question with the option verbatim (`question_pick_invalid`). `pick RUN` answers `questions`, each with its
-strata and choices; `summary` shows each question's picks per stratum and a `Needs a person:` list. A question needs a person when its
-text or options fall in a human class (public price, public words, legal, spending, irreversible: the keyword lists in
-`domain/decision.rs`), when its sources fall under a human rule of `personajury.toml`, or when the jurors of one stratum split on it
-and it is about money or trust. `apply-check` answers `human` for those (reason `human_class`, `via` `question`, `picks` or `sources`).
+A subject of kind `decision` is a `questions.md` plus the files a point of view is read from (rules, decisions, reports), all
+attached. The questions file has a strict grammar, and nothing else: a question is exactly `## Q<n> [class: <class>] <text>` with `n`
+canonical (1, 2, 3 ... in order, no leading zero); an option is a `- <option>` line under it, at least two each; blank lines are
+allowed. Any other non-blank line (a title, prose, `### Q2`, `**Q3 ...**`, an option before the first question), a duplicate or
+non-canonical id, an unknown class or a question with fewer than two options is `invalid_questions`, naming the line; a question with
+no class tag is `question_class_missing`. Nothing is ever silently dropped. The classes are `taste`, `product`, `copy`, `ops` (a jury
+may decide them) and the human classes `money`, `permission`, `deploy`, `secret`, `licence`, `public-claim`, `brand`, `legal`,
+`spending`, `irreversible`.
+
+Brief it under the shipped `decide` lens (one dimension, `confidence`; a lens that asks no pick is refused). A verdict carries lines
+`about: "Q<n>"` and `picks`, one `{about, choice, reason}` per question with the option verbatim (`question_pick_invalid`). `pick RUN`
+answers `questions`, each with its strata and choices; `summary` shows each question's picks per stratum and a `Needs a person:` list.
+A question answers `human` when it declares a human class (`human_class`, `via: declared`); when it declares a jury class but its text
+or options hit the stem table (`class_mismatch`, the `stem` named); when the strata's top picks differ on it and it is money, spending,
+trust, legal or public-claim, declared or matched (`split_on_sensitive`); or when its sources' paths fall under a human rule of
+`personajury.toml`. A split on any other question answers `advise` (`split_on_question`); a stratum tied at the top counts as a split.
+
+The stem table (`domain/decision.rs`, `STEMS`) matches a word that starts with a stem, so plurals and other endings count
+("prices", "migrations") and a word that only contains one does not ("relationship" never meets "ship"):
+- money: pric, charg, fee, bill, refund, pay, spend, budget, cost, discount, invoice, dollar, purchas, salar, payroll, revenue, hire,
+  hiring, vendor, and a currency sign (`$`, `€`, `£`);
+- legal: legal, contract, licen, terms, privacy, gdpr, consent, liabil, complian, trademark, patent;
+- irreversible: delet, drop, purge, migrat, irreversib, sunset, deprecat, turn off, shut down;
+- outward: deploy, release, ship, publish, announce, press, public, email (beside all, every... or customer...), notify all;
+- secret and permission: secret, key, token, password, permission, access, role, admin, credential.
+
+Trust, for a split only: trust, secur, safe, confiden, audit, consent, and any secret-or-permission stem. The table leans wide: a false
+hit costs a person a minute, a miss lets a jury decide what is the owner's. **Source text is informational**: the point-of-view files
+are scanned with the same table and their hits are listed in `summary` ("Sources mention: ...") and as the `apply-check` reason
+`sources_mention` (`info`); they change no answer. What decides is the questions' class and text and the project's path rules.
 
 ### Starter config
-`personajury init` writes `personajury.toml` when the project has none: `internals` (`crates/**`, `migrations/**`, `tools/**`,
-`.github/**`, `router/rules/**`, `scripts/**`, `tests/**`) at quorum `none`, a `surface` class (`screens/**`, `pages/**`, `docs/**`) at
-quorum `low` naming a panel `default` you create, and the human classes as commented examples. It is a starting point; `setup --apply`
+`personajury init` writes `personajury.toml` when the project has none, with every rule active: the human rules `money` (pricing,
+prices, billing, checkout paths), `legal` (legal, terms, privacy), `permission` (auth) and `secret` (secrets, `.env*`) at quorum
+`human`; a `surface` class (`screens/**`, `pages/**`, `docs/**`, `site/**`) at quorum `high` naming a panel `default` you create; and
+`internals` (`crates/**`, `src/**`, `migrations/**`, `tools/**`, `.github/**`, `router/rules/**`, `scripts/**`, `tests/**`) at quorum
+`none`. The highest quorum among a change's paths wins, so `crates/billing/...` and `site/pricing.html` are `human`. It is a starting point; `setup --apply`
 writes it too and neither ever overwrites an existing file.

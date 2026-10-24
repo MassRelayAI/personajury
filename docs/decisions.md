@@ -543,6 +543,9 @@ pass `--options attachments`**: the recorded verdicts score `about: pricing.png`
 re-recorded. What would change it: a regenerated fixture jury whose verdicts score `about: lantern-site`. The `a-technical-decision`
 playbook, whose options are files, now says `--options attachments` in its command; `pick-a-name-or-logo` is a `design` subject and
 is unchanged. A decision subject (D37) takes the third word, `questions`, and refuses `--options`.
+**Amended after the v0.6-C review (M1).** With no `--options`, a subject briefed before keeps the mode of its latest run (a run with
+no recorded mode, made before v0.6, counts as `attachments`), so a page briefed under v0.5 and again under v0.6 keeps option cells that
+`delta` can compare; a subject never briefed takes its kind's default, and an explicit `--options` always wins.
 
 ## D33 — deliberation: one advise-only round (2026-10-24, the maintainer)
 *Built in v0.6-C. Reference: [`commands.md`](commands.md), Deliberation.*
@@ -560,6 +563,13 @@ holds the files). The latest **initial** batch is what every read uses by defaul
 `check --history` lists each batch with its phase. `apply-check` answers at most `advise` for a run with a deliberated verdict (reason
 `deliberated`); `escalate` and `human` take precedence. Rejected: letting a deliberated batch replace the first (it would turn a
 measure of persuasion into the verdict) and several rounds (a second round measures the first round's anchoring).
+**Amended after the v0.6-C review (the maintainer's rulings, 2026-10-24).** The independent batch is frozen the moment `deliberate`
+starts: an initial verdict for the run after that, with or without `"phase": "initial"`, is refused (`initial_closed`), because a
+juror who may have read the others could otherwise answer again as the jury's first word and reach `apply`. A person's `--by-human`
+verdict (D19) is no juror's first word and is still taken. `apply-check` advises (`deliberated`) as soon as the round exists, with or
+without a deliberated verdict, and reads only the frozen batch. **Schema v6**: `verdict.phase` changes what "the latest batch" means,
+so the store's version moved from 5 to 6 (the v0.6 columns are added on open, idempotently); a v0.5 binary refuses a v6 store by its
+version rather than reading a deliberated batch as the latest, and a v5 store upgrades in place.
 
 ## D34 — the honest metrics: counts per stratum, never pooled, never a mean (2026-10-24, the maintainer)
 *Built in v0.6-C. Source: the metrics note, 2026-10-24. Reference: [`commands.md`](commands.md), The counted metrics.*
@@ -579,6 +589,10 @@ grep -c '^<'` is 0), `matrix.json` gained `within_one`, `agreement` and a stratu
 recorded table and its `ends_with` legend test stand; the footers live in the summary). The summary's line budget went from about thirty
 to thirty-four for the four new sentences and lines. **Rejected**: win probability, average damages, pooled indexes, emotion signals
 and simulated-time curves. A guessed number has no evidence behind it, and a pooled one breaks the strata law.
+**Amended after the v0.6-C review (M2, M4).** `cost.per_juror` is one entry per juror of a run (`batches` lists its batches, the tokens
+are their sum), so a juror with two batches is listed once. The agreement sentence capitalises only its first stratum ("...; secondary
+jurors agree ..."); the goldens `summary.txt` and `summary.md` changed in that line only, a line this lane added, so against main they
+still only gain lines.
 
 ## D37 — decision juries (2026-10-24, the maintainer, adopter feedback from a build terminal)
 *Built in v0.6-C. Numbered D37 because lane B holds D35 and D36. Reference: [`commands.md`](commands.md), Decision juries.*
@@ -593,6 +607,28 @@ options fall in one of five classes (public price, public words, legal, spending
 on it and it is about money or trust; the summary lists them and `apply-check` answers `human` (reason `human_class`, `via` `question`,
 `picks` or `sources`). The lists are a first cut and miss words; a miss is a question the jury answers and a person still reads, and a
 false hit costs a person a minute, so the lists lean wide.
+**Amended after the v0.6-C review (the maintainer's rulings, 2026-10-24).** D13 governs: apply only when proven.
+- **A strict grammar.** A question is exactly `## Q<n> [class: <class>] <text>`, `n` canonical (1, 2, 3 ..., no leading zero); options
+  are `- <option>` lines; blank lines are allowed. Any other non-blank line, any heading of another level that mentions `Q<digit>`, a
+  duplicate or non-canonical id, or a question with fewer than two options is `invalid_questions`, naming the line. The review found a
+  `### Q2` price question silently merged into Q1; nothing is dropped now. (A `# title` line is refused too: the grammar lists only
+  questions, options and blank lines.)
+- **A declared class.** Every question declares `taste`, `product`, `copy`, `ops` or a human class (`money`, `permission`, `deploy`,
+  `secret`, `licence`, `public-claim`, `brand`, `legal`, `spending`, `irreversible`); none is `question_class_missing`. A declared human
+  class answers `human`. The keyword lists became a documented stem table (`domain/decision.rs` `STEMS`, listed in `commands.md`),
+  matched by word start so plurals count: a jury class whose text or options hit a stem answers `human`, reason `class_mismatch`, with
+  the stem named. Beyond the ruled stems the table keeps the earlier list's words (dollar, purchase, salary, payroll, revenue, hire,
+  vendor, compliance, trademark, patent, sunset, deprecate, public, credential) and adds `turn off` and `shut down`, which the review's
+  "turn off the old API for all users" needed; the headline/tagline/slogan words were dropped so a `copy` question can stay with a
+  jury. The three classes a decision adds (`legal`, `spending`, `irreversible`) are question classes only; the `personajury.toml`
+  human-class list (D13) is unchanged.
+- **A split is between strata.** A question is split when the strata's top picks differ (a stratum tied at the top counts). A split on
+  money, spending, trust, legal or public-claim (declared, or matched: money and spending by the money stems, legal by the legal stems,
+  public-claim by the outward stems, trust by trust, secur, safe, confiden, audit, consent or a secret-or-permission stem) answers
+  `human`, reason `split_on_sensitive`; a split on any other question answers `advise`, reason `split_on_question`.
+- **Sources are informational.** The point-of-view files are scanned with the same table; hits are listed in `summary` ("Sources
+  mention: ...") and as the `apply-check` reason `sources_mention` (`info`). They change no answer: what decides is the question's class
+  and text and the project's path rules (a source path under a human rule still answers `human`).
 
 ## D38 — the starter config and cost by default (2026-10-24, the maintainer, adopter feedback)
 *Built in v0.6-C.*
@@ -602,3 +638,9 @@ false hit costs a person a minute, so the lists lean wide.
 the human classes as comments. It is a starting point, said so in its first line; setup reports it under `project_config`. **Cost by
 default**: `summary` always ends with a cost line (estimate and reported tokens per run and per seat; reported only when verdicts carry
 usage), the adopter tracking a weekly budget. No new dependency.
+**Amended after the v0.6-C review (the maintainer's ruling, 2026-10-24).** The starter ships its rules active, not commented out:
+human rules for pricing, prices, billing and checkout (`money`), legal, terms and privacy (`legal`), auth (`permission`) and secrets
+and `.env*` paths (`secret`); `high` for the other surface paths (`screens/**`, `pages/**`, `docs/**`, `site/**`); `none` for code,
+migrations, tools and CI (`crates/**`, `src/**`, `migrations/**`, `tools/**`, `.github/**`, `router/rules/**`, `scripts/**`,
+`tests/**`). The highest quorum wins, so `crates/billing/src/price.rs` and `site/pricing.html` are `human`. The review had found that
+adopting the old starter made `apply` reachable on prices and legal pages (`low`), where no config at all answered `advise`.

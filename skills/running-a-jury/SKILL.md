@@ -168,17 +168,20 @@ personajury verdict --run <run> --file v.json --deliberated   # the answer, "pha
 ```
 Run it only to learn how persuadable the jury was: how many scores moved, which way, toward or away from the group's first median
 (`matrix` shows `shift`, `summary` says it in one sentence). Never use it to change the verdict: the jurors read each other, so the run
-now answers at most `advise` (`deliberated`) and every table you show is the initial batch unless you pass `--phase deliberated`. One
+now answers at most `advise` (`deliberated`) from the moment the round starts, and no initial verdict is taken after it and every table you show is the initial batch unless you pass `--phase deliberated`. One
 round per run; give each seat's file to a fresh subagent, as in step 2.
 
 ## 5c. A decision jury (questions, not a surface)
 When the thing to settle is a list of questions and a point of view written in files, not a page: write `questions.md`
-(`## Q1 <question>` then one `- option` line per option, at least two), attach it with the files the view is read from
+(`## Q1 [class: product] <question>` then one `- option` line per option, at least two; nothing else but blank lines, and every
+question declares its class: `taste`, `product`, `copy`, `ops`, or a human class such as `money`, `legal`, `spending`), attach it with the files the view is read from
 (`subject add d --kind decision --attach questions.md rules.md decisions.md`), seat the personas (`--seats auto` with an `--audience`,
 or a panel), and `brief --subject d --lens decide ...`. Each juror answers every question: lines `about: "Q1"` and one `picks` entry
 per question (`{about, choice, reason}`, the option verbatim). `pick` and `summary` show each question's picks per stratum and a
-"Needs a person" list: a question about a public price or words, legal, spending or something irreversible, one whose sources fall
-under a human rule, or one the jurors split on over money or trust. `apply-check` answers `human` for those; the jury advises on
+"Needs a person" list: a question declared in a human class, one whose text hits the stem table (money, legal, irreversible, outward,
+secret or permission words), one whose sources' paths fall under a human rule, or one whose strata's top picks differ on money,
+spending, trust, legal or public claims (a split on another question advises). "Sources mention" lists the point-of-view files' hits
+for you to read; they change no answer. `apply-check` answers `human` for those; the jury advises on
 them, a person decides.
 
 ## 6. Next round

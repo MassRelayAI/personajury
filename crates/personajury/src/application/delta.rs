@@ -28,7 +28,12 @@ pub fn show_phase(root: &Path, a: i64, b: i64, phase: &str) -> Result<Value> {
     let before = score_rows(&ra, &super::verdict::rows_in(&store, a, phase)?);
     let after = score_rows(&rb, &super::verdict::rows_in(&store, b, phase)?);
     let d = delta::compute(&before, &after, step, &ra.stakes, &rb.stakes);
+    let mut d = d;
+    let (paired, unpaired) = delta::split_unpaired(std::mem::take(&mut d.moves));
+    d.moves = paired;
     let mut out = serde_json::to_value(&d).expect("delta serialises");
+    // personas seated in one run only came or went; they are listed apart from the moves
+    out["unpaired"] = json!(unpaired);
     out["a"] = json!(a);
     out["b"] = json!(b);
     out["subject"] = json!(rb.subject_name);

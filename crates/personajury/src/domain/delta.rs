@@ -33,6 +33,32 @@ fn by_stratum(rows: &[ScoreRow], stakes: &BTreeMap<String, Stake>) -> BTreeMap<S
     out
 }
 
+/// A persona seated in only one of the two runs: it did not move, it came or went. `only_in` is `before` or `after`.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize)]
+pub struct Unpaired {
+    pub persona: String,
+    pub only_in: &'static str,
+    pub cells: usize,
+}
+
+/// Split moves into those of personas present in both runs and the personas seated in one run only.
+pub fn split_unpaired(moves: Vec<Move>) -> (Vec<Move>, Vec<Unpaired>) {
+    let mut seen: BTreeMap<String, (bool, bool, usize)> = BTreeMap::new();
+    for m in &moves {
+        let e = seen.entry(m.persona.clone()).or_default();
+        e.0 |= m.before.is_some();
+        e.1 |= m.after.is_some();
+        e.2 += 1;
+    }
+    let one_sided = |p: &str| matches!(seen.get(p), Some((true, false, _)) | Some((false, true, _)));
+    let unpaired = seen
+        .iter()
+        .filter(|(p, _)| one_sided(p))
+        .map(|(p, (b, _, n))| Unpaired { persona: p.clone(), only_in: if *b { "before" } else { "after" }, cells: *n })
+        .collect();
+    (moves.into_iter().filter(|m| !one_sided(&m.persona)).collect(), unpaired)
+}
+
 /// `stakes_before` and `stakes_after` are the stakes each run declared.
 pub fn compute(
     before: &[ScoreRow],
@@ -203,6 +229,15 @@ mod tests {
         assert_eq!(d.incomplete.len(), 1);
         assert_eq!(d.incomplete[0].persona, "a");
         assert!(!d.landed);
+    }
+    #[test]
+    fn personas_seated_in_one_run_only_are_not_moves() {
+        let d = go(&[row("a", "x", 3, 0), row("b", "x", 2, 0)], &[row("a", "x", 4, 0), row("c", "x", 5, 0)], 2);
+        let (paired, unpaired) = split_unpaired(d.moves);
+        assert_eq!(paired.len(), 1);
+        assert_eq!((paired[0].persona.as_str(), paired[0].moved), ("a", Some(1)));
+        let u: Vec<(&str, &str)> = unpaired.iter().map(|u| (u.persona.as_str(), u.only_in)).collect();
+        assert_eq!(u, vec![("b", "before"), ("c", "after")]);
     }
     #[test]
     fn an_empty_later_run_never_lands() {

@@ -564,7 +564,10 @@ pub fn run(root: &Path, runs: &[i64], rule: Option<&str>, calibration: Option<&P
                         json!({"lens": r.lens_name, "a": prev.id, "b": r.id}),
                     ));
                 }
-                let new_cells = d["moves"].as_array().map_or(0, |m| m.iter().filter(|x| x["before"].is_null()).count());
+                let new_cells = d["moves"].as_array().map_or(0, |m| m.iter().filter(|x| x["before"].is_null()).count())
+                    + d["unpaired"].as_array().map_or(0, |u| {
+                        u.iter().filter(|x| x["only_in"] == "after").map(|x| x["cells"].as_u64().unwrap_or(0) as usize).sum()
+                    });
                 if new_cells > 0 {
                     reasons.push(unavailable(format!("{new_cells} cell(s) the previous round does not have")));
                 }

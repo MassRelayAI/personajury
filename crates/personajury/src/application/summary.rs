@@ -10,6 +10,9 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
+/// a persona's latest pick on one question: its stratum and its choice
+type LatestPicks = BTreeMap<String, (Stake, String)>;
+
 const STAKES: [Stake; 3] = [Stake::Primary, Stake::Secondary, Stake::Bystander];
 
 fn stake_of(v: &Value) -> Option<Stake> {
@@ -138,22 +141,28 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     rows.sort_by(|a, b| key(&b.cells).cmp(&key(&a.cells)).then_with(|| a.label.cmp(&b.label)));
     f.rows = rows;
 
-    // the picks, per stratum, as counts
+    // the picks, per stratum, as counts. A decision question asked in several runs is tallied once: each persona's latest
+    // pick (the later run wins) counts, so a run that seated only some personas adds to the others instead of repeating them.
+    let mut tally: Vec<(String, String, LatestPicks)> = Vec::new();
     for r in &given {
         let p = pick::show(root, r.id)?;
         for q in p["questions"].as_array().into_iter().flatten() {
-            let mut lines = Vec::new();
+            let id = q["about"].as_str().unwrap_or("").to_string();
+            let at = match tally.iter().position(|t| t.0 == id) {
+                Some(i) => i,
+                None => {
+                    tally.push((id, q["question"].as_str().unwrap_or("").to_string(), BTreeMap::new()));
+                    tally.len() - 1
+                }
+            };
             for s in q["strata"].as_array().into_iter().flatten() {
                 let Some(stake) = stake_of(&s["stake"]) else { continue };
-                let choices: Vec<(String, usize)> = s["choices"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .map(|c| (c["choice"].as_str().unwrap_or("").to_string(), c["count"].as_u64().unwrap_or(0) as usize))
-                    .collect();
-                lines.push(sm::PickLine { stake, total: choices.iter().map(|c| c.1).sum(), choices });
+                for c in s["choices"].as_array().into_iter().flatten() {
+                    for who in c["personas"].as_array().into_iter().flatten().filter_map(Value::as_str) {
+                        tally[at].2.insert(who.to_string(), (stake, c["choice"].as_str().unwrap_or("").to_string()));
+                    }
+                }
             }
-            f.questions.push((q["about"].as_str().unwrap_or("").to_string(), q["question"].as_str().unwrap_or("").to_string(), lines));
         }
         if let Some(sub) = store.subject_at(&r.subject_name, r.subject_version)?.filter(|s| s.kind == SubjectKind::Decision) {
             for n in super::decision::needs_person(root, &store, r, &sub)? {
@@ -169,8 +178,19 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
                         why.push(c);
                     }
                 }
-                if !why.is_empty() {
-                    f.needs_person.push((n["question"].as_str().unwrap_or("").to_string(), why));
+                let q = n["question"].as_str().unwrap_or("").to_string();
+                if why.is_empty() {
+                    continue;
+                }
+                match f.needs_person.iter_mut().find(|(x, _)| *x == q) {
+                    Some((_, seen)) => {
+                        for w in why {
+                            if !seen.contains(&w) {
+                                seen.push(w);
+                            }
+                        }
+                    }
+                    None => f.needs_person.push((q, why)),
                 }
             }
             for m in super::decision::sources_mention(root, &sub)? {
@@ -189,6 +209,23 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
             f.picks.push(sm::PickLine { stake, total: choices.iter().map(|c| c.1).sum(), choices });
         }
     }
+    for (id, text, by_persona) in tally {
+        let mut lines = Vec::new();
+        for stake in STAKES {
+            let mut counts: BTreeMap<&str, usize> = BTreeMap::new();
+            for (_, choice) in by_persona.values().filter(|(st, _)| *st == stake) {
+                *counts.entry(choice.as_str()).or_insert(0) += 1;
+            }
+            if counts.is_empty() {
+                continue;
+            }
+            let mut choices: Vec<(String, usize)> = counts.into_iter().map(|(c, n)| (c.to_string(), n)).collect();
+            choices.sort_by(|a, b| b.1.cmp(&a.1).then_with(|| a.0.cmp(&b.0)));
+            lines.push(sm::PickLine { stake, total: choices.iter().map(|c| c.1).sum(), choices });
+        }
+        f.questions.push((id, text, lines));
+    }
+    f.sources_mention.dedup_by(|a, b| a.0 == b.0);
 
     // the blockers of the judged (latest per lens) runs, primary first, each with its decision
     let mut judged: Vec<&RunRow> = Vec::new();

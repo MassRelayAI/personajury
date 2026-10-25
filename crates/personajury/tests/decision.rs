@@ -367,3 +367,19 @@ fn source_text_that_hits_a_stem_is_listed_and_changes_no_answer() {
     }
     assert!(!flat.contains("Needs a person"), "{s}");
 }
+
+#[test]
+fn a_summary_of_two_runs_tallies_each_question_once_over_the_latest_pick_of_each_persona() {
+    let ws = world();
+    let w = ws.path();
+    let first = run_id(w);
+    // a second run on the same subject where only one persona answered again
+    let second = ok(brief(w))["run"].as_i64().unwrap();
+    let r = jg(w, &["verdict", "--run", &second.to_string(), "--file", verdict_file("builder-ana").to_str().unwrap()]);
+    assert_eq!(r["ok"], true, "{r}");
+    let t = ok(jg(w, &["summary", &first.to_string(), &second.to_string(), "--width", "200"]))["text"].as_str().unwrap().to_string();
+    let flat = t.split_whitespace().collect::<Vec<_>>().join(" ");
+    assert_eq!(flat.matches("On Q1 (").count(), 1, "{t}");
+    assert!(flat.contains("On Q1 (Which order should the onboarding checklist follow?), primary chose Install first, account second, 2 of 2;"), "{t}");
+    assert_eq!(flat.matches("Needs a person:").count(), 1, "{t}");
+}

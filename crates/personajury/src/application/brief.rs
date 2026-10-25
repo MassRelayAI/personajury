@@ -1481,6 +1481,17 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
     } else if !trimmed.is_empty() {
         out["trimmed"] = json!(trimmed);
     }
+    // a panel the caller wrote out in full (`--query`) cut by effort is said aloud, not only in `trimmed`
+    if let Some(t) = trimmed.iter().find(|t| t["what"] == "seats").filter(|_| a.query.is_some()) {
+        let w = json!({
+            "code": "effort_trimmed_seats", "asked": t["from"], "seated": t["to"], "why": t["why"],
+            "note": format!("{} seats were asked and {} are seated; pass --spend N or a higher --effort to seat more", t["from"], t["to"]),
+        });
+        match out.get_mut("warnings").and_then(Value::as_array_mut) {
+            Some(list) => list.push(w),
+            None => out["warnings"] = json!([w]),
+        }
+    }
     if let Some(b) = budget {
         out["budget_tokens"] = json!(b);
     }

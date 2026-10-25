@@ -67,5 +67,8 @@ pub fn write(root: &Path, apply: bool) -> Result<Value> {
 
 /// `personajury init`.
 pub fn run(root: &Path) -> Result<Value> {
-    write(root, true)
+    let out = write(root, true)?;
+    // The workspace exists after init, so read verbs (`lens list`) answer at once on an empty one.
+    crate::store::Store::open(root)?;
+    Ok(out)
 }

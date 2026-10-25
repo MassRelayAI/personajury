@@ -464,11 +464,13 @@ pub enum LensCmd {
 }
 #[derive(Subcommand, Debug)]
 pub enum SubjectCmd {
+    #[command(override_usage = "personajury subject add <NAME> --kind <KIND> --attach <FILE>... [--audience <TAGS>]")]
     Add {
         name: String,
         /// page | diff | design | logo | document | menu | prices | decision (a questions.md plus the files a point of view is read from)
         #[arg(long)]
         kind: String,
+        /// the files, after NAME: NAME goes first, or end the list with `--` before it
         #[arg(long, num_args = 1.., required = true)]
         attach: Vec<PathBuf>,
         /// who the subject speaks to, as tags (for `brief --seats auto`): "docs,developers"

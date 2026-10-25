@@ -62,7 +62,8 @@ pub enum Cmd {
         /// a saved panel (or `--query`, or `--rule` for the rule's panel)
         #[arg(long)]
         panel: Option<String>,
-        /// an ad-hoc panel, not saved: "3 builder=primary, 2 others=bystander"
+        /// an ad-hoc panel, not saved: a count, a tag and an optional `=stake` per term, terms separated by commas, for example
+        /// "2 user=primary, 3 expert=secondary, 1 business=bystander" (a bare "6 user,expert,business" is invalid_query)
         #[arg(long)]
         query: Option<String>,
         /// one run per lens, repeated or comma-separated (default: the rule's)
@@ -469,6 +470,16 @@ pub enum SubjectCmd {
     Add {
         name: String,
         /// page | diff | design | logo | document | menu | prices | decision (a questions.md plus the files a point of view is read from)
+        ///
+        /// A decision subject needs a file named exactly `questions.md` holding ONLY question headings and `- option` lines
+        /// (no prose, two or more options each), numbered Q1, Q2 ... with no gaps:
+        ///   ## Q1 [class: product] Which order should the checklist follow?
+        ///   - Install first, account second
+        ///   - Account first, install second
+        ///
+        /// A jury may decide the classes taste, product, copy and ops. Only a person decides money, permission, deploy,
+        /// secret, licence, public-claim, brand, legal, spending and irreversible. Attach the files a point of view is read
+        /// from beside it.
         #[arg(long)]
         kind: String,
         /// the files, after NAME: NAME goes first, or end the list with `--` before it

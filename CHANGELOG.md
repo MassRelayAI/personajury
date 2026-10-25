@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed (usage feedback from a first Windows run, 2026-10-25)
+- `init` now creates the workspace, so `lens list` answers straight after it.
+- `subject add` usage shows NAME first (`--attach` still takes a list; put NAME before it, or end the list with `--`).
+- `brief --effort low` on an explicit `--query` says it aloud: a `warnings` entry `effort_trimmed_seats` with the asked and seated counts.
+- `delta` lists personas seated in only one run under `unpaired`, apart from `moves`.
+- `summary` over several runs tallies each decision question once, over each persona's latest pick; `needs a person` is not repeated.
+- `summary --md` without a path returns the markdown in `data.markdown` and writes no file.
+- Help: the decision `questions.md` grammar and class list on `subject add`; a multi-term `--query` example on `brief`; the `PATH` note after install.
+
 ### Added
 - Homebrew: `brew install massrelay-ai/tap/personajury`, from the shared massrelay-ai tap (the formula follows each release; installed, tested and audited on macOS arm and Intel and on Linux).
 

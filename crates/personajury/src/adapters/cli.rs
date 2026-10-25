@@ -258,8 +258,9 @@ pub enum Cmd {
         /// one self-contained html file (inline CSS, the jury graph, every per-stratum table)
         #[arg(long)]
         html: Option<PathBuf>,
-        /// the same summary as markdown, with the decisions per finding, the run ids and brief hashes, and the date
-        #[arg(long)]
+        /// the same summary as markdown, with the decisions per finding, the run ids and brief hashes, and the date;
+        /// without a path the markdown comes back in the answer's `markdown` and no file is written
+        #[arg(long, num_args = 0..=1, default_missing_value = "-")]
         md: Option<PathBuf>,
         /// write the markdown to <report_dir>/<date>-<subject>.md (refused when personajury.toml has no report_dir)
         #[arg(long)]

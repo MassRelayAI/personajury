@@ -453,16 +453,22 @@ pub fn show(
             None => Ok(None),
         }
     };
-    let (html, md) = (target(html, "html")?, target(md, "md")?);
+    let to_stdout = md == Some(Path::new("-"));
+    let (html, md) = (target(html, "html")?, if to_stdout { md.map(Path::to_path_buf) } else { target(md, "md")? });
     let (f, _) = gather(root, runs, slice)?;
     let mut out = json!({ "runs": f.runs, "answer": f.answer, "text": sm::text(&f, width) });
     if let Some(p) = html {
         write(&p, &sm::html(&f, &graph::render(root, &f.runs)?))?;
         out["html"] = json!(p);
     }
-    if let Some(p) = md {
-        write(&p, &sm::markdown(&f))?;
-        out["md"] = json!(p);
+    match md {
+        // `--md` with no path: the markdown comes back in the answer
+        Some(p) if p == Path::new("-") => out["markdown"] = json!(sm::markdown(&f)),
+        Some(p) => {
+            write(&p, &sm::markdown(&f))?;
+            out["md"] = json!(p);
+        }
+        None => {}
     }
     if let Some(d) = dir {
         let p = d.join(format!("{}-{}.md", f.date, f.subject));

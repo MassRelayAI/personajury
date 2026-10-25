@@ -76,3 +76,15 @@ fn item5_an_effort_trim_of_an_explicit_query_is_a_loud_warning_naming_what_was_a
     assert_eq!(w0["seated"], 3, "{w0}");
     assert!(w0["note"].as_str().unwrap().contains("--spend"), "{w0}");
 }
+
+#[test]
+fn items_2_and_4_the_help_carries_the_questions_grammar_and_a_multi_term_query() {
+    let d = tempfile::tempdir().unwrap();
+    let help = |args: &[&str]| String::from_utf8_lossy(&cmd(d.path(), d.path(), args).stdout).to_string();
+    let subject = help(&["subject", "add", "--help"]);
+    for want in ["questions.md", "## Q1 [class: product]", "irreversible", "taste"] {
+        assert!(subject.contains(want), "{want}: {subject}");
+    }
+    let brief = help(&["brief", "--help"]);
+    assert!(brief.contains("2 user=primary, 3 expert=secondary, 1 business=bystander"), "{brief}");
+}

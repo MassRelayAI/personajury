@@ -49,6 +49,7 @@ You give PersonaJury the files people would see: screenshots of a page, a docume
    It downloads one file for your system from the [v0.6.0 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.6.0),
    checks it against `SHA256SUMS`, and puts it in `~/.local/bin`. No sudo, nothing else. To read it before running it,
    see [Install](#install). To remove everything later, see [Uninstall](#uninstall).
+   If your shell then says `personajury: command not found`, `~/.local/bin` is not on your `PATH`: add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
 2. **Connect your agent.** In Claude Code, type:
    ```text
    /plugin marketplace add massrelay-ai/personajury

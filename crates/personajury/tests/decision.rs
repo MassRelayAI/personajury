@@ -383,3 +383,15 @@ fn a_summary_of_two_runs_tallies_each_question_once_over_the_latest_pick_of_each
     assert!(flat.contains("On Q1 (Which order should the onboarding checklist follow?), primary chose Install first, account second, 2 of 2;"), "{t}");
     assert_eq!(flat.matches("Needs a person:").count(), 1, "{t}");
 }
+
+#[test]
+fn summary_md_without_a_path_returns_the_markdown_in_the_answer_and_writes_no_file() {
+    let ws = world();
+    let w = ws.path();
+    let run = run_id(w);
+    let r = ok(jg(w, &["summary", &run.to_string(), "--md"]));
+    let md = r["markdown"].as_str().unwrap_or_else(|| panic!("no markdown: {r}"));
+    assert!(md.contains("## Decisions per finding") || md.contains('#'), "{md}");
+    assert!(r.get("md").is_none(), "{r}");
+    assert!(!w.join("-").exists());
+}

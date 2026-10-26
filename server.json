@@ -8,11 +8,11 @@
     "url": "https://github.com/massrelay-ai/personajury",
     "source": "github"
   },
-  "version": "0.6.0",
+  "version": "0.6.1",
   "packages": [
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.0/personajury-linux-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.1/personajury-linux-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -20,7 +20,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.0/personajury-darwin-arm64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.1/personajury-darwin-arm64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -28,7 +28,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.0/personajury-darwin-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.1/personajury-darwin-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"
@@ -36,7 +36,7 @@
     },
     {
       "registryType": "mcpb",
-      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.0/personajury-win32-x64.mcpb",
+      "identifier": "https://github.com/massrelay-ai/personajury/releases/download/v0.6.1/personajury-win32-x64.mcpb",
       "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "transport": {
         "type": "stdio"

@@ -1,6 +1,6 @@
 {
   "name": "personajury",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Run a persona jury as an engine: personas, panels, lenses, evidence on every line, scores per stratum. No LLM inside the engine. Needs the personajury binary on PATH.",
   "author": {
     "name": "Nicholas Andrea Sujitno",

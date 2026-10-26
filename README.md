@@ -46,7 +46,7 @@ You give PersonaJury the files people would see: screenshots of a page, a docume
    ```bash
    curl -fsSL https://raw.githubusercontent.com/massrelay-ai/personajury/main/scripts/install.sh | sh
    ```
-   It downloads one file for your system from the [v0.6.0 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.6.0),
+   It downloads one file for your system from the [v0.6.1 release](https://github.com/massrelay-ai/personajury/releases/tag/v0.6.1),
    checks it against `SHA256SUMS`, and puts it in `~/.local/bin`. No sudo, nothing else. To read it before running it,
    see [Install](#install). To remove everything later, see [Uninstall](#uninstall).
    If your shell then says `personajury: command not found`, `~/.local/bin` is not on your `PATH`: add `export PATH="$HOME/.local/bin:$PATH"` to your shell profile.
@@ -107,10 +107,10 @@ Release binaries for Linux x64 and arm64, macOS arm64 and x64, and Windows x64, 
 The install script downloads one file, the `personajury` binary for your platform, checks it against `SHA256SUMS`, and copies it to `~/.local/bin` (`PERSONAJURY_INSTALL_DIR` moves it). It does not use `sudo` and changes nothing else. To read it before it runs:
 
 ```bash
-# the script as tagged for v0.6.0: download it, read it, run it pinned to that release
-curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/personajury/v0.6.0/scripts/install.sh
+# the script as tagged for v0.6.1: download it, read it, run it pinned to that release
+curl -fsSLO https://raw.githubusercontent.com/massrelay-ai/personajury/v0.6.1/scripts/install.sh
 less install.sh
-PERSONAJURY_VERSION=v0.6.0 sh install.sh
+PERSONAJURY_VERSION=v0.6.1 sh install.sh
 ```
 
 - **Homebrew,** macOS and Linux: `brew install massrelay-ai/tap/personajury` (one tap for all massrelay-ai tools; the formula follows each release).

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.6.1] - 2026-10-27
 ### Fixed (usage feedback from a first Windows run, 2026-10-25)
 - `init` now creates the workspace, so `lens list` answers straight after it.
 - `subject add` usage shows NAME first (`--attach` still takes a list; put NAME before it, or end the list with `--`).

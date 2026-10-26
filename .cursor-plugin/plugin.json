@@ -2,7 +2,7 @@
   "name": "personajury",
   "displayName": "PersonaJury",
   "description": "Run a persona jury as an engine: evidence on every line, scores per stratum. Needs the personajury binary on PATH.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": {
     "name": "Nicholas Andrea Sujitno",
     "email": "support@massrelay.ai"

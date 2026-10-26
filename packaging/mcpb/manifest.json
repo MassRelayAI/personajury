@@ -3,7 +3,7 @@
   "manifest_version": "0.4",
   "name": "personajury",
   "display_name": "PersonaJury",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A persona jury as an engine: briefs, verdicts refused without evidence, scores per stratum. Local; never calls a model.",
   "long_description": "PersonaJury writes the briefs, refuses any verdict without evidence and reports scores per stratum, never averaged. It calls no model and no network: the app you chat in runs the personas. Claude Desktop has no subagents, so one context plays every juror; runs made here are labelled sequential, and `personajury_apply_check` answers advise for them, never apply. Pick the project folder that holds (or will hold) `.personajury/`.",
   "author": { "name": "Nicholas Andrea Sujitno", "email": "support@massrelay.ai" },

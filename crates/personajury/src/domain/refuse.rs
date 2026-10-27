@@ -153,6 +153,8 @@ pub enum Refusal {
     InvalidQuestions { why: String },
     #[error("the questions file: {why}")]
     QuestionClassMissing { why: String },
+    #[error("--neutral: the questions lean on an option ({hits}); a juror must not be told what the author prefers")]
+    LeakedRecommendation { hits: String },
     #[error("run {run} has a deliberation round: its independent batch was frozen when the round started, so no initial verdict is taken after it")]
     InitialClosed { run: i64 },
     #[error("{}", if question.is_empty() { format!("picks: {why}") } else { format!("pick for {question}: {why}") })]
@@ -228,6 +230,7 @@ impl Refusal {
             Refusal::PhaseWithoutFlag => "phase_without_flag",
             Refusal::InvalidQuestions { .. } => "invalid_questions",
             Refusal::QuestionClassMissing { .. } => "question_class_missing",
+            Refusal::LeakedRecommendation { .. } => "leaked_recommendation",
             Refusal::InitialClosed { .. } => "initial_closed",
             Refusal::QuestionPickInvalid { .. } => "question_pick_invalid",
             Refusal::InvalidQuery(_) => "invalid_query",

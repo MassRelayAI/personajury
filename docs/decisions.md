@@ -806,3 +806,15 @@ A `seen` line cites a node of an ARIA walk, and until now every user had to make
 - The id rule is `<role>-<slug(name)>`, numbered `-2`, `-3` in document order, generic and ignored nodes dropped (docs/walks.md).
   The same page gives byte-identical walks. The fixture's hand-written ids predate the tool, so re-cite from a captured walk.
 - Tests: `node --test tools/test/*.test.mjs` in CI; the capture tests skip without Chrome or `WebSocket`, the unit tests still run.
+
+## D43 — ballot hygiene and ballot size (2026-10-28)
+From two juries run by hand (usage feedback of 2026-10-27, asks 4 and 9).
+- `brief --neutral` (decision subjects only) refuses the brief as `leaked_recommendation` when a question or an option carries a
+  phrase that tells a juror what the author prefers ("(Recommended)", "we prefer", "preferred option", "(default)" and a few more; the
+  word "recommend" alone is not a hit). It names each hit as `Q2 option "..."`. Opt-in: no existing ballot changes. On any other subject
+  kind it is an `invalid_arguments`, so it never passes silently.
+- `summary` over a decision run adds one line per question, `size, Q1: N bytes of question and options (P% of the ballot's M bytes)`, before
+  the total `cost:` line. It states bytes, not tokens: jurors report one token total each, and the engine does not divide tokens (D34), so a
+  per-question token figure would be invented. The size is what decides whether to split a ballot.
+- Not built, on purpose: a second choice per question with a tie-break (it needs a new stored field, so it waits for the design pass
+  with the voting rule and the veto seats); the voting rule, veto seats, the screens kind and loop mode (design first).

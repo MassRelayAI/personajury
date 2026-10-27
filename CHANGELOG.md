@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- `brief --neutral`: refuse a decision ballot whose questions or options lean on an option (`leaked_recommendation`, D42).
+- `summary` of a decision run sizes each question in bytes beside the cost lines (D43).
 
 ## [0.6.1] - 2026-10-27
 ### Fixed (usage feedback from a first Windows run, 2026-10-25)

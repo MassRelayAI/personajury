@@ -395,3 +395,55 @@ fn summary_md_without_a_path_returns_the_markdown_in_the_answer_and_writes_no_fi
     assert!(r.get("md").is_none(), "{r}");
     assert!(!w.join("-").exists());
 }
+
+#[test]
+fn brief_neutral_refuses_a_ballot_that_leans_on_an_option_and_passes_a_plain_one() {
+    let ws = world();
+    let w = ws.path();
+    // the shipped ballot is plain
+    let ok = jg(w, &["brief", "--subject", "next-release", "--query", QUERY, "--lens", "decide", "--model", "m", "--neutral"]);
+    assert_eq!(ok["ok"], true, "{ok}");
+    // the same ballot with one option marked
+    let q = w.join("lean").join("questions.md");
+    std::fs::create_dir_all(q.parent().unwrap()).unwrap();
+    std::fs::write(&q, "## Q1 [class: product] Which order should the checklist follow?\n- Install first (Recommended)\n- Account first\n").unwrap();
+    ok_(jg(w, &["subject", "add", "leaning", "--kind", "decision", "--attach", q.to_str().unwrap()]));
+    let args = |extra: &[&str]| {
+        let mut a = vec!["brief", "--subject", "leaning", "--query", QUERY, "--lens", "decide", "--model", "m"];
+        a.extend(extra);
+        jg(w, &a)
+    };
+    let r = args(&["--neutral"]);
+    assert_eq!(code(&r), "leaked_recommendation", "{r}");
+    assert!(r["error"]["message"].as_str().unwrap().contains("Q1 option"), "{r}");
+    // without the flag nothing changes
+    assert_eq!(args(&[])["ok"], true);
+}
+
+#[test]
+fn brief_neutral_on_a_subject_that_is_not_a_decision_is_an_invalid_argument() {
+    let ws = installed();
+    let w = ws.path();
+    let f = w.join("p.md");
+    std::fs::write(&f, "# p\n").unwrap();
+    ok_(jg(w, &["subject", "add", "doc", "--kind", "document", "--attach", f.to_str().unwrap()]));
+    let r = jg(w, &["brief", "--subject", "doc", "--query", "1 builder=primary", "--lens", "critical", "--model", "m", "--neutral"]);
+    assert_eq!(code(&r), "invalid_arguments", "{r}");
+}
+fn ok_(v: Value) {
+    assert_eq!(v["ok"], true, "{v}");
+}
+
+#[test]
+fn the_summary_sizes_each_question_of_a_ballot_and_keeps_the_cost_line_last() {
+    let ws = world();
+    let run = run_id(ws.path());
+    let t = ok(jg(ws.path(), &["summary", &run.to_string(), "--width", "200"]))["text"].as_str().unwrap().to_string();
+    let lines: Vec<&str> = t.lines().filter(|l| l.starts_with("size, Q") || l.starts_with("cost:")).collect();
+    assert_eq!(lines.len(), 4, "three sizes and the total: {t}");
+    assert!(lines[0].starts_with("size, Q1: ") && lines[0].contains("bytes of question and options"), "{lines:?}");
+    assert!(lines[3].starts_with("cost:"), "the total stays last: {lines:?}");
+    // the percentages are shares of one ballot
+    let pct: u32 = lines[..3].iter().map(|l| l.split('(').nth(1).unwrap().split('%').next().unwrap().parse::<u32>().unwrap()).sum();
+    assert!((97..=100).contains(&pct), "{pct}: {lines:?}");
+}

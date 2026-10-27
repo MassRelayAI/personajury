@@ -24,6 +24,30 @@ pub const QUESTION_HUMAN_CLASSES: [&str; 10] =
 /// The classes a split between strata is never left with a jury on (C4).
 pub const SENSITIVE_CLASSES: [&str; 5] = ["money", "spending", "trust", "legal", "public-claim"];
 
+/// Phrases that tell a juror which option the author prefers (`brief --neutral`). Lower-case; matched against the lower-cased text.
+const LEANING: [&str; 10] = [
+    "(recommended)", "[recommended]", "recommended:", "we recommend", "we prefer", "i prefer", "our preference", "preferred option", "(preferred)", "(default)",
+];
+
+/// The lines of a questions file that carry a leaned-on option, as `Q2 option "..." (we prefer)`. Question text and options are read;
+/// an empty list means the ballot is neutral. Order: question order, text before options.
+pub fn leaning_hits(questions: &[Question]) -> Vec<String> {
+    let mut hits = Vec::new();
+    for q in questions {
+        let mut check = |what: &str, line: &str| {
+            let low = line.to_lowercase();
+            if let Some(m) = LEANING.iter().find(|m| low.contains(**m)) {
+                hits.push(format!("{} {what} \"{}\" ({})", q.id, line.trim(), m.trim_matches(|c| c == '(' || c == ')' || c == '[' || c == ']' || c == ':')));
+            }
+        };
+        check("question", &q.text);
+        for o in &q.options {
+            check("option", o);
+        }
+    }
+    hits
+}
+
 /// Why a questions file is refused: the class is missing, or any other break of the grammar.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum QuestionsError {
@@ -188,6 +212,29 @@ pub fn sensitive_classes(q: &Question) -> Vec<&'static str> {
                 }
         })
         .collect()
+}
+
+#[cfg(test)]
+mod leaning_tests {
+    use super::*;
+    fn q(id: &str, text: &str, options: &[&str]) -> Question {
+        Question { id: id.into(), class: "product".into(), text: text.into(), options: options.iter().map(|o| o.to_string()).collect() }
+    }
+    #[test]
+    fn a_marked_option_is_a_hit_and_a_plain_ballot_is_not() {
+        let plain = [q("Q1", "Which order?", &["Install first", "Account first"])];
+        assert!(leaning_hits(&plain).is_empty());
+        let marked = [q("Q1", "Which order?", &["Install first (Recommended)", "Account first"]), q("Q2", "Which price? We prefer the lower one", &["9", "12"])];
+        let hits = leaning_hits(&marked);
+        assert_eq!(hits.len(), 2, "{hits:?}");
+        assert!(hits[0].starts_with("Q1 option") && hits[0].contains("recommended"), "{hits:?}");
+        assert!(hits[1].starts_with("Q2 question") && hits[1].contains("we prefer"), "{hits:?}");
+    }
+    #[test]
+    fn the_word_recommend_alone_is_not_a_hit() {
+        let ok = [q("Q1", "Would you recommend this to a friend?", &["yes", "no"])];
+        assert!(leaning_hits(&ok).is_empty());
+    }
 }
 
 #[cfg(test)]

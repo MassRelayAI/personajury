@@ -45,6 +45,8 @@ pub struct BriefArgs {
     pub seats: Option<String>,
     /// `subject` or `attachments` (D32); none = by the subject's kind
     pub options: Option<String>,
+    /// refuse a decision ballot whose questions lean on an option (`leaked_recommendation`)
+    pub neutral: bool,
 }
 
 /// What the briefs of a run render of the personas' traits (D31).
@@ -909,6 +911,15 @@ pub fn compose(root: &Path, a: &BriefArgs) -> Result<Value> {
 
     // a decision subject (D37): its questions are the options, a pick is made per question, and nothing is compared
     let questions = if subject.kind == SubjectKind::Decision { super::decision::questions_of(root, &subject)? } else { vec![] };
+    if a.neutral {
+        if subject.kind != SubjectKind::Decision {
+            return Err(AppError::InvalidArguments("--neutral checks a decision's questions; this subject is not a decision".into()));
+        }
+        let hits = crate::domain::decision::leaning_hits(&questions);
+        if !hits.is_empty() {
+            return Err(Refusal::LeakedRecommendation { hits: hits.join("; ") }.into());
+        }
+    }
     if !questions.is_empty() {
         if a.options.is_some() {
             return Err(AppError::InvalidArguments("a decision jury's options are its questions; leave --options out".into()));

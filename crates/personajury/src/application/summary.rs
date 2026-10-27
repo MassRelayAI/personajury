@@ -144,6 +144,7 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
     // the picks, per stratum, as counts. A decision question asked in several runs is tallied once: each persona's latest
     // pick (the later run wins) counts, so a run that seated only some personas adds to the others instead of repeating them.
     let mut tally: Vec<(String, String, LatestPicks)> = Vec::new();
+    let mut sized: Vec<String> = Vec::new();
     for r in &given {
         let p = pick::show(root, r.id)?;
         for q in p["questions"].as_array().into_iter().flatten() {
@@ -191,6 +192,23 @@ fn gather(root: &Path, runs: &[i64], slice: Option<&str>) -> Result<(Facts, Vec<
                         }
                     }
                     None => f.needs_person.push((q, why)),
+                }
+            }
+            // the ballot's size per question (bytes of the question and its options), once per subject: tokens are never divided,
+            // jurors report one total each, so this is the measure that helps decide whether to split a ballot
+            if !sized.contains(&sub.name) {
+                sized.push(sub.name.clone());
+                let qs = super::decision::questions_of(root, &sub)?;
+                let size = |q: &crate::domain::decision::Question| q.text.len() + q.options.iter().map(String::len).sum::<usize>();
+                let total: usize = qs.iter().map(size).sum();
+                let lines: Vec<String> = qs
+                    .iter()
+                    .map(|q| format!("size, {}: {} bytes of question and options ({}% of the ballot's {total} bytes)", q.id, size(q), size(q) * 100 / total.max(1)))
+                    .collect();
+                // the total `cost:` line stays last
+                let at = f.cost_lines.len().saturating_sub(1);
+                for (i, l) in lines.into_iter().enumerate() {
+                    f.cost_lines.insert(at + i, l);
                 }
             }
             for m in super::decision::sources_mention(root, &sub)? {

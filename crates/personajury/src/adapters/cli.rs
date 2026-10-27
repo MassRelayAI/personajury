@@ -122,6 +122,9 @@ pub enum Cmd {
         /// also write ONE markdown file for a web chat: how to answer, then every brief; the run is sequential (D41)
         #[arg(long)]
         chat_pack: Option<PathBuf>,
+        /// refuse a decision ballot whose questions or options lean on an option ("(Recommended)", "we prefer", ...): `leaked_recommendation`
+        #[arg(long)]
+        neutral: bool,
     },
     /// Ingest one persona's verdict JSON for a run
     Verdict {
@@ -611,7 +614,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
             app::subject::add(root, name, kind(k)?, attach, true, audience)
         }
         Cmd::Brief {
-            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats, options, chat_pack,
+            subject, panel, query, lens, spend, stakes, model, comparators, detail: d, rule, draw, allow_large, reason, by, wave, effort, independence, traits, seats, options, chat_pack, neutral,
         } => {
             // D41: one chat reads every brief, so the run is sequential; a lens per pack, checked before anything is made
             let independence = independence.as_deref().map(parse_independence).transpose()?;
@@ -648,6 +651,7 @@ fn dispatch(cli: &Cli) -> app::Result<serde_json::Value> {
                     traits: traits.clone(),
                     seats: seats.clone(),
                     options: options.clone(),
+                    neutral: *neutral,
                 },
             )?;
             if let Some(p) = chat_pack {
